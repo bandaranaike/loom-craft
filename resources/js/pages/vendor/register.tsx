@@ -1,16 +1,22 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
-import { home, login } from '@/routes';
-import { store } from '@/routes/register';
+import { dashboard, home } from '@/routes';
+import { store } from '@/routes/vendor/register';
+
+type Props = {
+    status?: string;
+};
 
 const inputClassName =
     'w-full rounded-full border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] placeholder:text-[#7a5a3a]/70 shadow-[0_8px_20px_-18px_rgba(43,36,28,0.7)] focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20';
 
-export default function Register() {
+export default function VendorRegister() {
+    const { status } = usePage<Props>().props;
+
     return (
         <>
-            <Head title="Register">
+            <Head title="Vendor Registration">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
@@ -39,10 +45,10 @@ export default function Register() {
                         </Link>
                         <nav className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
                             <Link
-                                href={login()}
+                                href={dashboard()}
                                 className="rounded-full border border-[#2b241c] px-4 py-2 font-semibold text-[#2b241c] transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
                             >
-                                Log in
+                                Back to Dashboard
                             </Link>
                         </nav>
                     </header>
@@ -50,33 +56,33 @@ export default function Register() {
                     <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-4 lg:grid-cols-[1.05fr_0.95fr]">
                         <div className="space-y-6">
                             <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                Become a Patron
+                                Vendor Application
                             </p>
                             <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
-                                Join the LoomCraft collector circle.
+                                Apply to sell heritage pieces on LoomCraft.
                             </h1>
                             <p className="max-w-xl text-sm text-[#5a4a3a] md:text-base">
-                                Create your account to reserve limited releases, follow artisan
-                                stories, and access a curated marketplace dedicated to heritage
-                                weaving.
+                                Vendor approval is manual to preserve craft quality and
+                                provenance. Share your artisan profile and atelier details
+                                for review.
                             </p>
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-5">
                                     <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                        Vendor Approval
+                                        Commission
                                     </p>
                                     <p className="mt-3 text-sm text-[#5a4a3a]">
-                                        Artisan sellers are reviewed manually to protect the
-                                        heritage network.
+                                        A fixed 7% commission supports the marketplace and
+                                        artisan storytelling.
                                     </p>
                                 </div>
                                 <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-5">
                                     <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                        Transparent Pricing
+                                        Approval Process
                                     </p>
                                     <p className="mt-3 text-sm text-[#5a4a3a]">
-                                        The platform applies a fixed 7% commission across every
-                                        textile.
+                                        Every vendor application is reviewed by LoomCraft
+                                        curators.
                                     </p>
                                 </div>
                             </div>
@@ -87,116 +93,85 @@ export default function Register() {
                             <div className="relative rounded-[36px] border border-[#d4b28c] bg-[#f9efe2] p-8 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.6)]">
                                 <div className="space-y-2">
                                     <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                        Register
+                                        Vendor Profile
                                     </p>
                                     <h2 className="font-['Playfair_Display',serif] text-2xl">
-                                        Create an account
+                                        Registration details
                                     </h2>
                                     <p className="text-sm text-[#5a4a3a]">
-                                        Enter your details below to begin.
+                                        Submit your artisan profile for review.
                                     </p>
                                 </div>
 
+                                {status && (
+                                    <div className="mt-4 rounded-[24px] border border-[#b6623a]/40 bg-[#fff8ed] px-4 py-3 text-sm text-[#7a5a3a]">
+                                        {status}
+                                    </div>
+                                )}
+
                                 <Form
                                     {...store.form()}
-                                    resetOnSuccess={[
-                                        'password',
-                                        'password_confirmation',
-                                    ]}
-                                    disableWhileProcessing
                                     className="mt-6 grid gap-5"
                                 >
                                     {({ processing, errors }) => (
                                         <>
                                             <div className="grid gap-2">
                                                 <label
-                                                    htmlFor="name"
+                                                    htmlFor="display_name"
                                                     className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
                                                 >
-                                                    Name
+                                                    Display name
                                                 </label>
                                                 <input
-                                                    id="name"
+                                                    id="display_name"
                                                     type="text"
-                                                    required
-                                                    autoFocus
-                                                    tabIndex={1}
-                                                    autoComplete="name"
-                                                    name="name"
-                                                    placeholder="Full name"
+                                                    name="display_name"
+                                                    placeholder="Studio name"
                                                     className={inputClassName}
+                                                    required
                                                 />
                                                 <InputError
-                                                    message={errors.name}
+                                                    message={errors.display_name}
                                                     className="text-xs"
                                                 />
                                             </div>
 
                                             <div className="grid gap-2">
                                                 <label
-                                                    htmlFor="email"
+                                                    htmlFor="location"
                                                     className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
                                                 >
-                                                    Email address
+                                                    Location
                                                 </label>
                                                 <input
-                                                    id="email"
-                                                    type="email"
-                                                    required
-                                                    tabIndex={2}
-                                                    autoComplete="email"
-                                                    name="email"
-                                                    placeholder="email@example.com"
+                                                    id="location"
+                                                    type="text"
+                                                    name="location"
+                                                    placeholder="Kandy, Sri Lanka"
                                                     className={inputClassName}
                                                 />
                                                 <InputError
-                                                    message={errors.email}
+                                                    message={errors.location}
                                                     className="text-xs"
                                                 />
                                             </div>
 
                                             <div className="grid gap-2">
                                                 <label
-                                                    htmlFor="password"
+                                                    htmlFor="bio"
                                                     className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
                                                 >
-                                                    Password
+                                                    Artisan bio
                                                 </label>
-                                                <input
-                                                    id="password"
-                                                    type="password"
-                                                    required
-                                                    tabIndex={3}
-                                                    autoComplete="new-password"
-                                                    name="password"
-                                                    placeholder="Password"
-                                                    className={inputClassName}
+                                                <textarea
+                                                    id="bio"
+                                                    name="bio"
+                                                    rows={5}
+                                                    placeholder="Share your weaving lineage, materials, and atelier story."
+                                                    className="w-full rounded-[24px] border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] placeholder:text-[#7a5a3a]/70 shadow-[0_8px_20px_-18px_rgba(43,36,28,0.7)] focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
                                                 />
                                                 <InputError
-                                                    message={errors.password}
-                                                    className="text-xs"
-                                                />
-                                            </div>
-
-                                            <div className="grid gap-2">
-                                                <label
-                                                    htmlFor="password_confirmation"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
-                                                >
-                                                    Confirm password
-                                                </label>
-                                                <input
-                                                    id="password_confirmation"
-                                                    type="password"
-                                                    required
-                                                    tabIndex={4}
-                                                    autoComplete="new-password"
-                                                    name="password_confirmation"
-                                                    placeholder="Confirm password"
-                                                    className={inputClassName}
-                                                />
-                                                <InputError
-                                                    message={errors.password_confirmation}
+                                                    message={errors.bio}
                                                     className="text-xs"
                                                 />
                                             </div>
@@ -204,28 +179,19 @@ export default function Register() {
                                             <button
                                                 type="submit"
                                                 className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#2b241c] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f6f1e8] transition hover:-translate-y-0.5 hover:bg-[#3a2f25] disabled:cursor-not-allowed disabled:opacity-70"
-                                                tabIndex={5}
-                                                data-test="register-user-button"
+                                                disabled={processing}
                                             >
                                                 {processing && (
                                                     <Spinner className="text-[#f6f1e8]" />
                                                 )}
-                                                Create account
+                                                Submit for Review
                                             </button>
+                                            <p className="text-center text-xs uppercase tracking-[0.25em] text-[#7a5a3a]">
+                                                Submissions open to approved patrons only.
+                                            </p>
                                         </>
                                     )}
                                 </Form>
-
-                                <div className="mt-6 text-center text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                    Already have an account?{' '}
-                                    <Link
-                                        href={login()}
-                                        className="font-semibold text-[#2b241c]"
-                                        tabIndex={6}
-                                    >
-                                        Log in
-                                    </Link>
-                                </div>
                             </div>
                         </div>
                     </section>
