@@ -12,6 +12,10 @@ class ApproveVendor
     {
         Gate::authorize('approve', $data->vendor);
 
+        $data->vendor->user()->update([
+            'role' => 'vendor',
+        ]);
+
         $data->vendor->forceFill([
             'status' => 'approved',
             'approved_at' => now(),

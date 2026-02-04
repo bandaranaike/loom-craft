@@ -1,5 +1,12 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, ShieldCheck } from 'lucide-react';
+import {
+    BookOpen,
+    Folder,
+    LayoutGrid,
+    Package,
+    ShieldCheck,
+    Video,
+} from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -13,7 +20,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { connect as adminYouTubeConnect } from '@/routes/admin/youtube';
 import { pending as adminVendorsPending } from '@/routes/admin/vendors';
+import { index as vendorProductsIndex } from '@/routes/vendor/products';
 import type { NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
 
@@ -33,6 +42,7 @@ const footerNavItems: NavItem[] = [
 export function AppSidebar() {
     const { auth } = usePage<SharedData>().props;
     const isAdmin = auth?.user?.role === 'admin';
+    const isVendor = auth?.user?.role === 'vendor';
 
     const mainNavItems: NavItem[] = [
         {
@@ -46,6 +56,20 @@ export function AppSidebar() {
                       title: 'Vendor Approvals',
                       href: adminVendorsPending(),
                       icon: ShieldCheck,
+                  },
+                  {
+                      title: 'YouTube Connect',
+                      href: adminYouTubeConnect(),
+                      icon: Video,
+                  },
+              ]
+            : []),
+        ...(isVendor
+            ? [
+                  {
+                      title: 'My Products',
+                      href: vendorProductsIndex(),
+                      icon: Package,
                   },
               ]
             : []),

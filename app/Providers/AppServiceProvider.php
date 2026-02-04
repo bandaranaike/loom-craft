@@ -2,9 +2,16 @@
 
 namespace App\Providers;
 
+use App\Contracts\VideoUploader;
+use App\Models\Product;
+use App\Models\User;
 use App\Models\Vendor;
+use App\Policies\AdminPolicy;
+use App\Policies\ProductPolicy;
 use App\Policies\VendorPolicy;
+use App\Services\Video\YouTubeVideoUploader;
 use Carbon\CarbonImmutable;
+use Google\Client;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -18,7 +25,26 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(Client::class, function (): Client {
+            $client = new Client;
+            $client->setClientId(config('services.youtube.client_id'));
+            $client->setClientSecret(config('services.youtube.client_secret'));
+
+            return $client;
+        });
+
+        $this->app->bind(VideoUploader::class, function (): YouTubeVideoUploader {
+            $client = app(Client::class);
+            $refreshToken = config('services.youtube.refresh_token');
+
+            if (is_string($refreshToken) && $refreshToken !== '') {
+                $client->setAccessToken([
+                    'refresh_token' => $refreshToken,
+                ]);
+            }
+
+            return new YouTubeVideoUploader($client);
+        });
     }
 
     /**
@@ -51,6 +77,8 @@ class AppServiceProvider extends ServiceProvider
 
     protected function registerPolicies(): void
     {
+        Gate::policy(User::class, AdminPolicy::class);
+        Gate::policy(Product::class, ProductPolicy::class);
         Gate::policy(Vendor::class, VendorPolicy::class);
     }
 }

@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { dashboard, login, register } from '@/routes';
+import { index as productsIndex } from '@/routes/products';
 import type { SharedData } from '@/types';
 
 const highlights = [
@@ -91,6 +92,12 @@ export default function Welcome({
                             </div>
                         </div>
                         <nav className="flex flex-wrap items-center gap-3 text-sm">
+                            <Link
+                                href={productsIndex().url}
+                                className="rounded-full border border-transparent px-4 py-2 font-medium text-[#2b241c]/70 transition hover:border-[#2b241c] hover:text-[#2b241c]"
+                            >
+                                Browse Products
+                            </Link>
                             {auth.user ? (
                                 <Link
                                     href={dashboard()}
@@ -133,6 +140,12 @@ export default function Welcome({
                                 provenance, authentic materials, and a heritage-first story.
                             </p>
                             <div className="flex flex-wrap items-center gap-4">
+                                <Link
+                                    href={productsIndex().url}
+                                    className="rounded-full border border-[#2b241c] px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#2b241c] transition hover:-translate-y-0.5 hover:bg-[#2b241c] hover:text-[#f6f1e8]"
+                                >
+                                    Browse Products
+                                </Link>
                                 {auth.user ? (
                                     <Link
                                         href={dashboard()}

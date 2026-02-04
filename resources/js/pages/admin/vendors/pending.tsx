@@ -1,4 +1,4 @@
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
@@ -15,9 +15,28 @@ type VendorItem = {
     user_email: string;
 };
 
+type PaginationLink = {
+    url: string | null;
+    label: string;
+    active: boolean;
+};
+
+type Pagination = {
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
+    from: number | null;
+    to: number | null;
+    links: PaginationLink[];
+};
+
 type Props = {
     vendors: VendorItem[];
     status?: string;
+    search?: string | null;
+    per_page: number;
+    pagination: Pagination;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -27,8 +46,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const perPageOptions = [10, 25, 50];
+
 export default function PendingVendors() {
-    const { vendors, status } = usePage<Props>().props;
+    const { vendors, status, search, pagination, per_page } =
+        usePage<Props>().props;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -41,16 +63,74 @@ export default function PendingVendors() {
                 )}
 
                 <div className="rounded-xl border border-sidebar-border/70 bg-sidebar/30 p-6 dark:border-sidebar-border">
-                    <div className="flex flex-col gap-2">
-                        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                            Review Queue
-                        </p>
-                        <h2 className="text-2xl font-semibold text-foreground">
-                            Vendor applications awaiting approval
-                        </h2>
-                        <p className="text-sm text-muted-foreground">
-                            Approve artisans once their profile and documentation are verified.
-                        </p>
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex flex-col gap-2">
+                            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                                Review Queue
+                            </p>
+                            <h2 className="text-2xl font-semibold text-foreground">
+                                Vendor applications awaiting approval
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                                Approve artisans once their profile and documentation are verified.
+                            </p>
+                        </div>
+                        <div className="flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                            <Form
+                                {...adminVendorsPending.form()}
+                                className="flex w-full max-w-md items-center gap-3"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="per_page"
+                                    value={per_page}
+                                />
+                                <input
+                                    type="search"
+                                    name="search"
+                                    placeholder="Search by display name"
+                                    defaultValue={search ?? ''}
+                                    className="w-full rounded-full border border-sidebar-border/70 bg-background px-4 py-2 text-sm text-foreground shadow-xs focus:border-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 dark:border-sidebar-border"
+                                />
+                                <button
+                                    type="submit"
+                                    className="inline-flex shrink-0 items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"
+                                >
+                                    Search
+                                </button>
+                            </Form>
+                            <Form
+                                {...adminVendorsPending.form()}
+                                className="flex items-center gap-2"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="search"
+                                    value={search ?? ''}
+                                />
+                                <label
+                                    htmlFor="per_page"
+                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground"
+                                >
+                                    Per page
+                                </label>
+                                <select
+                                    id="per_page"
+                                    name="per_page"
+                                    defaultValue={per_page}
+                                    className="rounded-full border border-sidebar-border/70 bg-background px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground shadow-xs focus:border-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 dark:border-sidebar-border"
+                                    onChange={(event) => {
+                                        event.currentTarget.form?.requestSubmit();
+                                    }}
+                                >
+                                    {perPageOptions.map((option) => (
+                                        <option key={option} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                            </Form>
+                        </div>
                     </div>
                 </div>
 
@@ -153,6 +233,46 @@ export default function PendingVendors() {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                )}
+
+                {pagination.last_page > 1 && (
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sidebar-border/70 bg-sidebar/20 px-4 py-3 text-xs text-muted-foreground dark:border-sidebar-border">
+                        <div>
+                            Showing {pagination.from ?? 0} - {pagination.to ?? 0} of{' '}
+                            {pagination.total}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {pagination.links.map((link) => {
+                                const key = `${link.label}-${link.url}`;
+                                const baseClass =
+                                    'rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] transition';
+                                if (!link.url) {
+                                    return (
+                                        <span
+                                            key={key}
+                                            className={`${baseClass} border-sidebar-border/60 text-muted-foreground/60`}
+                                        >
+                                            {link.label}
+                                        </span>
+                                    );
+                                }
+
+                                return (
+                                    <Link
+                                        key={key}
+                                        href={link.url}
+                                        className={`${baseClass} ${
+                                            link.active
+                                                ? 'border-foreground bg-foreground text-background'
+                                                : 'border-foreground/50 text-foreground hover:bg-foreground hover:text-background'
+                                        }`}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                );
+                            })}
+                        </div>
                     </div>
                 )}
             </div>
