@@ -11,6 +11,23 @@ final readonly class Money
         return new self(self::normalize($amount));
     }
 
+    public function multiply(int|float $multiplier): self
+    {
+        $base = (float) $this->amount;
+        $result = $base * $multiplier;
+
+        return new self(self::normalize((string) $result));
+    }
+
+    public function percentageOf(string $rate): self
+    {
+        $base = (float) $this->amount;
+        $percentage = (float) $rate;
+        $result = $base * ($percentage / 100);
+
+        return new self(self::normalize((string) $result));
+    }
+
     public function addPercentage(string $rate): self
     {
         $base = (float) $this->amount;

@@ -10,6 +10,7 @@ use Google\Service\YouTube\Video;
 use Google\Service\YouTube\VideoSnippet;
 use Google\Service\YouTube\VideoStatus;
 use Illuminate\Http\UploadedFile;
+use RuntimeException;
 
 class YouTubeVideoUploader implements VideoUploader
 {
@@ -47,7 +48,7 @@ class YouTubeVideoUploader implements VideoUploader
         $videoId = $response->getId();
 
         if (! $videoId) {
-            throw new \RuntimeException('YouTube upload failed: missing video ID.');
+            throw new RuntimeException('YouTube upload failed: missing video ID.');
         }
 
         return "https://www.youtube.com/watch?v={$videoId}";

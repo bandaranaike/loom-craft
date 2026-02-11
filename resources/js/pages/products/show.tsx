@@ -1,6 +1,10 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { dashboard, home, login, register } from '@/routes';
+import { show as cartShow } from '@/routes/cart';
+import { store as cartItemStore } from '@/routes/cart/items';
+import InputError from '@/components/input-error';
 import type { SharedData } from '@/types';
+import type { FormEvent } from 'react';
 
 type ProductImage = {
     type: 'image';
@@ -61,6 +65,18 @@ export default function ProductShow({
     const { auth } = usePage<SharedData>().props;
     const primaryImage = product.images[0];
     const dimensionLabel = formatDimensions(product.dimensions);
+    const form = useForm({
+        product_id: product.id,
+        quantity: 1,
+        currency: 'USD',
+    });
+
+    const submit = (event: FormEvent) => {
+        event.preventDefault();
+        form.post(cartItemStore().url, {
+            preserveScroll: true,
+        });
+    };
 
     return (
         <>
@@ -185,6 +201,51 @@ export default function ProductShow({
                                     Vendor base price {product.vendor_price} USD + 7% commission.
                                 </p>
                             </div>
+                            <form onSubmit={submit} className="grid gap-4 rounded-[32px] border border-[#e0c7a7] bg-[#f9efe2] p-6">
+                                <div className="flex flex-wrap items-center justify-between gap-4">
+                                    <div>
+                                        <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            Reserve this piece
+                                        </p>
+                                        <p className="mt-1 text-sm text-[#5a4a3a]">
+                                            Choose a quantity to add to your cart.
+                                        </p>
+                                    </div>
+                                    <Link
+                                        href={cartShow()}
+                                        className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a] underline"
+                                    >
+                                        View cart
+                                    </Link>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-4">
+                                    <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                        Quantity
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        name="quantity"
+                                        value={form.data.quantity}
+                                        onChange={(event) =>
+                                            form.setData(
+                                                'quantity',
+                                                Number(event.target.value),
+                                            )
+                                        }
+                                        className="w-24 rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={form.processing}
+                                        className="inline-flex items-center justify-center rounded-full border border-[#2b241c] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] transition hover:bg-[#2b241c] hover:text-[#f6f1e8] disabled:cursor-not-allowed disabled:opacity-70"
+                                    >
+                                        {form.processing ? 'Adding...' : 'Add to cart'}
+                                    </button>
+                                </div>
+                                <InputError message={form.errors.quantity} />
+                                <InputError message={form.errors.product_id} />
+                            </form>
                             <p className="text-base text-[#5a4a3a]">
                                 {product.description}
                             </p>

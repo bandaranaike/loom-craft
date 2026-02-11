@@ -6,10 +6,7 @@ use App\Http\Requests\Product\IndexPublicProductsRequest;
 
 class ProductPublicIndexData
 {
-    public function __construct(
-        public ?string $search,
-        public int $perPage,
-    ) {}
+    public function __construct(public ?string $search, public int $perPage) {}
 
     public static function fromRequest(IndexPublicProductsRequest $request): self
     {
