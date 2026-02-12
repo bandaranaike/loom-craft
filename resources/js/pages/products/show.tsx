@@ -1,9 +1,8 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { dashboard, home, login, register } from '@/routes';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { show as cartShow } from '@/routes/cart';
 import { store as cartItemStore } from '@/routes/cart/items';
 import InputError from '@/components/input-error';
-import type { SharedData } from '@/types';
+import PublicSiteLayout from '@/layouts/public-site-layout';
 import type { FormEvent } from 'react';
 
 type ProductImage = {
@@ -62,7 +61,6 @@ export default function ProductShow({
     product,
     canRegister = true,
 }: ProductShowProps) {
-    const { auth } = usePage<SharedData>().props;
     const primaryImage = product.images[0];
     const dimensionLabel = formatDimensions(product.dimensions);
     const form = useForm({
@@ -87,55 +85,7 @@ export default function ProductShow({
                     rel="stylesheet"
                 />
             </Head>
-            <div className="min-h-screen bg-[#F6F1E8] text-[#2b241c]">
-                <div className="relative overflow-hidden">
-                    <div className="pointer-events-none absolute -left-40 top-0 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_top,_#c77b45,_transparent_65%)] opacity-40" />
-                    <div className="pointer-events-none absolute -right-32 top-20 h-[360px] w-[360px] rounded-full bg-[radial-gradient(circle,_#a14d2a,_transparent_68%)] opacity-30" />
-                    <div className="pointer-events-none absolute bottom-0 left-1/2 h-[320px] w-[720px] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(ellipse_at_center,_#e0c7a7,_transparent_70%)] opacity-60" />
-
-                    <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 pb-6 pt-8">
-                        <Link href={home()} className="flex items-center gap-3">
-                            <div className="grid h-12 w-12 place-items-center rounded-full border border-[#2b241c] bg-[#f2e4d4] text-lg font-semibold tracking-[0.08em]">
-                                LC
-                            </div>
-                            <div>
-                                <p className="text-sm uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                    LoomCraft
-                                </p>
-                                <p className="font-['Playfair_Display',serif] text-xl">
-                                    Woven Heritage House
-                                </p>
-                            </div>
-                        </Link>
-                        <nav className="flex flex-wrap items-center gap-3 text-sm">
-                            {auth.user ? (
-                                <Link
-                                    href={dashboard()}
-                                    className="rounded-full border border-[#2b241c] px-4 py-2 font-medium transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
-                                >
-                                    Enter Atelier
-                                </Link>
-                            ) : (
-                                <>
-                                    <Link
-                                        href={login()}
-                                        className="rounded-full border border-transparent px-4 py-2 font-medium text-[#2b241c]/70 transition hover:border-[#2b241c] hover:text-[#2b241c]"
-                                    >
-                                        Log in
-                                    </Link>
-                                    {canRegister && (
-                                        <Link
-                                            href={register()}
-                                            className="rounded-full border border-[#2b241c] px-4 py-2 font-medium transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
-                                        >
-                                            Become a Patron
-                                        </Link>
-                                    )}
-                                </>
-                            )}
-                        </nav>
-                    </header>
-
+            <PublicSiteLayout canRegister={canRegister}>
                     <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-6 lg:grid-cols-[1.05fr_0.95fr]">
                         <div className="grid gap-6">
                             <div className="rounded-[36px] border border-[#d4b28c] bg-[#f9efe2] p-6 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.6)]">
@@ -305,7 +255,6 @@ export default function ProductShow({
                             </div>
                         </div>
                     </section>
-                </div>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-20">
                     <div className="grid gap-8 rounded-[48px] border border-[#e0c7a7] bg-[#fff8ed] p-10 md:grid-cols-3">
@@ -347,7 +296,7 @@ export default function ProductShow({
                         </div>
                     </div>
                 </section>
-            </div>
+            </PublicSiteLayout>
         </>
     );
 }

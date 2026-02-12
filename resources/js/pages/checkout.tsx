@@ -1,10 +1,10 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { dashboard, home, login, register } from '@/routes';
-import { store as checkoutStore } from '@/routes/checkout';
-import { show as cartShow } from '@/routes/cart';
-import InputError from '@/components/input-error';
-import type { SharedData } from '@/types';
 import { useState, type FormEvent } from 'react';
+import InputError from '@/components/input-error';
+import PublicSiteLayout from '@/layouts/public-site-layout';
+import { show as cartShow } from '@/routes/cart';
+import { store as checkoutStore } from '@/routes/checkout';
+import type { SharedData } from '@/types';
 
 type CartItem = {
     id: number;
@@ -99,7 +99,9 @@ export default function CheckoutPage({
                       billing_phone: data.shipping_phone,
                   }
                 : data,
-        ).post(checkoutStore().url, {
+        );
+
+        form.post(checkoutStore().url, {
             preserveScroll: true,
         });
     };
@@ -113,58 +115,10 @@ export default function CheckoutPage({
                     rel="stylesheet"
                 />
             </Head>
-            <div className="min-h-screen bg-[#F6F1E8] text-[#2b241c]">
-                <div className="relative overflow-hidden">
-                    <div className="pointer-events-none absolute -left-40 top-0 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_top,_#c77b45,_transparent_65%)] opacity-40" />
-                    <div className="pointer-events-none absolute -right-32 top-20 h-[360px] w-[360px] rounded-full bg-[radial-gradient(circle,_#a14d2a,_transparent_68%)] opacity-30" />
-                    <div className="pointer-events-none absolute bottom-0 left-1/2 h-[320px] w-[720px] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(ellipse_at_center,_#e0c7a7,_transparent_70%)] opacity-60" />
-
-                    <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 pb-6 pt-8">
-                        <Link href={home()} className="flex items-center gap-3">
-                            <div className="grid h-12 w-12 place-items-center rounded-full border border-[#2b241c] bg-[#f2e4d4] text-lg font-semibold tracking-[0.08em]">
-                                LC
-                            </div>
-                            <div>
-                                <p className="text-sm uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                    LoomCraft
-                                </p>
-                                <p className="font-['Playfair_Display',serif] text-xl">
-                                    Woven Heritage House
-                                </p>
-                            </div>
-                        </Link>
-                        <nav className="flex flex-wrap items-center gap-3 text-sm">
-                            {auth.user ? (
-                                <Link
-                                    href={dashboard()}
-                                    className="rounded-full border border-[#2b241c] px-4 py-2 font-medium transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
-                                >
-                                    Enter Atelier
-                                </Link>
-                            ) : (
-                                <>
-                                    <Link
-                                        href={login()}
-                                        className="rounded-full border border-transparent px-4 py-2 font-medium text-[#2b241c]/70 transition hover:border-[#2b241c] hover:text-[#2b241c]"
-                                    >
-                                        Log in
-                                    </Link>
-                                    {canRegister && (
-                                        <Link
-                                            href={register()}
-                                            className="rounded-full border border-[#2b241c] px-4 py-2 font-medium transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
-                                        >
-                                            Become a Patron
-                                        </Link>
-                                    )}
-                                </>
-                            )}
-                        </nav>
-                    </header>
-
-                    <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <PublicSiteLayout canRegister={canRegister}>
+                    <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-4 pb-16 lg:grid-cols-[1.2fr_0.8fr]">
                         <div className="space-y-6">
-                            <div className="inline-flex items-center gap-3 rounded-full border border-[#d4b28c] bg-[#f9efe2] px-4 py-2 text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            <div className="inline-flex items-center gap-3 rounded-full border border-[#d4b28c] bg-[#f9efe2] px-4 py-2 text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                 Checkout Atelier
                             </div>
                             <div>
@@ -172,20 +126,20 @@ export default function CheckoutPage({
                                     Confirm your heritage order
                                 </h1>
                                 <p className="mt-3 text-sm text-[#5a4a3a]">
-                                    Provide shipping and billing details to secure your
-                                    curated pieces.
+                                    Provide shipping and billing details to
+                                    secure your curated pieces.
                                 </p>
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {!auth.user && (
                                     <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6">
-                                        <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                        <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                             Guest information
                                         </p>
                                         <div className="mt-4 grid gap-4 md:grid-cols-2">
                                             <div className="space-y-2">
-                                                <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                                <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                     Full name
                                                 </label>
                                                 <input
@@ -198,57 +152,74 @@ export default function CheckoutPage({
                                                             event.target.value,
                                                         )
                                                     }
-                                                    className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                    className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                                 />
-                                                <InputError message={form.errors.guest_name} />
+                                                <InputError
+                                                    message={
+                                                        form.errors.guest_name
+                                                    }
+                                                />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                                <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                     Email address
                                                 </label>
                                                 <input
                                                     type="email"
                                                     name="guest_email"
-                                                    value={form.data.guest_email}
+                                                    value={
+                                                        form.data.guest_email
+                                                    }
                                                     onChange={(event) =>
                                                         form.setData(
                                                             'guest_email',
                                                             event.target.value,
                                                         )
                                                     }
-                                                    className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                    className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                                 />
-                                                <InputError message={form.errors.guest_email} />
+                                                <InputError
+                                                    message={
+                                                        form.errors.guest_email
+                                                    }
+                                                />
                                             </div>
                                         </div>
                                     </div>
                                 )}
 
                                 <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                    <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                         Shipping details
                                     </p>
                                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Recipient name
                                             </label>
                                             <input
                                                 type="text"
                                                 name="shipping_full_name"
-                                                value={form.data.shipping_full_name}
+                                                value={
+                                                    form.data.shipping_full_name
+                                                }
                                                 onChange={(event) =>
                                                     form.setData(
                                                         'shipping_full_name',
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                             />
-                                            <InputError message={form.errors.shipping_full_name} />
+                                            <InputError
+                                                message={
+                                                    form.errors
+                                                        .shipping_full_name
+                                                }
+                                            />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Phone (optional)
                                             </label>
                                             <input
@@ -261,12 +232,12 @@ export default function CheckoutPage({
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                             />
                                         </div>
                                     </div>
                                     <div className="mt-4 space-y-2">
-                                        <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                        <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                             Address line 1
                                         </label>
                                         <input
@@ -279,12 +250,14 @@ export default function CheckoutPage({
                                                     event.target.value,
                                                 )
                                             }
-                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                         />
-                                        <InputError message={form.errors.shipping_line1} />
+                                        <InputError
+                                            message={form.errors.shipping_line1}
+                                        />
                                     </div>
                                     <div className="mt-4 space-y-2">
-                                        <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                        <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                             Address line 2 (optional)
                                         </label>
                                         <input
@@ -297,12 +270,12 @@ export default function CheckoutPage({
                                                     event.target.value,
                                                 )
                                             }
-                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                         />
                                     </div>
                                     <div className="mt-4 grid gap-4 md:grid-cols-3">
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 City
                                             </label>
                                             <input
@@ -315,86 +288,111 @@ export default function CheckoutPage({
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                             />
-                                            <InputError message={form.errors.shipping_city} />
+                                            <InputError
+                                                message={
+                                                    form.errors.shipping_city
+                                                }
+                                            />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Region
                                             </label>
                                             <input
                                                 type="text"
                                                 name="shipping_region"
-                                                value={form.data.shipping_region}
+                                                value={
+                                                    form.data.shipping_region
+                                                }
                                                 onChange={(event) =>
                                                     form.setData(
                                                         'shipping_region',
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Postal code
                                             </label>
                                             <input
                                                 type="text"
                                                 name="shipping_postal_code"
-                                                value={form.data.shipping_postal_code}
+                                                value={
+                                                    form.data
+                                                        .shipping_postal_code
+                                                }
                                                 onChange={(event) =>
                                                     form.setData(
                                                         'shipping_postal_code',
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                             />
                                         </div>
                                     </div>
                                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Country code
                                             </label>
                                             <input
                                                 type="text"
                                                 name="shipping_country_code"
-                                                value={form.data.shipping_country_code}
+                                                value={
+                                                    form.data
+                                                        .shipping_country_code
+                                                }
                                                 onChange={(event) =>
                                                     form.setData(
                                                         'shipping_country_code',
                                                         event.target.value.toUpperCase(),
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm uppercase text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] uppercase shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                             />
-                                            <InputError message={form.errors.shipping_country_code} />
+                                            <InputError
+                                                message={
+                                                    form.errors
+                                                        .shipping_country_code
+                                                }
+                                            />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Shipping responsibility
                                             </label>
                                             <select
                                                 name="shipping_responsibility"
-                                                value={form.data.shipping_responsibility}
+                                                value={
+                                                    form.data
+                                                        .shipping_responsibility
+                                                }
                                                 onChange={(event) =>
                                                     form.setData(
                                                         'shipping_responsibility',
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-xs font-semibold tracking-[0.3em] text-[#2b241c] uppercase shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                             >
-                                                {shipping_responsibilities.map((option) => (
-                                                    <option key={option} value={option}>
-                                                        {option === 'vendor'
-                                                            ? 'Vendor handled'
-                                                            : 'Platform handled'}
-                                                    </option>
-                                                ))}
+                                                {shipping_responsibilities.map(
+                                                    (option) => (
+                                                        <option
+                                                            key={option}
+                                                            value={option}
+                                                        >
+                                                            {option === 'vendor'
+                                                                ? 'Vendor handled'
+                                                                : 'Platform handled'}
+                                                        </option>
+                                                    ),
+                                                )}
                                             </select>
                                         </div>
                                     </div>
@@ -402,13 +400,17 @@ export default function CheckoutPage({
 
                                 <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6">
                                     <div className="flex flex-wrap items-center justify-between gap-4">
-                                        <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                        <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                             Billing details
                                         </p>
                                         <button
                                             type="button"
-                                            onClick={() => setMirrorBilling((prev) => !prev)}
-                                            className="rounded-full border border-[#7a5a3a] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a] transition hover:bg-[#7a5a3a] hover:text-[#f6f1e8]"
+                                            onClick={() =>
+                                                setMirrorBilling(
+                                                    (prev) => !prev,
+                                                )
+                                            }
+                                            className="rounded-full border border-[#7a5a3a] px-4 py-2 text-xs font-semibold tracking-[0.3em] text-[#7a5a3a] uppercase transition hover:bg-[#7a5a3a] hover:text-[#f6f1e8]"
                                         >
                                             {mirrorBilling
                                                 ? 'Use distinct billing'
@@ -417,13 +419,15 @@ export default function CheckoutPage({
                                     </div>
                                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Billing name
                                             </label>
                                             <input
                                                 type="text"
                                                 name="billing_full_name"
-                                                value={form.data.billing_full_name}
+                                                value={
+                                                    form.data.billing_full_name
+                                                }
                                                 onChange={(event) =>
                                                     form.setData(
                                                         'billing_full_name',
@@ -431,12 +435,17 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20 disabled:opacity-70"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
                                             />
-                                            <InputError message={form.errors.billing_full_name} />
+                                            <InputError
+                                                message={
+                                                    form.errors
+                                                        .billing_full_name
+                                                }
+                                            />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Billing phone
                                             </label>
                                             <input
@@ -450,12 +459,12 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20 disabled:opacity-70"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
                                             />
                                         </div>
                                     </div>
                                     <div className="mt-4 space-y-2">
-                                        <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                        <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                             Address line 1
                                         </label>
                                         <input
@@ -469,12 +478,14 @@ export default function CheckoutPage({
                                                 )
                                             }
                                             disabled={mirrorBilling}
-                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20 disabled:opacity-70"
+                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
                                         />
-                                        <InputError message={form.errors.billing_line1} />
+                                        <InputError
+                                            message={form.errors.billing_line1}
+                                        />
                                     </div>
                                     <div className="mt-4 space-y-2">
-                                        <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                        <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                             Address line 2 (optional)
                                         </label>
                                         <input
@@ -488,12 +499,12 @@ export default function CheckoutPage({
                                                 )
                                             }
                                             disabled={mirrorBilling}
-                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20 disabled:opacity-70"
+                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
                                         />
                                     </div>
                                     <div className="mt-4 grid gap-4 md:grid-cols-3">
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 City
                                             </label>
                                             <input
@@ -507,12 +518,16 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20 disabled:opacity-70"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
                                             />
-                                            <InputError message={form.errors.billing_city} />
+                                            <InputError
+                                                message={
+                                                    form.errors.billing_city
+                                                }
+                                            />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Region
                                             </label>
                                             <input
@@ -526,17 +541,20 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20 disabled:opacity-70"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Postal code
                                             </label>
                                             <input
                                                 type="text"
                                                 name="billing_postal_code"
-                                                value={form.data.billing_postal_code}
+                                                value={
+                                                    form.data
+                                                        .billing_postal_code
+                                                }
                                                 onChange={(event) =>
                                                     form.setData(
                                                         'billing_postal_code',
@@ -544,19 +562,22 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20 disabled:opacity-70"
-                                        />
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
+                                            />
                                         </div>
                                     </div>
                                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Country code
                                             </label>
                                             <input
                                                 type="text"
                                                 name="billing_country_code"
-                                                value={form.data.billing_country_code}
+                                                value={
+                                                    form.data
+                                                        .billing_country_code
+                                                }
                                                 onChange={(event) =>
                                                     form.setData(
                                                         'billing_country_code',
@@ -564,12 +585,17 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm uppercase text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20 disabled:opacity-70"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] uppercase shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
                                             />
-                                            <InputError message={form.errors.billing_country_code} />
+                                            <InputError
+                                                message={
+                                                    form.errors
+                                                        .billing_country_code
+                                                }
+                                            />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                                 Payment method
                                             </label>
                                             <select
@@ -581,24 +607,35 @@ export default function CheckoutPage({
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-xs font-semibold tracking-[0.3em] text-[#2b241c] uppercase shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
                                             >
-                                                {payment_methods.map((method) => (
-                                                    <option key={method} value={method}>
-                                                        {defaultPaymentLabel(method)}
-                                                    </option>
-                                                ))}
+                                                {payment_methods.map(
+                                                    (method) => (
+                                                        <option
+                                                            key={method}
+                                                            value={method}
+                                                        >
+                                                            {defaultPaymentLabel(
+                                                                method,
+                                                            )}
+                                                        </option>
+                                                    ),
+                                                )}
                                             </select>
                                         </div>
                                     </div>
                                 </div>
 
-                                <input type="hidden" name="currency" value={form.data.currency} />
+                                <input
+                                    type="hidden"
+                                    name="currency"
+                                    value={form.data.currency}
+                                />
 
                                 <button
                                     type="submit"
                                     disabled={form.processing}
-                                    className="inline-flex w-full items-center justify-center rounded-full border border-[#2b241c] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] transition hover:bg-[#2b241c] hover:text-[#f6f1e8] disabled:cursor-not-allowed disabled:opacity-70"
+                                    className="inline-flex w-full items-center justify-center rounded-full border border-[#2b241c] px-4 py-3 text-xs font-semibold tracking-[0.3em] text-[#2b241c] uppercase transition hover:bg-[#2b241c] hover:text-[#f6f1e8] disabled:cursor-not-allowed disabled:opacity-70"
                                 >
                                     {form.processing
                                         ? 'Securing order...'
@@ -609,12 +646,12 @@ export default function CheckoutPage({
 
                         <aside className="rounded-[32px] border border-[#d4b28c] bg-[#f9efe2] p-6 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.6)]">
                             <div className="flex items-center justify-between">
-                                <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
                                     Order Summary
                                 </p>
                                 <Link
                                     href={cartShow()}
-                                    className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a] underline"
+                                    className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase underline"
                                 >
                                     Edit cart
                                 </Link>
@@ -625,24 +662,26 @@ export default function CheckoutPage({
                                         <p className="text-sm font-semibold">
                                             {item.name}
                                         </p>
-                                        <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                            {item.vendor_name} • {item.quantity} × {item.unit_price}
+                                        <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            {item.vendor_name} • {item.quantity}{' '}
+                                            × {item.unit_price}
                                         </p>
                                         <p className="text-sm text-[#2b241c]">
-                                            Line total {item.line_total} {cart.currency}
+                                            Line total {item.line_total}{' '}
+                                            {cart.currency}
                                         </p>
                                     </div>
                                 ))}
                             </div>
                             <div className="mt-6 space-y-3 border-t border-[#e0c7a7] pt-4 text-sm">
                                 <div className="flex items-center justify-between">
-                                    <span className="uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                    <span className="tracking-[0.3em] text-[#7a5a3a] uppercase">
                                         Items
                                     </span>
                                     <span>{cart.item_count}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                    <span className="tracking-[0.3em] text-[#7a5a3a] uppercase">
                                         Subtotal
                                     </span>
                                     <span>
@@ -650,20 +689,20 @@ export default function CheckoutPage({
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                    <span className="tracking-[0.3em] text-[#7a5a3a] uppercase">
                                         Currency
                                     </span>
                                     <span>{cart.currency}</span>
                                 </div>
                             </div>
                             <p className="mt-4 text-xs text-[#5a4a3a]">
-                                Shipping fees are arranged directly with the responsible
-                                vendor or the LoomCraft team after confirmation.
+                                Shipping fees are arranged directly with the
+                                responsible vendor or the LoomCraft team after
+                                confirmation.
                             </p>
                         </aside>
                     </section>
-                </div>
-            </div>
+            </PublicSiteLayout>
         </>
     );
 }

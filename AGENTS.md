@@ -59,10 +59,19 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Documentation Files
 
 - You must only create documentation files if explicitly requested by the user.
+- Keep `.ai/implementation-status.md` updated as features are completed.
 
 ## Replies
 
 - Be concise in your explanations - focus on what's important rather than explaining obvious details.
+- All instructions for this project live in `.ai/`.
+- `.ai/architecture.md` — product vision, required pages, role scope.
+- `.ai/implementation.md` — concrete implementation guidance for the approved scope.
+- `.ai/best-practices.md` — strict engineering rules and patterns.
+- `.ai/guardrails.md` — hard non-negotiables.
+- `.ai/dbschema.md` — authoritative domain fields.
+- `.ai/order-process.md` — checkout and order lifecycle.
+- `.ai/implementation-status.md` — code-verified progress snapshot.
 
 === boost rules ===
 

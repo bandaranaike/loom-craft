@@ -1,4 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import PublicSiteLayout from '@/layouts/public-site-layout';
 import { dashboard, login, register } from '@/routes';
 import { index as productsIndex } from '@/routes/products';
 import type { SharedData } from '@/types';
@@ -71,61 +72,7 @@ export default function Welcome({
                     rel="stylesheet"
                 />
             </Head>
-            <div className="min-h-screen bg-[#F6F1E8] text-[#2b241c]">
-                <div className="relative overflow-hidden">
-                    <div className="pointer-events-none absolute -left-40 top-0 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_top,_#c77b45,_transparent_65%)] opacity-40" />
-                    <div className="pointer-events-none absolute -right-32 top-20 h-[360px] w-[360px] rounded-full bg-[radial-gradient(circle,_#a14d2a,_transparent_68%)] opacity-30" />
-                    <div className="pointer-events-none absolute bottom-0 left-1/2 h-[320px] w-[720px] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(ellipse_at_center,_#e0c7a7,_transparent_70%)] opacity-60" />
-
-                    <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 pb-6 pt-8">
-                        <div className="flex items-center gap-3">
-                            <div className="grid h-12 w-12 place-items-center rounded-full border border-[#2b241c] bg-[#f2e4d4] text-lg font-semibold tracking-[0.08em]">
-                                LC
-                            </div>
-                            <div>
-                                <p className="text-sm uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                    LoomCraft
-                                </p>
-                                <p className="font-['Playfair_Display',serif] text-xl">
-                                    Woven Heritage House
-                                </p>
-                            </div>
-                        </div>
-                        <nav className="flex flex-wrap items-center gap-3 text-sm">
-                            <Link
-                                href={productsIndex().url}
-                                className="rounded-full border border-transparent px-4 py-2 font-medium text-[#2b241c]/70 transition hover:border-[#2b241c] hover:text-[#2b241c]"
-                            >
-                                Browse Products
-                            </Link>
-                            {auth.user ? (
-                                <Link
-                                    href={dashboard()}
-                                    className="rounded-full border border-[#2b241c] px-4 py-2 font-medium transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
-                                >
-                                    Enter Atelier
-                                </Link>
-                            ) : (
-                                <>
-                                    <Link
-                                        href={login()}
-                                        className="rounded-full border border-transparent px-4 py-2 font-medium text-[#2b241c]/70 transition hover:border-[#2b241c] hover:text-[#2b241c]"
-                                    >
-                                        Log in
-                                    </Link>
-                                    {canRegister && (
-                                        <Link
-                                            href={register()}
-                                            className="rounded-full border border-[#2b241c] px-4 py-2 font-medium transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
-                                        >
-                                            Become a Patron
-                                        </Link>
-                                    )}
-                                </>
-                            )}
-                        </nav>
-                    </header>
-
+            <PublicSiteLayout canRegister={canRegister}>
                     <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-6 lg:grid-cols-[1.1fr_0.9fr]">
                         <div className="space-y-6">
                             <div className="inline-flex items-center gap-3 rounded-full border border-[#d4b28c] bg-[#f9efe2] px-4 py-2 text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
@@ -219,7 +166,6 @@ export default function Welcome({
                             </div>
                         </div>
                     </section>
-                </div>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
                     <div className="grid gap-8 rounded-[48px] border border-[#e0c7a7] bg-[#fff8ed] p-10 md:grid-cols-3">
@@ -361,26 +307,7 @@ export default function Welcome({
                         </div>
                     </div>
                 </section>
-
-                <footer className="border-t border-[#e0c7a7] bg-[#f9efe2]">
-                    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <p className="font-['Playfair_Display',serif] text-2xl">
-                                LoomCraft
-                            </p>
-                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                Heritage Marketplace
-                            </p>
-                        </div>
-                        <div className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.25em] text-[#7a5a3a]">
-                            <span>Contact</span>
-                            <span>Terms</span>
-                            <span>Privacy</span>
-                            <span>Cookies</span>
-                        </div>
-                    </div>
-                </footer>
-            </div>
+            </PublicSiteLayout>
         </>
     );
 }
