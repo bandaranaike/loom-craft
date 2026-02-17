@@ -3,6 +3,7 @@ import {
     BookOpen,
     Folder,
     LayoutGrid,
+    MessageSquareQuote,
     Package,
     ShieldCheck,
     Video,
@@ -20,8 +21,10 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { pending as adminFeedbackPending } from '@/routes/admin/feedback';
 import { connect as adminYouTubeConnect } from '@/routes/admin/youtube';
 import { pending as adminVendorsPending } from '@/routes/admin/vendors';
+import { create as vendorFeedbackCreate } from '@/routes/vendor/feedback';
 import { index as vendorProductsIndex } from '@/routes/vendor/products';
 import type { NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
@@ -62,6 +65,11 @@ export function AppSidebar() {
                       href: adminYouTubeConnect(),
                       icon: Video,
                   },
+                  {
+                      title: 'Feedback Approvals',
+                      href: adminFeedbackPending(),
+                      icon: MessageSquareQuote,
+                  },
               ]
             : []),
         ...(isVendor
@@ -70,6 +78,11 @@ export function AppSidebar() {
                       title: 'My Products',
                       href: vendorProductsIndex(),
                       icon: Package,
+                  },
+                  {
+                      title: 'Vendor Feedback',
+                      href: vendorFeedbackCreate(),
+                      icon: MessageSquareQuote,
                   },
               ]
             : []),

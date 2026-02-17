@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,12 @@ class SuggestionFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'user_id' => User::factory(),
+            'guest_email' => null,
+            'title' => fake()->sentence(4),
+            'details' => fake()->paragraph(),
+            'status' => 'pending',
+            'handled_by' => null,
         ];
     }
 }

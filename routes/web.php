@@ -1,27 +1,25 @@
 <?php
 
+use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\VendorApprovalController;
 use App\Http\Controllers\Admin\YouTubeAuthorizationController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderConfirmationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductIndexController;
 use App\Http\Controllers\ProductShowController;
+use App\Http\Controllers\Vendor\FeedbackController as VendorFeedbackController;
 use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\ProductController;
 use App\Http\Controllers\Vendor\VendorRegistrationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
-Route::get('/', function () {
-    return Inertia::render('welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
-})->name('home');
+Route::get('/', HomeController::class)->name('home');
 
 Route::get('products', [ProductIndexController::class, 'index'])
     ->name('products.index');
@@ -66,6 +64,10 @@ Route::middleware(['auth'])->group(function () {
             ->name('products.store');
         Route::get('orders', [VendorOrderController::class, 'index'])
             ->name('orders.index');
+        Route::get('feedback', [VendorFeedbackController::class, 'create'])
+            ->name('feedback.create');
+        Route::post('feedback', [VendorFeedbackController::class, 'store'])
+            ->name('feedback.store');
     });
 
     Route::prefix('admin')->group(function () {
@@ -83,6 +85,11 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('orders', [AdminOrderController::class, 'index'])
             ->name('admin.orders.index');
+
+        Route::get('feedback/pending', [AdminFeedbackController::class, 'pending'])
+            ->name('admin.feedback.pending');
+        Route::post('feedback/{suggestion}/approve', [AdminFeedbackController::class, 'approve'])
+            ->name('admin.feedback.approve');
     });
 
     Route::get('orders', [OrderController::class, 'index'])

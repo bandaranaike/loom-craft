@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { dashboard, login, register } from '@/routes';
-import { index as productsIndex } from '@/routes/products';
+import { index as productsIndex, show as productShow } from '@/routes/products';
 import type { SharedData } from '@/types';
 
 const highlights = [
@@ -56,10 +56,37 @@ const craftsmanshipSteps = [
     },
 ];
 
+type LedgerProps = {
+    active_products: number;
+    approved_feedback: number;
+};
+
+type FeedbackItem = {
+    id: number;
+    title: string;
+    details: string;
+    vendor_name: string;
+    approved_at: string | null;
+};
+
+type LatestProduct = {
+    id: number;
+    name: string;
+    selling_price: string;
+    vendor_name: string;
+    image_url: string | null;
+};
+
 export default function Welcome({
     canRegister = true,
+    atelier_ledger,
+    vendor_feedback,
+    latest_products,
 }: {
     canRegister?: boolean;
+    atelier_ledger: LedgerProps;
+    vendor_feedback: FeedbackItem[];
+    latest_products: LatestProduct[];
 }) {
     const { auth } = usePage<SharedData>().props;
 
@@ -126,7 +153,6 @@ export default function Welcome({
                             </div>
                         </div>
                         <div className="relative">
-                            <div className="absolute -right-6 top-12 h-60 w-60 rounded-[40px] border border-[#d4b28c] bg-[#fdf8f0] shadow-[0_20px_60px_-30px_rgba(43,36,28,0.45)]" />
                             <div className="relative grid gap-6 rounded-[36px] border border-[#d4b28c] bg-[#f9efe2] p-8 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.6)]">
                                 <div className="flex items-center justify-between">
                                     <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
@@ -136,32 +162,47 @@ export default function Welcome({
                                         Live
                                     </span>
                                 </div>
-                                <div className="space-y-3">
-                                    <p className="font-['Playfair_Display',serif] text-3xl">
-                                        214
-                                    </p>
-                                    <p className="text-sm text-[#5a4a3a]">
-                                        Heritage pieces currently available
-                                    </p>
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                    <div className="space-y-1 rounded-[20px] border border-[#e0c7a7] bg-[#fdf8f0] p-4">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                            Active Products
+                                        </p>
+                                        <p className="font-['Playfair_Display',serif] text-3xl">
+                                            {atelier_ledger.active_products}
+                                        </p>
+                                    </div>
+                                    <div className="space-y-1 rounded-[20px] border border-[#e0c7a7] bg-[#fdf8f0] p-4">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                            Approved Feedback
+                                        </p>
+                                        <p className="font-['Playfair_Display',serif] text-3xl">
+                                            {atelier_ledger.approved_feedback}
+                                        </p>
+                                    </div>
                                 </div>
                                 <div className="grid gap-4 rounded-[28px] border border-[#e0c7a7] bg-[#fdf8f0] p-5">
                                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#7a5a3a]">
-                                        Featured Artisan
+                                        Latest Approved Vendor Note
                                     </p>
-                                    <div className="space-y-1">
-                                        <p className="font-['Playfair_Display',serif] text-2xl">
-                                            Dilhani Perera
-                                        </p>
+                                    {vendor_feedback.length > 0 ? (
+                                        <div className="space-y-2">
+                                            <div className="space-y-1">
+                                                <p className="font-['Playfair_Display',serif] text-2xl">
+                                                    {vendor_feedback[0].vendor_name}
+                                                </p>
+                                                <p className="text-sm text-[#5a4a3a]">
+                                                    {vendor_feedback[0].title}
+                                                </p>
+                                            </div>
+                                            <p className="text-xs text-[#7a5a3a]">
+                                                {vendor_feedback[0].details}
+                                            </p>
+                                        </div>
+                                    ) : (
                                         <p className="text-sm text-[#5a4a3a]">
-                                            18 years in Dumbara Rataa weaving
+                                            Vendor feedback will appear here once approved by admins.
                                         </p>
-                                    </div>
-                                    <div className="h-2 w-full overflow-hidden rounded-full bg-[#e7d1b6]">
-                                        <div className="h-full w-2/3 rounded-full bg-[#b6623a]" />
-                                    </div>
-                                    <p className="text-xs text-[#7a5a3a]">
-                                        Limited release: 6 signed textiles this season.
-                                    </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -220,6 +261,105 @@ export default function Welcome({
                             </div>
                         ))}
                     </div>
+                </section>
+
+                <section className="mx-auto w-full max-w-6xl px-6 pb-16">
+                    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                New Arrivals
+                            </p>
+                            <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
+                                Latest products from approved ateliers.
+                            </h2>
+                        </div>
+                        <Link
+                            href={productsIndex().url}
+                            className="rounded-full border border-[#2b241c] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
+                        >
+                            View all products
+                        </Link>
+                    </div>
+                    {latest_products.length === 0 ? (
+                        <div className="rounded-[32px] border border-dashed border-[#d4b28c] bg-[#fff8ed] p-8 text-sm text-[#7a5a3a]">
+                            No products available yet.
+                        </div>
+                    ) : (
+                        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+                            {latest_products.map((product) => (
+                                <Link
+                                    key={product.id}
+                                    href={productShow(product.id).url}
+                                    className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] transition hover:-translate-y-1 hover:border-[#b6623a]"
+                                >
+                                    <div className="relative aspect-[4/3] bg-[#f9efe2]">
+                                        {product.image_url ? (
+                                            <img
+                                                src={product.image_url}
+                                                alt={product.name}
+                                                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                                            />
+                                        ) : (
+                                            <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                                Image forthcoming
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-1 flex-col gap-2 p-4">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                            {product.vendor_name}
+                                        </p>
+                                        <h3 className="font-['Playfair_Display',serif] text-xl">
+                                            {product.name}
+                                        </h3>
+                                        <p className="mt-auto text-sm font-semibold text-[#2b241c]">
+                                            {product.selling_price} USD
+                                        </p>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                </section>
+
+                <section className="mx-auto w-full max-w-6xl px-6 pb-16">
+                    <div className="mb-6">
+                        <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            Atelier Voices
+                        </p>
+                        <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
+                            Approved vendor feedback from the LoomCraft network.
+                        </h2>
+                    </div>
+                    {vendor_feedback.length === 0 ? (
+                        <div className="rounded-[32px] border border-dashed border-[#d4b28c] bg-[#fff8ed] p-8 text-sm text-[#7a5a3a]">
+                            No approved feedback yet.
+                        </div>
+                    ) : (
+                        <div className="grid gap-5 md:grid-cols-3">
+                            {vendor_feedback.map((feedback) => (
+                                <div
+                                    key={feedback.id}
+                                    className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6"
+                                >
+                                    <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                        {feedback.vendor_name}
+                                    </p>
+                                    <h3 className="mt-2 font-['Playfair_Display',serif] text-2xl">
+                                        {feedback.title}
+                                    </h3>
+                                    <p className="mt-3 text-sm text-[#5a4a3a]">
+                                        {feedback.details}
+                                    </p>
+                                    {feedback.approved_at && (
+                                        <p className="mt-4 text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                            Approved {feedback.approved_at}
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </section>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">

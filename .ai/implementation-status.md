@@ -17,6 +17,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Home page (`/`) and dashboard placeholder (`/dashboard`).
 - Product listing (`/products`) with search/per-page inputs.
 - Product detail page (`/products/{product}`).
+- Home page now includes dynamic Atelier ledger metrics, approved vendor feedback, and latest product highlights.
 
 ### Cart & Checkout
 - Cart view with guest cart support (guest token cookie).
@@ -39,6 +40,8 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Pending vendor approvals list + approve/reject actions.
 - Admin order list (`/admin/orders`).
 - YouTube OAuth connect + callback for video upload authorization.
+- Vendor feedback approval queue (`/admin/feedback/pending`) with publish action.
+- Vendor feedback submission form (`/vendor/feedback`) with admin approval workflow.
 
 ### Product Media Handling
 - Image uploads stored in local storage (`public` disk).
@@ -46,7 +49,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 
 ### Core Domain Models & Policies
 - Models: `User`, `Vendor`, `Product`, `ProductMedia`, `Cart`, `CartItem`, `Order`, `OrderItem`, `OrderAddress`, `Payment`, `Shipment`, `VendorPayout`, `Dispute`, `Complaint`, `ProductReport`, `Suggestion`.
-- Policies present for Admin, Vendor, Product, Cart, and Order.
+- Policies present for Admin, Vendor, Product, Cart, Order, and Suggestion.
 - Value objects for money, currency, and dimensions.
 
 ## Partial / Notes
@@ -56,7 +59,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 ## Not Yet Implemented (From Architecture/Requirements)
 - Admin vendor CRUD beyond approve/reject workflows.
 - Product moderation workflows and related admin UI.
-- Complaints, product reports, disputes, and suggestions UI/workflows.
+- Complaints, product reports, and disputes UI/workflows.
 - Vendor payments/earnings views and vendor shipping management UI.
 - Public content pages: About, Contact, Terms, Privacy, Cookie policy.
 - Vendor profile public page.
@@ -64,8 +67,8 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 ## Implemented Pages (Inertia)
 - Public: `welcome`, `products/index`, `products/show`, `cart`, `checkout`, `orders/confirmation`.
 - Auth: `auth/*` pages, `settings/*` pages.
-- Vendor: `vendor/register`, `vendor/products/index`, `vendor/products/create`, `vendor/orders/index`.
-- Admin: `admin/vendors/pending`, `admin/orders/index`, `admin/youtube/connect`.
+- Vendor: `vendor/register`, `vendor/products/index`, `vendor/products/create`, `vendor/orders/index`, `vendor/feedback/create`.
+- Admin: `admin/vendors/pending`, `admin/orders/index`, `admin/youtube/connect`, `admin/feedback/pending`.
 
 ## Tests Present (Coverage of Implemented Areas)
 - Feature tests for auth, cart flow, checkout, orders, vendor registration, product creation, vendor approvals, YouTube authorization, and schema checks.

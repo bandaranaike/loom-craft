@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
-import type { PropsWithChildren, ReactNode } from 'react';
+import type { CSSProperties, PropsWithChildren, ReactNode } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
+import dumbaraPatterns from '@/images/dumbara-patterns.png';
 import { dashboard, home, login, register } from '@/routes';
 import { show as cartShow } from '@/routes/cart';
 import { show as checkoutShow } from '@/routes/checkout';
@@ -23,13 +24,31 @@ export default function PublicSiteLayout({
     headerActions,
 }: PublicSiteLayoutProps) {
     const { auth } = usePage<SharedData>().props;
+    const leftSidePatternStyle: CSSProperties = {
+        backgroundImage: `linear-gradient(to right, rgba(246,241,232,0.95), rgba(246,241,232,0.45), transparent), url(${dumbaraPatterns}), url(${dumbaraPatterns})`,
+        backgroundSize: '100% 100%, 170px auto, 140px auto',
+        backgroundRepeat: 'no-repeat, repeat-y, repeat-y',
+        backgroundPosition: 'left center, 0 0, 84px 120px',
+    };
+    const rightSidePatternStyle: CSSProperties = {
+        backgroundImage: `linear-gradient(to left, rgba(246,241,232,0.95), rgba(246,241,232,0.45), transparent), url(${dumbaraPatterns}), url(${dumbaraPatterns})`,
+        backgroundSize: '100% 100%, 170px auto, 140px auto',
+        backgroundRepeat: 'no-repeat, repeat-y, repeat-y',
+        backgroundPosition: 'right center, 100% 0, calc(100% - 84px) 120px',
+    };
 
     return (
         <div className="min-h-screen bg-[#F6F1E8] text-[#2b241c]">
             <div className="relative overflow-hidden">
-                <div className="pointer-events-none absolute top-0 -left-40 h-105 w-105 rounded-full bg-[radial-gradient(circle_at_top,#c77b45,transparent_65%)] opacity-40" />
-                <div className="pointer-events-none absolute top-20 -right-32 h-90 w-90 rounded-full bg-[radial-gradient(circle,#a14d2a,transparent_68%)] opacity-30" />
                 <div className="pointer-events-none absolute bottom-0 left-1/2 h-80 w-180 -translate-x-1/2 rounded-[100%] bg-[radial-gradient(ellipse_at_center,#e0c7a7,transparent_70%)] opacity-60" />
+                <div
+                    className="pointer-events-none absolute inset-y-0 left-0 w-34 mask-[linear-gradient(to_right,black,transparent)] opacity-10 mix-blend-multiply"
+                    style={leftSidePatternStyle}
+                />
+                <div
+                    className="pointer-events-none absolute inset-y-0 right-0 w-34 mask-[linear-gradient(to_left,black,transparent)] opacity-10 mix-blend-multiply"
+                    style={rightSidePatternStyle}
+                />
 
                 <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 pt-8 pb-6">
                     <Link href={home()} className="flex items-center gap-3">
@@ -132,9 +151,6 @@ export default function PublicSiteLayout({
                                 <span>Cookies</span>
                             </div>
                         </div>
-                    </div>
-                    <div className="p-12">
-                        <AppLogoIcon className="h-48 w-auto object-contain mx-auto" />
                     </div>
                 </footer>
             </div>
