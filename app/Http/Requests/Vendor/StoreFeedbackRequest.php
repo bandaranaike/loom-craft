@@ -13,11 +13,17 @@ class StoreFeedbackRequest extends FormRequest
     {
         $user = $this->user();
 
-        if ($user === null || $user->role !== 'vendor') {
+        if ($user === null) {
             return false;
         }
 
-        return $user->vendor !== null && $user->vendor->status === 'approved';
+        if ($user->role === 'customer') {
+            return true;
+        }
+
+        return $user->role === 'vendor'
+            && $user->vendor !== null
+            && $user->vendor->status === 'approved';
     }
 
     /**

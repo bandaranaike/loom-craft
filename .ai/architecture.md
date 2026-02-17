@@ -87,6 +87,7 @@ If something is not defined, state the limitation instead of inventing details.
 * Checkout and place orders
 * Pay using supported payment methods
 * Submit complaints and product reports
+* If authenticated, submit and edit one home-page feedback entry (buyer voice)
 
 ---
 
@@ -99,6 +100,7 @@ If something is not defined, state the limitation instead of inventing details.
 * Configure shipping responsibility
 * View payments and earnings
 * Participate in dispute handling
+* Submit and edit one home-page feedback entry (vendor voice)
 
 ---
 
@@ -140,6 +142,7 @@ If something is not defined, state the limitation instead of inventing details.
 ### Public Pages
 
 * Home
+  * Includes approved community feedback and authenticated feedback composer (single editable entry per user)
 * Product listing
 * Product details (images + optional video)
 * Vendor profile

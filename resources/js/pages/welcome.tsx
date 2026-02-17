@@ -1,7 +1,9 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
+import InputError from '@/components/input-error';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { dashboard, login, register } from '@/routes';
 import { index as productsIndex, show as productShow } from '@/routes/products';
+import { store as feedbackStore } from '@/routes/vendor/feedback';
 import type { SharedData } from '@/types';
 
 const highlights = [
@@ -65,9 +67,17 @@ type FeedbackItem = {
     id: number;
     title: string;
     details: string;
-    vendor_name: string;
+    author_name: string;
+    author_role: string;
     approved_at: string | null;
 };
+
+type MyFeedback = {
+    id: number;
+    title: string;
+    details: string;
+    status: string;
+} | null;
 
 type LatestProduct = {
     id: number;
@@ -82,13 +92,17 @@ export default function Welcome({
     atelier_ledger,
     vendor_feedback,
     latest_products,
+    my_feedback,
 }: {
     canRegister?: boolean;
     atelier_ledger: LedgerProps;
     vendor_feedback: FeedbackItem[];
     latest_products: LatestProduct[];
+    my_feedback: MyFeedback;
 }) {
     const { auth } = usePage<SharedData>().props;
+    const canLeaveFeedback =
+        auth.user && (auth.user.role === 'vendor' || auth.user.role === 'customer');
 
     return (
         <>
@@ -188,7 +202,7 @@ export default function Welcome({
                                         <div className="space-y-2">
                                             <div className="space-y-1">
                                                 <p className="font-['Playfair_Display',serif] text-2xl">
-                                                    {vendor_feedback[0].vendor_name}
+                                                    {vendor_feedback[0].author_name}
                                                 </p>
                                                 <p className="text-sm text-[#5a4a3a]">
                                                     {vendor_feedback[0].title}
@@ -292,7 +306,7 @@ export default function Welcome({
                                     href={productShow(product.id).url}
                                     className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] transition hover:-translate-y-1 hover:border-[#b6623a]"
                                 >
-                                    <div className="relative aspect-[4/3] bg-[#f9efe2]">
+                                    <div className="relative aspect-4/3 bg-[#f9efe2]">
                                         {product.image_url ? (
                                             <img
                                                 src={product.image_url}
@@ -328,11 +342,84 @@ export default function Welcome({
                             Atelier Voices
                         </p>
                         <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
-                            Approved vendor feedback from the LoomCraft network.
+                            Approved feedback from the LoomCraft network.
                         </h2>
                     </div>
+                    {canLeaveFeedback && (
+                        <div className="mb-6 rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6">
+                            <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                {my_feedback ? 'Edit Your Feedback' : 'Share Your Feedback'}
+                            </p>
+                            <h3 className="mt-2 font-['Playfair_Display',serif] text-2xl">
+                                {my_feedback
+                                    ? 'Update your vendor or buyer note'
+                                    : 'Add your vendor or buyer note'}
+                            </h3>
+                            <p className="mt-2 text-sm text-[#5a4a3a]">
+                                You can keep one feedback entry. Saving again updates your existing
+                                submission.
+                            </p>
+                            {my_feedback && (
+                                <p className="mt-2 text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                    Current status: {my_feedback.status}
+                                </p>
+                            )}
+                            <Form
+                                {...feedbackStore.form()}
+                                className="mt-4 grid gap-4"
+                                disableWhileProcessing
+                            >
+                                {({ errors, processing }) => (
+                                    <>
+                                        <div className="grid gap-2">
+                                            <label
+                                                htmlFor="title"
+                                                className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]"
+                                            >
+                                                Headline
+                                            </label>
+                                            <input
+                                                id="title"
+                                                name="title"
+                                                defaultValue={my_feedback?.title ?? ''}
+                                                className="w-full rounded-xl border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] outline-none ring-[#2b241c]/20 focus:ring-2"
+                                                placeholder="Share one headline from your LoomCraft experience"
+                                                required
+                                            />
+                                            <InputError message={errors.title} className="text-xs" />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <label
+                                                htmlFor="details"
+                                                className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]"
+                                            >
+                                                Details
+                                            </label>
+                                            <textarea
+                                                id="details"
+                                                name="details"
+                                                rows={4}
+                                                defaultValue={my_feedback?.details ?? ''}
+                                                className="w-full rounded-xl border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] outline-none ring-[#2b241c]/20 focus:ring-2"
+                                                placeholder="Describe your experience as a vendor or buyer."
+                                                required
+                                            />
+                                            <InputError message={errors.details} className="text-xs" />
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            className="inline-flex w-fit items-center rounded-full bg-[#2b241c] px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#f6f1e8] transition hover:bg-[#3a2f25] disabled:cursor-not-allowed disabled:opacity-70"
+                                            disabled={processing}
+                                        >
+                                            {my_feedback ? 'Update Feedback' : 'Submit Feedback'}
+                                        </button>
+                                    </>
+                                )}
+                            </Form>
+                        </div>
+                    )}
                     {vendor_feedback.length === 0 ? (
-                        <div className="rounded-[32px] border border-dashed border-[#d4b28c] bg-[#fff8ed] p-8 text-sm text-[#7a5a3a]">
+                        <div className="rounded-4xl border border-dashed border-[#d4b28c] bg-[#fff8ed] p-8 text-sm text-[#7a5a3a]">
                             No approved feedback yet.
                         </div>
                     ) : (
@@ -343,7 +430,7 @@ export default function Welcome({
                                     className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6"
                                 >
                                     <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
-                                        {feedback.vendor_name}
+                                        {feedback.author_name} • {feedback.author_role}
                                     </p>
                                     <h3 className="mt-2 font-['Playfair_Display',serif] text-2xl">
                                         {feedback.title}

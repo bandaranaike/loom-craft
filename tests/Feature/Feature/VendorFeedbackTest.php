@@ -25,11 +25,15 @@ test('approved vendors can view feedback page', function () {
 });
 
 test('non-vendor users cannot view feedback page', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['role' => 'customer']);
 
     $response = $this->actingAs($user)->get(route('vendor.feedback.create'));
 
-    $response->assertForbidden();
+    $response
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('vendor/feedback/create')
+        );
 });
 
 test('approved vendors can submit feedback', function () {
@@ -38,10 +42,12 @@ test('approved vendors can submit feedback', function () {
         'status' => 'approved',
     ]);
 
-    $response = $this->actingAs($user)->post(route('vendor.feedback.store'), [
-        'title' => 'Consistent buyer demand',
-        'details' => 'Our studio has received steady weekly orders.',
-    ]);
+    $response = $this->actingAs($user)
+        ->from(route('vendor.feedback.create'))
+        ->post(route('vendor.feedback.store'), [
+            'title' => 'Consistent buyer demand',
+            'details' => 'Our studio has received steady weekly orders.',
+        ]);
 
     $response->assertRedirect(route('vendor.feedback.create'));
 
@@ -59,10 +65,57 @@ test('unapproved vendors cannot submit feedback', function () {
         'status' => 'pending',
     ]);
 
-    $response = $this->actingAs($user)->post(route('vendor.feedback.store'), [
-        'title' => 'Blocked',
-        'details' => 'This should not be accepted.',
-    ]);
+    $response = $this->actingAs($user)
+        ->from(route('vendor.feedback.create'))
+        ->post(route('vendor.feedback.store'), [
+            'title' => 'Blocked',
+            'details' => 'This should not be accepted.',
+        ]);
 
     $response->assertForbidden();
+});
+
+test('customers can submit feedback', function () {
+    $customer = User::factory()->create(['role' => 'customer']);
+
+    $response = $this->actingAs($customer)
+        ->from(route('vendor.feedback.create'))
+        ->post(route('vendor.feedback.store'), [
+            'title' => 'Smooth checkout experience',
+            'details' => 'The product details and checkout steps were clear.',
+        ]);
+
+    $response->assertRedirect(route('vendor.feedback.create'));
+
+    $this->assertDatabaseHas('suggestions', [
+        'user_id' => $customer->id,
+        'title' => 'Smooth checkout experience',
+        'status' => 'pending',
+    ]);
+});
+
+test('submitting feedback again updates existing feedback instead of creating a second record', function () {
+    $customer = User::factory()->create(['role' => 'customer']);
+
+    $this->actingAs($customer)
+        ->from(route('vendor.feedback.create'))
+        ->post(route('vendor.feedback.store'), [
+            'title' => 'First note',
+            'details' => 'First details',
+        ])->assertRedirect(route('vendor.feedback.create'));
+
+    $this->actingAs($customer)
+        ->from(route('vendor.feedback.create'))
+        ->post(route('vendor.feedback.store'), [
+            'title' => 'Updated note',
+            'details' => 'Updated details',
+        ])->assertRedirect(route('vendor.feedback.create'));
+
+    $this->assertDatabaseCount('suggestions', 1);
+    $this->assertDatabaseHas('suggestions', [
+        'user_id' => $customer->id,
+        'title' => 'Updated note',
+        'details' => 'Updated details',
+        'status' => 'pending',
+    ]);
 });

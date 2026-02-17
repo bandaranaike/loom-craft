@@ -20,17 +20,19 @@ class FeedbackController extends Controller
         $feedback = Suggestion::query()
             ->with(['user.vendor'])
             ->where('status', 'pending')
-            ->whereHas('user', fn ($query) => $query->where('role', 'vendor'))
             ->latest()
             ->get()
             ->map(function (Suggestion $suggestion): array {
+                $author = $suggestion->user;
+
                 return [
                     'id' => $suggestion->id,
                     'title' => $suggestion->title,
                     'details' => $suggestion->details,
-                    'vendor_name' => $suggestion->user?->vendor?->display_name
-                        ?? $suggestion->user?->name
-                        ?? 'Unknown vendor',
+                    'author_name' => $author?->vendor?->display_name
+                        ?? $author?->name
+                        ?? 'Unknown user',
+                    'author_role' => $author?->role ?? 'customer',
                     'submitted_at' => $suggestion->created_at?->toDateTimeString(),
                 ];
             })

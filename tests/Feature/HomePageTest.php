@@ -35,9 +35,10 @@ test('home page renders', function () {
             ->where('atelier_ledger.approved_feedback', 1)
             ->has('vendor_feedback', 1)
             ->where('vendor_feedback.0.id', $suggestion->id)
-            ->where('vendor_feedback.0.vendor_name', $vendor->display_name)
+            ->where('vendor_feedback.0.author_name', $vendor->display_name)
             ->has('latest_products', 1)
             ->where('latest_products.0.id', $product->id)
             ->where('latest_products.0.name', $product->name)
+            ->where('my_feedback', null)
         );
 });

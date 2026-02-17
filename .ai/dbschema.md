@@ -341,13 +341,16 @@ Site improvement suggestions (admin review).
 - `guest_email` (varchar, nullable)
 - `title` (varchar)
 - `details` (text)
-- `status` (varchar) — `open`, `under_review`, `resolved`, `rejected`
+- `status` (varchar) — `pending`, `approved`, `rejected`
 - `handled_by` (bigint, FK → users.id, nullable)
 - `created_at` (timestamp, nullable)
 - `updated_at` (timestamp, nullable)
 
 Indexes:
 - `suggestions_status_index` on `status`
+
+Constraints:
+- Logical constraint: one suggestion/feedback per authenticated user (application-enforced upsert behavior).
 
 ---
 

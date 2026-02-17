@@ -48,12 +48,14 @@ This document translates the approved architecture into concrete implementation 
 ### Guest / Customer
 - Browse, view details, add to the cart, checkout, pay
 - Submit complaints and product reports
+- If authenticated, submit and edit one home-page feedback entry
 
 ### Vendor
 - Requires admin approval before selling
 - Access vendor dashboard post‑approval
 - Manage products, orders, shipping responsibility, payments/earnings
 - Participate in dispute handling
+- Submit and edit one home-page feedback entry
 
 ### Admin
 - Full access
@@ -72,6 +74,8 @@ This document translates the approved architecture into concrete implementation 
 
 ### Public Pages
 - Home
+  - Shows approved feedback entries
+  - For authenticated vendor/customer users, includes a feedback form that creates or updates a single user-owned entry
 - Product listing
 - Product details (images + optional video)
 - Vendor profile
@@ -165,6 +169,15 @@ This document translates the approved architecture into concrete implementation 
 ## 8. Non‑Goals / Explicit Boundaries
 
 - Do not change dependencies without approval
+
+---
+
+## 9. Feedback Workflow Rules (Home Page)
+
+- Feedback is authenticated-only for `vendor` and `customer` roles.
+- One feedback record per user is enforced in application flow (create-or-update behavior).
+- Editing an existing feedback entry is done in place from the same home-page form.
+- Guest feedback submission is out of scope for now.
 
 ---
 

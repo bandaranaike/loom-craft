@@ -1,4 +1,33 @@
 <laravel-boost-guidelines>
+## Quick Project Snapshot (Code-Verified on 2026-02-17)
+
+Use this section first for orientation, then follow the detailed rules below.
+
+- App type: Laravel 12 + Inertia React marketplace (`LoomCraft`).
+- Current route surface: 37 web routes across public, auth/settings, vendor, and admin areas.
+- Main implemented domains:
+  - Public storefront (`/`, `/products`, `/products/{product}`)
+  - Home-page feedback composer for authenticated vendors/customers (single entry create-or-edit)
+  - Cart + checkout + order confirmation
+  - Customer orders (`/orders`, `/orders/{order}`)
+  - Vendor registration, vendor products, vendor order items, vendor feedback submission
+  - Admin vendor approvals, admin order list, admin feedback approvals, YouTube OAuth connect/callback
+- Service integrations:
+  - `app/Services/Video/YouTubeVideoUploader.php` for video uploads to YouTube (via `VideoUploader` contract)
+  - Image uploads stored on Laravel `public` disk
+- Test suite snapshot:
+  - 28 test files (27 feature, 1 unit)
+  - Coverage includes auth/settings, cart/checkout, orders, vendor approvals, product creation, feedback moderation, YouTube callback
+- Known gaps against architecture scope:
+  - Public content pages (About/Contact/Terms/Privacy/Cookie)
+  - Vendor public profile page
+  - Product moderation UI, complaints/reports/disputes workflows
+  - Vendor payments/earnings and shipping management workflows
+  - Full payment provider workflows (beyond stored payment records/status)
+- Feedback behavior:
+  - One feedback entry per authenticated vendor/customer user (upsert, no duplicates)
+  - Existing feedback is editable from the home page
+
 === foundation rules ===
 
 # Laravel Boost Guidelines

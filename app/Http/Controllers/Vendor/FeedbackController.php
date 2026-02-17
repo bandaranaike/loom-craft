@@ -23,16 +23,18 @@ class FeedbackController extends Controller
 
     public function store(StoreFeedbackRequest $request): RedirectResponse
     {
-        Suggestion::query()->create([
+        Gate::authorize('create', Suggestion::class);
+
+        Suggestion::query()->updateOrCreate([
             'user_id' => $request->user()?->id,
+        ], [
             'title' => $request->string('title')->toString(),
             'details' => $request->string('details')->toString(),
             'status' => 'pending',
             'handled_by' => null,
         ]);
 
-        return redirect()
-            ->route('vendor.feedback.create')
+        return back()
             ->with('status', 'Feedback submitted for admin approval.');
     }
 }

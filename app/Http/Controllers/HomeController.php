@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Suggestion;
+use App\Models\User;
 use App\ValueObjects\Money;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -40,23 +41,45 @@ class HomeController extends Controller
         $approvedFeedback = Suggestion::query()
             ->with(['user.vendor'])
             ->where('status', 'approved')
-            ->whereHas('user', fn ($query) => $query->where('role', 'vendor'))
             ->latest()
             ->limit(3)
             ->get()
             ->map(function (Suggestion $suggestion): array {
+                $author = $suggestion->user;
+
                 return [
                     'id' => $suggestion->id,
                     'title' => $suggestion->title,
                     'details' => $suggestion->details,
-                    'vendor_name' => $suggestion->user?->vendor?->display_name
-                        ?? $suggestion->user?->name
-                        ?? 'Verified vendor',
+                    'author_name' => $author?->vendor?->display_name
+                        ?? $author?->name
+                        ?? 'Verified member',
+                    'author_role' => $author?->role ?? 'customer',
                     'approved_at' => $suggestion->updated_at?->toDateString(),
                 ];
             })
             ->values()
             ->all();
+
+        /** @var User|null $user */
+        $user = auth()->user();
+        $myFeedback = null;
+
+        if ($user !== null && in_array($user->role, ['vendor', 'customer'], true)) {
+            $suggestion = Suggestion::query()
+                ->where('user_id', $user->id)
+                ->latest()
+                ->first();
+
+            if ($suggestion !== null) {
+                $myFeedback = [
+                    'id' => $suggestion->id,
+                    'title' => $suggestion->title,
+                    'details' => $suggestion->details,
+                    'status' => $suggestion->status,
+                ];
+            }
+        }
 
         return Inertia::render('welcome', [
             'canRegister' => Features::enabled(Features::registration()),
@@ -67,11 +90,11 @@ class HomeController extends Controller
                     ->count(),
                 'approved_feedback' => Suggestion::query()
                     ->where('status', 'approved')
-                    ->whereHas('user', fn ($query) => $query->where('role', 'vendor'))
                     ->count(),
             ],
             'vendor_feedback' => $approvedFeedback,
             'latest_products' => $latestProducts,
+            'my_feedback' => $myFeedback,
         ]);
     }
 }

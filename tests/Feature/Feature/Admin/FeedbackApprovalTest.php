@@ -82,6 +82,28 @@ test('approved feedback appears on the home page', function () {
             ->component('welcome')
             ->has('vendor_feedback', 1)
             ->where('vendor_feedback.0.id', $suggestion->id)
-            ->where('vendor_feedback.0.vendor_name', $vendor->display_name)
+            ->where('vendor_feedback.0.author_name', $vendor->display_name)
+        );
+});
+
+test('admins can view pending buyer feedback', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $buyer = User::factory()->create(['role' => 'customer', 'name' => 'Buyer One']);
+
+    $suggestion = Suggestion::factory()->for($buyer)->create([
+        'status' => 'pending',
+        'title' => 'Need saved filters',
+    ]);
+
+    $response = $this->actingAs($admin)->get(route('admin.feedback.pending'));
+
+    $response
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/feedback/pending')
+            ->has('feedback', 1)
+            ->where('feedback.0.id', $suggestion->id)
+            ->where('feedback.0.author_name', 'Buyer One')
+            ->where('feedback.0.author_role', 'customer')
         );
 });

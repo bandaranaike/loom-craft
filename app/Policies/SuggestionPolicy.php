@@ -28,6 +28,10 @@ class SuggestionPolicy
      */
     public function create(User $user): bool
     {
+        if ($user->role === 'customer') {
+            return true;
+        }
+
         return $user->role === 'vendor'
             && $user->vendor !== null
             && $user->vendor->status === 'approved';

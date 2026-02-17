@@ -8,7 +8,8 @@ type FeedbackItem = {
     id: number;
     title: string;
     details: string;
-    vendor_name: string;
+    author_name: string;
+    author_role: string;
     submitted_at: string | null;
 };
 
@@ -43,7 +44,7 @@ export default function PendingFeedback() {
                             Curation Queue
                         </p>
                         <h2 className="text-2xl font-semibold text-foreground">
-                            Vendor feedback awaiting approval
+                            Community feedback awaiting approval
                         </h2>
                         <p className="text-sm text-muted-foreground">
                             Approve responses to publish them on the home page.
@@ -53,7 +54,7 @@ export default function PendingFeedback() {
 
                 {feedback.length === 0 ? (
                     <div className="rounded-xl border border-dashed border-sidebar-border/80 p-10 text-center text-sm text-muted-foreground dark:border-sidebar-border">
-                        No pending vendor feedback right now.
+                        No pending community feedback right now.
                     </div>
                 ) : (
                     <div className="grid gap-4 lg:grid-cols-2">
@@ -64,7 +65,7 @@ export default function PendingFeedback() {
                             >
                                 <div className="space-y-2">
                                     <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                        {item.vendor_name}
+                                        {item.author_name} • {item.author_role}
                                     </p>
                                     <h3 className="text-xl font-semibold text-foreground">
                                         {item.title}
