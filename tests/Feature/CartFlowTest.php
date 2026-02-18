@@ -5,6 +5,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
 
@@ -36,4 +37,16 @@ it('allows guests to add items to the cart', function () {
         'quantity' => 2,
         'unit_price' => '125.00',
     ]);
+});
+
+it('shows the cart page for guests and queues a guest token cookie', function () {
+    $response = $this->get(route('cart.show'));
+
+    $response
+        ->assertOk()
+        ->assertCookie('loomcraft_guest_token')
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('cart')
+            ->where('cart.item_count', 0)
+        );
 });

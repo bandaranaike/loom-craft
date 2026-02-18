@@ -6,8 +6,41 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
+
+it('shows checkout for guests and preserves the guest token cookie', function () {
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'selling_price' => '180.00',
+    ]);
+
+    $cart = Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'USD',
+    ]);
+
+    $cart->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 1,
+        'unit_price' => '180.00',
+    ]);
+
+    $response = $this
+        ->withCookie('loomcraft_guest_token', 'guest-token')
+        ->get(route('checkout.show'));
+
+    $response
+        ->assertOk()
+        ->assertCookie('loomcraft_guest_token')
+        ->assertInertia(fn (Assert $page) => $page->component('checkout'));
+});
 
 it('creates an order from checkout and clears the cart', function () {
     $vendorUser = User::factory()->create(['role' => 'vendor']);

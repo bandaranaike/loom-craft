@@ -1,33 +1,4 @@
 <laravel-boost-guidelines>
-## Quick Project Snapshot (Code-Verified on 2026-02-17)
-
-Use this section first for orientation, then follow the detailed rules below.
-
-- App type: Laravel 12 + Inertia React marketplace (`LoomCraft`).
-- Current route surface: 37 web routes across public, auth/settings, vendor, and admin areas.
-- Main implemented domains:
-  - Public storefront (`/`, `/products`, `/products/{product}`)
-  - Home-page feedback composer for authenticated vendors/customers (single entry create-or-edit)
-  - Cart + checkout + order confirmation
-  - Customer orders (`/orders`, `/orders/{order}`)
-  - Vendor registration, vendor products, vendor order items, vendor feedback submission
-  - Admin vendor approvals, admin order list, admin feedback approvals, YouTube OAuth connect/callback
-- Service integrations:
-  - `app/Services/Video/YouTubeVideoUploader.php` for video uploads to YouTube (via `VideoUploader` contract)
-  - Image uploads stored on Laravel `public` disk
-- Test suite snapshot:
-  - 28 test files (27 feature, 1 unit)
-  - Coverage includes auth/settings, cart/checkout, orders, vendor approvals, product creation, feedback moderation, YouTube callback
-- Known gaps against architecture scope:
-  - Public content pages (About/Contact/Terms/Privacy/Cookie)
-  - Vendor public profile page
-  - Product moderation UI, complaints/reports/disputes workflows
-  - Vendor payments/earnings and shipping management workflows
-  - Full payment provider workflows (beyond stored payment records/status)
-- Feedback behavior:
-  - One feedback entry per authenticated vendor/customer user (upsert, no duplicates)
-  - Existing feedback is editable from the home page
-
 === foundation rules ===
 
 # Laravel Boost Guidelines
@@ -44,7 +15,9 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
 - laravel/wayfinder (WAYFINDER) - v0
+- laravel/boost (BOOST) - v2
 - laravel/mcp (MCP) - v0
+- laravel/pail (PAIL) - v1
 - laravel/pint (PINT) - v1
 - laravel/sail (SAIL) - v1
 - pestphp/pest (PEST) - v4
@@ -88,19 +61,10 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Documentation Files
 
 - You must only create documentation files if explicitly requested by the user.
-- Keep `.ai/implementation-status.md` updated as features are completed.
 
 ## Replies
 
 - Be concise in your explanations - focus on what's important rather than explaining obvious details.
-- All instructions for this project live in `.ai/`.
-- `.ai/architecture.md` — product vision, required pages, role scope.
-- `.ai/implementation.md` — concrete implementation guidance for the approved scope.
-- `.ai/best-practices.md` — strict engineering rules and patterns.
-- `.ai/guardrails.md` — hard non-negotiables.
-- `.ai/dbschema.md` — authoritative domain fields.
-- `.ai/order-process.md` — checkout and order lifecycle.
-- `.ai/implementation-status.md` — code-verified progress snapshot.
 
 === boost rules ===
 
@@ -120,6 +84,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 - You should use the `tinker` tool when you need to execute PHP to debug code or query Eloquent models directly.
 - Use the `database-query` tool when you only need to read from the database.
+- Use the `database-schema` tool to inspect table structure before writing migrations or models.
 
 ## Reading Browser Logs With the `browser-logs` Tool
 
@@ -150,7 +115,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Constructors
 
 - Use PHP 8 constructor property promotion in `__construct()`.
-    - <code-snippet>public function __construct(public GitHub $github) { }</code-snippet>
+    - `public function __construct(public GitHub $github) { }`
 - Do not allow empty `__construct()` methods with zero parameters unless the constructor is private.
 
 ## Type Declarations
@@ -158,12 +123,13 @@ This project has domain-specific skills available. You MUST activate the relevan
 - Always use explicit return type declarations for methods and functions.
 - Use appropriate PHP type hints for method parameters.
 
-<code-snippet name="Explicit Return Types and Method Params" lang="php">
+<!-- Explicit Return Types and Method Params -->
+```php
 protected function isAccessible(User $user, ?string $path = null): bool
 {
     ...
 }
-</code-snippet>
+```
 
 ## Enums
 
@@ -189,7 +155,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 # Inertia
 
 - Inertia creates fully client-side rendered SPAs without modern SPA complexity, leveraging existing server-side patterns.
-- Components live in `resources/js/Pages` (unless specified in `vite.config.js`). Use `Inertia::render()` for server-side routing instead of Blade views.
+- Components live in `resources/js/pages` (unless specified in `vite.config.js`). Use `Inertia::render()` for server-side routing instead of Blade views.
 - ALWAYS use `search-docs` tool for version-specific Inertia documentation and updated code examples.
 - IMPORTANT: Activate `inertia-react-development` when working with Inertia client-side patterns.
 
@@ -297,8 +263,8 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 
 # Laravel Pint Code Formatter
 
-- You must run `vendor/bin/pint --dirty` before finalizing changes to ensure your code matches the project's expected style.
-- Do not run `vendor/bin/pint --test`, simply run `vendor/bin/pint` to fix any formatting issues.
+- You must run `vendor/bin/pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
+- Do not run `vendor/bin/pint --test --format agent`, simply run `vendor/bin/pint --format agent` to fix any formatting issues.
 
 === pest/core rules ===
 
@@ -331,4 +297,10 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - Fortify is a headless authentication backend that provides authentication routes and controllers for Laravel applications.
 - IMPORTANT: Always use the `search-docs` tool for detailed Laravel Fortify patterns and documentation.
 - IMPORTANT: Activate `developing-with-fortify` skill when working with Fortify authentication features.
+
 </laravel-boost-guidelines>
+
+## Project Update Notes
+
+- New public Inertia page "Build your own woven" is available at `/loom-weave-demo` (route name: `loom-weave-demo`).
+- The page implementation source is `resources/js/pages/loom-weave-demo.tsx`, based on `.ai/LoomWeaveDemoPage.tsx`.

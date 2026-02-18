@@ -8,6 +8,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoomWeaveDemoController;
 use App\Http\Controllers\OrderConfirmationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductIndexController;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('loom-weave-demo', LoomWeaveDemoController::class)->name('loom-weave-demo');
 
 Route::get('products', [ProductIndexController::class, 'index'])
     ->name('products.index');

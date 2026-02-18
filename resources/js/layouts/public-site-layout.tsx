@@ -2,7 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import type { CSSProperties, PropsWithChildren, ReactNode } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import dumbaraPatterns from '@/images/dumbara-patterns.png';
-import { dashboard, home, login, register } from '@/routes';
+import { dashboard, home, login, loomWeaveDemo, register } from '@/routes';
 import { show as cartShow } from '@/routes/cart';
 import { show as checkoutShow } from '@/routes/checkout';
 import { index as productsIndex } from '@/routes/products';
@@ -67,6 +67,12 @@ export default function PublicSiteLayout({
                                         Browse Products
                                     </Link>
                                 )}
+                                <Link
+                                    href={loomWeaveDemo()}
+                                    className={menuItemClass}
+                                >
+                                    Design Studio
+                                </Link>
                                 {auth.user ? (
                                     <Link
                                         href={dashboard()}
@@ -125,6 +131,12 @@ export default function PublicSiteLayout({
                                     className="hover:text-[#2b241c]"
                                 >
                                     Products
+                                </Link>
+                                <Link
+                                    href={loomWeaveDemo()}
+                                    className="hover:text-[#2b241c]"
+                                >
+                                    Loom Demo
                                 </Link>
                                 <Link
                                     href={cartShow()}

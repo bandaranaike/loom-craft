@@ -1,14 +1,14 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-02-17
+Last reviewed: 2026-02-18
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices.md`, `.ai/guardrails.md`, `.ai/dbschema.md`, and `.ai/order-process.md`.
 
 ## Current Delivery Snapshot
 
-- Route surface: 37 web routes (`php artisan route:list --except-vendor`).
-- Test inventory: 28 tests files total (27 feature, 1 unit).
+- Route surface: 38 web routes (`php artisan route:list --except-vendor`).
+- Test inventory: 29 tests files total (28 feature, 1 unit).
 - Service layer: one concrete external integration service at `app/Services/Video/YouTubeVideoUploader.php`.
 - Frontend page surface: Inertia React pages are present for public, auth/settings, vendor, and admin areas under `resources/js/pages`.
 
@@ -25,6 +25,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
   - approved community feedback highlights,
   - basic storefront metrics (`atelier_ledger`).
 - Home page now includes authenticated feedback composer for vendor/customer users with edit-in-place behavior.
+- Build Your Own Woven page (`/loom-weave-demo`) with interactive grid painting, compile preview, undo/redo history, constraint visibility, and PNG export.
 - Product index (`/products`) with search and pagination inputs.
 - Product show (`/products/{product}`) restricted to active products from approved vendors.
 
@@ -62,7 +63,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 
 ## Implemented Pages (Inertia)
 
-- Public: `welcome`, `products/index`, `products/show`, `cart`, `checkout`, `orders/confirmation`.
+- Public: `welcome`, `loom-weave-demo`, `products/index`, `products/show`, `cart`, `checkout`, `orders/confirmation`.
 - Auth/settings: `auth/*`, `settings/profile`, `settings/password`, `settings/two-factor`, `settings/appearance`.
 - Customer: `orders/index`, `orders/show`, `dashboard`.
 - Vendor: `vendor/register`, `vendor/products/index`, `vendor/products/create`, `vendor/orders/index`, `vendor/feedback/create`.
@@ -72,6 +73,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 
 - Auth + account settings (including two-factor challenge/settings and rate limiting).
 - Public pages and dashboard access.
+- Public loom weave demo route/component availability.
 - Product index/show visibility rules.
 - Vendor registration and vendor product workflows.
 - Cart flow and checkout order creation.

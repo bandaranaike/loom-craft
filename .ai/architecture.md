@@ -143,6 +143,7 @@ If something is not defined, state the limitation instead of inventing details.
 
 * Home
   * Includes approved community feedback and authenticated feedback composer (single editable entry per user)
+* Build Your Own Woven (interactive design playground)
 * Product listing
 * Product details (images + optional video)
 * Vendor profile

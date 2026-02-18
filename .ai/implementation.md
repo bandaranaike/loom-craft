@@ -76,6 +76,8 @@ This document translates the approved architecture into concrete implementation 
 - Home
   - Shows approved feedback entries
   - For authenticated vendor/customer users, includes a feedback form that creates or updates a single user-owned entry
+- Build Your Own Woven (`/loom-weave-demo`)
+  - Interactive pixel-grid editor with undo/redo, compile preview, and PNG export
 - Product listing
 - Product details (images + optional video)
 - Vendor profile

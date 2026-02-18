@@ -9,6 +9,7 @@ use App\DTOs\Order\CheckoutStoreData;
 use App\Http\Requests\Order\StoreCheckoutRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
@@ -31,7 +32,7 @@ class CheckoutController extends Controller
         ]);
 
         if ($request->user() === null && $result->guestToken !== null) {
-            $response->withCookie(cookie('loomcraft_guest_token', $result->guestToken, 60 * 24 * 30));
+            Cookie::queue(cookie('loomcraft_guest_token', $result->guestToken, 60 * 24 * 30));
         }
 
         return $response;
