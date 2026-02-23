@@ -10,7 +10,7 @@ type Props = {
 };
 
 const inputClassName =
-    'w-full rounded-full border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] placeholder:text-[#7a5a3a]/70 shadow-[0_8px_20px_-18px_rgba(43,36,28,0.7)] focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20';
+    'w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) placeholder:text-(--welcome-muted-70) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
 
 export default function VendorRegister() {
     const { status } = usePage<Props>().props;
@@ -29,7 +29,7 @@ export default function VendorRegister() {
                 headerActions={
                     <Link
                         href={dashboard()}
-                        className="rounded-full border border-[#2b241c] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
+                        className="rounded-full border border-(--welcome-strong) px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
                     >
                         Back to Dashboard
                     </Link>
@@ -37,32 +37,32 @@ export default function VendorRegister() {
             >
                     <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-4 lg:grid-cols-[1.05fr_0.95fr]">
                         <div className="space-y-6">
-                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                 Vendor Application
                             </p>
                             <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
                                 Apply to sell heritage pieces on LoomCraft.
                             </h1>
-                            <p className="max-w-xl text-sm text-[#5a4a3a] md:text-base">
+                            <p className="max-w-xl text-sm text-(--welcome-body-text) md:text-base">
                                 Vendor approval is manual to preserve craft quality and
                                 provenance. Share your artisan profile and atelier details
                                 for review.
                             </p>
                             <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Commission
                                     </p>
-                                    <p className="mt-3 text-sm text-[#5a4a3a]">
+                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
                                         A fixed 7% commission supports the marketplace and
                                         artisan storytelling.
                                     </p>
                                 </div>
-                                <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Approval Process
                                     </p>
-                                    <p className="mt-3 text-sm text-[#5a4a3a]">
+                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
                                         Every vendor application is reviewed by LoomCraft
                                         curators.
                                     </p>
@@ -71,22 +71,22 @@ export default function VendorRegister() {
                         </div>
 
                         <div className="relative">
-                            <div className="absolute -right-4 top-10 h-48 w-48 rounded-[32px] border border-[#d4b28c] bg-[#fdf8f0] shadow-[0_20px_60px_-30px_rgba(43,36,28,0.45)]" />
-                            <div className="relative rounded-[36px] border border-[#d4b28c] bg-[#f9efe2] p-8 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.6)]">
+                            <div className="absolute -right-4 top-10 h-48 w-48 rounded-[32px] border border-(--welcome-border) bg-(--welcome-surface-2) shadow-[0_20px_60px_-30px_var(--welcome-shadow-soft)]" />
+                            <div className="relative rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
                                 <div className="space-y-2">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Vendor Profile
                                     </p>
                                     <h2 className="font-['Playfair_Display',serif] text-2xl">
                                         Registration details
                                     </h2>
-                                    <p className="text-sm text-[#5a4a3a]">
+                                    <p className="text-sm text-(--welcome-body-text)">
                                         Submit your artisan profile for review.
                                     </p>
                                 </div>
 
                                 {status && (
-                                    <div className="mt-4 rounded-[24px] border border-[#b6623a]/40 bg-[#fff8ed] px-4 py-3 text-sm text-[#7a5a3a]">
+                                    <div className="mt-4 rounded-[24px] border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-muted-text)">
                                         {status}
                                     </div>
                                 )}
@@ -100,7 +100,7 @@ export default function VendorRegister() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="display_name"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Display name
                                                 </label>
@@ -121,7 +121,7 @@ export default function VendorRegister() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="location"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Location
                                                 </label>
@@ -141,7 +141,7 @@ export default function VendorRegister() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="bio"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Artisan bio
                                                 </label>
@@ -150,7 +150,7 @@ export default function VendorRegister() {
                                                     name="bio"
                                                     rows={5}
                                                     placeholder="Share your weaving lineage, materials, and atelier story."
-                                                    className="w-full rounded-[24px] border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] placeholder:text-[#7a5a3a]/70 shadow-[0_8px_20px_-18px_rgba(43,36,28,0.7)] focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                                    className="w-full rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) placeholder:text-(--welcome-muted-70) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
                                                 />
                                                 <InputError
                                                     message={errors.bio}
@@ -160,15 +160,15 @@ export default function VendorRegister() {
 
                                             <button
                                                 type="submit"
-                                                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#2b241c] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f6f1e8] transition hover:-translate-y-0.5 hover:bg-[#3a2f25] disabled:cursor-not-allowed disabled:opacity-70"
+                                                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-(--welcome-strong) px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
                                                 disabled={processing}
                                             >
                                                 {processing && (
-                                                    <Spinner className="text-[#f6f1e8]" />
+                                                    <Spinner className="text-(--welcome-on-strong)" />
                                                 )}
                                                 Submit for Review
                                             </button>
-                                            <p className="text-center text-xs uppercase tracking-[0.25em] text-[#7a5a3a]">
+                                            <p className="text-center text-xs uppercase tracking-[0.25em] text-(--welcome-muted-text)">
                                                 Submissions open to approved patrons only.
                                             </p>
                                         </>

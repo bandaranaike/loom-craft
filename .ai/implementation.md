@@ -136,6 +136,7 @@ This document translates the approved architecture into concrete implementation 
 ## 6. Payments & Currency
 
 ### Payment Methods
+- PayPal
 - Stripe
 - Manual bank transfer (admin‑verified)
 - Cash on delivery

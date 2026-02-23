@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\ProductApprovalController;
 use App\Http\Controllers\Admin\VendorApprovalController;
 use App\Http\Controllers\Admin\YouTubeAuthorizationController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CheckoutPayPalController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoomWeaveDemoController;
 use App\Http\Controllers\OrderConfirmationController;
@@ -41,6 +43,12 @@ Route::get('checkout', [CheckoutController::class, 'show'])
     ->name('checkout.show');
 Route::post('checkout', [CheckoutController::class, 'store'])
     ->name('checkout.store');
+Route::post('checkout/paypal/create', [CheckoutPayPalController::class, 'create'])
+    ->name('checkout.paypal.create');
+Route::get('checkout/paypal/approved', [CheckoutPayPalController::class, 'approved'])
+    ->name('checkout.paypal.approved');
+Route::get('checkout/paypal/cancelled', [CheckoutPayPalController::class, 'cancelled'])
+    ->name('checkout.paypal.cancelled');
 
 Route::get('orders/{order}/confirmation', [OrderConfirmationController::class, 'show'])
     ->name('orders.confirmation');
@@ -92,6 +100,11 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.feedback.pending');
         Route::post('feedback/{suggestion}/approve', [AdminFeedbackController::class, 'approve'])
             ->name('admin.feedback.approve');
+
+        Route::get('products/pending', [ProductApprovalController::class, 'pending'])
+            ->name('admin.products.pending');
+        Route::post('products/{product}/approve', [ProductApprovalController::class, 'approve'])
+            ->name('admin.products.approve');
     });
 
     Route::get('orders', [OrderController::class, 'index'])

@@ -54,24 +54,30 @@ export default function PendingVendors() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Pending Vendors" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <Head title="Pending Vendors">
+                <link rel="preconnect" href="https://fonts.bunny.net" />
+                <link
+                    href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
+                    rel="stylesheet"
+                />
+            </Head>
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-[24px] bg-(--welcome-on-strong) p-5 text-(--welcome-strong)">
                 {status && (
-                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-sm text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/40 dark:text-emerald-100">
+                    <div className="rounded-[24px] border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-6 py-4 text-sm text-(--welcome-muted-text)">
                         {status}
                     </div>
                 )}
 
-                <div className="rounded-xl border border-sidebar-border/70 bg-sidebar/30 p-6 dark:border-sidebar-border">
+                <div className="rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-1) p-7 shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-col gap-2">
-                            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                 Review Queue
                             </p>
-                            <h2 className="text-2xl font-semibold text-foreground">
+                            <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">
                                 Vendor applications awaiting approval
                             </h2>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-(--welcome-body-text)">
                                 Approve artisans once their profile and documentation are verified.
                             </p>
                         </div>
@@ -90,11 +96,11 @@ export default function PendingVendors() {
                                     name="search"
                                     placeholder="Search by display name"
                                     defaultValue={search ?? ''}
-                                    className="w-full rounded-full border border-sidebar-border/70 bg-background px-4 py-2 text-sm text-foreground shadow-xs focus:border-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 dark:border-sidebar-border"
+                                    className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-2 text-sm text-(--welcome-strong) placeholder:text-(--welcome-muted-70) shadow-[0_8px_20px_-16px_var(--welcome-shadow)] focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
                                 />
                                 <button
                                     type="submit"
-                                    className="inline-flex shrink-0 items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"
+                                    className="inline-flex shrink-0 items-center justify-center rounded-full border border-(--welcome-muted-text) px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text) transition hover:bg-(--welcome-muted-text) hover:text-(--welcome-surface-3)"
                                 >
                                     Search
                                 </button>
@@ -110,7 +116,7 @@ export default function PendingVendors() {
                                 />
                                 <label
                                     htmlFor="per_page"
-                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground"
+                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                 >
                                     Per page
                                 </label>
@@ -118,7 +124,7 @@ export default function PendingVendors() {
                                     id="per_page"
                                     name="per_page"
                                     defaultValue={per_page}
-                                    className="rounded-full border border-sidebar-border/70 bg-background px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground shadow-xs focus:border-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 dark:border-sidebar-border"
+                                    className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-2) px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) shadow-[0_8px_20px_-16px_var(--welcome-shadow)] focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
                                     onChange={(event) => {
                                         event.currentTarget.form?.requestSubmit();
                                     }}
@@ -135,7 +141,7 @@ export default function PendingVendors() {
                 </div>
 
                 {vendors.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-sidebar-border/80 p-10 text-center text-sm text-muted-foreground dark:border-sidebar-border">
+                    <div className="rounded-[24px] border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-10 text-center text-sm text-(--welcome-muted-text)">
                         No pending vendor applications right now.
                     </div>
                 ) : (
@@ -143,32 +149,32 @@ export default function PendingVendors() {
                         {vendors.map((vendor) => (
                             <div
                                 key={vendor.id}
-                                className="flex h-full flex-col gap-4 rounded-xl border border-sidebar-border/70 bg-background p-6 shadow-xs dark:border-sidebar-border"
+                                className="flex h-full flex-col gap-4 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6 shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]"
                             >
                                 <div className="space-y-2">
                                     <div className="flex flex-wrap items-center justify-between gap-2">
                                         <div>
-                                            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                                 {vendor.status}
                                             </p>
-                                            <h3 className="text-xl font-semibold text-foreground">
+                                            <h3 className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">
                                                 {vendor.display_name}
                                             </h3>
                                         </div>
                                         {vendor.submitted_at && (
-                                            <span className="rounded-full border border-sidebar-border/60 px-3 py-1 text-xs text-muted-foreground dark:border-sidebar-border">
+                                            <span className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-2) px-3 py-1 text-xs text-(--welcome-muted-text)">
                                                 Submitted {vendor.submitted_at}
                                             </span>
                                         )}
                                     </div>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-sm text-(--welcome-body-text)">
                                         {vendor.location ?? 'Location not provided'}
                                     </p>
-                                    <div className="text-sm text-foreground">
+                                    <div className="text-sm text-(--welcome-strong)">
                                         <span className="font-semibold">
                                             {vendor.user_name}
                                         </span>{' '}
-                                        <span className="text-muted-foreground">
+                                        <span className="text-(--welcome-muted-text)">
                                             ({vendor.user_email})
                                         </span>
                                     </div>
@@ -183,7 +189,7 @@ export default function PendingVendors() {
                                         {({ processing }) => (
                                             <button
                                                 type="submit"
-                                                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-background transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+                                                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-(--welcome-muted-text) px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-surface-3) transition hover:-translate-y-0.5 hover:bg-(--welcome-muted-strong) disabled:cursor-not-allowed disabled:opacity-70"
                                                 disabled={processing}
                                             >
                                                 {processing && <Spinner />}
@@ -202,7 +208,7 @@ export default function PendingVendors() {
                                                 <div className="grid gap-2">
                                                     <label
                                                         htmlFor={`reason-${vendor.id}`}
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground"
+                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                     >
                                                         Rejection reason
                                                     </label>
@@ -211,7 +217,7 @@ export default function PendingVendors() {
                                                         name="reason"
                                                         rows={3}
                                                         placeholder="Explain why this vendor was rejected."
-                                                        className="w-full rounded-xl border border-sidebar-border/70 bg-background px-4 py-3 text-sm text-foreground shadow-xs focus:border-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20 dark:border-sidebar-border"
+                                                        className="w-full rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) placeholder:text-(--welcome-muted-70) shadow-[0_8px_20px_-16px_var(--welcome-shadow)] focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
                                                         required
                                                     />
                                                     <InputError
@@ -221,7 +227,7 @@ export default function PendingVendors() {
                                                 </div>
                                                 <button
                                                     type="submit"
-                                                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:-translate-y-0.5 hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-70"
+                                                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-(--welcome-muted-text) px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text) transition hover:-translate-y-0.5 hover:bg-(--welcome-muted-text) hover:text-(--welcome-surface-3) disabled:cursor-not-allowed disabled:opacity-70"
                                                     disabled={processing}
                                                 >
                                                     {processing && <Spinner />}
@@ -237,7 +243,7 @@ export default function PendingVendors() {
                 )}
 
                 {pagination.last_page > 1 && (
-                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sidebar-border/70 bg-sidebar/20 px-4 py-3 text-xs text-muted-foreground dark:border-sidebar-border">
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-xs text-(--welcome-muted-text)">
                         <div>
                             Showing {pagination.from ?? 0} - {pagination.to ?? 0} of{' '}
                             {pagination.total}
@@ -251,7 +257,7 @@ export default function PendingVendors() {
                                     return (
                                         <span
                                             key={key}
-                                            className={`${baseClass} border-sidebar-border/60 text-muted-foreground/60`}
+                                            className={`${baseClass} border-(--welcome-border) text-(--welcome-muted-60)`}
                                         >
                                             {link.label}
                                         </span>
@@ -264,8 +270,8 @@ export default function PendingVendors() {
                                         href={link.url}
                                         className={`${baseClass} ${
                                             link.active
-                                                ? 'border-foreground bg-foreground text-background'
-                                                : 'border-foreground/50 text-foreground hover:bg-foreground hover:text-background'
+                                                ? 'border-(--welcome-muted-text) bg-(--welcome-muted-text) text-(--welcome-surface-3)'
+                                                : 'border-(--welcome-muted-50) text-(--welcome-muted-text) hover:bg-(--welcome-muted-text) hover:text-(--welcome-surface-3)'
                                         }`}
                                     >
                                         {link.label}

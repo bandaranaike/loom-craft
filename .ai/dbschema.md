@@ -2,6 +2,8 @@
 
 This schema is the **authoritative target** aligned with the architecture and implementation guides. It focuses on core business logic and keeps framework/system tables out of scope except `users`, which is central to roles and permissions. Do not introduce new domain fields outside this file without updating it.
 
+Last synchronized with `.ai/db.sql`: 2026-02-23.
+
 ---
 
 ## Overview
@@ -30,6 +32,10 @@ Authentication + role holder.
 - `email_verified_at` (timestamp, nullable)
 - `password` (varchar)
 - `role` (varchar) — `admin`, `vendor`, `customer`
+- `two_factor_secret` (text, nullable)
+- `two_factor_recovery_codes` (text, nullable)
+- `two_factor_confirmed_at` (timestamp, nullable)
+- `remember_token` (varchar(100), nullable)
 - `created_at` (timestamp, nullable)
 - `updated_at` (timestamp, nullable)
 
@@ -236,7 +242,7 @@ Single source for checkout payments.
 
 - `id` (bigint, PK)
 - `order_id` (bigint, FK → orders.id)
-- `method` (varchar) — `stripe`, `bank_transfer`, `cod`
+- `method` (varchar) — `paypal`, `stripe`, `bank_transfer`, `cod`
 - `status` (varchar) — `pending`, `authorized`, `paid`, `failed`, `refunded`
 - `amount` (decimal(10,2))
 - `currency` (varchar) — `USD`, `EUR`, `LKR`
@@ -245,6 +251,9 @@ Single source for checkout payments.
 - `verified_at` (timestamp, nullable)
 - `created_at` (timestamp, nullable)
 - `updated_at` (timestamp, nullable)
+
+Implementation note:
+- `order_id` is **not unique** at DB level. Current application flow creates one payment per order, but this is application-enforced rather than a database uniqueness constraint.
 
 Indexes:
 - `payments_order_id_index` on `order_id`
@@ -363,7 +372,7 @@ Constraints:
 - `orders` 1—* `order_items`
 - `orders` 1—* `order_addresses`
 - `orders` 1—* `shipments`
-- `orders` 1—1 `payments`
+- `orders` 1—* `payments` (current DB constraint); application flow currently treats this as one payment per order
 - `vendors` 1—* `vendor_payouts`
 - `orders` 1—* `disputes`
 - `products` 1—* `product_reports`

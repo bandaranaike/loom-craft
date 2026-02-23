@@ -61,6 +61,17 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Documentation Files
 
 - You must only create documentation files if explicitly requested by the user.
+- The `.ai/` folder contains project descriptions and implementation instructions. Before executing tasks, read the relevant `.ai/` files and use them as guidelines.
+- Quick `.ai` guide for task targeting:
+  - `.ai/guardrails.md`: mandatory non-negotiables (always read first).
+  - `.ai/best-practices.md`: coding and implementation rules (read for all implementation tasks).
+  - `.ai/implementation.md`: feature/page implementation scope and mappings.
+  - `.ai/architecture.md`: high-level product architecture and role/page scope.
+  - `.ai/order-process.md`: cart, checkout, payment, and order lifecycle rules.
+  - `.ai/dbschema.md`: authoritative domain schema reference for fields/relationships.
+  - `.ai/db.sql`: actual SQL snapshot; use to verify/refresh `.ai/dbschema.md`.
+  - `.ai/implementation-status.md`: current delivered vs pending features.
+- After every implementation task, update `.ai/implementation-status.md` to reflect what changed (implemented, partial, or pending).
 
 ## Replies
 
@@ -289,6 +300,7 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - Always use existing Tailwind conventions; check project patterns before adding new ones.
 - IMPORTANT: Always use `search-docs` tool for version-specific Tailwind CSS documentation and updated code examples. Never rely on training data.
 - IMPORTANT: Activate `tailwindcss-development` every time you're working with a Tailwind CSS or styling-related task.
+- For CSS variable utilities in Tailwind v4, use shorthand class syntax: `bg-(--token)`, `border-(--token)`, `ring-(--token)`, and `text-(--token)` instead of bracket `var(...)` syntax.
 
 === laravel/fortify rules ===
 
@@ -304,3 +316,11 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 
 - New public Inertia page "Build your own woven" is available at `/loom-weave-demo` (route name: `loom-weave-demo`).
 - The page implementation source is `resources/js/pages/loom-weave-demo.tsx`, based on `.ai/LoomWeaveDemoPage.tsx`.
+- PayPal checkout integration is available via:
+  - `POST /checkout/paypal/create` (`checkout.paypal.create`)
+  - `GET /checkout/paypal/approved` (`checkout.paypal.approved`)
+  - `GET /checkout/paypal/cancelled` (`checkout.paypal.cancelled`)
+- Required PayPal environment variables:
+  - `PAYPAL_CLIENT_ID`
+  - `PAYPAL_CLIENT_SECRET`
+  - `PAYPAL_BASE_URL` (optional, defaults to sandbox API URL)

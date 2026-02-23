@@ -120,6 +120,7 @@ If something is not defined, state the limitation instead of inventing details.
 
 ### Payment Methods
 
+* PayPal
 * Stripe
 * Manual bank transfer (admin-verified)
 * Cash on delivery

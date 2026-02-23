@@ -116,13 +116,13 @@ export default function Welcome({
             <PublicSiteLayout canRegister={canRegister}>
                     <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-6 lg:grid-cols-[1.1fr_0.9fr]">
                         <div className="space-y-6">
-                            <div className="inline-flex items-center gap-3 rounded-full border border-[#d4b28c] bg-[#f9efe2] px-4 py-2 text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                 Handloomed • Curated • Collectible
                             </div>
                             <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl lg:text-6xl">
                                 A marketplace devoted to Sri Lanka&apos;s most rare woven luxury.
                             </h1>
-                            <p className="max-w-xl text-base text-[#5a4a3a] md:text-lg">
+                            <p className="max-w-xl text-base text-(--welcome-body-text) md:text-lg">
                                 LoomCraft brings Dumbara Rataa artisans into a refined global
                                 atelier. Each piece is crafted in limited numbers with detailed
                                 provenance, authentic materials, and a heritage-first story.
@@ -130,14 +130,14 @@ export default function Welcome({
                             <div className="flex flex-wrap items-center gap-4">
                                 <Link
                                     href={productsIndex().url}
-                                    className="rounded-full border border-[#2b241c] px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#2b241c] transition hover:-translate-y-0.5 hover:bg-[#2b241c] hover:text-[#f6f1e8]"
+                                    className="rounded-full border border-(--welcome-strong) px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
                                 >
                                     Browse Products
                                 </Link>
                                 {auth.user ? (
                                     <Link
                                         href={dashboard()}
-                                        className="rounded-full bg-[#2b241c] px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#f6f1e8] transition hover:-translate-y-0.5 hover:bg-[#3a2f25]"
+                                        className="rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover)"
                                     >
                                         Visit Dashboard
                                     </Link>
@@ -146,47 +146,47 @@ export default function Welcome({
                                         {canRegister && (
                                             <Link
                                                 href={register()}
-                                                className="rounded-full bg-[#2b241c] px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#f6f1e8] transition hover:-translate-y-0.5 hover:bg-[#3a2f25]"
+                                                className="rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover)"
                                             >
                                                 Start Collecting
                                             </Link>
                                         )}
                                         <Link
                                             href={login()}
-                                            className="rounded-full border border-[#2b241c] px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#2b241c] transition hover:-translate-y-0.5 hover:bg-[#2b241c] hover:text-[#f6f1e8]"
+                                            className="rounded-full border border-(--welcome-strong) px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
                                         >
                                             Sign In
                                         </Link>
                                     </>
                                 )}
                             </div>
-                            <div className="flex flex-wrap items-center gap-6 text-xs uppercase tracking-[0.24em] text-[#7a5a3a]">
+                            <div className="flex flex-wrap items-center gap-6 text-xs uppercase tracking-[0.24em] text-(--welcome-muted-text)">
                                 <span>Guest Checkout</span>
                                 <span>USD / EUR / LKR</span>
                                 <span>Manual &amp; Stripe Payments</span>
                             </div>
                         </div>
                         <div className="relative">
-                            <div className="relative grid gap-6 rounded-[36px] border border-[#d4b28c] bg-[#f9efe2] p-8 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.6)]">
+                            <div className="relative grid gap-6 rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
                                 <div className="flex items-center justify-between">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Atelier Ledger
                                     </p>
-                                    <span className="rounded-full bg-[#2b241c] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#f6f1e8]">
+                                    <span className="rounded-full bg-(--welcome-strong) px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-(--welcome-on-strong)">
                                         Live
                                     </span>
                                 </div>
                                 <div className="grid gap-3 sm:grid-cols-2">
-                                    <div className="space-y-1 rounded-[20px] border border-[#e0c7a7] bg-[#fdf8f0] p-4">
-                                        <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                    <div className="space-y-1 rounded-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-4">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                             Active Products
                                         </p>
                                         <p className="font-['Playfair_Display',serif] text-3xl">
                                             {atelier_ledger.active_products}
                                         </p>
                                     </div>
-                                    <div className="space-y-1 rounded-[20px] border border-[#e0c7a7] bg-[#fdf8f0] p-4">
-                                        <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                    <div className="space-y-1 rounded-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-4">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                             Approved Feedback
                                         </p>
                                         <p className="font-['Playfair_Display',serif] text-3xl">
@@ -194,8 +194,8 @@ export default function Welcome({
                                         </p>
                                     </div>
                                 </div>
-                                <div className="grid gap-4 rounded-[28px] border border-[#e0c7a7] bg-[#fdf8f0] p-5">
-                                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                <div className="grid gap-4 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-5">
+                                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                         Latest Approved Vendor Note
                                     </p>
                                     {vendor_feedback.length > 0 ? (
@@ -204,16 +204,16 @@ export default function Welcome({
                                                 <p className="font-['Playfair_Display',serif] text-2xl">
                                                     {vendor_feedback[0].author_name}
                                                 </p>
-                                                <p className="text-sm text-[#5a4a3a]">
+                                                <p className="text-sm text-(--welcome-body-text)">
                                                     {vendor_feedback[0].title}
                                                 </p>
                                             </div>
-                                            <p className="text-xs text-[#7a5a3a]">
+                                            <p className="text-xs text-(--welcome-muted-text)">
                                                 {vendor_feedback[0].details}
                                             </p>
                                         </div>
                                     ) : (
-                                        <p className="text-sm text-[#5a4a3a]">
+                                        <p className="text-sm text-(--welcome-body-text)">
                                             Vendor feedback will appear here once approved by admins.
                                         </p>
                                     )}
@@ -223,19 +223,19 @@ export default function Welcome({
                     </section>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
-                    <div className="grid gap-8 rounded-[48px] border border-[#e0c7a7] bg-[#fff8ed] p-10 md:grid-cols-3">
+                    <div className="grid gap-8 rounded-[48px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-10 md:grid-cols-3">
                         {highlights.map((item) => (
                             <div
                                 key={item.title}
-                                className="space-y-3 border-b border-[#e0c7a7] pb-6 last:border-b-0 last:pb-0 md:border-b-0 md:border-r md:pb-0 md:pr-8 md:last:border-r-0 md:last:pr-0"
+                                className="space-y-3 border-b border-(--welcome-border-soft) pb-6 last:border-b-0 last:pb-0 md:border-b-0 md:border-r md:pb-0 md:pr-8 md:last:border-r-0 md:last:pr-0"
                             >
-                                <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                     Signature
                                 </p>
                                 <h2 className="font-['Playfair_Display',serif] text-2xl">
                                     {item.title}
                                 </h2>
-                                <p className="text-sm text-[#5a4a3a]">
+                                <p className="text-sm text-(--welcome-body-text)">
                                     {item.description}
                                 </p>
                             </div>
@@ -245,13 +245,13 @@ export default function Welcome({
 
                 <section className="mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 lg:grid-cols-[0.9fr_1.1fr]">
                     <div className="space-y-6">
-                        <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                             Curated Collections
                         </p>
                         <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
                             Designed for galleries, rituals, and refined living.
                         </h2>
-                        <p className="text-sm text-[#5a4a3a]">
+                        <p className="text-sm text-(--welcome-body-text)">
                             Every collection is an editorial of texture, story, and provenance —
                             ready for patrons, design studios, and collectors worldwide.
                         </p>
@@ -260,18 +260,18 @@ export default function Welcome({
                         {collections.map((collection) => (
                             <div
                                 key={collection.name}
-                                className="group rounded-[32px] border border-[#e0c7a7] bg-[#fff8ed] p-6 transition hover:-translate-y-1 hover:border-[#b6623a]"
+                                className="group rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6 transition hover:-translate-y-1 hover:border-(--welcome-accent)"
                             >
-                                <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                     Collection
                                 </p>
                                 <h3 className="mt-3 font-['Playfair_Display',serif] text-xl">
                                     {collection.name}
                                 </h3>
-                                <p className="mt-2 text-sm text-[#5a4a3a]">
+                                <p className="mt-2 text-sm text-(--welcome-body-text)">
                                     {collection.note}
                                 </p>
-                                <div className="mt-6 h-1 w-12 rounded-full bg-[#b6623a] transition group-hover:w-20" />
+                                <div className="mt-6 h-1 w-12 rounded-full bg-(--welcome-accent) transition group-hover:w-20" />
                             </div>
                         ))}
                     </div>
@@ -280,7 +280,7 @@ export default function Welcome({
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
                     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                         <div>
-                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                 New Arrivals
                             </p>
                             <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
@@ -289,13 +289,13 @@ export default function Welcome({
                         </div>
                         <Link
                             href={productsIndex().url}
-                            className="rounded-full border border-[#2b241c] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
+                            className="rounded-full border border-(--welcome-strong) px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
                         >
                             View all products
                         </Link>
                     </div>
                     {latest_products.length === 0 ? (
-                        <div className="rounded-[32px] border border-dashed border-[#d4b28c] bg-[#fff8ed] p-8 text-sm text-[#7a5a3a]">
+                        <div className="rounded-4xl border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-8 text-sm text-(--welcome-muted-text)">
                             No products available yet.
                         </div>
                     ) : (
@@ -304,9 +304,9 @@ export default function Welcome({
                                 <Link
                                     key={product.id}
                                     href={productShow(product.id).url}
-                                    className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] transition hover:-translate-y-1 hover:border-[#b6623a]"
+                                    className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)"
                                 >
-                                    <div className="relative aspect-4/3 bg-[#f9efe2]">
+                                    <div className="relative aspect-4/3 bg-(--welcome-surface-1)">
                                         {product.image_url ? (
                                             <img
                                                 src={product.image_url}
@@ -314,19 +314,19 @@ export default function Welcome({
                                                 className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                                             />
                                         ) : (
-                                            <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                            <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                                 Image forthcoming
                                             </div>
                                         )}
                                     </div>
                                     <div className="flex flex-1 flex-col gap-2 p-4">
-                                        <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                             {product.vendor_name}
                                         </p>
                                         <h3 className="font-['Playfair_Display',serif] text-xl">
                                             {product.name}
                                         </h3>
-                                        <p className="mt-auto text-sm font-semibold text-[#2b241c]">
+                                        <p className="mt-auto text-sm font-semibold text-(--welcome-strong)">
                                             {product.selling_price} USD
                                         </p>
                                     </div>
@@ -338,7 +338,7 @@ export default function Welcome({
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
                     <div className="mb-6">
-                        <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                             Atelier Voices
                         </p>
                         <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
@@ -346,8 +346,8 @@ export default function Welcome({
                         </h2>
                     </div>
                     {canLeaveFeedback && (
-                        <div className="mb-6 rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6">
-                            <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                        <div className="mb-6 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
+                            <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                 {my_feedback ? 'Edit Your Feedback' : 'Share Your Feedback'}
                             </p>
                             <h3 className="mt-2 font-['Playfair_Display',serif] text-2xl">
@@ -355,12 +355,12 @@ export default function Welcome({
                                     ? 'Update your vendor or buyer note'
                                     : 'Add your vendor or buyer note'}
                             </h3>
-                            <p className="mt-2 text-sm text-[#5a4a3a]">
+                            <p className="mt-2 text-sm text-(--welcome-body-text)">
                                 You can keep one feedback entry. Saving again updates your existing
                                 submission.
                             </p>
                             {my_feedback && (
-                                <p className="mt-2 text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                <p className="mt-2 text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                     Current status: {my_feedback.status}
                                 </p>
                             )}
@@ -374,7 +374,7 @@ export default function Welcome({
                                         <div className="grid gap-2">
                                             <label
                                                 htmlFor="title"
-                                                className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]"
+                                                className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)"
                                             >
                                                 Headline
                                             </label>
@@ -382,7 +382,7 @@ export default function Welcome({
                                                 id="title"
                                                 name="title"
                                                 defaultValue={my_feedback?.title ?? ''}
-                                                className="w-full rounded-xl border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] outline-none ring-[#2b241c]/20 focus:ring-2"
+                                                className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) outline-none ring-(--welcome-ring) focus:ring-2"
                                                 placeholder="Share one headline from your LoomCraft experience"
                                                 required
                                             />
@@ -391,7 +391,7 @@ export default function Welcome({
                                         <div className="grid gap-2">
                                             <label
                                                 htmlFor="details"
-                                                className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]"
+                                                className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)"
                                             >
                                                 Details
                                             </label>
@@ -400,7 +400,7 @@ export default function Welcome({
                                                 name="details"
                                                 rows={4}
                                                 defaultValue={my_feedback?.details ?? ''}
-                                                className="w-full rounded-xl border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] outline-none ring-[#2b241c]/20 focus:ring-2"
+                                                className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) outline-none ring-(--welcome-ring) focus:ring-2"
                                                 placeholder="Describe your experience as a vendor or buyer."
                                                 required
                                             />
@@ -408,7 +408,7 @@ export default function Welcome({
                                         </div>
                                         <button
                                             type="submit"
-                                            className="inline-flex w-fit items-center rounded-full bg-[#2b241c] px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#f6f1e8] transition hover:bg-[#3a2f25] disabled:cursor-not-allowed disabled:opacity-70"
+                                            className="inline-flex w-fit items-center rounded-full bg-(--welcome-strong) px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-(--welcome-on-strong) transition hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
                                             disabled={processing}
                                         >
                                             {my_feedback ? 'Update Feedback' : 'Submit Feedback'}
@@ -419,7 +419,7 @@ export default function Welcome({
                         </div>
                     )}
                     {vendor_feedback.length === 0 ? (
-                        <div className="rounded-4xl border border-dashed border-[#d4b28c] bg-[#fff8ed] p-8 text-sm text-[#7a5a3a]">
+                        <div className="rounded-4xl border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-8 text-sm text-(--welcome-muted-text)">
                             No approved feedback yet.
                         </div>
                     ) : (
@@ -427,19 +427,19 @@ export default function Welcome({
                             {vendor_feedback.map((feedback) => (
                                 <div
                                     key={feedback.id}
-                                    className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6"
+                                    className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
                                 >
-                                    <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                    <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                         {feedback.author_name} • {feedback.author_role}
                                     </p>
                                     <h3 className="mt-2 font-['Playfair_Display',serif] text-2xl">
                                         {feedback.title}
                                     </h3>
-                                    <p className="mt-3 text-sm text-[#5a4a3a]">
+                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
                                         {feedback.details}
                                     </p>
                                     {feedback.approved_at && (
-                                        <p className="mt-4 text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                        <p className="mt-4 text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                             Approved {feedback.approved_at}
                                         </p>
                                     )}
@@ -450,15 +450,15 @@ export default function Welcome({
                 </section>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
-                    <div className="grid gap-10 rounded-[48px] border border-[#e0c7a7] bg-[#f9efe2] p-10 lg:grid-cols-[1.1fr_0.9fr]">
+                    <div className="grid gap-10 rounded-[48px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-10 lg:grid-cols-[1.1fr_0.9fr]">
                         <div className="space-y-6">
-                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                 Craftsmanship Flow
                             </p>
                             <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
                                 From fiber to finish, every detail is traced.
                             </h2>
-                            <p className="text-sm text-[#5a4a3a]">
+                            <p className="text-sm text-(--welcome-body-text)">
                                 LoomCraft documents each stage of creation, so patrons receive
                                 not only the textile, but its story, materials, and maker.
                             </p>
@@ -467,16 +467,16 @@ export default function Welcome({
                             {craftsmanshipSteps.map((step, index) => (
                                 <div
                                     key={step.label}
-                                    className="flex items-start gap-4 rounded-[24px] border border-[#e0c7a7] bg-[#fff8ed] p-4"
+                                    className="flex items-start gap-4 rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4"
                                 >
-                                    <div className="grid h-10 w-10 place-items-center rounded-full border border-[#b6623a] text-sm font-semibold">
+                                    <div className="grid h-10 w-10 place-items-center rounded-full border border-(--welcome-accent) text-sm font-semibold">
                                         {index + 1}
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                             {step.label}
                                         </p>
-                                        <p className="mt-1 text-sm text-[#5a4a3a]">
+                                        <p className="mt-1 text-sm text-(--welcome-body-text)">
                                             {step.text}
                                         </p>
                                     </div>
@@ -487,14 +487,14 @@ export default function Welcome({
                 </section>
 
                 <section className="mx-auto grid w-full max-w-6xl gap-8 px-6 pb-20 lg:grid-cols-[1fr_1fr]">
-                    <div className="rounded-[40px] border border-[#e0c7a7] bg-[#2b241c] p-8 text-[#f6f1e8]">
-                        <p className="text-xs uppercase tracking-[0.3em] text-[#e6c9a6]">
+                    <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-strong) p-8 text-(--welcome-on-strong)">
+                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-accent-soft)">
                             For Vendors
                         </p>
                         <h2 className="mt-4 font-['Playfair_Display',serif] text-3xl">
                             A refined marketplace for master weavers.
                         </h2>
-                        <p className="mt-3 text-sm text-[#f6f1e8]/80">
+                        <p className="mt-3 text-sm text-(--welcome-on-strong-muted)">
                             Gain access to a curated audience, transparent pricing, and a
                             dashboard built around your craft. Manual approval keeps the
                             marketplace authentic and exclusive.
@@ -503,31 +503,31 @@ export default function Welcome({
                             <div className="mt-6">
                                 <Link
                                     href={register()}
-                                    className="inline-flex items-center rounded-full border border-[#f6f1e8] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition hover:bg-[#f6f1e8] hover:text-[#2b241c]"
+                                    className="inline-flex items-center rounded-full border border-(--welcome-on-strong) px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition hover:bg-(--welcome-on-strong) hover:text-(--welcome-strong)"
                                 >
                                     Apply as Vendor
                                 </Link>
                             </div>
                         )}
                     </div>
-                    <div className="rounded-[40px] border border-[#e0c7a7] bg-[#fff8ed] p-8">
-                        <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                    <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-8">
+                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                             Patron Notes
                         </p>
                         <h2 className="mt-4 font-['Playfair_Display',serif] text-3xl">
                             "The weave carries the rhythm of the loom itself."
                         </h2>
-                        <p className="mt-3 text-sm text-[#5a4a3a]">
+                        <p className="mt-3 text-sm text-(--welcome-body-text)">
                             Each order arrives with a maker&apos;s note, woven coordinates, and
                             recommended care to preserve its luster for generations.
                         </p>
                         <div className="mt-6 flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-full border border-[#b6623a] bg-[#f9efe2]" />
+                            <div className="h-12 w-12 rounded-full border border-(--welcome-accent) bg-(--welcome-surface-1)" />
                             <div>
-                                <p className="text-sm font-semibold text-[#2b241c]">
+                                <p className="text-sm font-semibold text-(--welcome-strong)">
                                     Amara Wijekoon
                                 </p>
-                                <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a3a]">
+                                <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
                                     Curator, LoomCraft
                                 </p>
                             </div>

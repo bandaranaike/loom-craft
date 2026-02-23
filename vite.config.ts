@@ -21,6 +21,9 @@ export default defineConfig({
             formVariants: true,
         }),
     ],
+    resolve: {
+        dedupe: ['react', 'react-dom'],
+    },
     esbuild: {
         jsx: 'automatic',
     },

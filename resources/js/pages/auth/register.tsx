@@ -6,7 +6,7 @@ import { login } from '@/routes';
 import { store } from '@/routes/register';
 
 const inputClassName =
-    'w-full rounded-full border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] placeholder:text-[#7a5a3a]/70 shadow-[0_8px_20px_-18px_rgba(43,36,28,0.7)] focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20';
+    'w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) placeholder:text-(--welcome-muted-70) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
 
 export default function Register() {
     return (
@@ -18,45 +18,35 @@ export default function Register() {
                     rel="stylesheet"
                 />
             </Head>
-            <PublicSiteLayout
-                canRegister={false}
-                headerActions={
-                    <Link
-                        href={login()}
-                        className="rounded-full border border-[#2b241c] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
-                    >
-                        Log in
-                    </Link>
-                }
-            >
+            <PublicSiteLayout canRegister={false}>
                     <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-4 lg:grid-cols-[1.05fr_0.95fr]">
                         <div className="space-y-6">
-                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                 Become a Patron
                             </p>
                             <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
                                 Join the LoomCraft collector circle.
                             </h1>
-                            <p className="max-w-xl text-sm text-[#5a4a3a] md:text-base">
+                            <p className="max-w-xl text-sm text-(--welcome-body-text) md:text-base">
                                 Create your account to reserve limited releases, follow artisan
                                 stories, and access a curated marketplace dedicated to heritage
                                 weaving.
                             </p>
                             <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Vendor Approval
                                     </p>
-                                    <p className="mt-3 text-sm text-[#5a4a3a]">
+                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
                                         Artisan sellers are reviewed manually to protect the
                                         heritage network.
                                     </p>
                                 </div>
-                                <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Transparent Pricing
                                     </p>
-                                    <p className="mt-3 text-sm text-[#5a4a3a]">
+                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
                                         The platform applies a fixed 7% commission across every
                                         textile.
                                     </p>
@@ -65,16 +55,16 @@ export default function Register() {
                         </div>
 
                         <div className="relative">
-                            <div className="absolute -right-4 top-10 h-48 w-48 rounded-[32px] border border-[#d4b28c] bg-[#fdf8f0] shadow-[0_20px_60px_-30px_rgba(43,36,28,0.45)]" />
-                            <div className="relative rounded-[36px] border border-[#d4b28c] bg-[#f9efe2] p-8 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.6)]">
+                            <div className="absolute -right-4 top-10 h-48 w-48 rounded-[32px] border border-(--welcome-border) bg-(--welcome-surface-2) shadow-[0_20px_60px_-30px_var(--welcome-shadow-soft)]" />
+                            <div className="relative rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
                                 <div className="space-y-2">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Register
                                     </p>
                                     <h2 className="font-['Playfair_Display',serif] text-2xl">
                                         Create an account
                                     </h2>
-                                    <p className="text-sm text-[#5a4a3a]">
+                                    <p className="text-sm text-(--welcome-body-text)">
                                         Enter your details below to begin.
                                     </p>
                                 </div>
@@ -93,7 +83,7 @@ export default function Register() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="name"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Name
                                                 </label>
@@ -117,7 +107,7 @@ export default function Register() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="email"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Email address
                                                 </label>
@@ -140,7 +130,7 @@ export default function Register() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="password"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Password
                                                 </label>
@@ -163,7 +153,7 @@ export default function Register() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="password_confirmation"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Confirm password
                                                 </label>
@@ -185,12 +175,12 @@ export default function Register() {
 
                                             <button
                                                 type="submit"
-                                                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#2b241c] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f6f1e8] transition hover:-translate-y-0.5 hover:bg-[#3a2f25] disabled:cursor-not-allowed disabled:opacity-70"
+                                                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-(--welcome-strong) px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
                                                 tabIndex={5}
                                                 data-test="register-user-button"
                                             >
                                                 {processing && (
-                                                    <Spinner className="text-[#f6f1e8]" />
+                                                    <Spinner className="text-(--welcome-on-strong)" />
                                                 )}
                                                 Create account
                                             </button>
@@ -198,11 +188,11 @@ export default function Register() {
                                     )}
                                 </Form>
 
-                                <div className="mt-6 text-center text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                <div className="mt-6 text-center text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                     Already have an account?{' '}
                                     <Link
                                         href={login()}
-                                        className="font-semibold text-[#2b241c]"
+                                        className="font-semibold text-(--welcome-strong)"
                                         tabIndex={6}
                                     >
                                         Log in

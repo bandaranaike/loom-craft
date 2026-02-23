@@ -56,18 +56,18 @@ export default function ProductIndex({
             <PublicSiteLayout canRegister={canRegister}>
                     <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-6 pb-12 pt-6 lg:grid-cols-[1.1fr_0.9fr]">
                         <div className="space-y-4">
-                            <div className="inline-flex items-center gap-3 rounded-full border border-[#d4b28c] bg-[#f9efe2] px-4 py-2 text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                 Approved Collection
                             </div>
                             <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
                                 Discover heritage pieces curated for collectors.
                             </h1>
-                            <p className="max-w-xl text-sm text-[#5a4a3a] md:text-base">
+                            <p className="max-w-xl text-sm text-(--welcome-body-text) md:text-base">
                                 Only LoomCraft-approved textiles are presented here — each woven
                                 by verified artisans with documented provenance.
                             </p>
                         </div>
-                        <div className="rounded-[36px] border border-[#d4b28c] bg-[#f9efe2] p-6 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.5)]">
+                        <div className="rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-6 shadow-[0_30px_80px_-45px_var(--welcome-shadow-medium)]">
                             <Form
                                 {...productsIndex.form()}
                                 className="flex flex-col gap-4"
@@ -79,7 +79,7 @@ export default function ProductIndex({
                                 />
                                 <label
                                     htmlFor="search"
-                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                 >
                                     Search the catalog
                                 </label>
@@ -89,23 +89,23 @@ export default function ProductIndex({
                                     name="search"
                                     placeholder="Search by product name"
                                     defaultValue={search ?? ''}
-                                    className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                    className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
                                 />
                                 <div className="flex flex-wrap items-center gap-3">
                                     <button
                                         type="submit"
-                                        className="inline-flex items-center justify-center rounded-full border border-[#2b241c] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
+                                        className="inline-flex items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
                                     >
                                         Explore
                                     </button>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                             Per page
                                         </span>
                                         <select
                                             name="per_page"
                                             defaultValue={per_page}
-                                            className="rounded-full border border-[#d4b28c] bg-[#fff8ed] px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
+                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
                                             onChange={(event) => {
                                                 event.currentTarget.form?.requestSubmit();
                                             }}
@@ -124,7 +124,7 @@ export default function ProductIndex({
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
                     {products.length === 0 ? (
-                        <div className="rounded-[32px] border border-dashed border-[#d4b28c] bg-[#fff8ed] p-10 text-center text-sm text-[#7a5a3a]">
+                        <div className="rounded-[32px] border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-10 text-center text-sm text-(--welcome-muted-text)">
                             No approved products yet. Please check back soon.
                         </div>
                     ) : (
@@ -133,9 +133,9 @@ export default function ProductIndex({
                                 <Link
                                     key={product.id}
                                     href={productShow(product.id).url}
-                                    className="group flex h-full flex-col overflow-hidden rounded-[32px] border border-[#e0c7a7] bg-[#fff8ed] transition hover:-translate-y-1 hover:border-[#b6623a]"
+                                    className="group flex h-full flex-col overflow-hidden rounded-[32px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)"
                                 >
-                                    <div className="relative aspect-[4/3] overflow-hidden bg-[#f9efe2]">
+                                    <div className="relative aspect-[4/3] overflow-hidden bg-(--welcome-surface-1)">
                                         {product.image_url ? (
                                             <img
                                                 src={product.image_url}
@@ -143,14 +143,14 @@ export default function ProductIndex({
                                                 className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                                             />
                                         ) : (
-                                            <div className="flex h-full w-full items-center justify-center text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <div className="flex h-full w-full items-center justify-center text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                                 Image forthcoming
                                             </div>
                                         )}
                                     </div>
                                     <div className="flex flex-1 flex-col gap-3 p-5">
                                         <div className="space-y-2">
-                                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                                 {product.vendor_name}
                                                 {product.vendor_location
                                                     ? ` • ${product.vendor_location}`
@@ -161,10 +161,10 @@ export default function ProductIndex({
                                             </h3>
                                         </div>
                                         <div className="mt-auto flex items-center justify-between text-sm">
-                                            <span className="text-[#5a4a3a]">
+                                            <span className="text-(--welcome-body-text)">
                                                 Selling price
                                             </span>
-                                            <span className="font-semibold text-[#2b241c]">
+                                            <span className="font-semibold text-(--welcome-strong)">
                                                 {product.selling_price} USD
                                             </span>
                                         </div>
@@ -177,7 +177,7 @@ export default function ProductIndex({
 
                 {pagination.last_page > 1 && (
                     <section className="mx-auto w-full max-w-6xl px-6 pb-20">
-                        <div className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] px-4 py-3 text-xs text-[#7a5a3a]">
+                        <div className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-xs text-(--welcome-muted-text)">
                             <div>
                                 Showing {pagination.from ?? 0} - {pagination.to ?? 0} of{' '}
                                 {pagination.total}
@@ -191,7 +191,7 @@ export default function ProductIndex({
                                         return (
                                             <span
                                                 key={key}
-                                                className={`${baseClass} border-[#d4b28c] text-[#7a5a3a]/60`}
+                                                className={`${baseClass} border-(--welcome-border) text-(--welcome-muted-60)`}
                                             >
                                                 {link.label}
                                             </span>
@@ -204,8 +204,8 @@ export default function ProductIndex({
                                             href={link.url}
                                             className={`${baseClass} ${
                                                 link.active
-                                                    ? 'border-[#2b241c] bg-[#2b241c] text-[#f6f1e8]'
-                                                    : 'border-[#2b241c]/50 text-[#2b241c] hover:bg-[#2b241c] hover:text-[#f6f1e8]'
+                                                    ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
+                                                    : 'border-(--welcome-strong-50) text-(--welcome-strong) hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)'
                                             }`}
                                         >
                                             {link.label}

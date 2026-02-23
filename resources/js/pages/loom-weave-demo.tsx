@@ -91,19 +91,19 @@ export default function LoomWeaveDemoPage() {
             <PublicSiteLayout>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-6 pt-6 pb-10 lg:grid-cols-[1.1fr_0.9fr]">
                     <div className="space-y-4">
-                        <div className="inline-flex items-center gap-3 rounded-full border border-[#d4b28c] bg-[#f9efe2] px-4 py-2 text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                        <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                             Design Studio
                         </div>
                         <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
                             Build your own woven
                         </h1>
-                        <p className="max-w-xl text-sm text-[#5a4a3a] md:text-base">
+                        <p className="max-w-xl text-sm text-(--welcome-body-text) md:text-base">
                             Paint your pattern, compile instantly, and export a
                             production preview PNG from the woven grid.
                         </p>
                     </div>
-                    <div className="rounded-[36px] border border-[#d4b28c] bg-[#f9efe2] p-6 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.5)]">
-                        <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                    <div className="rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-6 shadow-[0_30px_80px_-45px_var(--welcome-shadow-medium)]">
+                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                             Palette
                         </p>
                         <div className="mt-4 flex flex-wrap gap-3">
@@ -113,12 +113,12 @@ export default function LoomWeaveDemoPage() {
                                     onClick={() => setActiveColor(color.id)}
                                     className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.2em] uppercase transition ${
                                         activeColor === color.id
-                                            ? 'border-[#2b241c] bg-[#2b241c] text-[#f6f1e8]'
-                                            : 'border-[#d4b28c] bg-[#fff8ed] text-[#2b241c] hover:border-[#2b241c]'
+                                            ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
+                                            : 'border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-strong) hover:border-(--welcome-strong)'
                                     }`}
                                 >
                                     <span
-                                        className="h-4 w-4 rounded-full border border-[#b3a08d]"
+                                        className="h-4 w-4 rounded-full border border-(--welcome-border-quiet)"
                                         style={{ backgroundColor: color.hex }}
                                     />
                                     {color.name}
@@ -129,20 +129,20 @@ export default function LoomWeaveDemoPage() {
                             <button
                                 onClick={history.undo}
                                 disabled={!history.canUndo}
-                                className="rounded-full border border-[#2b241c] px-4 py-2 text-xs font-semibold tracking-[0.3em] text-[#2b241c] uppercase transition enabled:hover:bg-[#2b241c] enabled:hover:text-[#f6f1e8] disabled:cursor-not-allowed disabled:border-[#d4b28c] disabled:text-[#7a5a3a]/60"
+                                className="rounded-full border border-(--welcome-strong) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition enabled:hover:bg-(--welcome-strong) enabled:hover:text-(--welcome-on-strong) disabled:cursor-not-allowed disabled:border-(--welcome-border) disabled:text-(--welcome-muted-60)"
                             >
                                 Undo
                             </button>
                             <button
                                 onClick={history.redo}
                                 disabled={!history.canRedo}
-                                className="rounded-full border border-[#2b241c] px-4 py-2 text-xs font-semibold tracking-[0.3em] text-[#2b241c] uppercase transition enabled:hover:bg-[#2b241c] enabled:hover:text-[#f6f1e8] disabled:cursor-not-allowed disabled:border-[#d4b28c] disabled:text-[#7a5a3a]/60"
+                                className="rounded-full border border-(--welcome-strong) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition enabled:hover:bg-(--welcome-strong) enabled:hover:text-(--welcome-on-strong) disabled:cursor-not-allowed disabled:border-(--welcome-border) disabled:text-(--welcome-muted-60)"
                             >
                                 Redo
                             </button>
                             <button
                                 onClick={handleExportPng}
-                                className="rounded-full border border-[#2b241c] bg-[#2b241c] px-4 py-2 text-xs font-semibold tracking-[0.3em] text-[#f6f1e8] uppercase transition hover:bg-[#3a2f25]"
+                                className="rounded-full border border-(--welcome-strong) bg-(--welcome-strong) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-on-strong) uppercase transition hover:bg-(--welcome-strong-hover)"
                             >
                                 Export PNG
                             </button>
@@ -151,16 +151,16 @@ export default function LoomWeaveDemoPage() {
                 </section>
 
                 <section className="mx-auto grid w-full max-w-6xl gap-6 px-6 pb-10 lg:grid-cols-2">
-                    <div className="rounded-4xl border border-[#e0c7a7] bg-[#fff8ed] p-5">
+                    <div className="rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
                         <h3 className="font-['Playfair_Display',serif] text-2xl">
                             Editor Grid
                         </h3>
-                        <p className="mt-2 text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                        <p className="mt-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                             Click cells to paint
                         </p>
-                        <div className="mt-4 overflow-x-auto rounded-[20px] border border-[#d4b28c] bg-[#f9efe2] p-3">
+                        <div className="mt-4 overflow-x-auto rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-1) p-3">
                             <div
-                                className="grid gap-px bg-[#d4b28c] p-px"
+                                className="grid gap-px bg-(--welcome-border) p-px"
                                 style={{
                                     gridTemplateColumns: `repeat(${history.present.widthCells}, minmax(18px, 18px))`,
                                     width: 'fit-content',
@@ -194,38 +194,38 @@ export default function LoomWeaveDemoPage() {
                         </div>
                     </div>
 
-                    <div className="rounded-4xl border border-[#e0c7a7] bg-[#fff8ed] p-5">
+                    <div className="rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
                         <h3 className="font-['Playfair_Display',serif] text-2xl">
                             Compiled SVG Preview
                         </h3>
-                        <p className="mt-2 text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                        <p className="mt-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                             Real-time weave output
                         </p>
-                        <div className="mt-4 overflow-x-auto rounded-[20px] border border-[#d4b28c] bg-[#f9efe2] p-4">
+                        <div className="mt-4 overflow-x-auto rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-1) p-4">
                             <div dangerouslySetInnerHTML={{ __html: svg }} />
                         </div>
                     </div>
                 </section>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
-                    <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6">
+                    <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                         <h3 className="font-['Playfair_Display',serif] text-2xl">
                             Constraint Issues ({constraints.issues.length})
                         </h3>
-                        <ul className="mt-4 space-y-2 text-sm text-[#5a4a3a]">
+                        <ul className="mt-4 space-y-2 text-sm text-(--welcome-body-text)">
                             {constraints.issues.map((issue, index) => (
                                 <li
                                     key={`${issue.id}-${index}`}
-                                    className="rounded-2xl border border-[#e0c7a7] bg-[#f9efe2] px-4 py-3"
+                                    className="rounded-2xl border border-(--welcome-border-soft) bg-(--welcome-surface-1) px-4 py-3"
                                 >
-                                    <strong className="mr-2 text-[#2b241c]">
+                                    <strong className="mr-2 text-(--welcome-strong)">
                                         {issue.severity.toUpperCase()}:
                                     </strong>
                                     {issue.message}
                                 </li>
                             ))}
                             {constraints.issues.length === 0 ? (
-                                <li className="rounded-2xl border border-[#e0c7a7] bg-[#f9efe2] px-4 py-3 text-[#2b241c]">
+                                <li className="rounded-2xl border border-(--welcome-border-soft) bg-(--welcome-surface-1) px-4 py-3 text-(--welcome-strong)">
                                     No issues.
                                 </li>
                             ) : null}

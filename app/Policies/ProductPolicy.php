@@ -81,4 +81,9 @@ class ProductPolicy
     {
         return false;
     }
+
+    public function approve(User $user, Product $product): bool
+    {
+        return $user->role === 'admin' && $product->status === 'pending_review';
+    }
 }

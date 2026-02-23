@@ -93,6 +93,12 @@ Always enforce permissions on the backend (policies/gates/middleware).
   - Admin panel
 - Use named routes and `route()` helpers for links
 
+## Frontend Styling Convention
+- Use Tailwind v4 CSS variable shorthand classes for design tokens:
+  - `bg-(--token)`, `border-(--token)`, `ring-(--token)`
+  - `text-(--token)` for text color
+- Do not use bracket `var(...)` utility form when shorthand form is available.
+
 ---
 
 ## Laravel 12 Structure

@@ -83,7 +83,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 
 ## Partial / Gaps vs Architecture Scope
 
-- Payment methods are captured as records/status only; no real Stripe charge lifecycle and no bank transfer admin verification workflow UI.
+- PayPal approval/capture checkout flow is implemented; Stripe remains record/status-only and bank transfer admin verification workflow UI is still missing.
 - Shipment, disputes, complaints, and product reports are modeled at DB level but not surfaced as completed user/admin workflows.
 - Vendor shipping management and vendor payments/earnings pages are not implemented.
 - Admin vendor CRUD beyond pending/approve/reject is not implemented.

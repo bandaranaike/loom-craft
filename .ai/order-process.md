@@ -18,7 +18,7 @@ This document defines the end-to-end ordering workflow for LoomCraft, aligned wi
 - Multi‑vendor marketplace with a fixed **7%** platform commission on every item.
 - Guest checkout is allowed.
 - Supported currencies: **USD**, **EUR**, **LKR**.
-- Payment methods: **Stripe**, **Manual bank transfer (admin‑verified)**, **Cash on delivery**.
+- Payment methods: **PayPal**, **Stripe**, **Manual bank transfer (admin‑verified)**, **Cash on delivery**.
 - Refunds are **manual only** via disputes (no automated refunds).
 - Shipping responsibility per order: **vendor** or **platform**.
 - All controllers return **Inertia** responses.
@@ -104,7 +104,8 @@ No additional fields are introduced beyond `.ai/dbschema.md`.
 
 ### 4.5 Payment Selection
 
-- User chooses one method: **Stripe**, **Bank Transfer**, **Cash on Delivery**.
+- User chooses one method: **PayPal**, **Stripe**, **Bank Transfer**, **Cash on Delivery**.
+- PayPal redirects for approval and returns for capture before order finalization.
 - Stripe proceeds to payment capture.
 - Bank transfer is **pending** until admin verification.
 - COD is marked as pending/processing until fulfillment.

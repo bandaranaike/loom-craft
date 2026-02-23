@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { show as cartShow } from '@/routes/cart';
+import { create as checkoutPayPalCreate } from '@/routes/checkout/paypal';
 import { store as checkoutStore } from '@/routes/checkout';
 import type { SharedData } from '@/types';
 
@@ -31,10 +32,13 @@ type CheckoutPageProps = {
     guest_name?: string | null;
     guest_email?: string | null;
     canRegister?: boolean;
+    paypal_configured?: boolean;
 };
 
 const defaultPaymentLabel = (method: string) => {
     switch (method) {
+        case 'paypal':
+            return 'PayPal';
         case 'stripe':
             return 'Stripe (card)';
         case 'bank_transfer':
@@ -54,9 +58,11 @@ export default function CheckoutPage({
     guest_name,
     guest_email,
     canRegister = true,
+    paypal_configured = false,
 }: CheckoutPageProps) {
     const { auth } = usePage<SharedData>().props;
     const [mirrorBilling, setMirrorBilling] = useState(true);
+    const [paypalProcessing, setPaypalProcessing] = useState(false);
 
     const form = useForm({
         guest_name: guest_name ?? '',
@@ -82,24 +88,90 @@ export default function CheckoutPage({
         billing_phone: '',
     });
 
+    const normalizedPayload = () => {
+        if (!mirrorBilling) {
+            return form.data;
+        }
+
+        return {
+            ...form.data,
+            billing_full_name: form.data.shipping_full_name,
+            billing_line1: form.data.shipping_line1,
+            billing_line2: form.data.shipping_line2,
+            billing_city: form.data.shipping_city,
+            billing_region: form.data.shipping_region,
+            billing_postal_code: form.data.shipping_postal_code,
+            billing_country_code: form.data.shipping_country_code,
+            billing_phone: form.data.shipping_phone,
+        };
+    };
+
+    const csrfToken = () =>
+        document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content') ?? '';
+
+    const submitPayPalOrder = async (): Promise<void> => {
+        setPaypalProcessing(true);
+        form.clearErrors();
+
+        try {
+            const response = await fetch(checkoutPayPalCreate().url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': csrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify(normalizedPayload()),
+            });
+
+            if (response.status === 422) {
+                const payload = (await response.json()) as {
+                    errors?: Record<string, string | string[]>;
+                };
+
+                Object.entries(payload.errors ?? {}).forEach(
+                    ([field, value]) => {
+                        form.setError(
+                            field as keyof typeof form.errors,
+                            Array.isArray(value) ? value[0] : value,
+                        );
+                    },
+                );
+
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error('PayPal order creation failed.');
+            }
+
+            const payload = (await response.json()) as {
+                approve_url?: string;
+            };
+
+            if (!payload.approve_url) {
+                throw new Error('PayPal approval URL is missing.');
+            }
+
+            window.location.assign(payload.approve_url);
+        } finally {
+            setPaypalProcessing(false);
+        }
+    };
+
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
 
-        form.transform((data) =>
-            mirrorBilling
-                ? {
-                      ...data,
-                      billing_full_name: data.shipping_full_name,
-                      billing_line1: data.shipping_line1,
-                      billing_line2: data.shipping_line2,
-                      billing_city: data.shipping_city,
-                      billing_region: data.shipping_region,
-                      billing_postal_code: data.shipping_postal_code,
-                      billing_country_code: data.shipping_country_code,
-                      billing_phone: data.shipping_phone,
-                  }
-                : data,
-        );
+        if (form.data.payment_method === 'paypal') {
+            void submitPayPalOrder();
+
+            return;
+        }
+
+        form.transform(() => normalizedPayload());
 
         form.post(checkoutStore().url, {
             preserveScroll: true,
@@ -118,14 +190,14 @@ export default function CheckoutPage({
             <PublicSiteLayout canRegister={canRegister}>
                     <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-4 pb-16 lg:grid-cols-[1.2fr_0.8fr]">
                         <div className="space-y-6">
-                            <div className="inline-flex items-center gap-3 rounded-full border border-[#d4b28c] bg-[#f9efe2] px-4 py-2 text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                            <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                 Checkout Atelier
                             </div>
                             <div>
                                 <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
                                     Confirm your heritage order
                                 </h1>
-                                <p className="mt-3 text-sm text-[#5a4a3a]">
+                                <p className="mt-3 text-sm text-(--welcome-body-text)">
                                     Provide shipping and billing details to
                                     secure your curated pieces.
                                 </p>
@@ -133,13 +205,13 @@ export default function CheckoutPage({
 
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {!auth.user && (
-                                    <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6">
-                                        <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                    <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Guest information
                                         </p>
                                         <div className="mt-4 grid gap-4 md:grid-cols-2">
                                             <div className="space-y-2">
-                                                <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                     Full name
                                                 </label>
                                                 <input
@@ -152,7 +224,7 @@ export default function CheckoutPage({
                                                             event.target.value,
                                                         )
                                                     }
-                                                    className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                                    className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                                 />
                                                 <InputError
                                                     message={
@@ -161,7 +233,7 @@ export default function CheckoutPage({
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                     Email address
                                                 </label>
                                                 <input
@@ -176,7 +248,7 @@ export default function CheckoutPage({
                                                             event.target.value,
                                                         )
                                                     }
-                                                    className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                                    className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                                 />
                                                 <InputError
                                                     message={
@@ -188,13 +260,13 @@ export default function CheckoutPage({
                                     </div>
                                 )}
 
-                                <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6">
-                                    <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                         Shipping details
                                     </p>
                                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Recipient name
                                             </label>
                                             <input
@@ -209,7 +281,7 @@ export default function CheckoutPage({
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             />
                                             <InputError
                                                 message={
@@ -219,7 +291,7 @@ export default function CheckoutPage({
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Phone (optional)
                                             </label>
                                             <input
@@ -232,12 +304,12 @@ export default function CheckoutPage({
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             />
                                         </div>
                                     </div>
                                     <div className="mt-4 space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Address line 1
                                         </label>
                                         <input
@@ -250,14 +322,14 @@ export default function CheckoutPage({
                                                     event.target.value,
                                                 )
                                             }
-                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         />
                                         <InputError
                                             message={form.errors.shipping_line1}
                                         />
                                     </div>
                                     <div className="mt-4 space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Address line 2 (optional)
                                         </label>
                                         <input
@@ -270,12 +342,12 @@ export default function CheckoutPage({
                                                     event.target.value,
                                                 )
                                             }
-                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         />
                                     </div>
                                     <div className="mt-4 grid gap-4 md:grid-cols-3">
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 City
                                             </label>
                                             <input
@@ -288,7 +360,7 @@ export default function CheckoutPage({
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             />
                                             <InputError
                                                 message={
@@ -297,7 +369,7 @@ export default function CheckoutPage({
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Region
                                             </label>
                                             <input
@@ -312,11 +384,11 @@ export default function CheckoutPage({
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Postal code
                                             </label>
                                             <input
@@ -332,13 +404,13 @@ export default function CheckoutPage({
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             />
                                         </div>
                                     </div>
                                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Country code
                                             </label>
                                             <input
@@ -354,7 +426,7 @@ export default function CheckoutPage({
                                                         event.target.value.toUpperCase(),
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] uppercase shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             />
                                             <InputError
                                                 message={
@@ -364,7 +436,7 @@ export default function CheckoutPage({
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Shipping responsibility
                                             </label>
                                             <select
@@ -379,7 +451,7 @@ export default function CheckoutPage({
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-xs font-semibold tracking-[0.3em] text-[#2b241c] uppercase shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             >
                                                 {shipping_responsibilities.map(
                                                     (option) => (
@@ -398,9 +470,9 @@ export default function CheckoutPage({
                                     </div>
                                 </div>
 
-                                <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-6">
+                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                                     <div className="flex flex-wrap items-center justify-between gap-4">
-                                        <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Billing details
                                         </p>
                                         <button
@@ -410,7 +482,7 @@ export default function CheckoutPage({
                                                     (prev) => !prev,
                                                 )
                                             }
-                                            className="rounded-full border border-[#7a5a3a] px-4 py-2 text-xs font-semibold tracking-[0.3em] text-[#7a5a3a] uppercase transition hover:bg-[#7a5a3a] hover:text-[#f6f1e8]"
+                                            className="rounded-full border border-(--welcome-muted-text) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase transition hover:bg-(--welcome-muted-text) hover:text-(--welcome-on-strong)"
                                         >
                                             {mirrorBilling
                                                 ? 'Use distinct billing'
@@ -419,7 +491,7 @@ export default function CheckoutPage({
                                     </div>
                                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Billing name
                                             </label>
                                             <input
@@ -435,7 +507,7 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
                                             />
                                             <InputError
                                                 message={
@@ -445,7 +517,7 @@ export default function CheckoutPage({
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Billing phone
                                             </label>
                                             <input
@@ -459,12 +531,12 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
                                             />
                                         </div>
                                     </div>
                                     <div className="mt-4 space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Address line 1
                                         </label>
                                         <input
@@ -478,14 +550,14 @@ export default function CheckoutPage({
                                                 )
                                             }
                                             disabled={mirrorBilling}
-                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
                                         />
                                         <InputError
                                             message={form.errors.billing_line1}
                                         />
                                     </div>
                                     <div className="mt-4 space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Address line 2 (optional)
                                         </label>
                                         <input
@@ -499,12 +571,12 @@ export default function CheckoutPage({
                                                 )
                                             }
                                             disabled={mirrorBilling}
-                                            className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
                                         />
                                     </div>
                                     <div className="mt-4 grid gap-4 md:grid-cols-3">
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 City
                                             </label>
                                             <input
@@ -518,7 +590,7 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
                                             />
                                             <InputError
                                                 message={
@@ -527,7 +599,7 @@ export default function CheckoutPage({
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Region
                                             </label>
                                             <input
@@ -541,11 +613,11 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Postal code
                                             </label>
                                             <input
@@ -562,13 +634,13 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
                                             />
                                         </div>
                                     </div>
                                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Country code
                                             </label>
                                             <input
@@ -585,7 +657,7 @@ export default function CheckoutPage({
                                                     )
                                                 }
                                                 disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] uppercase shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none disabled:opacity-70"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
                                             />
                                             <InputError
                                                 message={
@@ -595,7 +667,7 @@ export default function CheckoutPage({
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Payment method
                                             </label>
                                             <select
@@ -607,7 +679,7 @@ export default function CheckoutPage({
                                                         event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-xs font-semibold tracking-[0.3em] text-[#2b241c] uppercase shadow-xs focus:border-[#2b241c] focus:ring-2 focus:ring-[#2b241c]/20 focus:outline-none"
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             >
                                                 {payment_methods.map(
                                                     (method) => (
@@ -634,24 +706,42 @@ export default function CheckoutPage({
 
                                 <button
                                     type="submit"
-                                    disabled={form.processing}
-                                    className="inline-flex w-full items-center justify-center rounded-full border border-[#2b241c] px-4 py-3 text-xs font-semibold tracking-[0.3em] text-[#2b241c] uppercase transition hover:bg-[#2b241c] hover:text-[#f6f1e8] disabled:cursor-not-allowed disabled:opacity-70"
+                                    disabled={
+                                        form.processing ||
+                                        paypalProcessing ||
+                                        (form.data.payment_method ===
+                                            'paypal' &&
+                                            !paypal_configured)
+                                    }
+                                    className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:cursor-not-allowed disabled:opacity-70"
                                 >
-                                    {form.processing
-                                        ? 'Securing order...'
-                                        : 'Place order'}
+                                    {paypalProcessing
+                                        ? 'Redirecting to PayPal...'
+                                        : form.processing
+                                          ? 'Securing order...'
+                                          : form.data.payment_method ===
+                                              'paypal'
+                                            ? 'Continue to PayPal'
+                                            : 'Place order'}
                                 </button>
+                                {form.data.payment_method === 'paypal' &&
+                                !paypal_configured ? (
+                                    <p className="text-xs text-(--welcome-danger)">
+                                        PayPal is not configured yet. Add
+                                        PayPal keys in `.env` and reload.
+                                    </p>
+                                ) : null}
                             </form>
                         </div>
 
-                        <aside className="rounded-[32px] border border-[#d4b28c] bg-[#f9efe2] p-6 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.6)]">
+                        <aside className="rounded-[32px] border border-(--welcome-border) bg-(--welcome-surface-1) p-6 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
                             <div className="flex items-center justify-between">
-                                <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                     Order Summary
                                 </p>
                                 <Link
                                     href={cartShow()}
-                                    className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase underline"
+                                    className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase underline"
                                 >
                                     Edit cart
                                 </Link>
@@ -662,26 +752,26 @@ export default function CheckoutPage({
                                         <p className="text-sm font-semibold">
                                             {item.name}
                                         </p>
-                                        <p className="text-xs tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             {item.vendor_name} • {item.quantity}{' '}
                                             × {item.unit_price}
                                         </p>
-                                        <p className="text-sm text-[#2b241c]">
+                                        <p className="text-sm text-(--welcome-strong)">
                                             Line total {item.line_total}{' '}
                                             {cart.currency}
                                         </p>
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-6 space-y-3 border-t border-[#e0c7a7] pt-4 text-sm">
+                            <div className="mt-6 space-y-3 border-t border-(--welcome-border-soft) pt-4 text-sm">
                                 <div className="flex items-center justify-between">
-                                    <span className="tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                    <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                         Items
                                     </span>
                                     <span>{cart.item_count}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                    <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                         Subtotal
                                     </span>
                                     <span>
@@ -689,13 +779,13 @@ export default function CheckoutPage({
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="tracking-[0.3em] text-[#7a5a3a] uppercase">
+                                    <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                         Currency
                                     </span>
                                     <span>{cart.currency}</span>
                                 </div>
                             </div>
-                            <p className="mt-4 text-xs text-[#5a4a3a]">
+                            <p className="mt-4 text-xs text-(--welcome-body-text)">
                                 Shipping fees are arranged directly with the
                                 responsible vendor or the LoomCraft team after
                                 confirmation.

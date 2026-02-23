@@ -13,13 +13,13 @@ type Props = {
 };
 
 const inputClassName =
-    'w-full rounded-full border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] placeholder:text-[#7a5a3a]/70 shadow-[0_8px_20px_-18px_rgba(43,36,28,0.7)] focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20';
+    'w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) placeholder:text-(--welcome-muted-70) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
 
 const textAreaClassName =
-    'w-full rounded-[24px] border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] placeholder:text-[#7a5a3a]/70 shadow-[0_8px_20px_-18px_rgba(43,36,28,0.7)] focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20';
+    'w-full rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) placeholder:text-(--welcome-muted-70) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
 
 const fileInputClassName =
-    'w-full rounded-[24px] border border-[#d4b28c] bg-[#fdf8f0] px-4 py-3 text-sm text-[#2b241c] shadow-[0_8px_20px_-18px_rgba(43,36,28,0.7)] file:mr-4 file:rounded-full file:border-0 file:bg-[#2b241c] file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.3em] file:text-[#f6f1e8] hover:file:bg-[#3a2f25] focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20';
+    'w-full rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] file:mr-4 file:rounded-full file:border-0 file:bg-(--welcome-strong) file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.3em] file:text-(--welcome-on-strong) hover:file:bg-(--welcome-strong-hover) focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
 
 export default function ProductCreate() {
     const { commission_rate, vendor_name, status } = usePage<Props>().props;
@@ -49,7 +49,7 @@ export default function ProductCreate() {
                 headerActions={
                     <Link
                         href={dashboard()}
-                        className="rounded-full border border-[#2b241c] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] transition hover:bg-[#2b241c] hover:text-[#f6f1e8]"
+                        className="rounded-full border border-(--welcome-strong) px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
                     >
                         Back to Dashboard
                     </Link>
@@ -57,45 +57,45 @@ export default function ProductCreate() {
             >
                     <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-4 lg:grid-cols-[1.05fr_0.95fr]">
                         <div className="space-y-6">
-                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                 Product Atelier
                             </p>
                             <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
                                 Register a new heritage piece for review.
                             </h1>
-                            <p className="max-w-xl text-sm text-[#5a4a3a] md:text-base">
+                            <p className="max-w-xl text-sm text-(--welcome-body-text) md:text-base">
                                 Share the provenance, pricing, and materials for each piece.
                                 Approved listings are curated for collectors worldwide.
                             </p>
                             <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Vendor Atelier
                                     </p>
-                                    <p className="mt-3 text-sm text-[#5a4a3a]">
+                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
                                         {vendor_name ?? 'LoomCraft artisan'}
                                     </p>
                                 </div>
-                                <div className="rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Commission
                                     </p>
-                                    <p className="mt-3 text-sm text-[#5a4a3a]">
+                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
                                         A fixed {commission_rate}% supports platform curation.
                                     </p>
                                 </div>
                             </div>
-                            <div className="grid gap-3 rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed] p-5">
-                                <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            <div className="grid gap-3 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                     Pricing Preview
                                 </p>
-                                <div className="flex items-center justify-between text-sm text-[#5a4a3a]">
+                                <div className="flex items-center justify-between text-sm text-(--welcome-body-text)">
                                     <span>Vendor price</span>
                                     <span>
                                         {vendorPrice ? `$${vendorPrice}` : '—'}
                                     </span>
                                 </div>
-                                <div className="flex items-center justify-between text-sm text-[#5a4a3a]">
+                                <div className="flex items-center justify-between text-sm text-(--welcome-body-text)">
                                     <span>Selling price</span>
                                     <span>
                                         {sellingPrice === '—'
@@ -107,22 +107,22 @@ export default function ProductCreate() {
                         </div>
 
                         <div className="relative">
-                            <div className="absolute -right-4 top-10 h-48 w-48 rounded-[32px] border border-[#d4b28c] bg-[#fdf8f0] shadow-[0_20px_60px_-30px_rgba(43,36,28,0.45)]" />
-                            <div className="relative rounded-[36px] border border-[#d4b28c] bg-[#f9efe2] p-8 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.6)]">
+                            <div className="absolute -right-4 top-10 h-48 w-48 rounded-[32px] border border-(--welcome-border) bg-(--welcome-surface-2) shadow-[0_20px_60px_-30px_var(--welcome-shadow-soft)]" />
+                            <div className="relative rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
                                 <div className="space-y-2">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Product dossier
                                     </p>
                                     <h2 className="font-['Playfair_Display',serif] text-2xl">
                                         Listing details
                                     </h2>
-                                    <p className="text-sm text-[#5a4a3a]">
+                                    <p className="text-sm text-(--welcome-body-text)">
                                         Provide full production context and media references.
                                     </p>
                                 </div>
 
                                 {status && (
-                                    <div className="mt-4 rounded-[24px] border border-[#b6623a]/40 bg-[#fff8ed] px-4 py-3 text-sm text-[#7a5a3a]">
+                                    <div className="mt-4 rounded-[24px] border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-muted-text)">
                                         {status}
                                     </div>
                                 )}
@@ -137,7 +137,7 @@ export default function ProductCreate() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="name"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Product name
                                                 </label>
@@ -158,7 +158,7 @@ export default function ProductCreate() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="description"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Description
                                                 </label>
@@ -179,7 +179,7 @@ export default function ProductCreate() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="vendor_price"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Vendor price
                                                 </label>
@@ -209,7 +209,7 @@ export default function ProductCreate() {
                                                 <div className="grid gap-2">
                                                     <label
                                                         htmlFor="materials"
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                     >
                                                         Materials
                                                     </label>
@@ -228,7 +228,7 @@ export default function ProductCreate() {
                                                 <div className="grid gap-2">
                                                     <label
                                                         htmlFor="pieces_count"
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                     >
                                                         Pieces produced
                                                     </label>
@@ -253,7 +253,7 @@ export default function ProductCreate() {
                                                 <div className="grid gap-2">
                                                     <label
                                                         htmlFor="production_time_days"
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                     >
                                                         Production days
                                                     </label>
@@ -275,7 +275,7 @@ export default function ProductCreate() {
                                                 <div className="grid gap-2">
                                                     <label
                                                         htmlFor="dimension_unit"
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                     >
                                                         Dimension unit
                                                     </label>
@@ -299,7 +299,7 @@ export default function ProductCreate() {
                                                 <div className="grid gap-2">
                                                     <label
                                                         htmlFor="dimension_length"
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                     >
                                                         Length
                                                     </label>
@@ -322,7 +322,7 @@ export default function ProductCreate() {
                                                 <div className="grid gap-2">
                                                     <label
                                                         htmlFor="dimension_width"
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                     >
                                                         Width
                                                     </label>
@@ -345,7 +345,7 @@ export default function ProductCreate() {
                                                 <div className="grid gap-2">
                                                     <label
                                                         htmlFor="dimension_height"
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                     >
                                                         Height
                                                     </label>
@@ -368,10 +368,10 @@ export default function ProductCreate() {
                                             </div>
 
                                             <div className="grid gap-3">
-                                                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]">
+                                                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                                     Product images
                                                 </p>
-                                                <p className="text-xs text-[#7a5a3a]/80">
+                                                <p className="text-xs text-(--welcome-muted-80)">
                                                     Upload one or more images. JPG, PNG, WEBP, or GIF.
                                                 </p>
                                                 <input
@@ -395,11 +395,11 @@ export default function ProductCreate() {
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="video"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a5a3a]"
+                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                 >
                                                     Optional video
                                                 </label>
-                                                <p className="text-xs text-[#7a5a3a]/80">
+                                                <p className="text-xs text-(--welcome-muted-80)">
                                                     MP4, MOV, WEBM, or MKV. Uploaded to YouTube.
                                                 </p>
                                                 <input
@@ -417,15 +417,15 @@ export default function ProductCreate() {
 
                                             <button
                                                 type="submit"
-                                                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#2b241c] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f6f1e8] transition hover:-translate-y-0.5 hover:bg-[#3a2f25] disabled:cursor-not-allowed disabled:opacity-70"
+                                                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-(--welcome-strong) px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
                                                 disabled={processing}
                                             >
                                                 {processing && (
-                                                    <Spinner className="text-[#f6f1e8]" />
+                                                    <Spinner className="text-(--welcome-on-strong)" />
                                                 )}
                                                 Submit for Review
                                             </button>
-                                            <p className="text-center text-xs uppercase tracking-[0.25em] text-[#7a5a3a]">
+                                            <p className="text-center text-xs uppercase tracking-[0.25em] text-(--welcome-muted-text)">
                                                 Listings are reviewed before publishing.
                                             </p>
                                         </>

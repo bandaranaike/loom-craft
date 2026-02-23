@@ -7,6 +7,7 @@ use App\Actions\Order\ShowCheckout;
 use App\DTOs\Cart\CartSessionData;
 use App\DTOs\Order\CheckoutStoreData;
 use App\Http\Requests\Order\StoreCheckoutRequest;
+use App\Services\Payments\PayPalOrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -29,6 +30,7 @@ class CheckoutController extends Controller
         $response = Inertia::render('checkout', [
             ...$result->toArray(),
             'canRegister' => Features::enabled(Features::registration()),
+            'paypal_configured' => app(PayPalOrderService::class)->isConfigured(),
         ]);
 
         if ($request->user() === null && $result->guestToken !== null) {

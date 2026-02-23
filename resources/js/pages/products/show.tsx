@@ -1,9 +1,9 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { show as cartShow } from '@/routes/cart';
-import { store as cartItemStore } from '@/routes/cart/items';
+import type { FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import PublicSiteLayout from '@/layouts/public-site-layout';
-import type { FormEvent } from 'react';
+import { show as cartShow } from '@/routes/cart';
+import { store as cartItemStore } from '@/routes/cart/items';
 
 type ProductImage = {
     type: 'image';
@@ -86,212 +86,228 @@ export default function ProductShow({
                 />
             </Head>
             <PublicSiteLayout canRegister={canRegister}>
-                    <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-6 lg:grid-cols-[1.05fr_0.95fr]">
-                        <div className="grid gap-6">
-                            <div className="rounded-[36px] border border-[#d4b28c] bg-[#f9efe2] p-6 shadow-[0_30px_80px_-45px_rgba(43,36,28,0.6)]">
-                                <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] border border-[#e0c7a7] bg-[#fff8ed]">
-                                    {primaryImage ? (
-                                        <img
-                                            src={primaryImage.url}
-                                            alt={primaryImage.alt_text ?? product.name}
-                                            className="h-full w-full object-cover"
-                                        />
-                                    ) : (
-                                        <div className="flex h-full w-full items-center justify-center text-sm uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                            Image forthcoming
-                                        </div>
-                                    )}
-                                </div>
-                                {product.images.length > 1 && (
-                                    <div className="mt-6 grid grid-cols-3 gap-4">
-                                        {product.images.slice(0, 3).map((image) => (
-                                            <div
-                                                key={image.url}
-                                                className="aspect-[4/3] overflow-hidden rounded-[20px] border border-[#e0c7a7] bg-[#fff8ed]"
-                                            >
-                                                <img
-                                                    src={image.url}
-                                                    alt={image.alt_text ?? product.name}
-                                                    className="h-full w-full object-cover"
-                                                />
-                                            </div>
-                                        ))}
+                <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-6 pb-16 lg:grid-cols-[1.05fr_0.95fr]">
+                    <div className="grid gap-6">
+                        <div className="rounded-[36px] bg-(--welcome-surface-1) shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
+                            <div className="relative aspect-4/3 overflow-hidden rounded-t-[28px] bg-(--welcome-surface-3)">
+                                {primaryImage ? (
+                                    <img
+                                        src={primaryImage.url}
+                                        alt={
+                                            primaryImage.alt_text ??
+                                            product.name
+                                        }
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center text-sm tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                        Image forthcoming
                                     </div>
                                 )}
                             </div>
-                            <div className="flex flex-wrap items-center gap-4 text-xs uppercase tracking-[0.25em] text-[#7a5a3a]">
-                                <span>Approved LoomCraft Release</span>
-                                <span>Curated by {product.vendor.display_name}</span>
-                                <span>Commission {product.commission_rate}%</span>
-                            </div>
+                            {product.images.length > 1 && (
+                                <div className="p-4 grid grid-cols-3">
+                                    {product.images.slice(0, 3).map((image) => (
+                                        <div
+                                            key={image.url}
+                                            className="aspect-4/3 overflow-hidden first:rounded-l-[20px] last:rounded-r-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-3)"
+                                        >
+                                            <img
+                                                src={image.url}
+                                                alt={
+                                                    image.alt_text ??
+                                                    product.name
+                                                }
+                                                className="h-full w-full object-cover"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                        <div className="space-y-6">
-                            <div className="inline-flex items-center gap-3 rounded-full border border-[#d4b28c] bg-[#f9efe2] px-4 py-2 text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                Heritage Product
-                            </div>
-                            <div>
-                                <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
-                                    {product.name}
-                                </h1>
-                                <p className="mt-3 text-sm uppercase tracking-[0.35em] text-[#7a5a3a]">
-                                    {product.vendor.display_name}
-                                    {product.vendor.location
-                                        ? ` • ${product.vendor.location}`
-                                        : ''}
-                                </p>
-                            </div>
-                            <div className="rounded-[32px] border border-[#e0c7a7] bg-[#fff8ed] p-6">
-                                <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                    Selling Price
-                                </p>
-                                <p className="mt-3 font-['Playfair_Display',serif] text-3xl">
-                                    {product.selling_price} USD
-                                </p>
-                                <p className="mt-2 text-sm text-[#5a4a3a]">
-                                    Vendor base price {product.vendor_price} USD + 7% commission.
-                                </p>
-                            </div>
-                            <form onSubmit={submit} className="grid gap-4 rounded-[32px] border border-[#e0c7a7] bg-[#f9efe2] p-6">
-                                <div className="flex flex-wrap items-center justify-between gap-4">
-                                    <div>
-                                        <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                            Reserve this piece
-                                        </p>
-                                        <p className="mt-1 text-sm text-[#5a4a3a]">
-                                            Choose a quantity to add to your cart.
-                                        </p>
-                                    </div>
-                                    <Link
-                                        href={cartShow()}
-                                        className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a] underline"
-                                    >
-                                        View cart
-                                    </Link>
-                                </div>
-                                <div className="flex flex-wrap items-center gap-4">
-                                    <label className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
-                                        Quantity
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min={1}
-                                        name="quantity"
-                                        value={form.data.quantity}
-                                        onChange={(event) =>
-                                            form.setData(
-                                                'quantity',
-                                                Number(event.target.value),
-                                            )
-                                        }
-                                        className="w-24 rounded-full border border-[#d4b28c] bg-[#fff8ed] px-4 py-2 text-sm text-[#2b241c] shadow-xs focus:border-[#2b241c] focus:outline-none focus:ring-2 focus:ring-[#2b241c]/20"
-                                    />
-                                    <button
-                                        type="submit"
-                                        disabled={form.processing}
-                                        className="inline-flex items-center justify-center rounded-full border border-[#2b241c] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2b241c] transition hover:bg-[#2b241c] hover:text-[#f6f1e8] disabled:cursor-not-allowed disabled:opacity-70"
-                                    >
-                                        {form.processing ? 'Adding...' : 'Add to cart'}
-                                    </button>
-                                </div>
-                                <InputError message={form.errors.quantity} />
-                                <InputError message={form.errors.product_id} />
-                            </form>
-                            <p className="text-base text-[#5a4a3a]">
-                                {product.description}
+                        <div className="flex flex-wrap items-center gap-4 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
+                            <span>Approved LoomCraft Release</span>
+                            <span>
+                                Curated by {product.vendor.display_name}
+                            </span>
+                            <span>Commission {product.commission_rate}%</span>
+                        </div>
+                    </div>
+                    <div className="space-y-6">
+                        <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                            Heritage Product
+                        </div>
+                        <div>
+                            <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
+                                {product.name}
+                            </h1>
+                            <p className="mt-3 text-sm tracking-[0.35em] text-(--welcome-muted-text) uppercase">
+                                {product.vendor.display_name}
+                                {product.vendor.location
+                                    ? ` • ${product.vendor.location}`
+                                    : ''}
                             </p>
-                            <div className="grid gap-4 rounded-[32px] border border-[#e0c7a7] bg-[#f9efe2] p-6">
-                                <div className="flex items-center justify-between gap-4 text-sm">
-                                    <span className="uppercase tracking-[0.25em] text-[#7a5a3a]">
-                                        Materials
-                                    </span>
-                                    <span className="text-[#2b241c]">
-                                        {product.materials ?? 'Documented on request'}
-                                    </span>
+                        </div>
+                        <div className="rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                Selling Price
+                            </p>
+                            <p className="mt-3 font-['Playfair_Display',serif] text-3xl">
+                                {product.selling_price} USD
+                            </p>
+                            <p className="mt-2 text-sm text-(--welcome-body-text)">
+                                Vendor base price {product.vendor_price} USD +
+                                7% commission.
+                            </p>
+                        </div>
+                        <form
+                            onSubmit={submit}
+                            className="grid gap-4 rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-6"
+                        >
+                            <div className="flex flex-wrap items-center justify-between gap-4">
+                                <div>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                        Reserve this piece
+                                    </p>
+                                    <p className="mt-1 text-sm text-(--welcome-body-text)">
+                                        Choose a quantity to add to your cart.
+                                    </p>
                                 </div>
-                                <div className="flex items-center justify-between gap-4 text-sm">
-                                    <span className="uppercase tracking-[0.25em] text-[#7a5a3a]">
-                                        Pieces
-                                    </span>
-                                    <span className="text-[#2b241c]">
-                                        {product.pieces_count ?? 'Limited run'}
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between gap-4 text-sm">
-                                    <span className="uppercase tracking-[0.25em] text-[#7a5a3a]">
-                                        Production
-                                    </span>
-                                    <span className="text-[#2b241c]">
-                                        {product.production_time_days
-                                            ? `${product.production_time_days} days`
-                                            : 'Timeline on request'}
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between gap-4 text-sm">
-                                    <span className="uppercase tracking-[0.25em] text-[#7a5a3a]">
-                                        Dimensions
-                                    </span>
-                                    <span className="text-[#2b241c]">
-                                        {dimensionLabel ?? 'Dimensions on request'}
-                                    </span>
-                                </div>
+                                <Link
+                                    href={cartShow()}
+                                    className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase underline"
+                                >
+                                    View cart
+                                </Link>
                             </div>
                             <div className="flex flex-wrap items-center gap-4">
+                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                    Quantity
+                                </label>
+                                <input
+                                    type="number"
+                                    min={1}
+                                    name="quantity"
+                                    value={form.data.quantity}
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'quantity',
+                                            Number(event.target.value),
+                                        )
+                                    }
+                                    className="w-24 rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                />
                                 <button
-                                    type="button"
-                                    className="rounded-full bg-[#2b241c] px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#f6f1e8] transition hover:-translate-y-0.5 hover:bg-[#3a2f25]"
+                                    type="submit"
+                                    disabled={form.processing}
+                                    className="inline-flex items-center justify-center rounded-full border border-(--welcome-strong) px-5 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:cursor-not-allowed disabled:opacity-70"
                                 >
-                                    Request Purchase
+                                    {form.processing
+                                        ? 'Adding...'
+                                        : 'Add to cart'}
                                 </button>
-                                {product.video_url && (
-                                    <a
-                                        href={product.video_url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="rounded-full border border-[#2b241c] px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#2b241c] transition hover:-translate-y-0.5 hover:bg-[#2b241c] hover:text-[#f6f1e8]"
-                                    >
-                                        Watch Studio Video
-                                    </a>
-                                )}
+                            </div>
+                            <InputError message={form.errors.quantity} />
+                            <InputError message={form.errors.product_id} />
+                        </form>
+                        <p className="text-base text-(--welcome-body-text)">
+                            {product.description}
+                        </p>
+                        <div className="grid gap-4 rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-6">
+                            <div className="flex items-center justify-between gap-4 text-sm">
+                                <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">
+                                    Materials
+                                </span>
+                                <span className="text-(--welcome-strong)">
+                                    {product.materials ??
+                                        'Documented on request'}
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between gap-4 text-sm">
+                                <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">
+                                    Pieces
+                                </span>
+                                <span className="text-(--welcome-strong)">
+                                    {product.pieces_count ?? 'Limited run'}
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between gap-4 text-sm">
+                                <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">
+                                    Production
+                                </span>
+                                <span className="text-(--welcome-strong)">
+                                    {product.production_time_days
+                                        ? `${product.production_time_days} days`
+                                        : 'Timeline on request'}
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between gap-4 text-sm">
+                                <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">
+                                    Dimensions
+                                </span>
+                                <span className="text-(--welcome-strong)">
+                                    {dimensionLabel ?? 'Dimensions on request'}
+                                </span>
                             </div>
                         </div>
-                    </section>
+                        <div className="flex flex-wrap items-center gap-4">
+                            <button
+                                type="button"
+                                className="rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-on-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover)"
+                            >
+                                Request Purchase
+                            </button>
+                            {product.video_url && (
+                                <a
+                                    href={product.video_url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="rounded-full border border-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                                >
+                                    Watch Studio Video
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                </section>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-20">
-                    <div className="grid gap-8 rounded-[48px] border border-[#e0c7a7] bg-[#fff8ed] p-10 md:grid-cols-3">
-                        <div className="space-y-3 border-b border-[#e0c7a7] pb-6 last:border-b-0 last:pb-0 md:border-b-0 md:border-r md:pb-0 md:pr-8 md:last:border-r-0 md:last:pr-0">
-                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                    <div className="grid gap-8 rounded-[48px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-10 md:grid-cols-3">
+                        <div className="space-y-3 border-b border-(--welcome-border-soft) pb-6 last:border-b-0 last:pb-0 md:border-r md:border-b-0 md:pr-8 md:pb-0 md:last:border-r-0 md:last:pr-0">
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                 Provenance
                             </p>
                             <h2 className="font-['Playfair_Display',serif] text-2xl">
                                 Artisan Verified
                             </h2>
-                            <p className="text-sm text-[#5a4a3a]">
-                                Every LoomCraft piece is reviewed for authenticity and cultural
-                                lineage before it reaches patrons.
+                            <p className="text-sm text-(--welcome-body-text)">
+                                Every LoomCraft piece is reviewed for
+                                authenticity and cultural lineage before it
+                                reaches patrons.
                             </p>
                         </div>
-                        <div className="space-y-3 border-b border-[#e0c7a7] pb-6 last:border-b-0 last:pb-0 md:border-b-0 md:border-r md:pb-0 md:pr-8 md:last:border-r-0 md:last:pr-0">
-                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                        <div className="space-y-3 border-b border-(--welcome-border-soft) pb-6 last:border-b-0 last:pb-0 md:border-r md:border-b-0 md:pr-8 md:pb-0 md:last:border-r-0 md:last:pr-0">
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                 Care Notes
                             </p>
                             <h2 className="font-['Playfair_Display',serif] text-2xl">
                                 Keeper&apos;s Guide
                             </h2>
-                            <p className="text-sm text-[#5a4a3a]">
-                                Request the artisan&apos;s care ritual to preserve texture,
-                                luminosity, and weave tension.
+                            <p className="text-sm text-(--welcome-body-text)">
+                                Request the artisan&apos;s care ritual to
+                                preserve texture, luminosity, and weave tension.
                             </p>
                         </div>
                         <div className="space-y-3">
-                            <p className="text-xs uppercase tracking-[0.3em] text-[#7a5a3a]">
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                 Commission
                             </p>
                             <h2 className="font-['Playfair_Display',serif] text-2xl">
                                 Transparent 7%
                             </h2>
-                            <p className="text-sm text-[#5a4a3a]">
-                                The LoomCraft commission is fixed and visible, supporting artisan
-                                growth without hidden fees.
+                            <p className="text-sm text-(--welcome-body-text)">
+                                The LoomCraft commission is fixed and visible,
+                                supporting artisan growth without hidden fees.
                             </p>
                         </div>
                     </div>

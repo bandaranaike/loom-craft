@@ -14,8 +14,10 @@ use Illuminate\Validation\ValidationException;
 
 class PlaceOrder
 {
-    public function handle(CheckoutStoreData $data): OrderPlacementResult
-    {
+    public function handle(
+        CheckoutStoreData $data,
+        ?string $paymentProviderReference = null,
+    ): OrderPlacementResult {
         Gate::authorize('create', Order::class);
 
         $cart = $this->resolveCart($data);
@@ -36,7 +38,7 @@ class PlaceOrder
             ]);
         }
 
-        return DB::transaction(function () use ($cart, $data): OrderPlacementResult {
+        return DB::transaction(function () use ($cart, $data, $paymentProviderReference): OrderPlacementResult {
             $lineItems = [];
             $subtotal = 0.0;
             $commissionTotal = 0.0;
@@ -72,8 +74,9 @@ class PlaceOrder
                 $commissionTotal += (float) $commissionAmount->amount;
             }
 
-            $paymentStatus = $data->paymentMethod === 'stripe' ? 'paid' : 'pending';
-            $orderStatus = $data->paymentMethod === 'stripe' ? 'paid' : 'pending';
+            $isInstantPaid = in_array($data->paymentMethod, ['stripe', 'paypal'], true);
+            $paymentStatus = $isInstantPaid ? 'paid' : 'pending';
+            $orderStatus = $isInstantPaid ? 'paid' : 'pending';
 
             $order = Order::query()->create([
                 'user_id' => $data->user?->id,
@@ -99,7 +102,7 @@ class PlaceOrder
                 'status' => $paymentStatus,
                 'amount' => Money::fromString((string) $subtotal)->amount,
                 'currency' => $data->currency->code,
-                'provider_reference' => null,
+                'provider_reference' => $paymentProviderReference,
             ]);
 
             $cart->items()->delete();
