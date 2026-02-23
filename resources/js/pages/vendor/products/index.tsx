@@ -1,5 +1,6 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import { formatMoney } from '@/lib/currency';
 import { create, index as vendorProductsIndex } from '@/routes/vendor/products';
 import type { BreadcrumbItem } from '@/types';
 
@@ -165,10 +166,12 @@ export default function VendorProductsIndex() {
                                         )}
                                     </div>
                                     <div className="text-sm text-muted-foreground">
-                                        Vendor price: ${product.vendor_price}
+                                        Vendor price:{' '}
+                                        {formatMoney(product.vendor_price, 'LKR')}
                                     </div>
                                     <div className="text-sm text-foreground">
-                                        Selling price: ${product.selling_price}
+                                        Selling price:{' '}
+                                        {formatMoney(product.selling_price, 'LKR')}
                                     </div>
                                 </div>
                             </div>

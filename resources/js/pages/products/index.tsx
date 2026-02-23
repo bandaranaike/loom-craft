@@ -1,4 +1,5 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { index as productsIndex, show as productShow } from '@/routes/products';
 
@@ -165,7 +166,7 @@ export default function ProductIndex({
                                                 Selling price
                                             </span>
                                             <span className="font-semibold text-(--welcome-strong)">
-                                                {product.selling_price} USD
+                                                {formatMoney(product.selling_price, 'LKR')}
                                             </span>
                                         </div>
                                     </div>

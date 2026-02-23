@@ -1,6 +1,7 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, type FormEvent } from 'react';
 import InputError from '@/components/input-error';
+import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { show as cartShow } from '@/routes/cart';
 import { create as checkoutPayPalCreate } from '@/routes/checkout/paypal';
@@ -754,11 +755,11 @@ export default function CheckoutPage({
                                         </p>
                                         <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             {item.vendor_name} • {item.quantity}{' '}
-                                            × {item.unit_price}
+                                            × {formatMoney(item.unit_price, cart.currency)}
                                         </p>
                                         <p className="text-sm text-(--welcome-strong)">
-                                            Line total {item.line_total}{' '}
-                                            {cart.currency}
+                                            Line total{' '}
+                                            {formatMoney(item.line_total, cart.currency)}
                                         </p>
                                     </div>
                                 ))}
@@ -775,7 +776,7 @@ export default function CheckoutPage({
                                         Subtotal
                                     </span>
                                     <span>
-                                        {cart.subtotal} {cart.currency}
+                                        {formatMoney(cart.subtotal, cart.currency)}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">

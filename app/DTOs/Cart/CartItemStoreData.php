@@ -25,7 +25,7 @@ class CartItemStoreData
             $request->cookie('loomcraft_guest_token'),
             $request->integer('product_id'),
             $request->integer('quantity'),
-            Currency::fromString($currency !== '' ? $currency : 'USD'),
+            Currency::fromString($currency !== '' ? $currency : 'LKR'),
         );
     }
 }

@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import { formatMoney } from '@/lib/currency';
 import { index as ordersIndex } from '@/routes/orders';
 import type { BreadcrumbItem } from '@/types';
 
@@ -65,7 +66,7 @@ export default function OrderShow() {
                                 Order #{order.id}
                             </p>
                             <h2 className="text-2xl font-semibold text-foreground">
-                                {order.total} {order.currency}
+                                {formatMoney(order.total, order.currency)}
                             </h2>
                             <p className="text-sm text-muted-foreground">
                                 Status {order.status} • Payment {order.payment_status}
@@ -102,10 +103,11 @@ export default function OrderShow() {
                                                 </p>
                                             </div>
                                             <div className="text-sm text-muted-foreground">
-                                                {item.quantity} × {item.unit_price}
+                                                {item.quantity} ×{' '}
+                                                {formatMoney(item.unit_price, order.currency)}
                                             </div>
                                             <div className="text-base font-semibold text-foreground">
-                                                {item.line_total} {order.currency}
+                                                {formatMoney(item.line_total, order.currency)}
                                             </div>
                                         </div>
                                     </div>
@@ -167,19 +169,19 @@ export default function OrderShow() {
                             <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Subtotal</span>
                                 <span className="text-foreground">
-                                    {order.subtotal} {order.currency}
+                                    {formatMoney(order.subtotal, order.currency)}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Commission</span>
                                 <span className="text-foreground">
-                                    {order.commission_total} {order.currency}
+                                    {formatMoney(order.commission_total, order.currency)}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between font-semibold">
                                 <span className="text-foreground">Total</span>
                                 <span className="text-foreground">
-                                    {order.total} {order.currency}
+                                    {formatMoney(order.total, order.currency)}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">

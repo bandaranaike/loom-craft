@@ -48,5 +48,6 @@ it('shows the cart page for guests and queues a guest token cookie', function ()
         ->assertInertia(fn (Assert $page) => $page
             ->component('cart')
             ->where('cart.item_count', 0)
+            ->where('cart.currency', 'LKR')
         );
 });

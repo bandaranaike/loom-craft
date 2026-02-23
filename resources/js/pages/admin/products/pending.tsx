@@ -1,6 +1,7 @@
 import { Form, Head, usePage } from '@inertiajs/react';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
+import { formatMoney } from '@/lib/currency';
 import { approve, pending } from '@/routes/admin/products';
 import type { BreadcrumbItem } from '@/types';
 
@@ -81,10 +82,12 @@ export default function PendingProducts() {
                                         Vendor: {product.vendor_name}
                                     </p>
                                     <p className="text-sm text-(--welcome-body-text)">
-                                        Vendor price: ${product.vendor_price}
+                                        Vendor price:{' '}
+                                        {formatMoney(product.vendor_price, 'LKR')}
                                     </p>
                                     <p className="text-sm text-(--welcome-strong)">
-                                        Selling price: ${product.selling_price}
+                                        Selling price:{' '}
+                                        {formatMoney(product.selling_price, 'LKR')}
                                     </p>
                                     {product.submitted_at && (
                                         <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">

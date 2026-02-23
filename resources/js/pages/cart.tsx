@@ -1,4 +1,5 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { show as checkoutShow } from '@/routes/checkout';
 import { index as productsIndex } from '@/routes/products';
@@ -99,7 +100,8 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                                         {item.name}
                                                     </p>
                                                     <p className="text-sm text-(--welcome-body-text)">
-                                                        Unit price {item.unit_price} {cart.currency}
+                                                        Unit price{' '}
+                                                        {formatMoney(item.unit_price, cart.currency)}
                                                     </p>
                                                 </div>
                                             </div>
@@ -130,7 +132,7 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                                         Line total
                                                     </span>
                                                     <span className="text-lg font-semibold">
-                                                        {item.line_total} {cart.currency}
+                                                        {formatMoney(item.line_total, cart.currency)}
                                                     </span>
                                                     <Form {...cartItemDestroy.form(item.id)}>
                                                         <button
@@ -165,7 +167,7 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                         Subtotal
                                     </span>
                                     <span className="text-(--welcome-strong)">
-                                        {cart.subtotal} {cart.currency}
+                                        {formatMoney(cart.subtotal, cart.currency)}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">

@@ -1,6 +1,7 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import InputError from '@/components/input-error';
+import { DEFAULT_CURRENCY, formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { show as cartShow } from '@/routes/cart';
 import { store as cartItemStore } from '@/routes/cart/items';
@@ -66,7 +67,7 @@ export default function ProductShow({
     const form = useForm({
         product_id: product.id,
         quantity: 1,
-        currency: 'USD',
+        currency: DEFAULT_CURRENCY,
     });
 
     const submit = (event: FormEvent) => {
@@ -153,10 +154,11 @@ export default function ProductShow({
                                 Selling Price
                             </p>
                             <p className="mt-3 font-['Playfair_Display',serif] text-3xl">
-                                {product.selling_price} USD
+                                {formatMoney(product.selling_price, DEFAULT_CURRENCY)}
                             </p>
                             <p className="mt-2 text-sm text-(--welcome-body-text)">
-                                Vendor base price {product.vendor_price} USD +
+                                Vendor base price{' '}
+                                {formatMoney(product.vendor_price, DEFAULT_CURRENCY)} +
                                 7% commission.
                             </p>
                         </div>

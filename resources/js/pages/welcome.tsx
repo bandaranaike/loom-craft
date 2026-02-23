@@ -1,5 +1,6 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
+import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { dashboard, login, register } from '@/routes';
 import { index as productsIndex, show as productShow } from '@/routes/products';
@@ -327,7 +328,7 @@ export default function Welcome({
                                             {product.name}
                                         </h3>
                                         <p className="mt-auto text-sm font-semibold text-(--welcome-strong)">
-                                            {product.selling_price} USD
+                                            {formatMoney(product.selling_price, 'LKR')}
                                         </p>
                                     </div>
                                 </Link>

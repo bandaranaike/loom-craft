@@ -1,6 +1,6 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-02-18
+Last reviewed: 2026-02-23
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices.md`, `.ai/guardrails.md`, `.ai/dbschema.md`, and `.ai/order-process.md`.
@@ -31,6 +31,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 
 ### Cart and Checkout
 - Guest and authenticated cart support with `loomcraft_guest_token` cookie for guest ownership.
+- Default cart/session currency is now `LKR` when not explicitly provided.
 - Cart item create/update/delete endpoints implemented.
 - Checkout page enforces non-empty cart before rendering.
 - Checkout store flow creates order aggregate and clears cart items.
@@ -97,3 +98,8 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
   - `tests/Feature/Feature/Admin/FeedbackApprovalTest.php`
   - `tests/Feature/Feature/VendorFeedbackTest.php`
   These tests run, but the directory shape is inconsistent with the rest of the suite.
+
+## Recent Update Notes
+
+- Price display now uses formatted currency labels in major storefront and order views.
+- LKR prices render as `Rs. 5,000.00` style formatting instead of raw amount + currency code.

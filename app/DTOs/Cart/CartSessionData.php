@@ -21,7 +21,7 @@ class CartSessionData
         return new self(
             $request->user(),
             $request->cookie('loomcraft_guest_token'),
-            Currency::fromString($currency !== '' ? $currency : 'USD'),
+            Currency::fromString($currency !== '' ? $currency : 'LKR'),
         );
     }
 }

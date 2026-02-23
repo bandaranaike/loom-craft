@@ -1,5 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import { formatMoney } from '@/lib/currency';
 import type { BreadcrumbItem } from '@/types';
 import { index as adminOrdersIndex } from '@/routes/admin/orders';
 
@@ -69,7 +70,7 @@ export default function AdminOrdersIndex() {
                                             Order #{order.id}
                                         </p>
                                         <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">
-                                            {order.total} {order.currency}
+                                            {formatMoney(order.total, order.currency)}
                                         </p>
                                         <p className="text-sm text-(--welcome-body-text)">
                                             {order.item_count} items • {order.status}

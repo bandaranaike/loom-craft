@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import PublicSiteLayout from '@/layouts/public-site-layout';
+import { formatMoney } from '@/lib/currency';
 import { index as ordersIndex } from '@/routes/orders';
 import type { SharedData } from '@/types';
 
@@ -95,10 +96,12 @@ export default function OrderConfirmation({
                                                 {item.product_name}
                                             </p>
                                             <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                                {item.vendor_name} • {item.quantity} × {item.unit_price}
+                                                {item.vendor_name} • {item.quantity} ×{' '}
+                                                {formatMoney(item.unit_price, order.currency)}
                                             </p>
                                             <p className="text-sm text-(--welcome-strong)">
-                                                Line total {item.line_total} {order.currency}
+                                                Line total{' '}
+                                                {formatMoney(item.line_total, order.currency)}
                                             </p>
                                         </div>
                                     ))}
@@ -162,7 +165,7 @@ export default function OrderConfirmation({
                                         Subtotal
                                     </span>
                                     <span>
-                                        {order.subtotal} {order.currency}
+                                        {formatMoney(order.subtotal, order.currency)}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -170,7 +173,7 @@ export default function OrderConfirmation({
                                         Commission
                                     </span>
                                     <span>
-                                        {order.commission_total} {order.currency}
+                                        {formatMoney(order.commission_total, order.currency)}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -178,7 +181,7 @@ export default function OrderConfirmation({
                                         Total
                                     </span>
                                     <span className="text-base font-semibold">
-                                        {order.total} {order.currency}
+                                        {formatMoney(order.total, order.currency)}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">
