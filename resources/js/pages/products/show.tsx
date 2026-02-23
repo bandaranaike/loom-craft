@@ -18,7 +18,6 @@ type ProductDetails = {
     description: string;
     vendor_price: string;
     selling_price: string;
-    commission_rate: string;
     materials: string | null;
     pieces_count: number | null;
     production_time_days: number | null;
@@ -131,7 +130,6 @@ export default function ProductShow({
                             <span>
                                 Curated by {product.vendor.display_name}
                             </span>
-                            <span>Commission {product.commission_rate}%</span>
                         </div>
                     </div>
                     <div className="space-y-6">
@@ -157,9 +155,8 @@ export default function ProductShow({
                                 {formatMoney(product.selling_price, DEFAULT_CURRENCY)}
                             </p>
                             <p className="mt-2 text-sm text-(--welcome-body-text)">
-                                Vendor base price{' '}
-                                {formatMoney(product.vendor_price, DEFAULT_CURRENCY)} +
-                                7% commission.
+                                Crafted by verified artisans and prepared for collector-grade
+                                delivery.
                             </p>
                         </div>
                         <form
@@ -302,14 +299,15 @@ export default function ProductShow({
                         </div>
                         <div className="space-y-3">
                             <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                Commission
+                                Atelier Standard
                             </p>
                             <h2 className="font-['Playfair_Display',serif] text-2xl">
-                                Transparent 7%
+                                Curated Excellence
                             </h2>
                             <p className="text-sm text-(--welcome-body-text)">
-                                The LoomCraft commission is fixed and visible,
-                                supporting artisan growth without hidden fees.
+                                Each listing is reviewed for motif quality,
+                                finishing precision, and presentation readiness
+                                before release.
                             </p>
                         </div>
                     </div>

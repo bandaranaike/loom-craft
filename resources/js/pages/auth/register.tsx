@@ -47,8 +47,8 @@ export default function Register() {
                                         Transparent Pricing
                                     </p>
                                     <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                        The platform applies a fixed 7% commission across every
-                                        textile.
+                                        Listings are reviewed and presented with clear final
+                                        pricing for collectors.
                                     </p>
                                 </div>
                             </div>

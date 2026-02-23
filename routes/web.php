@@ -72,6 +72,14 @@ Route::middleware(['auth'])->group(function () {
             ->name('products.create');
         Route::post('products', [ProductController::class, 'store'])
             ->name('products.store');
+        Route::get('products/{product}/edit', [ProductController::class, 'edit'])
+            ->name('products.edit');
+        Route::patch('products/{product}', [ProductController::class, 'update'])
+            ->name('products.update');
+        Route::post('products/{product}/images', [ProductController::class, 'storeImages'])
+            ->name('products.images.store');
+        Route::delete('products/{product}/images/{image}', [ProductController::class, 'destroyImage'])
+            ->name('products.images.destroy');
         Route::get('orders', [VendorOrderController::class, 'index'])
             ->name('orders.index');
         Route::get('feedback', [VendorFeedbackController::class, 'create'])

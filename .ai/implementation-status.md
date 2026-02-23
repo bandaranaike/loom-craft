@@ -49,6 +49,8 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 ### Vendor Features
 - Vendor registration form and submission (`/vendor/register`).
 - Vendor product index and create/store flow (`/vendor/products`, `/vendor/products/create`).
+- Vendor product edit/update flow is implemented (`/vendor/products/{product}/edit`, `/vendor/products/{product}`).
+- Vendor product image management is implemented from edit page (upload + delete via `/vendor/products/{product}/images` and `/vendor/products/{product}/images/{image}`).
 - Product creation enforces:
   - fixed commission `7.00`,
   - derived selling price (`vendor_price + 7%`),
@@ -103,3 +105,5 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 
 - Price display now uses formatted currency labels in major storefront and order views.
 - LKR prices render as `Rs. 5,000.00` style formatting instead of raw amount + currency code.
+- Vendor product edit image deletion now uses corrected Wayfinder argument mapping for `/vendor/products/{product}/images/{image}`.
+- Public/buyer-facing commission messaging has been removed; commission details remain visible in vendor product create/edit flows only.

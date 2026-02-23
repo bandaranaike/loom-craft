@@ -39,7 +39,7 @@ export default function VendorOrdersIndex() {
                             Vendor Orders
                         </p>
                         <h2 className="text-2xl font-semibold text-foreground">
-                            Fulfill your LoomCraft commissions
+                            Fulfill your LoomCraft orders
                         </h2>
                         <p className="text-sm text-muted-foreground">
                             Review order line items assigned to your studio.

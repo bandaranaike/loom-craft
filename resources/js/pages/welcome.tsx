@@ -16,7 +16,7 @@ const highlights = [
     {
         title: 'Direct Artisan Market',
         description:
-            'Vendors set their base price; the platform applies a transparent 7% commission.',
+            'Vendors present original work directly to patrons through a curated marketplace.',
     },
     {
         title: 'Collector-Grade Craft',

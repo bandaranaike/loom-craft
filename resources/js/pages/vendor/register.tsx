@@ -51,11 +51,11 @@ export default function VendorRegister() {
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
                                     <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Commission
+                                        Marketplace Standards
                                     </p>
                                     <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                        A fixed 7% commission supports the marketplace and
-                                        artisan storytelling.
+                                        Listings follow LoomCraft quality checks for heritage,
+                                        presentation, and artisan authenticity.
                                     </p>
                                 </div>
                                 <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">

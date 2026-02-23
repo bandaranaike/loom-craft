@@ -55,7 +55,14 @@ class ProductPolicy
      */
     public function update(User $user, Product $product): bool
     {
-        return false;
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        return $user->role === 'vendor'
+            && $user->vendor !== null
+            && $user->vendor->status === 'approved'
+            && $user->vendor->id === $product->vendor_id;
     }
 
     /**

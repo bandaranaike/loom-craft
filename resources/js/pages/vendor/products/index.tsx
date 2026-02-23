@@ -1,7 +1,7 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
-import { create, index as vendorProductsIndex } from '@/routes/vendor/products';
+import { create, edit, index as vendorProductsIndex } from '@/routes/vendor/products';
 import type { BreadcrumbItem } from '@/types';
 
 type ProductItem = {
@@ -173,6 +173,14 @@ export default function VendorProductsIndex() {
                                         Selling price:{' '}
                                         {formatMoney(product.selling_price, 'LKR')}
                                     </div>
+                                </div>
+                                <div className="mt-auto">
+                                    <Link
+                                        href={edit(product.id).url}
+                                        className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"
+                                    >
+                                        Edit Product
+                                    </Link>
                                 </div>
                             </div>
                         ))}

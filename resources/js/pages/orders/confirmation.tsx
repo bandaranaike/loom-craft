@@ -170,11 +170,9 @@ export default function OrderConfirmation({
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <span className="uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Commission
+                                        Shipping
                                     </span>
-                                    <span>
-                                        {formatMoney(order.commission_total, order.currency)}
-                                    </span>
+                                    <span>{order.shipping_responsibility}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <span className="uppercase tracking-[0.3em] text-(--welcome-muted-text)">
@@ -189,12 +187,6 @@ export default function OrderConfirmation({
                                         Payment
                                     </span>
                                     <span>{order.payment_method}</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Shipping
-                                    </span>
-                                    <span>{order.shipping_responsibility}</span>
                                 </div>
                             </div>
                             {auth.user && (

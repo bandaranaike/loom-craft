@@ -173,9 +173,9 @@ export default function OrderShow() {
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground">Commission</span>
+                                <span className="text-muted-foreground">Shipping</span>
                                 <span className="text-foreground">
-                                    {formatMoney(order.commission_total, order.currency)}
+                                    {order.shipping_responsibility}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between font-semibold">
@@ -188,12 +188,6 @@ export default function OrderShow() {
                                 <span className="text-muted-foreground">Payment</span>
                                 <span className="text-foreground">
                                     {order.payment_method} ({order.payment_status})
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground">Shipping</span>
-                                <span className="text-foreground">
-                                    {order.shipping_responsibility}
                                 </span>
                             </div>
                         </div>
