@@ -103,6 +103,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 
 ## Recent Update Notes
 
+- GitHub Actions production deploy workflow now creates the release tarball in `/tmp` before moving it to workspace, preventing `tar: .: file changed as we read it` failures during artifact packaging.
 - Deployment runbook added at `.ai/deployment.md` for Hostinger Ubuntu 24.04 production setup (`31.97.51.24`) with Nginx, HTTPS (Let's Encrypt), local-only MariaDB, systemd queue worker, scheduler cron, and GitHub Actions `main` branch CI-build/server-deploy flow.
 - `AGENTS.md` now explicitly requires reading `.ai/deployment.md` before any deployment-related work and treats it as the deployment source of truth unless user overrides.
 - Production deployment workflow created at `.github/workflows/deploy-production.yml` to auto-deploy `main` to the VPS using build artifact + SSH release deployment.
