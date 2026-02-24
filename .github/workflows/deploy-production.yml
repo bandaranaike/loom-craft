@@ -111,7 +111,9 @@ jobs:
           php artisan migrate --force
           php artisan storage:link || true
           php artisan config:cache
-          php artisan view:cache
+          if [ -d resources/views ]; then
+            php artisan view:cache
+          fi
 
           ln -sfn "${RELEASE_DIR}" "${CURRENT_LINK}"
           php "${CURRENT_LINK}/artisan" queue:restart
