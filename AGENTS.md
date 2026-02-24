@@ -70,7 +70,9 @@ This project has domain-specific skills available. You MUST activate the relevan
   - `.ai/order-process.md`: cart, checkout, payment, and order lifecycle rules.
   - `.ai/dbschema.md`: authoritative domain schema reference for fields/relationships.
   - `.ai/db.sql`: actual SQL snapshot; use to verify/refresh `.ai/dbschema.md`.
+  - `.ai/deployment.md`: production deployment runbook and CI/CD source of truth for VPS, Nginx, SSL, MariaDB, and GitHub Actions deployment flow.
   - `.ai/implementation-status.md`: current delivered vs pending features.
+- For any deployment-related task, you must read `.ai/deployment.md` before making changes, and follow it unless the user explicitly overrides a value.
 - After every implementation task, update `.ai/implementation-status.md` to reflect what changed (implemented, partial, or pending).
 
 ## Replies
