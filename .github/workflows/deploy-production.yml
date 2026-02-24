@@ -115,8 +115,12 @@ jobs:
           ln -sfn "${RELEASE_DIR}" "${CURRENT_LINK}"
           php "${CURRENT_LINK}/artisan" queue:restart
 
-          sudo systemctl reload php8.4-fpm
-          sudo systemctl reload nginx
+          if sudo -n true >/dev/null 2>&1; then
+            sudo systemctl reload php8.4-fpm
+            sudo systemctl reload nginx
+          else
+            echo "Skipping service reloads: passwordless sudo is not configured for ${USER}."
+          fi
 
           rm -f "/tmp/release-${RELEASE_SHA}.tar.gz"
           EOF

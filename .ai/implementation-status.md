@@ -107,6 +107,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Production deploy script now guards `php artisan view:cache` behind a `resources/views` directory existence check to prevent first-deploy failures when the view path is unavailable at runtime.
 - GitHub Actions `lint.yml` and `tests.yml` are temporarily manual-only (`workflow_dispatch`) and no longer auto-run on push/pull_request.
 - Production deploy no longer runs `php artisan view:cache`; deployment keeps `config:cache` only to avoid `View path not found` runtime failures during release activation.
+- Deploy script now reloads `php8.4-fpm`/`nginx` only when `sudo -n` is available; otherwise it logs and skips reloads to prevent CI failure on password-protected sudo.
 - Deployment runbook added at `.ai/deployment.md` for Hostinger Ubuntu 24.04 production setup (`31.97.51.24`) with Nginx, HTTPS (Let's Encrypt), local-only MariaDB, systemd queue worker, scheduler cron, and GitHub Actions `main` branch CI-build/server-deploy flow.
 - `AGENTS.md` now explicitly requires reading `.ai/deployment.md` before any deployment-related work and treats it as the deployment source of truth unless user overrides.
 - Production deployment workflow created at `.github/workflows/deploy-production.yml` to auto-deploy `main` to the VPS using build artifact + SSH release deployment.
