@@ -27,6 +27,7 @@ import { connect as adminYouTubeConnect } from '@/routes/admin/youtube';
 import { pending as adminVendorsPending } from '@/routes/admin/vendors';
 import { create as vendorFeedbackCreate } from '@/routes/vendor/feedback';
 import { index as vendorProductsIndex } from '@/routes/vendor/products';
+import { index as ordersIndex } from '@/routes/orders';
 import type { NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
 
@@ -53,6 +54,11 @@ export function AppSidebar() {
             title: 'Dashboard',
             href: dashboard(),
             icon: LayoutGrid,
+        },
+        {
+            title: 'Order History',
+            href: ordersIndex(),
+            icon: Package,
         },
         ...(isAdmin
             ? [

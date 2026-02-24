@@ -9,6 +9,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CheckoutPayPalController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoomWeaveDemoController;
 use App\Http\Controllers\OrderConfirmationController;
@@ -20,7 +21,6 @@ use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\ProductController;
 use App\Http\Controllers\Vendor\VendorRegistrationController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('loom-weave-demo', LoomWeaveDemoController::class)->name('loom-weave-demo');
@@ -53,11 +53,9 @@ Route::get('checkout/paypal/cancelled', [CheckoutPayPalController::class, 'cance
 Route::get('orders/{order}/confirmation', [OrderConfirmationController::class, 'show'])
     ->name('orders.confirmation');
 
-Route::get('dashboard', function () {
-    return Inertia::render('dashboard', [
-        'status' => session('status'),
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('dashboard', DashboardController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('vendor/register', [VendorRegistrationController::class, 'register'])

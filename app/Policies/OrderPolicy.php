@@ -31,6 +31,11 @@ class OrderPolicy
         return in_array($user->role, ['customer', 'vendor', 'admin'], true);
     }
 
+    public function viewDashboard(User $user): bool
+    {
+        return $user->id > 0;
+    }
+
     public function viewVendorIndex(User $user): bool
     {
         return $user->role === 'vendor'

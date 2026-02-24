@@ -1,6 +1,6 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-02-23
+Last reviewed: 2026-02-24
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices.md`, `.ai/guardrails.md`, `.ai/dbschema.md`, and `.ai/order-process.md`.
@@ -107,3 +107,4 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - LKR prices render as `Rs. 5,000.00` style formatting instead of raw amount + currency code.
 - Vendor product edit image deletion now uses corrected Wayfinder argument mapping for `/vendor/products/{product}/images/{image}`.
 - Public/buyer-facing commission messaging has been removed; commission details remain visible in vendor product create/edit flows only.
+- Dashboard now loads authenticated users' recent order histories via `DashboardController` + `ListDashboardOrderHistories` and displays them in a `/vendor/products`-style card layout with click-to-open detailed order popup.
