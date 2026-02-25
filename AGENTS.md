@@ -10,7 +10,7 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
 - php - 8.4.1
-- inertiajs/inertia-laravel (INERTIA) - v2
+- inertiajs/inertia-laravel (INERTIA_LARAVEL) - v2
 - laravel/fortify (FORTIFY) - v1
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
@@ -22,10 +22,10 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/sail (SAIL) - v1
 - pestphp/pest (PEST) - v4
 - phpunit/phpunit (PHPUNIT) - v12
-- @inertiajs/react (INERTIA) - v2
+- @inertiajs/react (INERTIA_REACT) - v2
 - react (REACT) - v19
 - tailwindcss (TAILWINDCSS) - v4
-- @laravel/vite-plugin-wayfinder (WAYFINDER) - v0
+- @laravel/vite-plugin-wayfinder (WAYFINDER_VITE) - v0
 - eslint (ESLINT) - v9
 - prettier (PRETTIER) - v3
 
@@ -61,19 +61,6 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Documentation Files
 
 - You must only create documentation files if explicitly requested by the user.
-- The `.ai/` folder contains project descriptions and implementation instructions. Before executing tasks, read the relevant `.ai/` files and use them as guidelines.
-- Quick `.ai` guide for task targeting:
-  - `.ai/guardrails.md`: mandatory non-negotiables (always read first).
-  - `.ai/best-practices.md`: coding and implementation rules (read for all implementation tasks).
-  - `.ai/implementation.md`: feature/page implementation scope and mappings.
-  - `.ai/architecture.md`: high-level product architecture and role/page scope.
-  - `.ai/order-process.md`: cart, checkout, payment, and order lifecycle rules.
-  - `.ai/dbschema.md`: authoritative domain schema reference for fields/relationships.
-  - `.ai/db.sql`: actual SQL snapshot; use to verify/refresh `.ai/dbschema.md`.
-  - `.ai/deployment.md`: production deployment runbook and CI/CD source of truth for VPS, Nginx, SSL, MariaDB, and GitHub Actions deployment flow.
-  - `.ai/implementation-status.md`: current delivered vs pending features.
-- For any deployment-related task, you must read `.ai/deployment.md` before making changes, and follow it unless the user explicitly overrides a value.
-- After every implementation task, update `.ai/implementation-status.md` to reflect what changed (implemented, partial, or pending).
 
 ## Replies
 
@@ -172,7 +159,20 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - ALWAYS use `search-docs` tool for version-specific Inertia documentation and updated code examples.
 - IMPORTANT: Activate `inertia-react-development` when working with Inertia client-side patterns.
 
+# Inertia v2
+
+- Use all Inertia features from v1 and v2. Check the documentation before making changes to ensure the correct approach.
+- New features: deferred props, infinite scroll, merging props, polling, prefetching, once props, flash data.
+- When using deferred props, add an empty state with a pulsing or animated skeleton.
+
 === inertia-laravel/v2 rules ===
+
+# Inertia
+
+- Inertia creates fully client-side rendered SPAs without modern SPA complexity, leveraging existing server-side patterns.
+- Components live in `resources/js/pages` (unless specified in `vite.config.js`). Use `Inertia::render()` for server-side routing instead of Blade views.
+- ALWAYS use `search-docs` tool for version-specific Inertia documentation and updated code examples.
+- IMPORTANT: Activate `inertia-react-development` when working with Inertia client-side patterns.
 
 # Inertia v2
 
@@ -276,7 +276,7 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 
 # Laravel Pint Code Formatter
 
-- You must run `vendor/bin/pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
+- If you have modified any PHP files, you must run `vendor/bin/pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
 - Do not run `vendor/bin/pint --test --format agent`, simply run `vendor/bin/pint --format agent` to fix any formatting issues.
 
 === pest/core rules ===
@@ -302,7 +302,6 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - Always use existing Tailwind conventions; check project patterns before adding new ones.
 - IMPORTANT: Always use `search-docs` tool for version-specific Tailwind CSS documentation and updated code examples. Never rely on training data.
 - IMPORTANT: Activate `tailwindcss-development` every time you're working with a Tailwind CSS or styling-related task.
-- For CSS variable utilities in Tailwind v4, use shorthand class syntax: `bg-(--token)`, `border-(--token)`, `ring-(--token)`, and `text-(--token)` instead of bracket `var(...)` syntax.
 
 === laravel/fortify rules ===
 

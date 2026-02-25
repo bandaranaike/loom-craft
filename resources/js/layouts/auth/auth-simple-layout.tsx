@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import AppLogoIcon from '@/components/app-logo-icon';
+import LegalLinks from '@/components/legal-links';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 
@@ -31,6 +32,10 @@ export default function AuthSimpleLayout({
                         </div>
                     </div>
                     {children}
+                    <LegalLinks
+                        className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground"
+                        linkClassName="transition hover:text-foreground"
+                    />
                 </div>
             </div>
         </div>

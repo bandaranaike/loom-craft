@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
+import LegalLinks from '@/components/legal-links';
 import {
     Card,
     CardContent,
@@ -41,6 +42,10 @@ export default function AuthCardLayout({
                             {children}
                         </CardContent>
                     </Card>
+                    <LegalLinks
+                        className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground"
+                        linkClassName="transition hover:text-foreground"
+                    />
                 </div>
             </div>
         </div>

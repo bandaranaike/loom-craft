@@ -21,9 +21,14 @@ use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\ProductController;
 use App\Http\Controllers\Vendor\VendorRegistrationController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('loom-weave-demo', LoomWeaveDemoController::class)->name('loom-weave-demo');
+Route::get('privacy-policy', fn () => Inertia::render('privacy-policy'))
+    ->name('privacy-policy');
+Route::get('terms-of-service', fn () => Inertia::render('terms-of-service'))
+    ->name('terms-of-service');
 
 Route::get('products', [ProductIndexController::class, 'index'])
     ->name('products.index');

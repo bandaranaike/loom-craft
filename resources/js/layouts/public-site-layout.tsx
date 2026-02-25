@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { Moon, Sun } from 'lucide-react';
 import type { CSSProperties, PropsWithChildren, ReactNode } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
+import LegalLinks from '@/components/legal-links';
 import { useAppearance } from '@/hooks/use-appearance';
 import dumbaraPatterns from '@/images/dumbara-patterns.png';
 import { dashboard, home, login, loomWeaveDemo, register } from '@/routes';
@@ -129,9 +130,6 @@ export default function PublicSiteLayout({
                             </p>
                         </div>
                         <div>
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                Header Menu
-                            </p>
                             <div className="mt-3 flex flex-wrap gap-3 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
                                 <Link
                                     href={home()}
@@ -145,36 +143,13 @@ export default function PublicSiteLayout({
                                 >
                                     Products
                                 </Link>
-                                <Link
-                                    href={loomWeaveDemo()}
-                                    className="hover:text-(--welcome-strong)"
-                                >
-                                    Loom Demo
-                                </Link>
-                                <Link
-                                    href={cartShow()}
-                                    className="hover:text-(--welcome-strong)"
-                                >
-                                    Cart
-                                </Link>
-                                <Link
-                                    href={checkoutShow()}
-                                    className="hover:text-(--welcome-strong)"
-                                >
-                                    Checkout
-                                </Link>
                             </div>
                         </div>
                         <div>
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                Footer Menu
-                            </p>
-                            <div className="mt-3 flex flex-wrap gap-3 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
-                                <span>Contact</span>
-                                <span>Terms</span>
-                                <span>Privacy</span>
-                                <span>Cookies</span>
-                            </div>
+                            <LegalLinks
+                                className="mt-3 flex flex-wrap gap-3 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase"
+                                linkClassName="hover:text-(--welcome-strong)"
+                            />
                         </div>
                     </div>
                 </footer>

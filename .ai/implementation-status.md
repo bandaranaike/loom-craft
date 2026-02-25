@@ -1,6 +1,6 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-02-24
+Last reviewed: 2026-02-25
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices.md`, `.ai/guardrails.md`, `.ai/dbschema.md`, and `.ai/order-process.md`.
@@ -67,6 +67,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 ## Implemented Pages (Inertia)
 
 - Public: `welcome`, `loom-weave-demo`, `products/index`, `products/show`, `cart`, `checkout`, `orders/confirmation`.
+- Public legal: `privacy-policy`, `terms-of-service`.
 - Auth/settings: `auth/*`, `settings/profile`, `settings/password`, `settings/two-factor`, `settings/appearance`.
 - Customer: `orders/index`, `orders/show`, `dashboard`.
 - Vendor: `vendor/register`, `vendor/products/index`, `vendor/products/create`, `vendor/orders/index`, `vendor/feedback/create`.
@@ -91,7 +92,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Vendor shipping management and vendor payments/earnings pages are not implemented.
 - Admin vendor CRUD beyond pending/approve/reject is not implemented.
 - Product moderation workflow UI beyond vendor submission status is not implemented.
-- Public informational pages are not implemented: About, Contact, Terms, Privacy, Cookie.
+- Public informational pages are partially implemented: About, Contact, and Cookie pages remain pending.
 - Public vendor profile page is not implemented.
 
 ## Structural Notes
@@ -116,3 +117,5 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Vendor product edit image deletion now uses corrected Wayfinder argument mapping for `/vendor/products/{product}/images/{image}`.
 - Public/buyer-facing commission messaging has been removed; commission details remain visible in vendor product create/edit flows only.
 - Dashboard now loads authenticated users' recent order histories via `DashboardController` + `ListDashboardOrderHistories` and displays them in a `/vendor/products`-style card layout with click-to-open detailed order popup.
+- Public legal pages are now available at `/privacy-policy` and `/terms-of-service` with Inertia React implementations.
+- Shared bottom legal navigation now links Terms of Service and Privacy Policy across public, auth, and app layouts.
