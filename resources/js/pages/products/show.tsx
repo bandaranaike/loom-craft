@@ -5,6 +5,7 @@ import { DEFAULT_CURRENCY, formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { show as cartShow } from '@/routes/cart';
 import { store as cartItemStore } from '@/routes/cart/items';
+import { show as vendorShow } from '@/routes/vendors';
 
 type ProductImage = {
     type: 'image';
@@ -30,6 +31,7 @@ type ProductDetails = {
     vendor: {
         id: number;
         display_name: string;
+        slug: string | null;
         location: string | null;
     };
     images: ProductImage[];
@@ -128,7 +130,14 @@ export default function ProductShow({
                         <div className="flex flex-wrap items-center gap-4 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
                             <span>Approved LoomCraft Release</span>
                             <span>
-                                Curated by {product.vendor.display_name}
+                                Curated by{' '}
+                                {product.vendor.slug ? (
+                                    <Link href={vendorShow(product.vendor.slug)}>
+                                        {product.vendor.display_name}
+                                    </Link>
+                                ) : (
+                                    product.vendor.display_name
+                                )}
                             </span>
                         </div>
                     </div>
@@ -141,7 +150,13 @@ export default function ProductShow({
                                 {product.name}
                             </h1>
                             <p className="mt-3 text-sm tracking-[0.35em] text-(--welcome-muted-text) uppercase">
-                                {product.vendor.display_name}
+                                {product.vendor.slug ? (
+                                    <Link href={vendorShow(product.vendor.slug)}>
+                                        {product.vendor.display_name}
+                                    </Link>
+                                ) : (
+                                    product.vendor.display_name
+                                )}
                                 {product.vendor.location
                                     ? ` • ${product.vendor.location}`
                                     : ''}

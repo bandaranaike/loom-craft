@@ -14,7 +14,8 @@ class PrepareProductCreation
         Gate::authorize('create', Product::class);
 
         $vendorName = $data->user->vendor?->display_name;
+        $vendorSlug = $data->user->vendor?->slug;
 
-        return new ProductCreateFormResult('7.00', $vendorName);
+        return new ProductCreateFormResult('7.00', $vendorName, $vendorSlug);
     }
 }

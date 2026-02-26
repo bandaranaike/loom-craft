@@ -1,8 +1,9 @@
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import { approve, pending } from '@/routes/admin/products';
+import { show as vendorShow } from '@/routes/vendors';
 import type { BreadcrumbItem } from '@/types';
 
 type ProductItem = {
@@ -10,6 +11,7 @@ type ProductItem = {
     name: string;
     status: string;
     vendor_name: string;
+    vendor_slug: string | null;
     vendor_price: string;
     selling_price: string;
     submitted_at: string | null;
@@ -79,7 +81,14 @@ export default function PendingProducts() {
                                         {product.name}
                                     </h3>
                                     <p className="text-sm text-(--welcome-body-text)">
-                                        Vendor: {product.vendor_name}
+                                        Vendor:{' '}
+                                        {product.vendor_slug ? (
+                                            <Link href={vendorShow(product.vendor_slug)}>
+                                                {product.vendor_name}
+                                            </Link>
+                                        ) : (
+                                            product.vendor_name
+                                        )}
                                     </p>
                                     <p className="text-sm text-(--welcome-body-text)">
                                         Vendor price:{' '}

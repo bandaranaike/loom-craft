@@ -35,6 +35,7 @@ class ListPendingVendors
                 static fn (Vendor $vendor): VendorApprovalListItem => new VendorApprovalListItem(
                     $vendor->id,
                     $vendor->display_name,
+                    $vendor->slug,
                     $vendor->location,
                     $vendor->status,
                     $vendor->created_at?->toDateTimeString(),

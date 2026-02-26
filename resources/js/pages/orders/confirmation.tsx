@@ -2,12 +2,14 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { formatMoney } from '@/lib/currency';
 import { index as ordersIndex } from '@/routes/orders';
+import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
 
 type OrderItem = {
     id: number;
     product_name: string;
     vendor_name: string;
+    vendor_slug: string | null;
     quantity: number;
     unit_price: string;
     line_total: string;
@@ -96,7 +98,14 @@ export default function OrderConfirmation({
                                                 {item.product_name}
                                             </p>
                                             <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                                {item.vendor_name} • {item.quantity} ×{' '}
+                                                {item.vendor_slug ? (
+                                                    <Link href={vendorShow(item.vendor_slug)}>
+                                                        {item.vendor_name}
+                                                    </Link>
+                                                ) : (
+                                                    item.vendor_name
+                                                )}{' '}
+                                                • {item.quantity} ×{' '}
                                                 {formatMoney(item.unit_price, order.currency)}
                                             </p>
                                             <p className="text-sm text-(--welcome-strong)">

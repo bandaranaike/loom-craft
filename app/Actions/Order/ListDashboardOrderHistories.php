@@ -32,6 +32,7 @@ class ListDashboardOrderHistories
                             $item->id,
                             $item->product?->name ?? 'Unavailable product',
                             $item->product?->vendor?->display_name ?? 'Unavailable vendor',
+                            $item->product?->vendor?->slug,
                             $item->quantity,
                             Money::fromString((string) $item->unit_price)->amount,
                             Money::fromString((string) $item->line_total)->amount,

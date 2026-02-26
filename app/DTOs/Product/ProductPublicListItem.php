@@ -9,6 +9,7 @@ class ProductPublicListItem
         public string $name,
         public string $sellingPrice,
         public string $vendorName,
+        public ?string $vendorSlug,
         public ?string $vendorLocation,
         public ?string $imageUrl,
     ) {}
@@ -23,6 +24,7 @@ class ProductPublicListItem
             'name' => $this->name,
             'selling_price' => $this->sellingPrice,
             'vendor_name' => $this->vendorName,
+            'vendor_slug' => $this->vendorSlug,
             'vendor_location' => $this->vendorLocation,
             'image_url' => $this->imageUrl,
         ];

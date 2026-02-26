@@ -3,11 +3,13 @@ import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
 import { approve, pending as adminVendorsPending, reject } from '@/routes/admin/vendors';
+import { show as vendorShow } from '@/routes/vendors';
 import type { BreadcrumbItem } from '@/types';
 
 type VendorItem = {
     id: number;
     display_name: string;
+    slug: string | null;
     location: string | null;
     status: string;
     submitted_at: string | null;
@@ -158,7 +160,13 @@ export default function PendingVendors() {
                                                 {vendor.status}
                                             </p>
                                             <h3 className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">
-                                                {vendor.display_name}
+                                                {vendor.slug ? (
+                                                    <Link href={vendorShow(vendor.slug)}>
+                                                        {vendor.display_name}
+                                                    </Link>
+                                                ) : (
+                                                    vendor.display_name
+                                                )}
                                             </h3>
                                         </div>
                                         {vendor.submitted_at && (

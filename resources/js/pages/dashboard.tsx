@@ -12,6 +12,7 @@ import { dashboard } from '@/routes';
 import { index as ordersIndex, show as ordersShow } from '@/routes/orders';
 import { pending as adminVendorPending } from '@/routes/admin/vendors';
 import { register as vendorRegister } from '@/routes/vendor';
+import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
 import type { BreadcrumbItem } from '@/types';
 import { useMemo, useState } from 'react';
@@ -32,6 +33,7 @@ type OrderItem = {
     id: number;
     product_name: string;
     vendor_name: string;
+    vendor_slug: string | null;
     quantity: number;
     unit_price: string;
     line_total: string;
@@ -245,7 +247,13 @@ export default function Dashboard() {
                                                             {item.product_name}
                                                         </p>
                                                         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                                            {item.vendor_name}
+                                                            {item.vendor_slug ? (
+                                                                <Link href={vendorShow(item.vendor_slug)}>
+                                                                    {item.vendor_name}
+                                                                </Link>
+                                                            ) : (
+                                                                item.vendor_name
+                                                            )}
                                                         </p>
                                                     </div>
                                                     <p className="text-muted-foreground">

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductApprovalController;
 use App\Http\Controllers\Admin\VendorApprovalController;
+use App\Http\Controllers\Admin\VendorInquiryController as AdminVendorInquiryController;
 use App\Http\Controllers\Admin\YouTubeAuthorizationController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartItemController;
@@ -17,9 +18,11 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductIndexController;
 use App\Http\Controllers\ProductShowController;
 use App\Http\Controllers\Vendor\FeedbackController as VendorFeedbackController;
+use App\Http\Controllers\Vendor\InquiryController as VendorInquiryController;
 use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\ProductController;
 use App\Http\Controllers\Vendor\VendorRegistrationController;
+use App\Http\Controllers\VendorPublicController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -34,6 +37,11 @@ Route::get('products', [ProductIndexController::class, 'index'])
     ->name('products.index');
 Route::get('products/{product}', [ProductShowController::class, 'show'])
     ->name('products.show');
+Route::get('vendors/{vendor:slug}', [VendorPublicController::class, 'show'])
+    ->name('vendors.show');
+Route::post('vendors/{vendor:slug}/inquiries', [VendorPublicController::class, 'storeInquiry'])
+    ->middleware('throttle:10,1')
+    ->name('vendors.inquiries.store');
 
 Route::get('cart', [CartController::class, 'show'])
     ->name('cart.show');
@@ -85,6 +93,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('products.images.destroy');
         Route::get('orders', [VendorOrderController::class, 'index'])
             ->name('orders.index');
+        Route::get('inquiries', [VendorInquiryController::class, 'index'])
+            ->name('inquiries.index');
         Route::get('feedback', [VendorFeedbackController::class, 'create'])
             ->name('feedback.create');
         Route::post('feedback', [VendorFeedbackController::class, 'store'])
@@ -116,6 +126,12 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.products.pending');
         Route::post('products/{product}/approve', [ProductApprovalController::class, 'approve'])
             ->name('admin.products.approve');
+        Route::get('vendor-inquiries/pending', [AdminVendorInquiryController::class, 'pending'])
+            ->name('admin.vendor-inquiries.pending');
+        Route::post('vendor-inquiries/{inquiry}/approve', [AdminVendorInquiryController::class, 'approve'])
+            ->name('admin.vendor-inquiries.approve');
+        Route::post('vendor-inquiries/{inquiry}/reject', [AdminVendorInquiryController::class, 'reject'])
+            ->name('admin.vendor-inquiries.reject');
     });
 
     Route::get('orders', [OrderController::class, 'index'])

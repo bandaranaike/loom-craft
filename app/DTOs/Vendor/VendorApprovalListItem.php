@@ -7,6 +7,7 @@ class VendorApprovalListItem
     public function __construct(
         public int $id,
         public string $displayName,
+        public ?string $slug,
         public ?string $location,
         public string $status,
         public ?string $submittedAt,
@@ -22,6 +23,7 @@ class VendorApprovalListItem
         return [
             'id' => $this->id,
             'display_name' => $this->displayName,
+            'slug' => $this->slug,
             'location' => $this->location,
             'status' => $this->status,
             'submitted_at' => $this->submittedAt,

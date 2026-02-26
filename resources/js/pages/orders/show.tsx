@@ -2,12 +2,14 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import { index as ordersIndex } from '@/routes/orders';
+import { show as vendorShow } from '@/routes/vendors';
 import type { BreadcrumbItem } from '@/types';
 
 type OrderItem = {
     id: number;
     product_name: string;
     vendor_name: string;
+    vendor_slug: string | null;
     quantity: number;
     unit_price: string;
     line_total: string;
@@ -99,7 +101,13 @@ export default function OrderShow() {
                                                     {item.product_name}
                                                 </p>
                                                 <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                                    {item.vendor_name}
+                                                    {item.vendor_slug ? (
+                                                        <Link href={vendorShow(item.vendor_slug)}>
+                                                            {item.vendor_name}
+                                                        </Link>
+                                                    ) : (
+                                                        item.vendor_name
+                                                    )}
                                                 </p>
                                             </div>
                                             <div className="text-sm text-muted-foreground">

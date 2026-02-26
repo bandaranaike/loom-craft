@@ -3,6 +3,7 @@ import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { show as checkoutShow } from '@/routes/checkout';
 import { index as productsIndex } from '@/routes/products';
+import { show as vendorShow } from '@/routes/vendors';
 import { destroy as cartItemDestroy, update as cartItemUpdate } from '@/routes/cart/items';
 
 type CartItem = {
@@ -10,6 +11,7 @@ type CartItem = {
     product_id: number;
     name: string;
     vendor_name: string;
+    vendor_slug: string | null;
     image_url: string | null;
     quantity: number;
     unit_price: string;
@@ -94,7 +96,13 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                                 </div>
                                                 <div className="flex-1 space-y-2">
                                                     <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                                        {item.vendor_name}
+                                                        {item.vendor_slug ? (
+                                                            <Link href={vendorShow(item.vendor_slug)}>
+                                                                {item.vendor_name}
+                                                            </Link>
+                                                        ) : (
+                                                            item.vendor_name
+                                                        )}
                                                     </p>
                                                     <p className="font-['Playfair_Display',serif] text-xl">
                                                         {item.name}

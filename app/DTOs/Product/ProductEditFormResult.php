@@ -23,6 +23,7 @@ class ProductEditFormResult
     public function __construct(
         public string $commissionRate,
         public ?string $vendorName,
+        public ?string $vendorSlug,
         public array $product,
     ) {}
 
@@ -34,6 +35,7 @@ class ProductEditFormResult
         return [
             'commission_rate' => $this->commissionRate,
             'vendor_name' => $this->vendorName,
+            'vendor_slug' => $this->vendorSlug,
             'product' => $this->product,
         ];
     }

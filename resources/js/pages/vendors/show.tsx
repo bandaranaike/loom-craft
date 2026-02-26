@@ -1,0 +1,386 @@
+import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
+import InputError from '@/components/input-error';
+import { Spinner } from '@/components/ui/spinner';
+import PublicSiteLayout from '@/layouts/public-site-layout';
+import { show as productShow } from '@/routes/products';
+import { store as storeVendorInquiry } from '@/routes/vendors/inquiries';
+
+type CategorySummary = {
+    id: number;
+    name: string;
+    slug: string;
+    count: number;
+};
+
+type ProductItem = {
+    id: number;
+    name: string;
+    description: string;
+    price: string;
+    image_url: string | null;
+    categories: {
+        id: number;
+        name: string;
+        slug: string;
+    }[];
+};
+
+type LocationItem = {
+    id: number;
+    location_name: string;
+    address_line_1: string;
+    address_line_2: string | null;
+    city: string;
+    region: string | null;
+    postal_code: string | null;
+    country: string;
+    phone: string | null;
+    hours: string | null;
+    map_url: string | null;
+    is_primary: boolean;
+};
+
+type VendorData = {
+    id: number;
+    display_name: string;
+    slug: string;
+    tagline: string | null;
+    bio: string | null;
+    about_title: string | null;
+    website_url: string | null;
+    contact_email: string | null;
+    contact_phone: string | null;
+    whatsapp_number: string | null;
+    location: string | null;
+    years_active: number | null;
+    craft_specialties: string[];
+    logo_url: string | null;
+    cover_image_url: string | null;
+    locations: LocationItem[];
+};
+
+type Props = {
+    vendor: VendorData;
+    products: ProductItem[];
+    categories: CategorySummary[];
+    status?: string;
+};
+
+export default function VendorShow() {
+    const { vendor, products, categories, status } = usePage<Props>().props;
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+    const filteredProducts = useMemo(() => {
+        if (selectedCategory === 'all') {
+            return products;
+        }
+
+        return products.filter((product) =>
+            product.categories.some((category) => category.slug === selectedCategory),
+        );
+    }, [products, selectedCategory]);
+
+    return (
+        <>
+            <Head title={`${vendor.display_name} | LoomCraft`}>
+                <link rel="preconnect" href="https://fonts.bunny.net" />
+                <link
+                    href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
+                    rel="stylesheet"
+                />
+            </Head>
+
+            <PublicSiteLayout canRegister={false}>
+                <section
+                    className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-6 lg:grid-cols-[1.1fr_0.9fr]"
+                    style={
+                        vendor.cover_image_url
+                            ? {
+                                  backgroundImage: `linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url(${vendor.cover_image_url})`,
+                                  backgroundSize: 'cover',
+                                  backgroundPosition: 'center',
+                              }
+                            : undefined
+                    }
+                >
+                    <div className="space-y-6">
+                        <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                            Artisan Storefront
+                        </div>
+                        <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl lg:text-6xl">
+                            {vendor.display_name}
+                        </h1>
+                        <p className="max-w-2xl text-base text-(--welcome-body-text) md:text-lg">
+                            {vendor.tagline ?? 'Handmade textiles and heritage craft from a verified LoomCraft vendor.'}
+                        </p>
+                        {vendor.location && (
+                            <p className="text-xs uppercase tracking-[0.24em] text-(--welcome-muted-text)">
+                                {vendor.location}
+                            </p>
+                        )}
+                        <div className="flex flex-wrap gap-3">
+                            <a
+                                href="#contact-us"
+                                className="rounded-full border border-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                            >
+                                Contact Vendor
+                            </a>
+                            {vendor.website_url && (
+                                <a
+                                    href={vendor.website_url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-on-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover)"
+                                >
+                                    Visit Website
+                                </a>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="relative">
+                        <div className="relative grid gap-6 rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
+                            <div className="flex items-center justify-between">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                    Vendor Highlights
+                                </p>
+                                <span className="rounded-full bg-(--welcome-strong) px-3 py-1 text-xs font-semibold tracking-[0.2em] text-(--welcome-on-strong) uppercase">
+                                    Live
+                                </span>
+                            </div>
+                            <div className="space-y-3">
+                                <p className="text-sm text-(--welcome-body-text)">
+                                    {vendor.about_title ?? 'Our weaving story'}
+                                </p>
+                                <p className="text-sm text-(--welcome-body-text)">
+                                    {vendor.bio ?? 'This vendor has not added their full story yet.'}
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {vendor.years_active && (
+                                    <span className="rounded-full border border-(--welcome-border) px-3 py-1 text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
+                                        {vendor.years_active}+ years
+                                    </span>
+                                )}
+                                {vendor.craft_specialties.map((specialty) => (
+                                    <span
+                                        key={specialty}
+                                        className="rounded-full border border-(--welcome-border) px-3 py-1 text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)"
+                                    >
+                                        {specialty}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="mx-auto w-full max-w-6xl px-6 pb-16">
+                    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Products</p>
+                            <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
+                                Crafted collection
+                            </h2>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setSelectedCategory('all')}
+                                className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] ${
+                                    selectedCategory === 'all'
+                                        ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
+                                        : 'border-(--welcome-border) text-(--welcome-muted-text)'
+                                }`}
+                            >
+                                All ({products.length})
+                            </button>
+                            {categories.map((category) => (
+                                <button
+                                    key={category.id}
+                                    type="button"
+                                    onClick={() => setSelectedCategory(category.slug)}
+                                    className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] ${
+                                        selectedCategory === category.slug
+                                            ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
+                                            : 'border-(--welcome-border) text-(--welcome-muted-text)'
+                                    }`}
+                                >
+                                    {category.name} ({category.count})
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {filteredProducts.length === 0 ? (
+                        <div className="rounded-4xl border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-8 text-sm text-(--welcome-muted-text)">
+                            No products available for this category yet.
+                        </div>
+                    ) : (
+                        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+                            {filteredProducts.map((product) => (
+                                <article
+                                    key={product.id}
+                                    className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)"
+                                >
+                                    <div className="relative aspect-4/3 bg-(--welcome-surface-1)">
+                                        {product.image_url ? (
+                                            <img
+                                                src={product.image_url}
+                                                alt={product.name}
+                                                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                                                loading="lazy"
+                                            />
+                                        ) : (
+                                            <div className="flex h-full items-center justify-center text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
+                                                Image forthcoming
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-1 flex-col gap-2 p-4">
+                                        <h3 className="font-['Playfair_Display',serif] text-xl">{product.name}</h3>
+                                        <p className="text-sm text-(--welcome-body-text)">{product.description}</p>
+                                        <div className="mt-auto flex items-center justify-between">
+                                            <p className="text-sm font-semibold text-(--welcome-strong)">USD {product.price}</p>
+                                            <Link
+                                                href={productShow(product.id)}
+                                                className="rounded-full border border-(--welcome-border) px-3 py-1 text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)"
+                                            >
+                                                View Product
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </section>
+
+                <section id="contact-us" className="mx-auto grid w-full max-w-6xl gap-10 px-6 pb-20 lg:grid-cols-[1fr_1fr]">
+                    <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-8">
+                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Store Locations</p>
+                        <h2 className="mt-4 font-['Playfair_Display',serif] text-3xl">Visit our atelier</h2>
+
+                        {vendor.locations.length === 0 ? (
+                            <p className="mt-4 text-sm text-(--welcome-body-text)">No store locations provided yet.</p>
+                        ) : (
+                            <div className="mt-5 space-y-4 text-sm text-(--welcome-body-text)">
+                                {vendor.locations.map((location) => (
+                                    <div key={location.id}>
+                                        <p className="font-semibold text-(--welcome-strong)">
+                                            {location.location_name}
+                                            {location.is_primary && (
+                                                <span className="ml-2 text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
+                                                    Primary
+                                                </span>
+                                            )}
+                                        </p>
+                                        <p>
+                                            {location.address_line_1}
+                                            {location.address_line_2 ? `, ${location.address_line_2}` : ''}
+                                        </p>
+                                        <p>
+                                            {location.city}
+                                            {location.region ? `, ${location.region}` : ''}
+                                            {location.postal_code ? ` ${location.postal_code}` : ''}, {location.country}
+                                        </p>
+                                        {location.phone && <p>Phone: {location.phone}</p>}
+                                        {location.hours && <p>Hours: {location.hours}</p>}
+                                        {location.map_url && (
+                                            <a
+                                                href={location.map_url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="inline-flex text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase underline"
+                                            >
+                                                Open map
+                                            </a>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-8">
+                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Contact Vendor</p>
+                        <h2 className="mt-4 font-['Playfair_Display',serif] text-3xl">Send an inquiry</h2>
+
+                        {(vendor.contact_email || vendor.contact_phone || vendor.whatsapp_number) && (
+                            <div className="mt-3 space-y-1 text-sm text-(--welcome-body-text)">
+                                {vendor.contact_email && <p>Email: {vendor.contact_email}</p>}
+                                {vendor.contact_phone && <p>Phone: {vendor.contact_phone}</p>}
+                                {vendor.whatsapp_number && <p>WhatsApp: {vendor.whatsapp_number}</p>}
+                            </div>
+                        )}
+
+                        {status && (
+                            <div className="mt-4 rounded-[18px] border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-muted-text)">
+                                {status}
+                            </div>
+                        )}
+
+                        <Form {...storeVendorInquiry.form(vendor.slug)} className="mt-5 grid gap-4" disableWhileProcessing>
+                            {({ errors, processing }) => (
+                                <>
+                                    <div>
+                                        <input
+                                            name="name"
+                                            placeholder="Your name"
+                                            className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none"
+                                        />
+                                        <InputError message={errors.name} className="mt-1 text-xs" />
+                                    </div>
+                                    <div>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            placeholder="Email address"
+                                            className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none"
+                                        />
+                                        <InputError message={errors.email} className="mt-1 text-xs" />
+                                    </div>
+                                    <div>
+                                        <input
+                                            name="phone"
+                                            placeholder="Phone number (optional)"
+                                            className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none"
+                                        />
+                                        <InputError message={errors.phone} className="mt-1 text-xs" />
+                                    </div>
+                                    <div>
+                                        <input
+                                            name="subject"
+                                            placeholder="Subject"
+                                            className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none"
+                                        />
+                                        <InputError message={errors.subject} className="mt-1 text-xs" />
+                                    </div>
+                                    <div>
+                                        <textarea
+                                            name="message"
+                                            rows={5}
+                                            placeholder="Write your inquiry"
+                                            className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none"
+                                        />
+                                        <InputError message={errors.message} className="mt-1 text-xs" />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="inline-flex items-center justify-center gap-2 rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-on-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
+                                    >
+                                        {processing && <Spinner className="text-(--welcome-on-strong)" />}
+                                        Send Inquiry
+                                    </button>
+                                </>
+                            )}
+                        </Form>
+                    </div>
+                </section>
+            </PublicSiteLayout>
+        </>
+    );
+}

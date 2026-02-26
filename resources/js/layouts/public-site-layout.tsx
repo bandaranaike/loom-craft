@@ -72,12 +72,6 @@ export default function PublicSiteLayout({
                                         Browse Products
                                     </Link>
                                 )}
-                                <Link
-                                    href={loomWeaveDemo()}
-                                    className={menuItemClass}
-                                >
-                                    Design Studio
-                                </Link>
                                 {auth.user ? (
                                     <Link
                                         href={dashboard()}
@@ -142,6 +136,12 @@ export default function PublicSiteLayout({
                                     className="hover:text-(--welcome-strong)"
                                 >
                                     Products
+                                </Link>
+                                <Link
+                                    href={loomWeaveDemo()}
+                                    className="hover:text-(--welcome-strong)"
+                                >
+                                    Design Studio
                                 </Link>
                             </div>
                         </div>

@@ -31,6 +31,7 @@ class ProductApprovalController extends Controller
                     'vendor_name' => $product->vendor?->display_name
                         ?? $product->vendor?->user?->name
                         ?? 'Unknown vendor',
+                    'vendor_slug' => $product->vendor?->slug,
                     'vendor_price' => (string) $product->vendor_price,
                     'selling_price' => (string) $product->selling_price,
                     'submitted_at' => $product->created_at?->toDateTimeString(),

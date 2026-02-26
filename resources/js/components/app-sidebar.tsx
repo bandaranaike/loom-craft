@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
     Folder,
+    Inbox,
     LayoutGrid,
     MessageSquareQuote,
     Package,
@@ -23,9 +24,11 @@ import {
 import { dashboard } from '@/routes';
 import { pending as adminFeedbackPending } from '@/routes/admin/feedback';
 import { pending as adminProductsPending } from '@/routes/admin/products';
+import { pending as adminVendorInquiriesPending } from '@/routes/admin/vendor-inquiries';
 import { connect as adminYouTubeConnect } from '@/routes/admin/youtube';
 import { pending as adminVendorsPending } from '@/routes/admin/vendors';
 import { create as vendorFeedbackCreate } from '@/routes/vendor/feedback';
+import { index as vendorInquiriesIndex } from '@/routes/vendor/inquiries';
 import { index as vendorProductsIndex } from '@/routes/vendor/products';
 import { index as ordersIndex } from '@/routes/orders';
 import type { NavItem, SharedData } from '@/types';
@@ -82,6 +85,11 @@ export function AppSidebar() {
                       href: adminFeedbackPending(),
                       icon: MessageSquareQuote,
                   },
+                  {
+                      title: 'Inquiry Moderation',
+                      href: adminVendorInquiriesPending(),
+                      icon: Inbox,
+                  },
               ]
             : []),
         ...(isVendor
@@ -95,6 +103,11 @@ export function AppSidebar() {
                       title: 'Vendor Feedback',
                       href: vendorFeedbackCreate(),
                       icon: MessageSquareQuote,
+                  },
+                  {
+                      title: 'Customer Inquiries',
+                      href: vendorInquiriesIndex(),
+                      icon: Inbox,
                   },
               ]
             : []),

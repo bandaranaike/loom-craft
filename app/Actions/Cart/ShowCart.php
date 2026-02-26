@@ -50,6 +50,7 @@ class ShowCart
                 $product->id,
                 $product->name,
                 $vendor->display_name,
+                $vendor->slug,
                 $image ? Storage::disk('public')->url($image->path) : null,
                 $item->quantity,
                 Money::fromString((string) $item->unit_price)->amount,

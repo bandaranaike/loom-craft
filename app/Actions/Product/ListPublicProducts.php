@@ -50,6 +50,7 @@ class ListPublicProducts
                     $product->name,
                     Money::fromString((string) $product->selling_price)->amount,
                     $vendor->display_name,
+                    $vendor->slug,
                     $vendor->location,
                     $image ? Storage::disk('public')->url($image->path) : null,
                 );

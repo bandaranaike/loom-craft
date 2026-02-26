@@ -6,12 +6,14 @@ import PublicSiteLayout from '@/layouts/public-site-layout';
 import { show as cartShow } from '@/routes/cart';
 import { create as checkoutPayPalCreate } from '@/routes/checkout/paypal';
 import { store as checkoutStore } from '@/routes/checkout';
+import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
 
 type CartItem = {
     id: number;
     name: string;
     vendor_name: string;
+    vendor_slug: string | null;
     quantity: number;
     unit_price: string;
     line_total: string;
@@ -754,7 +756,14 @@ export default function CheckoutPage({
                                             {item.name}
                                         </p>
                                         <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                            {item.vendor_name} • {item.quantity}{' '}
+                                            {item.vendor_slug ? (
+                                                <Link href={vendorShow(item.vendor_slug)}>
+                                                    {item.vendor_name}
+                                                </Link>
+                                            ) : (
+                                                item.vendor_name
+                                            )}{' '}
+                                            • {item.quantity}{' '}
                                             × {formatMoney(item.unit_price, cart.currency)}
                                         </p>
                                         <p className="text-sm text-(--welcome-strong)">

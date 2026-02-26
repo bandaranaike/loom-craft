@@ -9,11 +9,13 @@ use App\Models\Product;
 use App\Models\Suggestion;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\VendorContactSubmission;
 use App\Policies\AdminPolicy;
 use App\Policies\CartPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\SuggestionPolicy;
+use App\Policies\VendorContactSubmissionPolicy;
 use App\Policies\VendorPolicy;
 use App\Services\Video\YouTubeVideoUploader;
 use Carbon\CarbonImmutable;
@@ -89,5 +91,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Product::class, ProductPolicy::class);
         Gate::policy(Vendor::class, VendorPolicy::class);
         Gate::policy(Suggestion::class, SuggestionPolicy::class);
+        Gate::policy(VendorContactSubmission::class, VendorContactSubmissionPolicy::class);
     }
 }

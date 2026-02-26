@@ -1,9 +1,10 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
-import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
-import { dashboard, login, register } from '@/routes';
+import { formatMoney } from '@/lib/currency';
+import { dashboard, register } from '@/routes';
 import { index as productsIndex, show as productShow } from '@/routes/products';
+import { show as vendorShow } from '@/routes/vendors';
 import { store as feedbackStore } from '@/routes/vendor/feedback';
 import type { SharedData } from '@/types';
 
@@ -69,6 +70,7 @@ type FeedbackItem = {
     title: string;
     details: string;
     author_name: string;
+    author_vendor_slug: string | null;
     author_role: string;
     approved_at: string | null;
 };
@@ -85,6 +87,7 @@ type LatestProduct = {
     name: string;
     selling_price: string;
     vendor_name: string;
+    vendor_slug: string | null;
     image_url: string | null;
 };
 
@@ -103,7 +106,8 @@ export default function Welcome({
 }) {
     const { auth } = usePage<SharedData>().props;
     const canLeaveFeedback =
-        auth.user && (auth.user.role === 'vendor' || auth.user.role === 'customer');
+        auth.user &&
+        (auth.user.role === 'vendor' || auth.user.role === 'customer');
 
     return (
         <>
@@ -115,122 +119,124 @@ export default function Welcome({
                 />
             </Head>
             <PublicSiteLayout canRegister={canRegister}>
-                    <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-6 lg:grid-cols-[1.1fr_0.9fr]">
-                        <div className="space-y-6">
-                            <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Handloomed • Curated • Collectible
-                            </div>
-                            <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl lg:text-6xl">
-                                A marketplace devoted to Sri Lanka&apos;s most rare woven luxury.
-                            </h1>
-                            <p className="max-w-xl text-base text-(--welcome-body-text) md:text-lg">
-                                LoomCraft brings Dumbara Rataa artisans into a refined global
-                                atelier. Each piece is crafted in limited numbers with detailed
-                                provenance, authentic materials, and a heritage-first story.
-                            </p>
-                            <div className="flex flex-wrap items-center gap-4">
-                                <Link
-                                    href={productsIndex().url}
-                                    className="rounded-full border border-(--welcome-strong) px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
-                                >
-                                    Browse Products
-                                </Link>
-                                {auth.user ? (
-                                    <Link
-                                        href={dashboard()}
-                                        className="rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover)"
-                                    >
-                                        Visit Dashboard
-                                    </Link>
-                                ) : (
-                                    <>
-                                        {canRegister && (
-                                            <Link
-                                                href={register()}
-                                                className="rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover)"
-                                            >
-                                                Start Collecting
-                                            </Link>
-                                        )}
-                                        <Link
-                                            href={login()}
-                                            className="rounded-full border border-(--welcome-strong) px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
-                                        >
-                                            Sign In
-                                        </Link>
-                                    </>
-                                )}
-                            </div>
-                            <div className="flex flex-wrap items-center gap-6 text-xs uppercase tracking-[0.24em] text-(--welcome-muted-text)">
-                                <span>Guest Checkout</span>
-                                <span>USD / EUR / LKR</span>
-                                <span>Manual &amp; Stripe Payments</span>
-                            </div>
+                <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-6 pb-16 lg:grid-cols-[1.1fr_0.9fr]">
+                    <div className="space-y-6">
+                        <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                            Handloomed • Curated • Collectible
                         </div>
-                        <div className="relative">
-                            <div className="relative grid gap-6 rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
-                                <div className="flex items-center justify-between">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Atelier Ledger
+                        <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl lg:text-6xl">
+                            A marketplace devoted to Sri Lanka&apos;s most rare
+                            woven luxury.
+                        </h1>
+                        <p className="max-w-xl text-base text-(--welcome-body-text) md:text-lg">
+                            LoomCraft brings Dumbara Rataa artisans into a
+                            refined global atelier. Each piece is crafted in
+                            limited numbers with detailed provenance, authentic
+                            materials, and a heritage-first story.
+                        </p>
+                        <div className="flex flex-wrap items-center gap-4">
+                            <Link
+                                href={productsIndex().url}
+                                className="rounded-full border border-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                            >
+                                Browse Products
+                            </Link>
+                            {auth.user ? (
+                                <Link
+                                    href={dashboard()}
+                                    className="rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-on-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover)"
+                                >
+                                    Visit Dashboard
+                                </Link>
+                            ) : (
+                                <>
+                                    {canRegister && (
+                                        <Link
+                                            href={register()}
+                                            className="rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-on-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover)"
+                                        >
+                                            Start Collecting
+                                        </Link>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-6 text-xs tracking-[0.24em] text-(--welcome-muted-text) uppercase">
+                            <span>Collector-Safe Checkout</span>
+                            <span>Traceable Artisan Provenance</span>
+                        </div>
+                    </div>
+                    <div className="relative">
+                        <div className="relative grid gap-6 rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
+                            <div className="flex items-center justify-between">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                    Atelier Ledger
+                                </p>
+                                <span className="rounded-full bg-(--welcome-strong) px-3 py-1 text-xs font-semibold tracking-[0.2em] text-(--welcome-on-strong) uppercase">
+                                    Live
+                                </span>
+                            </div>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                <div className="space-y-1 rounded-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-4">
+                                    <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
+                                        Active Products
                                     </p>
-                                    <span className="rounded-full bg-(--welcome-strong) px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-(--welcome-on-strong)">
-                                        Live
-                                    </span>
-                                </div>
-                                <div className="grid gap-3 sm:grid-cols-2">
-                                    <div className="space-y-1 rounded-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-4">
-                                        <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
-                                            Active Products
-                                        </p>
-                                        <p className="font-['Playfair_Display',serif] text-3xl">
-                                            {atelier_ledger.active_products}
-                                        </p>
-                                    </div>
-                                    <div className="space-y-1 rounded-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-4">
-                                        <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
-                                            Approved Feedback
-                                        </p>
-                                        <p className="font-['Playfair_Display',serif] text-3xl">
-                                            {atelier_ledger.approved_feedback}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="grid gap-4 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-5">
-                                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-muted-text)">
-                                        Latest Approved Vendor Note
+                                    <p className="font-['Playfair_Display',serif] text-3xl">
+                                        {atelier_ledger.active_products}
                                     </p>
-                                    {vendor_feedback.length > 0 ? (
-                                        <div className="space-y-2">
-                                            <div className="space-y-1">
-                                                <p className="font-['Playfair_Display',serif] text-2xl">
-                                                    {vendor_feedback[0].author_name}
-                                                </p>
-                                                <p className="text-sm text-(--welcome-body-text)">
-                                                    {vendor_feedback[0].title}
-                                                </p>
-                                            </div>
-                                            <p className="text-xs text-(--welcome-muted-text)">
-                                                {vendor_feedback[0].details}
+                                </div>
+                                <div className="space-y-1 rounded-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-4">
+                                    <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
+                                        Approved Feedback
+                                    </p>
+                                    <p className="font-['Playfair_Display',serif] text-3xl">
+                                        {atelier_ledger.approved_feedback}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="grid gap-4 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-5">
+                                <p className="text-sm font-semibold tracking-[0.2em] text-(--welcome-muted-text) uppercase">
+                                    Latest Approved Vendor Note
+                                </p>
+                                {vendor_feedback.length > 0 ? (
+                                    <div className="space-y-2">
+                                        <div className="space-y-1">
+                                            <p className="font-['Playfair_Display',serif] text-2xl">
+                                                {vendor_feedback[0].author_vendor_slug ? (
+                                                    <Link href={vendorShow(vendor_feedback[0].author_vendor_slug)}>
+                                                        {vendor_feedback[0].author_name}
+                                                    </Link>
+                                                ) : (
+                                                    vendor_feedback[0].author_name
+                                                )}
+                                            </p>
+                                            <p className="text-sm text-(--welcome-body-text)">
+                                                {vendor_feedback[0].title}
                                             </p>
                                         </div>
-                                    ) : (
-                                        <p className="text-sm text-(--welcome-body-text)">
-                                            Vendor feedback will appear here once approved by admins.
+                                        <p className="text-xs text-(--welcome-muted-text)">
+                                            {vendor_feedback[0].details}
                                         </p>
-                                    )}
-                                </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-(--welcome-body-text)">
+                                        Vendor feedback will appear here once
+                                        approved by admins.
+                                    </p>
+                                )}
                             </div>
                         </div>
-                    </section>
+                    </div>
+                </section>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
                     <div className="grid gap-8 rounded-[48px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-10 md:grid-cols-3">
                         {highlights.map((item) => (
                             <div
                                 key={item.title}
-                                className="space-y-3 border-b border-(--welcome-border-soft) pb-6 last:border-b-0 last:pb-0 md:border-b-0 md:border-r md:pb-0 md:pr-8 md:last:border-r-0 md:last:pr-0"
+                                className="space-y-3 border-b border-(--welcome-border-soft) pb-6 last:border-b-0 last:pb-0 md:border-r md:border-b-0 md:pr-8 md:pb-0 md:last:border-r-0 md:last:pr-0"
                             >
-                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                     Signature
                                 </p>
                                 <h2 className="font-['Playfair_Display',serif] text-2xl">
@@ -244,17 +250,90 @@ export default function Welcome({
                     </div>
                 </section>
 
+                <section className="mx-auto w-full max-w-6xl px-6 pb-16">
+                    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                New Arrivals
+                            </p>
+                            <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
+                                Latest products from ateliers.
+                            </h2>
+                        </div>
+                        <Link
+                            href={productsIndex().url}
+                            className="rounded-full border border-(--welcome-strong) px-5 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                        >
+                            View all products
+                        </Link>
+                    </div>
+                    {latest_products.length === 0 ? (
+                        <div className="rounded-4xl border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-8 text-sm text-(--welcome-muted-text)">
+                            No products available yet.
+                        </div>
+                    ) : (
+                        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+                            {latest_products.map((product) => (
+                                <article
+                                    key={product.id}
+                                    className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)"
+                                >
+                                    <Link
+                                        href={productShow(product.id)}
+                                        className="relative aspect-4/3 bg-(--welcome-surface-1)"
+                                    >
+                                        {product.image_url ? (
+                                            <img
+                                                src={product.image_url}
+                                                alt={product.name}
+                                                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                                            />
+                                        ) : (
+                                            <div className="flex h-full items-center justify-center text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
+                                                Image forthcoming
+                                            </div>
+                                        )}
+                                    </Link>
+                                    <div className="flex flex-1 flex-col gap-2 p-4">
+                                        <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
+                                            {product.vendor_slug ? (
+                                                <Link href={vendorShow(product.vendor_slug)}>
+                                                    {product.vendor_name}
+                                                </Link>
+                                            ) : (
+                                                product.vendor_name
+                                            )}
+                                        </p>
+                                        <h3 className="font-['Playfair_Display',serif] text-xl">
+                                            <Link href={productShow(product.id)}>
+                                                {product.name}
+                                            </Link>
+                                        </h3>
+                                        <p className="mt-auto text-sm font-semibold text-(--welcome-strong)">
+                                            {formatMoney(
+                                                product.selling_price,
+                                                'LKR',
+                                            )}
+                                        </p>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </section>
+
                 <section className="mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 lg:grid-cols-[0.9fr_1.1fr]">
                     <div className="space-y-6">
-                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                             Curated Collections
                         </p>
                         <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
                             Designed for galleries, rituals, and refined living.
                         </h2>
                         <p className="text-sm text-(--welcome-body-text)">
-                            Every collection is an editorial of texture, story, and provenance —
-                            ready for patrons, design studios, and collectors worldwide.
+                            Every collection is an editorial of texture, story,
+                            and provenance — ready for patrons, design studios,
+                            and collectors worldwide.
                         </p>
                     </div>
                     <div className="grid gap-4 md:grid-cols-3">
@@ -263,7 +342,7 @@ export default function Welcome({
                                 key={collection.name}
                                 className="group rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6 transition hover:-translate-y-1 hover:border-(--welcome-accent)"
                             >
-                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                     Collection
                                 </p>
                                 <h3 className="mt-3 font-['Playfair_Display',serif] text-xl">
@@ -279,77 +358,20 @@ export default function Welcome({
                 </section>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
-                    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                        <div>
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                New Arrivals
-                            </p>
-                            <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
-                                Latest products from approved ateliers.
-                            </h2>
-                        </div>
-                        <Link
-                            href={productsIndex().url}
-                            className="rounded-full border border-(--welcome-strong) px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
-                        >
-                            View all products
-                        </Link>
-                    </div>
-                    {latest_products.length === 0 ? (
-                        <div className="rounded-4xl border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-8 text-sm text-(--welcome-muted-text)">
-                            No products available yet.
-                        </div>
-                    ) : (
-                        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-                            {latest_products.map((product) => (
-                                <Link
-                                    key={product.id}
-                                    href={productShow(product.id).url}
-                                    className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)"
-                                >
-                                    <div className="relative aspect-4/3 bg-(--welcome-surface-1)">
-                                        {product.image_url ? (
-                                            <img
-                                                src={product.image_url}
-                                                alt={product.name}
-                                                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                                            />
-                                        ) : (
-                                            <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
-                                                Image forthcoming
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="flex flex-1 flex-col gap-2 p-4">
-                                        <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
-                                            {product.vendor_name}
-                                        </p>
-                                        <h3 className="font-['Playfair_Display',serif] text-xl">
-                                            {product.name}
-                                        </h3>
-                                        <p className="mt-auto text-sm font-semibold text-(--welcome-strong)">
-                                            {formatMoney(product.selling_price, 'LKR')}
-                                        </p>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
-                </section>
-
-                <section className="mx-auto w-full max-w-6xl px-6 pb-16">
                     <div className="mb-6">
-                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                             Atelier Voices
                         </p>
                         <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
-                            Approved feedback from the LoomCraft network.
+                            Feedback from the LoomCraft network.
                         </h2>
                     </div>
                     {canLeaveFeedback && (
                         <div className="mb-6 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                            <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
-                                {my_feedback ? 'Edit Your Feedback' : 'Share Your Feedback'}
+                            <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
+                                {my_feedback
+                                    ? 'Edit Your Feedback'
+                                    : 'Share Your Feedback'}
                             </p>
                             <h3 className="mt-2 font-['Playfair_Display',serif] text-2xl">
                                 {my_feedback
@@ -357,11 +379,11 @@ export default function Welcome({
                                     : 'Add your vendor or buyer note'}
                             </h3>
                             <p className="mt-2 text-sm text-(--welcome-body-text)">
-                                You can keep one feedback entry. Saving again updates your existing
-                                submission.
+                                You can keep one feedback entry. Saving again
+                                updates your existing submission.
                             </p>
                             {my_feedback && (
-                                <p className="mt-2 text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
+                                <p className="mt-2 text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
                                     Current status: {my_feedback.status}
                                 </p>
                             )}
@@ -375,24 +397,29 @@ export default function Welcome({
                                         <div className="grid gap-2">
                                             <label
                                                 htmlFor="title"
-                                                className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)"
+                                                className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase"
                                             >
                                                 Headline
                                             </label>
                                             <input
                                                 id="title"
                                                 name="title"
-                                                defaultValue={my_feedback?.title ?? ''}
-                                                className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) outline-none ring-(--welcome-ring) focus:ring-2"
+                                                defaultValue={
+                                                    my_feedback?.title ?? ''
+                                                }
+                                                className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) ring-(--welcome-ring) outline-none focus:ring-2"
                                                 placeholder="Share one headline from your LoomCraft experience"
                                                 required
                                             />
-                                            <InputError message={errors.title} className="text-xs" />
+                                            <InputError
+                                                message={errors.title}
+                                                className="text-xs"
+                                            />
                                         </div>
                                         <div className="grid gap-2">
                                             <label
                                                 htmlFor="details"
-                                                className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)"
+                                                className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase"
                                             >
                                                 Details
                                             </label>
@@ -400,19 +427,26 @@ export default function Welcome({
                                                 id="details"
                                                 name="details"
                                                 rows={4}
-                                                defaultValue={my_feedback?.details ?? ''}
-                                                className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) outline-none ring-(--welcome-ring) focus:ring-2"
+                                                defaultValue={
+                                                    my_feedback?.details ?? ''
+                                                }
+                                                className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) ring-(--welcome-ring) outline-none focus:ring-2"
                                                 placeholder="Describe your experience as a vendor or buyer."
                                                 required
                                             />
-                                            <InputError message={errors.details} className="text-xs" />
+                                            <InputError
+                                                message={errors.details}
+                                                className="text-xs"
+                                            />
                                         </div>
                                         <button
                                             type="submit"
-                                            className="inline-flex w-fit items-center rounded-full bg-(--welcome-strong) px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-(--welcome-on-strong) transition hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
+                                            className="inline-flex w-fit items-center rounded-full bg-(--welcome-strong) px-5 py-2 text-xs font-semibold tracking-[0.2em] text-(--welcome-on-strong) uppercase transition hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
                                             disabled={processing}
                                         >
-                                            {my_feedback ? 'Update Feedback' : 'Submit Feedback'}
+                                            {my_feedback
+                                                ? 'Update Feedback'
+                                                : 'Submit Feedback'}
                                         </button>
                                     </>
                                 )}
@@ -430,8 +464,16 @@ export default function Welcome({
                                     key={feedback.id}
                                     className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
                                 >
-                                    <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
-                                        {feedback.author_name} • {feedback.author_role}
+                                    <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
+                                        {feedback.author_vendor_slug ? (
+                                            <Link href={vendorShow(feedback.author_vendor_slug)}>
+                                                {feedback.author_name}
+                                            </Link>
+                                        ) : (
+                                            feedback.author_name
+                                        )}{' '}
+                                        •{' '}
+                                        {feedback.author_role}
                                     </p>
                                     <h3 className="mt-2 font-['Playfair_Display',serif] text-2xl">
                                         {feedback.title}
@@ -440,7 +482,7 @@ export default function Welcome({
                                         {feedback.details}
                                     </p>
                                     {feedback.approved_at && (
-                                        <p className="mt-4 text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
+                                        <p className="mt-4 text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
                                             Approved {feedback.approved_at}
                                         </p>
                                     )}
@@ -453,15 +495,19 @@ export default function Welcome({
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
                     <div className="grid gap-10 rounded-[48px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-10 lg:grid-cols-[1.1fr_0.9fr]">
                         <div className="space-y-6">
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                 Craftsmanship Flow
                             </p>
                             <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
                                 From fiber to finish, every detail is traced.
                             </h2>
                             <p className="text-sm text-(--welcome-body-text)">
-                                LoomCraft documents each stage of creation, so patrons receive
-                                not only the textile, but its story, materials, and maker.
+                                LoomCraft documents each stage of creation with
+                                fiber source notes, hand-dye batch records, loom
+                                rhythm logs, and final finishing checks. Patrons
+                                receive not only the textile, but a verifiable
+                                record of materials, methods, and artisan
+                                stewardship from start to delivery.
                             </p>
                         </div>
                         <div className="grid gap-4">
@@ -474,7 +520,7 @@ export default function Welcome({
                                         {index + 1}
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--welcome-muted-text)">
+                                        <p className="text-sm font-semibold tracking-[0.2em] text-(--welcome-muted-text) uppercase">
                                             {step.label}
                                         </p>
                                         <p className="mt-1 text-sm text-(--welcome-body-text)">
@@ -489,22 +535,23 @@ export default function Welcome({
 
                 <section className="mx-auto grid w-full max-w-6xl gap-8 px-6 pb-20 lg:grid-cols-[1fr_1fr]">
                     <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-strong) p-8 text-(--welcome-on-strong)">
-                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-accent-soft)">
+                        <p className="text-xs tracking-[0.3em] text-(--welcome-accent-soft) uppercase">
                             For Vendors
                         </p>
                         <h2 className="mt-4 font-['Playfair_Display',serif] text-3xl">
                             A refined marketplace for master weavers.
                         </h2>
                         <p className="mt-3 text-sm text-(--welcome-on-strong-muted)">
-                            Gain access to a curated audience, transparent pricing, and a
-                            dashboard built around your craft. Manual approval keeps the
-                            marketplace authentic and exclusive.
+                            Gain access to a curated audience, transparent
+                            pricing, and a dashboard built around your craft.
+                            Manual approval keeps the marketplace authentic and
+                            exclusive.
                         </p>
                         {canRegister && !auth.user && (
                             <div className="mt-6">
                                 <Link
                                     href={register()}
-                                    className="inline-flex items-center rounded-full border border-(--welcome-on-strong) px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition hover:bg-(--welcome-on-strong) hover:text-(--welcome-strong)"
+                                    className="inline-flex items-center rounded-full border border-(--welcome-on-strong) px-5 py-2 text-xs font-semibold tracking-[0.3em] uppercase transition hover:bg-(--welcome-on-strong) hover:text-(--welcome-strong)"
                                 >
                                     Apply as Vendor
                                 </Link>
@@ -512,23 +559,24 @@ export default function Welcome({
                         )}
                     </div>
                     <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-8">
-                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                             Patron Notes
                         </p>
                         <h2 className="mt-4 font-['Playfair_Display',serif] text-3xl">
                             "The weave carries the rhythm of the loom itself."
                         </h2>
                         <p className="mt-3 text-sm text-(--welcome-body-text)">
-                            Each order arrives with a maker&apos;s note, woven coordinates, and
-                            recommended care to preserve its luster for generations.
+                            Each order arrives with a maker&apos;s note, woven
+                            coordinates, and recommended care to preserve its
+                            luster for generations.
                         </p>
                         <div className="mt-6 flex items-center gap-4">
                             <div className="h-12 w-12 rounded-full border border-(--welcome-accent) bg-(--welcome-surface-1)" />
                             <div>
                                 <p className="text-sm font-semibold text-(--welcome-strong)">
-                                    Amara Wijekoon
+                                    Ishara Karunadasa
                                 </p>
-                                <p className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
+                                <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
                                     Curator, LoomCraft
                                 </p>
                             </div>

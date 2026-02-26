@@ -22,6 +22,7 @@ class PrepareProductEditing
         return new ProductEditFormResult(
             '7.00',
             $data->user->vendor?->display_name,
+            $data->user->vendor?->slug,
             [
                 'id' => $product->id,
                 'name' => $product->name,

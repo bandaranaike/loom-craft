@@ -2,12 +2,14 @@ import { Form, Head, Link } from '@inertiajs/react';
 import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { index as productsIndex, show as productShow } from '@/routes/products';
+import { show as vendorShow } from '@/routes/vendors';
 
 type ProductItem = {
     id: number;
     name: string;
     selling_price: string;
     vendor_name: string;
+    vendor_slug: string | null;
     vendor_location: string | null;
     image_url: string | null;
 };
@@ -131,12 +133,14 @@ export default function ProductIndex({
                     ) : (
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {products.map((product) => (
-                                <Link
+                                <article
                                     key={product.id}
-                                    href={productShow(product.id).url}
                                     className="group flex h-full flex-col overflow-hidden rounded-[32px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)"
                                 >
-                                    <div className="relative aspect-[4/3] overflow-hidden bg-(--welcome-surface-1)">
+                                    <Link
+                                        href={productShow(product.id)}
+                                        className="relative aspect-[4/3] overflow-hidden bg-(--welcome-surface-1)"
+                                    >
                                         {product.image_url ? (
                                             <img
                                                 src={product.image_url}
@@ -148,17 +152,25 @@ export default function ProductIndex({
                                                 Image forthcoming
                                             </div>
                                         )}
-                                    </div>
+                                    </Link>
                                     <div className="flex flex-1 flex-col gap-3 p-5">
                                         <div className="space-y-2">
                                             <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                                {product.vendor_name}
+                                                {product.vendor_slug ? (
+                                                    <Link href={vendorShow(product.vendor_slug)}>
+                                                        {product.vendor_name}
+                                                    </Link>
+                                                ) : (
+                                                    product.vendor_name
+                                                )}
                                                 {product.vendor_location
                                                     ? ` • ${product.vendor_location}`
                                                     : ''}
                                             </p>
                                             <h3 className="font-['Playfair_Display',serif] text-xl">
-                                                {product.name}
+                                                <Link href={productShow(product.id)}>
+                                                    {product.name}
+                                                </Link>
                                             </h3>
                                         </div>
                                         <div className="mt-auto flex items-center justify-between text-sm">
@@ -170,7 +182,7 @@ export default function ProductIndex({
                                             </span>
                                         </div>
                                     </div>
-                                </Link>
+                                </article>
                             ))}
                         </div>
                     )}

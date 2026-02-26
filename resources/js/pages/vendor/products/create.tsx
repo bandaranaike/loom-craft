@@ -1,14 +1,16 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
-import PublicSiteLayout from '@/layouts/public-site-layout';
 import { Spinner } from '@/components/ui/spinner';
+import PublicSiteLayout from '@/layouts/public-site-layout';
 import { dashboard } from '@/routes';
 import { store } from '@/routes/vendor/products';
+import { show as vendorShow } from '@/routes/vendors';
 
 type Props = {
     commission_rate: string;
     vendor_name: string | null;
+    vendor_slug: string | null;
     status?: string;
 };
 
@@ -22,7 +24,7 @@ const fileInputClassName =
     'w-full rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] file:mr-4 file:rounded-full file:border-0 file:bg-(--welcome-strong) file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.3em] file:text-(--welcome-on-strong) hover:file:bg-(--welcome-strong-hover) focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
 
 export default function ProductCreate() {
-    const { commission_rate, vendor_name, status } = usePage<Props>().props;
+    const { commission_rate, vendor_name, vendor_slug, status } = usePage<Props>().props;
     const [vendorPrice, setVendorPrice] = useState('');
 
     const sellingPrice = useMemo(() => {
@@ -73,7 +75,13 @@ export default function ProductCreate() {
                                         Vendor Atelier
                                     </p>
                                     <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                        {vendor_name ?? 'LoomCraft artisan'}
+                                        {vendor_name && vendor_slug ? (
+                                            <Link href={vendorShow(vendor_slug)}>
+                                                {vendor_name}
+                                            </Link>
+                                        ) : (
+                                            vendor_name ?? 'LoomCraft artisan'
+                                        )}
                                     </p>
                                 </div>
                                 <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
@@ -107,7 +115,6 @@ export default function ProductCreate() {
                         </div>
 
                         <div className="relative">
-                            <div className="absolute -right-4 top-10 h-48 w-48 rounded-[32px] border border-(--welcome-border) bg-(--welcome-surface-2) shadow-[0_20px_60px_-30px_var(--welcome-shadow-soft)]" />
                             <div className="relative rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
                                 <div className="space-y-2">
                                     <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
@@ -122,7 +129,7 @@ export default function ProductCreate() {
                                 </div>
 
                                 {status && (
-                                    <div className="mt-4 rounded-[24px] border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-muted-text)">
+                                    <div className="mt-4 rounded-3xl border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-muted-text)">
                                         {status}
                                     </div>
                                 )}

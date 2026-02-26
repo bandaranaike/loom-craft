@@ -32,6 +32,7 @@ class FeedbackController extends Controller
                     'author_name' => $author?->vendor?->display_name
                         ?? $author?->name
                         ?? 'Unknown user',
+                    'author_vendor_slug' => $author?->vendor?->slug,
                     'author_role' => $author?->role ?? 'customer',
                     'submitted_at' => $suggestion->created_at?->toDateTimeString(),
                 ];

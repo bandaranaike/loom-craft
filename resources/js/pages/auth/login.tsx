@@ -65,7 +65,6 @@ export default function Login({
                         </div>
 
                         <div className="relative">
-                            <div className="absolute -right-4 top-10 h-48 w-48 rounded-[32px] border border-(--welcome-border) bg-(--welcome-surface-2) shadow-[0_20px_60px_-30px_var(--welcome-shadow-soft)]" />
                             <div className="relative rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
                                 <div className="space-y-2">
                                     <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">

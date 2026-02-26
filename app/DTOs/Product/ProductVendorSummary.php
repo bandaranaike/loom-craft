@@ -7,6 +7,7 @@ class ProductVendorSummary
     public function __construct(
         public int $id,
         public string $displayName,
+        public ?string $slug,
         public ?string $location,
     ) {}
 
@@ -18,6 +19,7 @@ class ProductVendorSummary
         return [
             'id' => $this->id,
             'display_name' => $this->displayName,
+            'slug' => $this->slug,
             'location' => $this->location,
         ];
     }

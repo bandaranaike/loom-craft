@@ -32,6 +32,7 @@ class HomeController extends Controller
                     'name' => $product->name,
                     'selling_price' => Money::fromString((string) $product->selling_price)->amount,
                     'vendor_name' => $product->vendor?->display_name ?? 'Unknown vendor',
+                    'vendor_slug' => $product->vendor?->slug,
                     'image_url' => $image ? asset('storage/'.$image->path) : null,
                 ];
             })
@@ -54,6 +55,7 @@ class HomeController extends Controller
                     'author_name' => $author?->vendor?->display_name
                         ?? $author?->name
                         ?? 'Verified member',
+                    'author_vendor_slug' => $author?->vendor?->slug,
                     'author_role' => $author?->role ?? 'customer',
                     'approved_at' => $suggestion->updated_at?->toDateString(),
                 ];

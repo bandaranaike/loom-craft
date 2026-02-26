@@ -19,7 +19,18 @@ class Vendor extends Model
     protected $fillable = [
         'user_id',
         'display_name',
+        'slug',
         'bio',
+        'tagline',
+        'website_url',
+        'contact_email',
+        'contact_phone',
+        'whatsapp_number',
+        'logo_path',
+        'cover_image_path',
+        'about_title',
+        'craft_specialties',
+        'years_active',
         'location',
         'status',
         'approved_at',
@@ -33,6 +44,7 @@ class Vendor extends Model
     {
         return [
             'approved_at' => 'datetime',
+            'craft_specialties' => 'array',
         ];
     }
 
@@ -64,5 +76,15 @@ class Vendor extends Model
     public function payouts(): HasMany
     {
         return $this->hasMany(VendorPayout::class);
+    }
+
+    public function locations(): HasMany
+    {
+        return $this->hasMany(VendorLocation::class);
+    }
+
+    public function contactSubmissions(): HasMany
+    {
+        return $this->hasMany(VendorContactSubmission::class);
     }
 }

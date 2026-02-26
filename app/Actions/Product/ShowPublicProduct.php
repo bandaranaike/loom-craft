@@ -67,6 +67,7 @@ class ShowPublicProduct
                 new ProductVendorSummary(
                     $vendor->id,
                     $vendor->display_name,
+                    $vendor->slug,
                     $vendor->location,
                 ),
                 $images,

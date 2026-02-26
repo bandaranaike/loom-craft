@@ -36,6 +36,7 @@ class ShowOrder
                 $item->id,
                 $product->name,
                 $vendor->display_name,
+                $vendor->slug,
                 $item->quantity,
                 Money::fromString((string) $item->unit_price)->amount,
                 Money::fromString((string) $item->line_total)->amount,

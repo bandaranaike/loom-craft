@@ -1,7 +1,8 @@
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
 import { approve, pending } from '@/routes/admin/feedback';
+import { show as vendorShow } from '@/routes/vendors';
 import type { BreadcrumbItem } from '@/types';
 
 type FeedbackItem = {
@@ -9,6 +10,7 @@ type FeedbackItem = {
     title: string;
     details: string;
     author_name: string;
+    author_vendor_slug: string | null;
     author_role: string;
     submitted_at: string | null;
 };
@@ -71,7 +73,14 @@ export default function PendingFeedback() {
                             >
                                 <div className="space-y-2">
                                     <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        {item.author_name} • {item.author_role}
+                                        {item.author_vendor_slug ? (
+                                            <Link href={vendorShow(item.author_vendor_slug)}>
+                                                {item.author_name}
+                                            </Link>
+                                        ) : (
+                                            item.author_name
+                                        )}{' '}
+                                        • {item.author_role}
                                     </p>
                                     <h3 className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">
                                         {item.title}
