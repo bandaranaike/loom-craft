@@ -4,8 +4,8 @@ import PublicSiteLayout from '@/layouts/public-site-layout';
 import { formatMoney } from '@/lib/currency';
 import { dashboard, register } from '@/routes';
 import { index as productsIndex, show as productShow } from '@/routes/products';
-import { show as vendorShow } from '@/routes/vendors';
 import { store as feedbackStore } from '@/routes/vendor/feedback';
+import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
 
 const highlights = [

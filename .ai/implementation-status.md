@@ -119,3 +119,4 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Dashboard now loads authenticated users' recent order histories via `DashboardController` + `ListDashboardOrderHistories` and displays them in a `/vendor/products`-style card layout with click-to-open detailed order popup.
 - Public legal pages are now available at `/privacy-policy` and `/terms-of-service` with Inertia React implementations.
 - Shared bottom legal navigation now links Terms of Service and Privacy Policy across public, auth, and app layouts.
+- Product show gallery (`/products/{product}`) now supports clickable thumbnail switching, rounded main-image corners, and conditional floating thumbnails that dock only while the selected image bottom remains below the viewport; once the image bottom is visible, thumbnails fall back to inline below the image.

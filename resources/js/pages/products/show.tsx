@@ -1,8 +1,9 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import type { FormEvent } from 'react';
+import type { FormEvent, JSX } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
-import { DEFAULT_CURRENCY, formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
+import { DEFAULT_CURRENCY, formatMoney } from '@/lib/currency';
 import { show as cartShow } from '@/routes/cart';
 import { store as cartItemStore } from '@/routes/cart/items';
 import { show as vendorShow } from '@/routes/vendors';
@@ -63,7 +64,22 @@ export default function ProductShow({
     product,
     canRegister = true,
 }: ProductShowProps) {
-    const primaryImage = product.images[0];
+    const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
+        product.images[0]?.url ?? null,
+    );
+    const selectedImage =
+        product.images.find((image) => image.url === selectedImageUrl) ??
+        product.images[0] ??
+        null;
+    const selectedImageRef = useRef<HTMLImageElement | null>(null);
+    const selectedImageContainerRef = useRef<HTMLDivElement | null>(null);
+    const [thumbnailDockState, setThumbnailDockState] = useState<{
+        isDocked: boolean;
+        leftX: number;
+    }>({
+        isDocked: false,
+        leftX: 0,
+    });
     const dimensionLabel = formatDimensions(product.dimensions);
     const form = useForm({
         product_id: product.id,
@@ -71,12 +87,103 @@ export default function ProductShow({
         currency: DEFAULT_CURRENCY,
     });
 
-    const submit = (event: FormEvent) => {
+    const submit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         form.post(cartItemStore().url, {
             preserveScroll: true,
         });
     };
+
+    const updateThumbnailDockState = (): void => {
+        if (!selectedImageRef.current || !selectedImageContainerRef.current) {
+            setThumbnailDockState({
+                isDocked: false,
+                leftX: 0,
+            });
+
+            return;
+        }
+
+        const containerRect =
+            selectedImageContainerRef.current.getBoundingClientRect();
+        const viewportBottom = window.innerHeight;
+        const imageIsBelowViewportBottom =
+            containerRect.bottom > viewportBottom;
+        const imageIsInViewport =
+            containerRect.top < viewportBottom && containerRect.bottom > 0;
+        const shouldDock = imageIsBelowViewportBottom && imageIsInViewport;
+        const nextLeftX = Math.round(containerRect.left);
+
+        setThumbnailDockState((currentState) => {
+            if (
+                currentState.isDocked === shouldDock &&
+                currentState.leftX === nextLeftX
+            ) {
+                return currentState;
+            }
+
+            return {
+                isDocked: shouldDock,
+                leftX: nextLeftX,
+            };
+        });
+    };
+
+    useEffect(() => {
+        const handleScroll = (): void => {
+            updateThumbnailDockState();
+        };
+        const handleResize = (): void => {
+            updateThumbnailDockState();
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('resize', handleResize);
+
+        const animationFrameId = window.requestAnimationFrame(() => {
+            updateThumbnailDockState();
+        });
+
+        return () => {
+            window.cancelAnimationFrame(animationFrameId);
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [selectedImage?.url]);
+
+    const renderThumbnails = (): JSX.Element => {
+        return (
+            <div className="flex flex-wrap items-center gap-3">
+                {product.images.map((image) => {
+                    const isSelected = image.url === selectedImage?.url;
+
+                    return (
+                        <button
+                            key={image.url}
+                            type="button"
+                            onClick={() => setSelectedImageUrl(image.url)}
+                            className={`h-20 w-20 cursor-pointer overflow-hidden rounded-lg transition-opacity ${
+                                isSelected
+                                    ? 'opacity-100'
+                                    : 'opacity-60 hover:opacity-100'
+                            }`}
+                            aria-label={`Show image of ${product.name}`}
+                            aria-pressed={isSelected}
+                        >
+                            <img
+                                src={image.url}
+                                alt={image.alt_text ?? product.name}
+                                className="h-full w-full object-cover"
+                            />
+                        </button>
+                    );
+                })}
+            </div>
+        );
+    };
+
+    const shouldDockThumbnails =
+        product.images.length > 1 && thumbnailDockState.isDocked;
 
     return (
         <>
@@ -90,43 +197,41 @@ export default function ProductShow({
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-6 pb-16 lg:grid-cols-[1.05fr_0.95fr]">
                     <div className="grid gap-6">
-                        <div className="rounded-[36px] bg-(--welcome-surface-1) shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
-                            <div className="relative aspect-4/3 overflow-hidden rounded-t-[28px] bg-(--welcome-surface-3)">
-                                {primaryImage ? (
+                        <div className="grid gap-4">
+                            <div ref={selectedImageContainerRef}>
+                                {selectedImage ? (
                                     <img
-                                        src={primaryImage.url}
+                                        ref={selectedImageRef}
+                                        src={selectedImage.url}
                                         alt={
-                                            primaryImage.alt_text ??
+                                            selectedImage.alt_text ??
                                             product.name
                                         }
-                                        className="h-full w-full object-cover"
+                                        onLoad={updateThumbnailDockState}
+                                        className="h-auto w-full rounded-4xl"
                                     />
                                 ) : (
-                                    <div className="flex h-full w-full items-center justify-center text-sm tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                    <div className="flex min-h-72 w-full items-center justify-center text-sm tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                         Image forthcoming
                                     </div>
                                 )}
                             </div>
-                            {product.images.length > 1 && (
-                                <div className="p-4 grid grid-cols-3">
-                                    {product.images.slice(0, 3).map((image) => (
-                                        <div
-                                            key={image.url}
-                                            className="aspect-4/3 overflow-hidden first:rounded-l-[20px] last:rounded-r-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-3)"
-                                        >
-                                            <img
-                                                src={image.url}
-                                                alt={
-                                                    image.alt_text ??
-                                                    product.name
-                                                }
-                                                className="h-full w-full object-cover"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            {product.images.length > 1 &&
+                                !shouldDockThumbnails &&
+                                renderThumbnails()}
                         </div>
+                        {shouldDockThumbnails && (
+                            <div
+                                className="pointer-events-none fixed bottom-4 z-20"
+                                style={{
+                                    left: `${thumbnailDockState.leftX}px`,
+                                }}
+                            >
+                                <div className="pointer-events-auto">
+                                    {renderThumbnails()}
+                                </div>
+                            </div>
+                        )}
                         <div className="flex flex-wrap items-center gap-4 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
                             <span>Approved LoomCraft Release</span>
                             <span>
