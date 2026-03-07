@@ -19,11 +19,11 @@ type PublicSiteLayoutProps = PropsWithChildren<{
 const menuItemClass =
     'rounded-full border border-transparent px-4 py-2 font-medium text-(--welcome-strong-70) transition hover:border-(--welcome-strong) hover:text-(--welcome-strong)';
 const mobileMenuItemClass =
-    'w-full rounded-2xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-left font-medium text-(--welcome-strong) transition hover:border-(--welcome-strong)';
+    'block w-full border-b border-(--welcome-border-soft) px-1 py-3 text-left text-sm font-semibold tracking-[0.18em] text-(--welcome-muted-text) uppercase transition hover:text-(--welcome-strong)';
 const actionButtonClass =
     'rounded-full border border-(--welcome-strong) px-4 py-2 font-medium transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)';
 const mobileActionButtonClass =
-    'w-full rounded-2xl border border-(--welcome-strong) px-4 py-3 text-left font-medium transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)';
+    'block w-full border-b border-(--welcome-border-soft) px-1 py-3 text-left text-sm font-semibold tracking-[0.18em] text-(--welcome-strong) uppercase transition hover:text-(--welcome-accent)';
 const iconButtonClass =
     'inline-flex h-9 w-9 items-center justify-center rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-muted-text) transition hover:bg-(--welcome-surface-1) hover:text-(--welcome-strong)';
 
@@ -148,16 +148,27 @@ export default function PublicSiteLayout({
                         </div>
                     </header>
                     {isMobileMenuOpen && (
+                        <button
+                            type="button"
+                            className="fixed inset-0 z-15 bg-(--welcome-on-strong-45) backdrop-blur-[2px] md:hidden"
+                            aria-label="Close menu overlay"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        />
+                    )}
+                    {isMobileMenuOpen && (
                         <div
                             id="public-site-mobile-menu"
-                            className="absolute top-full right-0 left-0 z-30 px-6 pt-2 md:hidden"
+                            className="absolute top-full right-0 left-0 z-30 px-6 pt-3 md:hidden"
                         >
-                            <nav className="mx-auto grid w-full max-w-6xl gap-2 rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-4 text-sm shadow-[0_24px_60px_-30px_var(--welcome-shadow)]">
+                            <nav className="mx-auto w-full max-w-6xl rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-1) px-5 py-4 text-sm shadow-[0_28px_70px_-30px_var(--welcome-shadow)]">
+                                <p className="pb-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                    Navigation
+                                </p>
                                 {renderMenuActions(true)}
                                 <button
                                     type="button"
                                     onClick={() => updateAppearance(isDark ? 'light' : 'dark')}
-                                    className="flex w-full items-center justify-between rounded-2xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-left font-medium text-(--welcome-strong) transition hover:border-(--welcome-strong)"
+                                    className="flex w-full items-center justify-between px-1 pt-3 text-left text-sm font-semibold tracking-[0.18em] text-(--welcome-muted-text) uppercase transition hover:text-(--welcome-strong)"
                                 >
                                     <span>{toggleAppearanceLabel}</span>
                                     {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
