@@ -1,13 +1,12 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Moon, Sun } from 'lucide-react';
-import type { CSSProperties, PropsWithChildren, ReactNode } from 'react';
+import { Menu, Moon, Sun, X } from 'lucide-react';
+import { useState } from 'react';
+import type { CSSProperties, MouseEventHandler, PropsWithChildren, ReactNode } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import LegalLinks from '@/components/legal-links';
 import { useAppearance } from '@/hooks/use-appearance';
 import dumbaraPatterns from '@/images/dumbara-patterns.png';
 import { dashboard, home, login, loomWeaveDemo, register } from '@/routes';
-import { show as cartShow } from '@/routes/cart';
-import { show as checkoutShow } from '@/routes/checkout';
 import { index as productsIndex } from '@/routes/products';
 import type { SharedData } from '@/types';
 
@@ -19,6 +18,14 @@ type PublicSiteLayoutProps = PropsWithChildren<{
 
 const menuItemClass =
     'rounded-full border border-transparent px-4 py-2 font-medium text-(--welcome-strong-70) transition hover:border-(--welcome-strong) hover:text-(--welcome-strong)';
+const mobileMenuItemClass =
+    'w-full rounded-2xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-left font-medium text-(--welcome-strong) transition hover:border-(--welcome-strong)';
+const actionButtonClass =
+    'rounded-full border border-(--welcome-strong) px-4 py-2 font-medium transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)';
+const mobileActionButtonClass =
+    'w-full rounded-2xl border border-(--welcome-strong) px-4 py-3 text-left font-medium transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)';
+const iconButtonClass =
+    'inline-flex h-9 w-9 items-center justify-center rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-muted-text) transition hover:bg-(--welcome-surface-1) hover:text-(--welcome-strong)';
 
 export default function PublicSiteLayout({
     children,
@@ -28,7 +35,11 @@ export default function PublicSiteLayout({
 }: PublicSiteLayoutProps) {
     const { auth } = usePage<SharedData>().props;
     const { resolvedAppearance, updateAppearance } = useAppearance();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const isDark = resolvedAppearance === 'dark';
+    const toggleAppearanceLabel = isDark
+        ? 'Switch to light theme'
+        : 'Switch to dark theme';
     const leftSidePatternStyle: CSSProperties = {
         backgroundImage: `linear-gradient(to right, var(--welcome-on-strong-95), var(--welcome-on-strong-45), transparent), url(${dumbaraPatterns}), url(${dumbaraPatterns})`,
         backgroundSize: '100% 100%, 170px auto, 140px auto',
@@ -40,6 +51,57 @@ export default function PublicSiteLayout({
         backgroundSize: '100% 100%, 170px auto, 140px auto',
         backgroundRepeat: 'no-repeat, repeat-y, repeat-y',
         backgroundPosition: 'right center, 100% 0, calc(100% - 84px) 120px',
+    };
+    const handleMenuItemClick: MouseEventHandler = () => {
+        setIsMobileMenuOpen(false);
+    };
+
+    const renderMenuActions = (isMobile: boolean = false): ReactNode => {
+        if (headerActions) {
+            return headerActions;
+        }
+
+        return (
+            <>
+                {showBrowseProducts && (
+                    <Link
+                        href={productsIndex()}
+                        className={isMobile ? mobileMenuItemClass : menuItemClass}
+                        onClick={isMobile ? handleMenuItemClick : undefined}
+                    >
+                        Browse Products
+                    </Link>
+                )}
+                {auth.user ? (
+                    <Link
+                        href={dashboard()}
+                        className={isMobile ? mobileActionButtonClass : actionButtonClass}
+                        onClick={isMobile ? handleMenuItemClick : undefined}
+                    >
+                        Enter Atelier
+                    </Link>
+                ) : (
+                    <>
+                        <Link
+                            href={login()}
+                            className={isMobile ? mobileMenuItemClass : menuItemClass}
+                            onClick={isMobile ? handleMenuItemClick : undefined}
+                        >
+                            Log in
+                        </Link>
+                        {canRegister && (
+                            <Link
+                                href={register()}
+                                className={isMobile ? mobileActionButtonClass : actionButtonClass}
+                                onClick={isMobile ? handleMenuItemClick : undefined}
+                            >
+                                Become a Patron
+                            </Link>
+                        )}
+                    </>
+                )}
+            </>
+        );
     };
 
     return (
@@ -55,61 +117,55 @@ export default function PublicSiteLayout({
                     style={rightSidePatternStyle}
                 />
 
-                <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 pt-8 pb-6">
-                    <Link href={home()} className="flex items-center gap-3">
-                        <AppLogoIcon className="h-24 w-auto object-contain" />
-                    </Link>
-                    <nav className="flex flex-wrap items-center gap-3 text-sm">
-                        {headerActions ? (
-                            headerActions
-                        ) : (
-                            <>
-                                {showBrowseProducts && (
-                                    <Link
-                                        href={productsIndex()}
-                                        className={menuItemClass}
-                                    >
-                                        Browse Products
-                                    </Link>
-                                )}
-                                {auth.user ? (
-                                    <Link
-                                        href={dashboard()}
-                                        className="rounded-full border border-(--welcome-strong) px-4 py-2 font-medium transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
-                                    >
-                                        Enter Atelier
-                                    </Link>
-                                ) : (
-                                    <>
-                                        <Link
-                                            href={login()}
-                                            className={menuItemClass}
-                                        >
-                                            Log in
-                                        </Link>
-                                        {canRegister && (
-                                            <Link
-                                                href={register()}
-                                                className="rounded-full border border-(--welcome-strong) px-4 py-2 font-medium transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
-                                            >
-                                                Become a Patron
-                                            </Link>
-                                        )}
-                                    </>
-                                )}
-                            </>
-                        )}
-                        <button
-                            type="button"
-                            onClick={() => updateAppearance(isDark ? 'light' : 'dark')}
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-muted-text) transition hover:bg-(--welcome-surface-1) hover:text-(--welcome-strong)"
-                            aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
-                            title={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+                <div className="relative z-20">
+                    <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 pt-8 pb-6">
+                        <Link href={home()} className="flex items-center gap-3">
+                            <AppLogoIcon className="h-24 w-auto object-contain" />
+                        </Link>
+                        <div className="flex items-center gap-3">
+                            <nav className="hidden flex-wrap items-center gap-3 text-sm md:flex">
+                                {renderMenuActions()}
+                                <button
+                                    type="button"
+                                    onClick={() => updateAppearance(isDark ? 'light' : 'dark')}
+                                    className={iconButtonClass}
+                                    aria-label={toggleAppearanceLabel}
+                                    title={toggleAppearanceLabel}
+                                >
+                                    {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                                </button>
+                            </nav>
+                            <button
+                                type="button"
+                                onClick={() => setIsMobileMenuOpen((value) => !value)}
+                                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-muted-text) transition hover:bg-(--welcome-surface-1) hover:text-(--welcome-strong) md:hidden"
+                                aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+                                aria-expanded={isMobileMenuOpen}
+                                aria-controls="public-site-mobile-menu"
+                            >
+                                {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+                            </button>
+                        </div>
+                    </header>
+                    {isMobileMenuOpen && (
+                        <div
+                            id="public-site-mobile-menu"
+                            className="absolute top-full right-0 left-0 z-30 px-6 pt-2 md:hidden"
                         >
-                            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                        </button>
-                    </nav>
-                </header>
+                            <nav className="mx-auto grid w-full max-w-6xl gap-2 rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-4 text-sm shadow-[0_24px_60px_-30px_var(--welcome-shadow)]">
+                                {renderMenuActions(true)}
+                                <button
+                                    type="button"
+                                    onClick={() => updateAppearance(isDark ? 'light' : 'dark')}
+                                    className="flex w-full items-center justify-between rounded-2xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-left font-medium text-(--welcome-strong) transition hover:border-(--welcome-strong)"
+                                >
+                                    <span>{toggleAppearanceLabel}</span>
+                                    {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                                </button>
+                            </nav>
+                        </div>
+                    )}
+                </div>
 
                 <main className="relative z-10">{children}</main>
 

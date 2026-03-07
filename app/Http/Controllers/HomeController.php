@@ -22,7 +22,7 @@ class HomeController extends Controller
             ->where('status', 'active')
             ->whereHas('vendor', fn ($query) => $query->where('status', 'approved'))
             ->latest()
-            ->limit(4)
+            ->limit(8)
             ->get()
             ->map(function (Product $product): array {
                 $image = $product->media->firstWhere('type', 'image');

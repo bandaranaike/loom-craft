@@ -162,7 +162,7 @@ export default function ProductShow({
                             key={image.url}
                             type="button"
                             onClick={() => setSelectedImageUrl(image.url)}
-                            className={`h-20 w-20 cursor-pointer overflow-hidden rounded-lg transition-opacity ${
+                            className={`h-16 w-16 cursor-pointer overflow-hidden rounded-lg transition-opacity ${
                                 isSelected
                                     ? 'opacity-100'
                                     : 'opacity-60 hover:opacity-100'

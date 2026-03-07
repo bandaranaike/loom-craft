@@ -166,9 +166,9 @@ export default function Welcome({
                             <span>Traceable Artisan Provenance</span>
                         </div>
                     </div>
-                    <div className="relative">
+                    <div className="relative hidden md:block">
                         <div className="relative grid gap-6 rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-end sm:justify-between">
                                 <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                     Atelier Ledger
                                 </p>
@@ -230,34 +230,13 @@ export default function Welcome({
                 </section>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
-                    <div className="grid gap-8 rounded-[48px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-10 md:grid-cols-3">
-                        {highlights.map((item) => (
-                            <div
-                                key={item.title}
-                                className="space-y-3 border-b border-(--welcome-border-soft) pb-6 last:border-b-0 last:pb-0 md:border-r md:border-b-0 md:pr-8 md:pb-0 md:last:border-r-0 md:last:pr-0"
-                            >
-                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Signature
-                                </p>
-                                <h2 className="font-['Playfair_Display',serif] text-2xl">
-                                    {item.title}
-                                </h2>
-                                <p className="text-sm text-(--welcome-body-text)">
-                                    {item.description}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                <section className="mx-auto w-full max-w-6xl px-6 pb-16">
                     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                         <div>
                             <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                 New Arrivals
                             </p>
                             <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
-                                Latest products from ateliers.
+                                Shop the latest atelier pieces first.
                             </h2>
                         </div>
                         <Link
@@ -272,7 +251,7 @@ export default function Welcome({
                             No products available yet.
                         </div>
                     ) : (
-                        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                             {latest_products.map((product) => (
                                 <article
                                     key={product.id}
@@ -320,6 +299,27 @@ export default function Welcome({
                             ))}
                         </div>
                     )}
+                </section>
+
+                <section className="mx-auto w-full max-w-6xl px-6 pb-16">
+                    <div className="grid gap-8 rounded-[48px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-10 md:grid-cols-3">
+                        {highlights.map((item) => (
+                            <div
+                                key={item.title}
+                                className="space-y-3 border-b border-(--welcome-border-soft) pb-6 last:border-b-0 last:pb-0 md:border-r md:border-b-0 md:pr-8 md:pb-0 md:last:border-r-0 md:last:pr-0"
+                            >
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                    Signature
+                                </p>
+                                <h2 className="font-['Playfair_Display',serif] text-2xl">
+                                    {item.title}
+                                </h2>
+                                <p className="text-sm text-(--welcome-body-text)">
+                                    {item.description}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
                 </section>
 
                 <section className="mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 lg:grid-cols-[0.9fr_1.1fr]">
