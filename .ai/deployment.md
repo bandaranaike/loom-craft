@@ -311,6 +311,9 @@ jobs:
           ln -sfn /var/www/loom-craft/shared/.env "${RELEASE_DIR}/.env"
           rm -rf "${RELEASE_DIR}/storage"
           ln -sfn /var/www/loom-craft/shared/storage "${RELEASE_DIR}/storage"
+          mkdir -p /var/www/loom-craft/shared/storage/app/public
+          rm -rf "${RELEASE_DIR}/public/storage"
+          ln -sfn "${RELEASE_DIR}/storage/app/public" "${RELEASE_DIR}/public/storage"
           mkdir -p /var/www/loom-craft/shared/bootstrap/cache
           rm -rf "${RELEASE_DIR}/bootstrap/cache"
           ln -sfn /var/www/loom-craft/shared/bootstrap/cache "${RELEASE_DIR}/bootstrap/cache"
@@ -318,7 +321,6 @@ jobs:
           cd "${RELEASE_DIR}"
           php artisan migrate --force
           php artisan config:cache
-          php artisan view:cache
 
           ln -sfn "${RELEASE_DIR}" /var/www/loom-craft/current
 
@@ -358,6 +360,34 @@ If `sudo` requires password for `deploy`, allow passwordless reload only:
 5. `loomcraft-queue.service` is active.
 6. Scheduler cron exists for `deploy`.
 7. GitHub secrets configured.
+
+---
+
+## 10) Troubleshooting: Images Missing After Deploy
+
+Symptom in deploy logs:
+
+- `The [/var/www/loom-craft/releases/<sha>/public/storage] link already exists.`
+
+Cause:
+
+- In release-based deployments, `public/storage` may exist in the extracted artifact and point to an invalid target on the VPS.
+- If `storage:link` fails and is ignored, images under `/storage/*` become inaccessible.
+
+Immediate server fix:
+
+```bash
+cd /var/www/loom-craft/current
+rm -rf public/storage
+mkdir -p /var/www/loom-craft/shared/storage/app/public
+ln -sfn /var/www/loom-craft/shared/storage/app/public public/storage
+```
+
+Verification:
+
+```bash
+ls -l /var/www/loom-craft/current/public/storage
+```
 8. Push to `main` triggers successful pipeline.
 9. Smoke test:
    - Home page loads.

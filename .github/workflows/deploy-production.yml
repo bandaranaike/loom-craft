@@ -102,6 +102,10 @@ jobs:
 
           rm -rf "${RELEASE_DIR}/storage"
           ln -sfn "${SHARED_DIR}/storage" "${RELEASE_DIR}/storage"
+          mkdir -p "${SHARED_DIR}/storage/app/public"
+
+          rm -rf "${RELEASE_DIR}/public/storage"
+          ln -sfn "${RELEASE_DIR}/storage/app/public" "${RELEASE_DIR}/public/storage"
 
           mkdir -p "${SHARED_DIR}/bootstrap/cache"
           rm -rf "${RELEASE_DIR}/bootstrap/cache"
@@ -109,7 +113,6 @@ jobs:
 
           cd "${RELEASE_DIR}"
           php artisan migrate --force
-          php artisan storage:link || true
           php artisan config:cache
 
           ln -sfn "${RELEASE_DIR}" "${CURRENT_LINK}"

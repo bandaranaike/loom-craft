@@ -106,6 +106,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 
 - Public-site header now uses a mobile dropdown navigation pattern: menu links are hidden by default on small screens and toggled using a right-aligned 3-bar button.
 - Mobile dropdown navigation now opens as an absolute overlay (with spacing and shadow) so page content does not shift downward when the menu is toggled.
+- Production deploy workflow now recreates each release `public/storage` symlink from shared storage directly (instead of `artisan storage:link`) to prevent broken image links in release-based deploys.
 - Home page product merchandising was reprioritized for faster first-glance shopping: `welcome` now shows the New Arrivals product grid immediately after the hero section, and the backend feed limit was increased from 4 to 8 latest approved active products.
 - Home page hero-side Atelier Ledger panel is now hidden on mobile viewports and remains visible on `md+` screens for cleaner first-screen product focus on phones.
 - GitHub Actions production deploy workflow now creates the release tarball in `/tmp` before moving it to workspace, preventing `tar: .: file changed as we read it` failures during artifact packaging.
