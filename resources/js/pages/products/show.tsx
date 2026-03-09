@@ -1,8 +1,16 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent, JSX, KeyboardEvent, TouchEvent } from 'react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
 import ProductColorSwatches from '@/components/product-color-swatches';
+import VendorInquiryForm from '@/components/vendor-inquiry-form';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { DEFAULT_CURRENCY, formatMoney } from '@/lib/currency';
 import { show as cartShow } from '@/routes/cart';
@@ -40,6 +48,9 @@ type ProductDetails = {
         display_name: string;
         slug: string | null;
         location: string | null;
+        contact_email: string | null;
+        contact_phone: string | null;
+        whatsapp_number: string | null;
     };
     categories: Array<{
         id: number;
@@ -58,6 +69,7 @@ type ProductDetails = {
 type ProductShowProps = {
     product: ProductDetails;
     canRegister?: boolean;
+    status?: string | null;
 };
 
 const formatDimensions = (dimensions: ProductDetails['dimensions']) => {
@@ -79,8 +91,11 @@ const formatDimensions = (dimensions: ProductDetails['dimensions']) => {
 export default function ProductShow({
     product,
     canRegister = true,
+    status = null,
 }: ProductShowProps) {
+    const { errors } = usePage<{ errors: Record<string, string> }>().props;
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [isInquiryOpen, setIsInquiryOpen] = useState(false);
     const touchStartXRef = useRef<number | null>(null);
     const dimensionLabel = formatDimensions(product.dimensions);
     const hasMultipleImages = product.images.length > 1;
@@ -90,6 +105,21 @@ export default function ProductShow({
         quantity: 1,
         currency: DEFAULT_CURRENCY,
     });
+    const hasInquiryErrors = ['name', 'email', 'phone', 'subject', 'message'].some(
+        (field) => Boolean(errors[field]),
+    );
+
+    useEffect(() => {
+        if (hasInquiryErrors) {
+            setIsInquiryOpen(true);
+        }
+    }, [hasInquiryErrors]);
+
+    useEffect(() => {
+        if (status) {
+            setIsInquiryOpen(false);
+        }
+    }, [status]);
 
     const submit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -417,9 +447,10 @@ export default function ProductShow({
                         <div className="flex flex-wrap items-center gap-4">
                             <button
                                 type="button"
+                                onClick={() => setIsInquiryOpen(true)}
                                 className="rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-on-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover)"
                             >
-                                Request Purchase
+                                Send an inquiry
                             </button>
                             {product.video_url && (
                                 <a
@@ -434,6 +465,26 @@ export default function ProductShow({
                         </div>
                     </div>
                 </section>
+
+                <Dialog open={isInquiryOpen} onOpenChange={setIsInquiryOpen}>
+                    <DialogContent className="max-h-[92vh] overflow-y-auto border-(--welcome-border-soft) bg-(--welcome-surface-1) p-0 sm:max-w-2xl">
+                        <DialogHeader className="sr-only">
+                            <DialogTitle>Contact Vendor</DialogTitle>
+                            <DialogDescription>
+                                Send an inquiry directly to this vendor about the selected product.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="p-8">
+                            <VendorInquiryForm
+                                vendorSlug={product.vendor.slug ?? ''}
+                                contactEmail={product.vendor.contact_email}
+                                contactPhone={product.vendor.contact_phone}
+                                whatsappNumber={product.vendor.whatsapp_number}
+                                status={status}
+                            />
+                        </div>
+                    </DialogContent>
+                </Dialog>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-20">
                     <div className="grid gap-8 rounded-[48px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-10 md:grid-cols-3">

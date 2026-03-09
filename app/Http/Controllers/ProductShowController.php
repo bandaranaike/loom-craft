@@ -20,6 +20,7 @@ class ProductShowController extends Controller
         return Inertia::render('products/show', [
             ...$result->toArray(),
             'canRegister' => Features::enabled(Features::registration()),
+            'status' => session('status'),
         ]);
     }
 }

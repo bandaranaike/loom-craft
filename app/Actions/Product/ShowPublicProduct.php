@@ -89,6 +89,9 @@ class ShowPublicProduct
                     $vendor->display_name,
                     $vendor->slug,
                     $vendor->location,
+                    $vendor->contact_email,
+                    $vendor->contact_phone,
+                    $vendor->whatsapp_number,
                 ),
                 $images,
                 $product->categories

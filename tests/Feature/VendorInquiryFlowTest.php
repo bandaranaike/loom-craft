@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorContactSubmission;
@@ -12,13 +13,14 @@ test('guests can submit customer inquiries to approved vendors', function () {
         'slug' => 'craft-house',
     ]);
 
-    $response = $this->post(route('vendors.inquiries.store', ['vendor' => $vendor->slug]), [
-        'name' => 'Alex Buyer',
-        'email' => 'alex@example.com',
-        'phone' => '+1 555 123 1234',
-        'subject' => 'Bulk custom order',
-        'message' => 'I would like to discuss a recurring bulk order for handcrafted textiles.',
-    ]);
+    $response = $this->from(route('vendors.show', ['vendor' => $vendor->slug]))
+        ->post(route('vendors.inquiries.store', ['vendor' => $vendor->slug]), [
+            'name' => 'Alex Buyer',
+            'email' => 'alex@example.com',
+            'phone' => '+1 555 123 1234',
+            'subject' => 'Bulk custom order',
+            'message' => 'I would like to discuss a recurring bulk order for handcrafted textiles.',
+        ]);
 
     $response->assertRedirect(route('vendors.show', ['vendor' => $vendor->slug]));
 
@@ -29,6 +31,28 @@ test('guests can submit customer inquiries to approved vendors', function () {
         'subject' => 'Bulk custom order',
         'status' => 'pending',
     ]);
+});
+
+test('inquiry submission redirects back to the product page when sent from there', function () {
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+        'slug' => 'craft-house',
+    ]);
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+    ]);
+
+    $response = $this->from(route('products.show', $product))
+        ->post(route('vendors.inquiries.store', ['vendor' => $vendor->slug]), [
+            'name' => 'Alex Buyer',
+            'email' => 'alex@example.com',
+            'phone' => '+1 555 123 1234',
+            'subject' => 'Product detail request',
+            'message' => 'I would like more detail about materials, lead time, and shipping for this piece.',
+        ]);
+
+    $response->assertRedirect(route('products.show', $product));
 });
 
 test('inquiry submission validates required fields', function () {

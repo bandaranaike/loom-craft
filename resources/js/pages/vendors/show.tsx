@@ -1,10 +1,8 @@
-import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-import InputError from '@/components/input-error';
-import { Spinner } from '@/components/ui/spinner';
+import VendorInquiryForm from '@/components/vendor-inquiry-form';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { show as productShow } from '@/routes/products';
-import { store as storeVendorInquiry } from '@/routes/vendors/inquiries';
 
 type CategorySummary = {
     id: number;
@@ -319,80 +317,13 @@ export default function VendorShow() {
                     </div>
 
                     <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-8">
-                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Contact Vendor</p>
-                        <h2 className="mt-4 font-['Playfair_Display',serif] text-3xl">Send an inquiry</h2>
-
-                        {(vendor.contact_email || vendor.contact_phone || vendor.whatsapp_number) && (
-                            <div className="mt-3 space-y-1 text-sm text-(--welcome-body-text)">
-                                {vendor.contact_email && <p>Email: {vendor.contact_email}</p>}
-                                {vendor.contact_phone && <p>Phone: {vendor.contact_phone}</p>}
-                                {vendor.whatsapp_number && <p>WhatsApp: {vendor.whatsapp_number}</p>}
-                            </div>
-                        )}
-
-                        {status && (
-                            <div className="mt-4 rounded-[18px] border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-muted-text)">
-                                {status}
-                            </div>
-                        )}
-
-                        <Form {...storeVendorInquiry.form(vendor.slug)} className="mt-5 grid gap-4" disableWhileProcessing>
-                            {({ errors, processing }) => (
-                                <>
-                                    <div>
-                                        <input
-                                            name="name"
-                                            placeholder="Your name"
-                                            className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none"
-                                        />
-                                        <InputError message={errors.name} className="mt-1 text-xs" />
-                                    </div>
-                                    <div>
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            placeholder="Email address"
-                                            className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none"
-                                        />
-                                        <InputError message={errors.email} className="mt-1 text-xs" />
-                                    </div>
-                                    <div>
-                                        <input
-                                            name="phone"
-                                            placeholder="Phone number (optional)"
-                                            className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none"
-                                        />
-                                        <InputError message={errors.phone} className="mt-1 text-xs" />
-                                    </div>
-                                    <div>
-                                        <input
-                                            name="subject"
-                                            placeholder="Subject"
-                                            className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none"
-                                        />
-                                        <InputError message={errors.subject} className="mt-1 text-xs" />
-                                    </div>
-                                    <div>
-                                        <textarea
-                                            name="message"
-                                            rows={5}
-                                            placeholder="Write your inquiry"
-                                            className="w-full rounded-xl border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none"
-                                        />
-                                        <InputError message={errors.message} className="mt-1 text-xs" />
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={processing}
-                                        className="inline-flex items-center justify-center gap-2 rounded-full bg-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-on-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
-                                    >
-                                        {processing && <Spinner className="text-(--welcome-on-strong)" />}
-                                        Send Inquiry
-                                    </button>
-                                </>
-                            )}
-                        </Form>
+                        <VendorInquiryForm
+                            vendorSlug={vendor.slug}
+                            contactEmail={vendor.contact_email}
+                            contactPhone={vendor.contact_phone}
+                            whatsappNumber={vendor.whatsapp_number}
+                            status={status}
+                        />
                     </div>
                 </section>
             </PublicSiteLayout>

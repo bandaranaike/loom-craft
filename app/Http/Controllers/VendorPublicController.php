@@ -138,8 +138,6 @@ class VendorPublicController extends Controller
             'submitted_at' => now(),
         ]);
 
-        return redirect()
-            ->route('vendors.show', ['vendor' => $vendor->slug])
-            ->with('status', 'Your inquiry has been sent to the vendor.');
+        return back()->with('status', 'Your inquiry has been sent to the vendor.');
     }
 }
