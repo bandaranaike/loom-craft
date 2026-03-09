@@ -30,6 +30,11 @@ class IndexPublicProductsRequest extends FormRequest
                 'string',
                 Rule::exists('product_categories', 'slug')->where('is_active', true),
             ],
+            'colors' => ['nullable', 'array'],
+            'colors.*' => [
+                'string',
+                Rule::exists('product_colors', 'slug')->where('is_active', true),
+            ],
         ];
     }
 }

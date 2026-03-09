@@ -40,6 +40,11 @@ type ProductDetails = {
         name: string;
         slug: string;
     }>;
+    colors: Array<{
+        id: number;
+        name: string;
+        slug: string;
+    }>;
     images: ProductImage[];
     video_url: string | null;
 };
@@ -63,6 +68,32 @@ const formatDimensions = (dimensions: ProductDetails['dimensions']) => {
     const unit = dimensions.unit ? ` ${dimensions.unit}` : '';
 
     return `${parts.join(' × ')}${unit}`;
+};
+
+const colorSwatchMap: Record<string, string> = {
+    red: '#dc2626',
+    yellow: '#eab308',
+    blue: '#2563eb',
+    orange: '#ea580c',
+    green: '#16a34a',
+    purple: '#7c3aed',
+    'yellow-orange': '#f59e0b',
+    'red-orange': '#f97316',
+    'red-purple': '#c026d3',
+    'blue-purple': '#6366f1',
+    'blue-green': '#0f766e',
+    'yellow-green': '#65a30d',
+    black: '#111827',
+    white: '#ffffff',
+    beige: '#d6c2a1',
+    brown: '#8b5e3c',
+    pink: '#ec4899',
+    teal: '#0d9488',
+    amber: '#f59e0b',
+};
+
+const resolveColorSwatch = (slug: string): string => {
+    return colorSwatchMap[slug] ?? '#9ca3af';
 };
 
 export default function ProductShow({
@@ -280,6 +311,20 @@ export default function ProductShow({
                                         >
                                             {category.name}
                                         </span>
+                                    ))}
+                                </div>
+                            )}
+                            {product.colors.length > 0 && (
+                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                    {product.colors.map((color) => (
+                                        <span
+                                            key={color.id}
+                                            title={color.name}
+                                            className="block h-6 w-6 rounded-sm border border-black/10"
+                                            style={{
+                                                backgroundColor: resolveColorSwatch(color.slug),
+                                            }}
+                                        />
                                     ))}
                                 </div>
                             )}

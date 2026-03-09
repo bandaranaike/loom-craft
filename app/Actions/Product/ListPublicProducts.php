@@ -7,6 +7,7 @@ use App\DTOs\Product\ProductPublicIndexResult;
 use App\DTOs\Product\ProductPublicListItem;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductColor;
 use App\ValueObjects\Money;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
@@ -26,6 +27,10 @@ class ListPublicProducts
                     ->where('is_active', true)
                     ->orderBy('sort_order')
                     ->orderBy('name'),
+                'colors' => fn ($query) => $query
+                    ->where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->orderBy('name'),
             ])
             ->where('status', 'active')
             ->whereHas('vendor', fn ($query) => $query->where('status', 'approved'))
@@ -39,6 +44,13 @@ class ListPublicProducts
                         ->where('is_active', true);
                 });
             })
+            ->when($data->colors !== [], function ($query) use ($data): void {
+                $query->whereHas('colors', function ($colorQuery) use ($data): void {
+                    $colorQuery
+                        ->whereIn('slug', $data->colors)
+                        ->where('is_active', true);
+                });
+            })
             ->latest();
 
         $paginator = $query
@@ -46,6 +58,7 @@ class ListPublicProducts
             ->appends(array_filter([
                 'search' => $data->search,
                 'category' => $data->category,
+                'colors' => $data->colors !== [] ? $data->colors : null,
                 'per_page' => $data->perPage,
             ]));
 
@@ -74,6 +87,14 @@ class ListPublicProducts
                         ])
                         ->values()
                         ->all(),
+                    $product->colors
+                        ->map(static fn (ProductColor $color): array => [
+                            'id' => $color->id,
+                            'name' => $color->name,
+                            'slug' => $color->slug,
+                        ])
+                        ->values()
+                        ->all(),
                 );
             })
         );
@@ -93,10 +114,27 @@ class ListPublicProducts
                 'slug' => $category->slug,
             ])
             ->all();
+        $colors = ProductColor::query()
+            ->where('is_active', true)
+            ->whereHas('products', function ($productQuery): void {
+                $productQuery
+                    ->where('status', 'active')
+                    ->whereHas('vendor', fn ($vendorQuery) => $vendorQuery->where('status', 'approved'));
+            })
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->map(static fn (ProductColor $color): array => [
+                'id' => $color->id,
+                'name' => $color->name,
+                'slug' => $color->slug,
+            ])
+            ->all();
 
         return new ProductPublicIndexResult(
             $paginator->getCollection()->all(),
             $categories,
+            $colors,
             $this->paginationData($paginator),
         );
     }

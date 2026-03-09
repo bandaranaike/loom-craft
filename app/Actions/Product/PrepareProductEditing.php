@@ -5,6 +5,7 @@ namespace App\Actions\Product;
 use App\DTOs\Product\ProductEditFormData;
 use App\DTOs\Product\ProductEditFormResult;
 use App\Models\ProductCategory;
+use App\Models\ProductColor;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
@@ -22,6 +23,10 @@ class PrepareProductEditing
                 ->where('is_active', true)
                 ->orderBy('sort_order')
                 ->orderBy('name'),
+            'colors' => fn ($query) => $query
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name'),
         ]);
         $categories = ProductCategory::query()
             ->where('is_active', true)
@@ -32,6 +37,17 @@ class PrepareProductEditing
                 'id' => $category->id,
                 'name' => $category->name,
                 'slug' => $category->slug,
+            ])
+            ->all();
+        $colors = ProductColor::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->map(static fn (ProductColor $color): array => [
+                'id' => $color->id,
+                'name' => $color->name,
+                'slug' => $color->slug,
             ])
             ->all();
 
@@ -56,6 +72,11 @@ class PrepareProductEditing
                     ->map(static fn (int|string $id): int => (int) $id)
                     ->values()
                     ->all(),
+                'color_ids' => $product->colors
+                    ->pluck('id')
+                    ->map(static fn (int|string $id): int => (int) $id)
+                    ->values()
+                    ->all(),
                 'images' => $product->media
                     ->map(static fn ($media): array => [
                         'id' => $media->id,
@@ -64,6 +85,7 @@ class PrepareProductEditing
                     ->all(),
             ],
             $categories,
+            $colors,
         );
     }
 }

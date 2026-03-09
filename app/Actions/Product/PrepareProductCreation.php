@@ -6,6 +6,7 @@ use App\DTOs\Product\ProductCreateFormData;
 use App\DTOs\Product\ProductCreateFormResult;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductColor;
 use Illuminate\Support\Facades\Gate;
 
 class PrepareProductCreation
@@ -27,7 +28,18 @@ class PrepareProductCreation
                 'slug' => $category->slug,
             ])
             ->all();
+        $colors = ProductColor::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->map(static fn (ProductColor $color): array => [
+                'id' => $color->id,
+                'name' => $color->name,
+                'slug' => $color->slug,
+            ])
+            ->all();
 
-        return new ProductCreateFormResult('7.00', $vendorName, $vendorSlug, $categories);
+        return new ProductCreateFormResult('7.00', $vendorName, $vendorSlug, $categories, $colors);
     }
 }

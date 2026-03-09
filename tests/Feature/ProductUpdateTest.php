@@ -2,6 +2,7 @@
 
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductColor;
 use App\Models\ProductMedia;
 use App\Models\User;
 use App\Models\Vendor;
@@ -55,6 +56,9 @@ it('updates vendor owned products and recalculates selling price', function () {
     $initialCategory = ProductCategory::factory()->create();
     $product->categories()->sync([$initialCategory->id]);
     $updatedCategories = ProductCategory::factory()->count(2)->create();
+    $initialColor = ProductColor::factory()->create();
+    $product->colors()->sync([$initialColor->id]);
+    $updatedColors = ProductColor::factory()->count(2)->create();
 
     $response = $this->actingAs($vendorUser)->patch(
         route('vendor.products.update', $product),
@@ -70,6 +74,7 @@ it('updates vendor owned products and recalculates selling price', function () {
             'dimension_height' => 2,
             'dimension_unit' => 'cm',
             'category_ids' => $updatedCategories->pluck('id')->all(),
+            'color_ids' => $updatedColors->pluck('id')->all(),
         ]
     );
 
@@ -85,6 +90,8 @@ it('updates vendor owned products and recalculates selling price', function () {
     ]);
     expect($product->fresh()->categories()->pluck('product_categories.id')->all())
         ->toEqualCanonicalizing($updatedCategories->pluck('id')->all());
+    expect($product->fresh()->colors()->pluck('product_colors.id')->all())
+        ->toEqualCanonicalizing($updatedColors->pluck('id')->all());
 });
 
 it('prevents vendors from editing products they do not own', function () {
@@ -116,6 +123,7 @@ it('prevents vendors from editing products they do not own', function () {
             'description' => 'Blocked.',
             'vendor_price' => '99.00',
             'category_ids' => ProductCategory::factory()->count(1)->create()->pluck('id')->all(),
+            'color_ids' => ProductColor::factory()->count(1)->create()->pluck('id')->all(),
         ])
         ->assertForbidden();
 });

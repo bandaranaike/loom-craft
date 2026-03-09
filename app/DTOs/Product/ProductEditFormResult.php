@@ -18,6 +18,7 @@ class ProductEditFormResult
      *     dimension_height: float|null,
      *     dimension_unit: string|null,
      *     category_ids: list<int>,
+     *     color_ids: list<int>,
      *     images: list<array{id: int, url: string}>
      * }  $product
      */
@@ -28,6 +29,8 @@ class ProductEditFormResult
         public array $product,
         /** @var list<array{id: int, name: string, slug: string}> */
         public array $categories,
+        /** @var list<array{id: int, name: string, slug: string}> */
+        public array $colors,
     ) {}
 
     /**
@@ -41,6 +44,7 @@ class ProductEditFormResult
             'vendor_slug' => $this->vendorSlug,
             'product' => $this->product,
             'categories' => $this->categories,
+            'colors' => $this->colors,
         ];
     }
 }

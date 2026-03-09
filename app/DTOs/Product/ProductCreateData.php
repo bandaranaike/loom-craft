@@ -13,6 +13,7 @@ class ProductCreateData
     /**
      * @param  list<UploadedFile>  $images
      * @param  list<int>  $categoryIds
+     * @param  list<int>  $colorIds
      */
     public function __construct(
         public User $user,
@@ -24,6 +25,7 @@ class ProductCreateData
         public ?int $productionTimeDays,
         public Dimensions $dimensions,
         public array $categoryIds,
+        public array $colorIds,
         public array $images,
         public ?UploadedFile $video,
     ) {}
@@ -44,6 +46,10 @@ class ProductCreateData
             $request->array('category_ids'),
             static fn (mixed $categoryId): bool => is_numeric($categoryId)
         )));
+        $colorIds = array_values(array_unique(array_filter(
+            $request->array('color_ids'),
+            static fn (mixed $colorId): bool => is_numeric($colorId)
+        )));
 
         return new self(
             $request->user(),
@@ -60,6 +66,7 @@ class ProductCreateData
                 $request->string('dimension_unit')->toString() ?: null,
             ),
             array_map(static fn (int|string $categoryId): int => (int) $categoryId, $categoryIds),
+            array_map(static fn (int|string $colorId): int => (int) $colorId, $colorIds),
             $images,
             $video instanceof UploadedFile && $video->isValid() ? $video : null,
         );

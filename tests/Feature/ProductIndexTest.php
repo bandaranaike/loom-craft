@@ -2,6 +2,7 @@
 
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductColor;
 use App\Models\Vendor;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -20,6 +21,11 @@ test('guests can view approved active products', function () {
         'slug' => 'wall-hangers',
     ]);
     $activeProduct->categories()->sync([$category->id]);
+    $color = ProductColor::factory()->create([
+        'name' => 'Beige',
+        'slug' => 'beige',
+    ]);
+    $activeProduct->colors()->sync([$color->id]);
     Product::factory()->create([
         'vendor_id' => $approvedVendor->id,
         'status' => 'pending_review',
@@ -35,6 +41,7 @@ test('guests can view approved active products', function () {
             ->where('products.0.name', $activeProduct->name)
             ->where('products.0.vendor_name', $approvedVendor->display_name)
             ->where('products.0.categories.0.slug', 'wall-hangers')
+            ->where('products.0.colors.0.slug', 'beige')
         );
 });
 
@@ -100,5 +107,46 @@ test('users can filter public products by category slug', function () {
             ->has('products', 1)
             ->where('products.0.id', $matchingProduct->id)
             ->where('selected_category', 'pillow-covers')
+        );
+});
+
+test('users can filter public products by colors', function () {
+    $approvedVendor = Vendor::factory()->create([
+        'status' => 'approved',
+    ]);
+    $beige = ProductColor::factory()->create([
+        'name' => 'Beige',
+        'slug' => 'beige',
+    ]);
+    $black = ProductColor::factory()->create([
+        'name' => 'Black',
+        'slug' => 'black',
+    ]);
+
+    $beigeProduct = Product::factory()->create([
+        'vendor_id' => $approvedVendor->id,
+        'status' => 'active',
+        'name' => 'Beige Loom Pillow',
+    ]);
+    $beigeProduct->colors()->sync([$beige->id]);
+
+    $blackProduct = Product::factory()->create([
+        'vendor_id' => $approvedVendor->id,
+        'status' => 'active',
+        'name' => 'Black Loom Pillow',
+    ]);
+    $blackProduct->colors()->sync([$black->id]);
+
+    $response = $this->get(route('products.index', [
+        'colors' => ['beige'],
+    ]));
+
+    $response
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('products/index')
+            ->has('products', 1)
+            ->where('products.0.id', $beigeProduct->id)
+            ->where('selected_colors', ['beige'])
         );
 });

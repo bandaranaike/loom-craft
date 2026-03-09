@@ -6,6 +6,7 @@ import {
     LayoutGrid,
     MessageSquareQuote,
     Package,
+    Palette,
     ShieldCheck,
     Tags,
     Video,
@@ -25,6 +26,7 @@ import {
 import { dashboard } from '@/routes';
 import { pending as adminFeedbackPending } from '@/routes/admin/feedback';
 import { index as adminProductCategoriesIndex } from '@/routes/admin/product-categories';
+import { index as adminProductColorsIndex } from '@/routes/admin/product-colors';
 import { pending as adminProductsPending } from '@/routes/admin/products';
 import { pending as adminVendorInquiriesPending } from '@/routes/admin/vendor-inquiries';
 import { connect as adminYouTubeConnect } from '@/routes/admin/youtube';
@@ -81,6 +83,11 @@ export function AppSidebar() {
                       title: 'Product Categories',
                       href: adminProductCategoriesIndex(),
                       icon: Tags,
+                  },
+                  {
+                      title: 'Product Colors',
+                      href: adminProductColorsIndex(),
+                      icon: Palette,
                   },
                   {
                       title: 'YouTube Connect',

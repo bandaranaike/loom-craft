@@ -38,6 +38,11 @@ class UpdateProductRequest extends FormRequest
                 'integer',
                 Rule::exists('product_categories', 'id')->where('is_active', true),
             ],
+            'color_ids' => ['required', 'array', 'min:1'],
+            'color_ids.*' => [
+                'integer',
+                Rule::exists('product_colors', 'id')->where('is_active', true),
+            ],
         ];
     }
 
@@ -54,6 +59,9 @@ class UpdateProductRequest extends FormRequest
             'category_ids.required' => 'Please select at least one category.',
             'category_ids.min' => 'Please select at least one category.',
             'category_ids.*.exists' => 'Selected category is invalid or inactive.',
+            'color_ids.required' => 'Please select at least one color.',
+            'color_ids.min' => 'Please select at least one color.',
+            'color_ids.*.exists' => 'Selected color is invalid or inactive.',
         ];
     }
 }

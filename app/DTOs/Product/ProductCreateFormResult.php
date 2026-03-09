@@ -10,6 +10,8 @@ class ProductCreateFormResult
         public ?string $vendorSlug,
         /** @var list<array{id: int, name: string, slug: string}> */
         public array $categories,
+        /** @var list<array{id: int, name: string, slug: string}> */
+        public array $colors,
     ) {}
 
     /**
@@ -22,6 +24,7 @@ class ProductCreateFormResult
             'vendor_name' => $this->vendorName,
             'vendor_slug' => $this->vendorSlug,
             'categories' => $this->categories,
+            'colors' => $this->colors,
         ];
     }
 }

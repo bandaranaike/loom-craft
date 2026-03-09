@@ -36,6 +36,7 @@ class CreateProduct
             'status' => 'pending_review',
         ]);
         $product->categories()->sync($data->categoryIds);
+        $product->colors()->sync($data->colorIds);
 
         if ($data->images !== []) {
             $paths = array_map(

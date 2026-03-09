@@ -2,6 +2,7 @@
 
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductColor;
 use App\Models\Vendor;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -20,6 +21,11 @@ test('guests can view active products', function () {
         'slug' => 'cushion-covers',
     ]);
     $product->categories()->sync([$category->id]);
+    $color = ProductColor::factory()->create([
+        'name' => 'Brown',
+        'slug' => 'brown',
+    ]);
+    $product->colors()->sync([$color->id]);
 
     $response = $this->get(route('products.show', $product));
 
@@ -31,6 +37,7 @@ test('guests can view active products', function () {
             ->where('product.name', $product->name)
             ->where('product.vendor.display_name', $vendor->display_name)
             ->where('product.categories.0.slug', 'cushion-covers')
+            ->where('product.colors.0.slug', 'brown')
         );
 });
 

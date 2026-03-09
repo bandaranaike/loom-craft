@@ -68,4 +68,14 @@ class Product extends Model
             'product_category_id',
         );
     }
+
+    public function colors(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ProductColor::class,
+            'product_color_product',
+            'product_id',
+            'product_color_id',
+        );
+    }
 }

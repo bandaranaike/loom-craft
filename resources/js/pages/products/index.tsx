@@ -17,6 +17,11 @@ type ProductItem = {
         name: string;
         slug: string;
     }>;
+    colors: Array<{
+        id: number;
+        name: string;
+        slug: string;
+    }>;
 };
 
 type PaginationLink = {
@@ -42,10 +47,16 @@ type ProductIndexProps = {
         name: string;
         slug: string;
     }>;
+    colors: Array<{
+        id: number;
+        name: string;
+        slug: string;
+    }>;
     pagination: Pagination;
     per_page: number;
     search: string | null;
     selected_category: string | null;
+    selected_colors: string[];
     canRegister?: boolean;
 };
 
@@ -54,10 +65,12 @@ const perPageOptions = [9, 12, 24];
 export default function ProductIndex({
     products,
     categories,
+    colors,
     pagination,
     per_page,
     search,
     selected_category,
+    selected_colors,
     canRegister = true,
 }: ProductIndexProps) {
     return (
@@ -154,6 +167,29 @@ export default function ProductIndex({
                                         </select>
                                     </div>
                                 </div>
+                                {colors.length > 0 && (
+                                    <div className="grid gap-2">
+                                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                            Filter by colors
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {colors.map((color) => (
+                                                <label
+                                                    key={color.id}
+                                                    className="flex items-center gap-2 rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-1.5 text-xs text-(--welcome-strong)"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        name="colors[]"
+                                                        value={color.slug}
+                                                        defaultChecked={selected_colors.includes(color.slug)}
+                                                    />
+                                                    {color.name}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </Form>
                         </div>
                     </section>
@@ -213,6 +249,18 @@ export default function ProductIndex({
                                                             className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-(--welcome-muted-text)"
                                                         >
                                                             {category.name}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {product.colors.length > 0 && (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {product.colors.map((color) => (
+                                                        <span
+                                                            key={color.id}
+                                                            className="rounded-full border border-(--welcome-strong-50) bg-(--welcome-surface-1) px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-(--welcome-strong)"
+                                                        >
+                                                            {color.name}
                                                         </span>
                                                     ))}
                                                 </div>

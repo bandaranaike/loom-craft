@@ -26,5 +26,6 @@ class UpdateProduct
         ])->save();
 
         $data->product->categories()->sync($data->categoryIds);
+        $data->product->colors()->sync($data->colorIds);
     }
 }

@@ -1,6 +1,7 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
+import ProductColorSelector from '@/components/product-color-selector';
 import { Spinner } from '@/components/ui/spinner';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { dashboard } from '@/routes';
@@ -21,6 +22,7 @@ type ProductForm = {
     dimension_height: number | null;
     dimension_unit: string | null;
     category_ids: number[];
+    color_ids: number[];
     images: Array<{
         id: number;
         url: string;
@@ -33,6 +35,11 @@ type Props = {
     vendor_slug: string | null;
     product: ProductForm;
     categories: Array<{
+        id: number;
+        name: string;
+        slug: string;
+    }>;
+    colors: Array<{
         id: number;
         name: string;
         slug: string;
@@ -50,7 +57,7 @@ const fileInputClassName =
     'w-full rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] file:mr-4 file:rounded-full file:border-0 file:bg-(--welcome-strong) file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.3em] file:text-(--welcome-on-strong) hover:file:bg-(--welcome-strong-hover) focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
 
 export default function ProductEdit() {
-    const { commission_rate, vendor_name, vendor_slug, product, categories, status } = usePage<Props>().props;
+    const { commission_rate, vendor_name, vendor_slug, product, categories, colors, status } = usePage<Props>().props;
     const [vendorPrice, setVendorPrice] = useState(product.vendor_price);
 
     const sellingPrice = useMemo(() => {
@@ -310,6 +317,13 @@ export default function ProductEdit() {
                                             <InputError message={errors.category_ids} className="text-xs" />
                                             <InputError message={errors['category_ids.0']} className="text-xs" />
                                         </div>
+
+                                        <ProductColorSelector
+                                            colors={colors}
+                                            selectedColorIds={product.color_ids}
+                                            errorMessage={errors.color_ids}
+                                            itemErrorMessage={errors['color_ids.0']}
+                                        />
 
                                         <div className="grid gap-2">
                                             <label

@@ -10,6 +10,7 @@ use App\DTOs\Product\ProductShowResult;
 use App\DTOs\Product\ProductVendorSummary;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductColor;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,10 @@ class ShowPublicProduct
                 'vendor',
                 'media' => fn ($query) => $query->orderBy('sort_order'),
                 'categories' => fn ($query) => $query
+                    ->where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->orderBy('name'),
+                'colors' => fn ($query) => $query
                     ->where('is_active', true)
                     ->orderBy('sort_order')
                     ->orderBy('name'),
@@ -81,6 +86,14 @@ class ShowPublicProduct
                         'id' => $category->id,
                         'name' => $category->name,
                         'slug' => $category->slug,
+                    ])
+                    ->values()
+                    ->all(),
+                $product->colors
+                    ->map(static fn (ProductColor $color): array => [
+                        'id' => $color->id,
+                        'name' => $color->name,
+                        'slug' => $color->slug,
                     ])
                     ->values()
                     ->all(),

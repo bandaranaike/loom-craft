@@ -22,6 +22,8 @@ class ProductUpdateData
         public Dimensions $dimensions,
         /** @var list<int> */
         public array $categoryIds,
+        /** @var list<int> */
+        public array $colorIds,
     ) {}
 
     public static function fromRequest(UpdateProductRequest $request, Product $product): self
@@ -32,6 +34,10 @@ class ProductUpdateData
         $categoryIds = array_values(array_unique(array_filter(
             $request->array('category_ids'),
             static fn (mixed $categoryId): bool => is_numeric($categoryId)
+        )));
+        $colorIds = array_values(array_unique(array_filter(
+            $request->array('color_ids'),
+            static fn (mixed $colorId): bool => is_numeric($colorId)
         )));
 
         return new self(
@@ -50,6 +56,7 @@ class ProductUpdateData
                 $request->string('dimension_unit')->toString() ?: null,
             ),
             array_map(static fn (int|string $categoryId): int => (int) $categoryId, $categoryIds),
+            array_map(static fn (int|string $colorId): int => (int) $colorId, $colorIds),
         );
     }
 }

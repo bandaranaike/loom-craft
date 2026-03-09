@@ -3,6 +3,7 @@
 use App\Contracts\VideoUploader;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductColor;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -58,6 +59,7 @@ it('creates products for approved vendors', function () {
         'dimension_height' => 2.5,
         'dimension_unit' => 'cm',
         'category_ids' => ProductCategory::factory()->count(2)->create()->pluck('id')->all(),
+        'color_ids' => ProductColor::factory()->count(2)->create()->pluck('id')->all(),
         'images' => [
             UploadedFile::fake()->image('runner-front.jpg'),
             UploadedFile::fake()->image('runner-detail.jpg'),
@@ -79,6 +81,7 @@ it('creates products for approved vendors', function () {
 
     $product = Product::query()->where('name', 'Heritage Runner')->firstOrFail();
     expect($product->categories()->count())->toBe(2);
+    expect($product->colors()->count())->toBe(2);
 
     $this->assertSame(2, $product->media()->where('type', 'image')->count());
 
@@ -107,6 +110,7 @@ it('prevents non-vendors from creating products', function () {
             'description' => 'Not allowed.',
             'vendor_price' => '50.00',
             'category_ids' => ProductCategory::factory()->count(1)->create()->pluck('id')->all(),
+            'color_ids' => ProductColor::factory()->count(1)->create()->pluck('id')->all(),
             'images' => [UploadedFile::fake()->image('blocked.jpg')],
         ])
         ->assertForbidden();
