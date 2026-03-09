@@ -20,7 +20,7 @@ class VendorPolicy
      */
     public function view(User $user, Vendor $vendor): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'admin' || $user->id === $vendor->user_id;
     }
 
     /**
@@ -36,7 +36,7 @@ class VendorPolicy
      */
     public function update(User $user, Vendor $vendor): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'admin' || $user->id === $vendor->user_id;
     }
 
     /**

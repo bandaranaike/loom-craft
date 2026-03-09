@@ -11,6 +11,7 @@ import { formatMoney } from '@/lib/currency';
 import { dashboard } from '@/routes';
 import { index as ordersIndex, show as ordersShow } from '@/routes/orders';
 import { pending as adminVendorPending } from '@/routes/admin/vendors';
+import { edit as vendorProfileEdit } from '@/routes/vendor/profile';
 import { register as vendorRegister } from '@/routes/vendor';
 import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
@@ -111,10 +112,10 @@ export default function Dashboard() {
                                 Full Order History
                             </Link>
                             <Link
-                                href={vendorRegister()}
+                                href={auth?.vendor ? vendorProfileEdit() : vendorRegister()}
                                 className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"
                             >
-                                Become Vendor
+                                {auth?.vendor ? 'Vendor Profile' : 'Become Vendor'}
                             </Link>
                         </div>
                     </div>

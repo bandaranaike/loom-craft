@@ -45,8 +45,8 @@ export default function VendorRegister() {
                             </h1>
                             <p className="max-w-xl text-sm text-(--welcome-body-text) md:text-base">
                                 Vendor approval is manual to preserve craft quality and
-                                provenance. Share your artisan profile and atelier details
-                                for review.
+                                provenance. Start with the compulsory studio name now,
+                                then complete the full public profile after creation.
                             </p>
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
@@ -81,7 +81,7 @@ export default function VendorRegister() {
                                         Registration details
                                     </h2>
                                     <p className="text-sm text-(--welcome-body-text)">
-                                        Submit your artisan profile for review.
+                                        Submit the minimum details required to open your vendor record.
                                     </p>
                                 </div>
 
@@ -118,46 +118,6 @@ export default function VendorRegister() {
                                                 />
                                             </div>
 
-                                            <div className="grid gap-2">
-                                                <label
-                                                    htmlFor="location"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
-                                                >
-                                                    Location
-                                                </label>
-                                                <input
-                                                    id="location"
-                                                    type="text"
-                                                    name="location"
-                                                    placeholder="Kandy, Sri Lanka"
-                                                    className={inputClassName}
-                                                />
-                                                <InputError
-                                                    message={errors.location}
-                                                    className="text-xs"
-                                                />
-                                            </div>
-
-                                            <div className="grid gap-2">
-                                                <label
-                                                    htmlFor="bio"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
-                                                >
-                                                    Artisan bio
-                                                </label>
-                                                <textarea
-                                                    id="bio"
-                                                    name="bio"
-                                                    rows={5}
-                                                    placeholder="Share your weaving lineage, materials, and atelier story."
-                                                    className="w-full rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) placeholder:text-(--welcome-muted-70) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
-                                                />
-                                                <InputError
-                                                    message={errors.bio}
-                                                    className="text-xs"
-                                                />
-                                            </div>
-
                                             <button
                                                 type="submit"
                                                 className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-(--welcome-strong) px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
@@ -169,7 +129,7 @@ export default function VendorRegister() {
                                                 Submit for Review
                                             </button>
                                             <p className="text-center text-xs uppercase tracking-[0.25em] text-(--welcome-muted-text)">
-                                                Submissions open to approved patrons only.
+                                                Full profile details can be completed after registration.
                                             </p>
                                         </>
                                     )}

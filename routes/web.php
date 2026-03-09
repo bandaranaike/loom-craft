@@ -23,6 +23,7 @@ use App\Http\Controllers\Vendor\FeedbackController as VendorFeedbackController;
 use App\Http\Controllers\Vendor\InquiryController as VendorInquiryController;
 use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\ProductController;
+use App\Http\Controllers\Vendor\VendorProfileController;
 use App\Http\Controllers\Vendor\VendorRegistrationController;
 use App\Http\Controllers\VendorPublicController;
 use Illuminate\Support\Facades\Route;
@@ -79,6 +80,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('vendor.register.store');
 
     Route::prefix('vendor')->name('vendor.')->group(function () {
+        Route::get('profile', [VendorProfileController::class, 'edit'])
+            ->name('profile.edit');
+        Route::patch('profile', [VendorProfileController::class, 'update'])
+            ->name('profile.update');
         Route::get('products', [ProductController::class, 'index'])
             ->name('products.index');
         Route::get('products/create', [ProductController::class, 'create'])

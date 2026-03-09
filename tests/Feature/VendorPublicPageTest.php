@@ -59,3 +59,26 @@ test('public users cannot view unapproved vendor storefronts', function () {
     $this->get(route('vendors.show', ['vendor' => $vendor->slug]))
         ->assertNotFound();
 });
+
+test('public vendor storefront hides website and contact details when visibility is disabled', function () {
+    $vendor = Vendor::factory()->create([
+        'status' => 'approved',
+        'slug' => 'private-loom',
+        'website_url' => 'https://example.com',
+        'contact_email' => 'vendor@example.com',
+        'contact_phone' => '+94 77 123 4567',
+        'whatsapp_number' => '+94 77 123 4567',
+        'is_contact_public' => false,
+        'is_website_public' => false,
+    ]);
+
+    $this->get(route('vendors.show', ['vendor' => $vendor->slug]))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('vendors/show')
+            ->where('vendor.website_url', null)
+            ->where('vendor.contact_email', null)
+            ->where('vendor.contact_phone', null)
+            ->where('vendor.whatsapp_number', null)
+        );
+});

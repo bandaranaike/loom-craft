@@ -31,6 +31,8 @@ class Vendor extends Model
         'about_title',
         'craft_specialties',
         'years_active',
+        'is_contact_public',
+        'is_website_public',
         'location',
         'status',
         'approved_at',
@@ -45,6 +47,8 @@ class Vendor extends Model
         return [
             'approved_at' => 'datetime',
             'craft_specialties' => 'array',
+            'is_contact_public' => 'boolean',
+            'is_website_public' => 'boolean',
         ];
     }
 

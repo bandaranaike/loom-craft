@@ -29,8 +29,6 @@ test('authenticated users can submit vendor applications', function () {
 
     $response = $this->actingAs($user)->post(route('vendor.register.store'), [
         'display_name' => 'Loom Atelier',
-        'bio' => 'Generational Dumbara Rataa artisanship.',
-        'location' => 'Kandy, Sri Lanka',
     ]);
 
     $response->assertRedirect(route('dashboard'));
@@ -38,8 +36,6 @@ test('authenticated users can submit vendor applications', function () {
     $this->assertDatabaseHas('vendors', [
         'user_id' => $user->id,
         'display_name' => 'Loom Atelier',
-        'bio' => 'Generational Dumbara Rataa artisanship.',
-        'location' => 'Kandy, Sri Lanka',
         'status' => 'pending',
     ]);
 });
@@ -49,8 +45,6 @@ test('users cannot submit a second vendor application', function () {
 
     $response = $this->actingAs($vendor->user)->post(route('vendor.register.store'), [
         'display_name' => 'Second Studio',
-        'bio' => 'Another attempt.',
-        'location' => 'Matale, Sri Lanka',
     ]);
 
     $response->assertForbidden();

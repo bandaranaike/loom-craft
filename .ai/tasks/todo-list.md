@@ -9,3 +9,6 @@
 - [x] `product-quantity.md` completed on 2026-03-09
 
 ## Task to do
+
+1. Product edit/create page: product name should have long text input
+2. Home page should have random products

@@ -18,8 +18,6 @@ class SubmitVendorRegistration
             'user_id' => $data->user->id,
             'display_name' => $data->displayName,
             'slug' => $this->uniqueSlug($data->displayName),
-            'bio' => $data->bio,
-            'location' => $data->location,
             'status' => 'pending',
         ]);
 

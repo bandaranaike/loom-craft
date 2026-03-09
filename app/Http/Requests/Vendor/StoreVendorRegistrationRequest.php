@@ -23,8 +23,6 @@ class StoreVendorRegistrationRequest extends FormRequest
     {
         return [
             'display_name' => ['required', 'string', 'max:255'],
-            'bio' => ['nullable', 'string', 'max:1000'],
-            'location' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -36,8 +34,6 @@ class StoreVendorRegistrationRequest extends FormRequest
         return [
             'display_name.required' => 'Please provide your display name.',
             'display_name.max' => 'Display name may not be greater than 255 characters.',
-            'bio.max' => 'Artisan bio may not be greater than 1000 characters.',
-            'location.max' => 'Location may not be greater than 255 characters.',
         ];
     }
 }

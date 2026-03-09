@@ -45,6 +45,7 @@ class VendorPublicController extends Controller
             return [
                 'id' => $product->id,
                 'name' => $product->name,
+                'description' => str($product->description)->limit(120)->toString(),
                 'original_price' => $pricing->originalPrice,
                 'selling_price' => $pricing->discountedPrice,
                 'effective_discount_percentage' => $pricing->effectiveDiscountPercentage,
@@ -98,19 +99,39 @@ class VendorPublicController extends Controller
                 'tagline' => $vendor->tagline,
                 'bio' => $vendor->bio,
                 'about_title' => $vendor->about_title,
-                'website_url' => $vendor->website_url,
-                'contact_email' => $vendor->contact_email,
-                'contact_phone' => $vendor->contact_phone,
-                'whatsapp_number' => $vendor->whatsapp_number,
+                'website_url' => $vendor->is_website_public ? $vendor->website_url : null,
+                'contact_email' => $vendor->is_contact_public ? $vendor->contact_email : null,
+                'contact_phone' => $vendor->is_contact_public ? $vendor->contact_phone : null,
+                'whatsapp_number' => $vendor->is_contact_public ? $vendor->whatsapp_number : null,
                 'location' => $vendor->location,
                 'years_active' => $vendor->years_active,
                 'craft_specialties' => $vendor->craft_specialties ?? [],
+                'is_contact_public' => $vendor->is_contact_public,
+                'is_website_public' => $vendor->is_website_public,
                 'logo_url' => $vendor->logo_path
                     ? Storage::disk('public')->url($vendor->logo_path)
                     : null,
                 'cover_image_url' => $vendor->cover_image_path
                     ? Storage::disk('public')->url($vendor->cover_image_path)
                     : null,
+                'media' => collect([
+                    $vendor->cover_image_path
+                        ? [
+                            'id' => 'cover-image',
+                            'type' => 'image',
+                            'label' => 'Cover image',
+                            'url' => Storage::disk('public')->url($vendor->cover_image_path),
+                        ]
+                        : null,
+                    $vendor->logo_path
+                        ? [
+                            'id' => 'logo-image',
+                            'type' => 'image',
+                            'label' => 'Vendor logo',
+                            'url' => Storage::disk('public')->url($vendor->logo_path),
+                        ]
+                        : null,
+                ])->filter()->values()->all(),
                 'locations' => $vendor->locations
                     ->map(fn ($location): array => [
                         'id' => $location->id,

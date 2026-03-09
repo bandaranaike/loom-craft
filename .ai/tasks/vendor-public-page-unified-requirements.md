@@ -8,6 +8,8 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 2. Vendor-related customer-facing price displays use LKR.
 3. Strong mobile responsiveness and improved content hierarchy.
 4. Safe public visibility handling for contact, website, and media.
+5. Vendor profile create flow collects only compulsory fields.
+6. Vendor profile edit flow exposes all available vendor database fields.
 
 ## Routes
 1. Public vendor page:
@@ -25,10 +27,15 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 1. Hero
 - Vendor logo.
 - Vendor display name.
-- Cover image or branded background.
 - Optional tagline.
 - Primary CTA: `Contact Vendor`.
 - Secondary CTA: `Visit Website` (only when website exists and is public).
+- Compact public details block on the right side of the hero:
+  - Email
+  - Phone
+  - WhatsApp
+  - Website
+  - Visibility/status summary when useful
 
 2. About
 - Long-form bio/story content.
@@ -37,6 +44,7 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 - Trust indicators (for example `Verified Vendor`, `Handcrafted`).
 
 3. Products Showcase
+- Must appear directly below the hero as the second main row of the page.
 - Grid of vendor products (approved/active only).
 - Product card content:
   - Image
@@ -52,12 +60,7 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 - Category tiles/chips with product counts.
 - In-page filtering of product grid by selected category.
 
-5. Media
-- Photo/video gallery section.
-- Video embed/card support where media is available.
-- Graceful empty state when no media exists.
-
-6. Store Locations
+5. Store Locations
 - Show all provided vendor locations.
 - Per location:
   - Location name
@@ -70,15 +73,7 @@ Build and enhance the public vendor page as a mini storefront that improves trus
   - Embedded Google Map iframe is required when embeddable URL is available.
   - Fallback `Open in Google Maps` link if embed URL is unavailable.
 
-7. Contact Details
-- Show only public-approved fields:
-  - Email
-  - Phone
-  - WhatsApp
-  - Website
-  - Optional social links
-
-8. Contact Form
+6. Contact Form
 - Fields:
   - Name
   - Email
@@ -109,9 +104,16 @@ Build and enhance the public vendor page as a mini storefront that improves trus
   - `is_contact_public` (boolean, default true)
   - `is_website_public` (boolean, default true)
 
-2. Related data
+2. Vendor management form behavior
+- Create flow:
+  - Show only compulsory vendor fields required to successfully create the vendor record.
+  - Defer optional enrichment fields until after initial creation.
+- Edit flow:
+  - Show all vendor fields backed by the database so the vendor/admin can fully manage the public page profile.
+  - This includes optional profile, cover image, contact, visibility, locations, and storefront-supporting fields once the record exists.
+
+3. Related data
 - `vendor_locations` table for multi-location support.
-- Media relationship(s) for vendor photos/videos.
 - Product-category support with:
   - `product_categories`
   - `category_product` pivot
@@ -119,7 +121,7 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 
 ## Backend Requirements
 1. Vendor page payload
-- Load vendor, locations, media, and approved/active products.
+- Load vendor, locations, and approved/active products.
 - Include product categories and counts.
 - Use eager loading to avoid N+1.
 - Keep payload lean with pagination/deferred data where beneficial.
@@ -134,9 +136,13 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 
 4. URL normalization and validation
 - Normalize and validate `website_url` and map URLs.
-- Enforce media type constraints for vendor media.
 
-5. Contact form processing
+5. Vendor create/edit form requirements
+- Create form must remain minimal and include only required fields.
+- Edit form must load and display all persisted vendor fields available in the schema.
+- Validation must distinguish required-on-create fields from optional-on-edit enrichment fields where appropriate.
+
+6. Contact form processing
 - Validate request via Form Request.
 - Persist to `vendor_contact_submissions`.
 - Optional notification email if `contact_email` exists and notifications are enabled.
@@ -147,18 +153,21 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 
 2. UX and states
 - Responsive desktop/tablet/mobile layout.
-- Empty states for missing products, media, locations, and contact details.
+- Empty states for missing products, locations, and contact details.
 - Loading/skeleton states for deferred/async blocks.
 
 3. Visual direction
 - Premium artisan storefront style.
 - Strong typography and clear information hierarchy.
 - Accessible contrast, focus states, and semantic structure.
+- Keep the hero right column compact.
+- Do not visually display the cover image on the public vendor page for now.
+- The cover image remains editable/storable in the vendor edit flow only.
 
 ## SEO
 1. Dynamic title: `{Vendor Name} | LoomCraft`
 2. Meta description from vendor bio/tagline.
-3. OpenGraph image from cover/logo.
+3. OpenGraph image from logo, with cover image as optional fallback if needed.
 4. Canonical URL for vendor page.
 
 ## Validation Rules (High-Level)
@@ -170,8 +179,7 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 
 ## Performance
 1. Paginate product list (default 12 per page).
-2. Lazy-load non-critical media.
-3. Keep initial payload minimal; use deferred props where useful.
+2. Keep initial payload minimal; use deferred props where useful.
 
 ## Security and Privacy
 1. Only expose explicitly public vendor data.
@@ -189,18 +197,22 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 
 2. UI checks
 - Mobile readability and section behavior.
-- Media and map fallback behavior.
+- Map fallback behavior.
 
 ## Acceptance Criteria
 1. Public can visit vendor page via `/vendors/{slug}` (or configured fallback) and see a complete profile.
 2. Vendor-related pricing on public vendor page is formatted in LKR.
 3. Product grid shows approved/active items only.
 4. Category summary counts and in-page filtering work correctly.
-5. Media section supports available photos/videos with empty-state fallback.
-6. Locations render correctly with map embed or fallback link.
-7. Contact details/website obey visibility flags.
-8. Contact form is secure, validated, and stores submissions.
-9. Page is responsive, accessible, and free from main payload N+1 issues.
+5. Products section appears immediately below the hero as the second main row.
+6. Hero right section shows compact public details instead of a separate storefront details section.
+7. Cover image is not visually rendered on the public vendor page.
+8. Locations render correctly with map embed or fallback link.
+9. Contact details/website obey visibility flags.
+10. Contact form is secure, validated, and stores submissions.
+11. Page is responsive, accessible, and free from main payload N+1 issues.
+12. Vendor create page shows only compulsory fields needed to create the vendor.
+13. Vendor edit page shows all vendor fields stored in the database.
 
 ## Suggested Implementation Phases
 1. Database
@@ -215,6 +227,8 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 3. Frontend
 - Implement/enhance Inertia vendor page sections.
 - Add category filtering behavior and contact form UX.
+- Keep public details compact within the hero right column.
+- Do not include a public media gallery section.
 
 4. Testing
 - Add feature tests for visibility, product filtering, contact flow, and LKR formatting.

@@ -13,6 +13,11 @@ export type User = {
 
 export type Auth = {
     user: User;
+    vendor?: {
+        id: number;
+        slug: string;
+        status: string;
+    } | null;
 };
 
 export type TwoFactorSetupData = {

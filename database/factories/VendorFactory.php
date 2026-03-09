@@ -44,6 +44,8 @@ class VendorFactory extends Factory
                 2
             ),
             'years_active' => fake()->optional()->numberBetween(1, 40),
+            'is_contact_public' => true,
+            'is_website_public' => true,
             'location' => fake()->city(),
             'status' => 'pending',
             'approved_at' => null,
