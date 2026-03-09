@@ -7,16 +7,18 @@ use App\DTOs\Cart\CartMutationResult;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
-use App\ValueObjects\Money;
+use App\Services\ProductPricingService;
 use Illuminate\Support\Facades\Gate;
 
 class UpdateCartItem
 {
+    public function __construct(private ProductPricingService $productPricingService) {}
+
     public function handle(CartItemUpdateData $data): CartMutationResult
     {
         Gate::authorize('access', Cart::class);
 
-        $cartItem = CartItem::query()->with(['cart', 'product'])->findOrFail($data->cartItemId);
+        $cartItem = CartItem::query()->with(['cart', 'product.categories'])->findOrFail($data->cartItemId);
         $cart = $cartItem->cart;
 
         Gate::authorize('manage', [$cart, $data->guestToken]);
@@ -35,7 +37,7 @@ class UpdateCartItem
 
         $cartItem->update([
             'quantity' => $data->quantity,
-            'unit_price' => Money::fromString((string) $product->selling_price)->amount,
+            'unit_price' => $this->productPricingService->forProduct($product)->discountedPrice,
         ]);
 
         return new CartMutationResult($cart->id, $cart->guest_token);

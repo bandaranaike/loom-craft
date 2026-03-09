@@ -6,6 +6,7 @@ use App\Http\Requests\StoreVendorInquiryRequest;
 use App\Models\Product;
 use App\Models\Vendor;
 use App\Models\VendorContactSubmission;
+use App\Services\ProductPricingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -13,6 +14,8 @@ use Inertia\Response;
 
 class VendorPublicController extends Controller
 {
+    public function __construct(private ProductPricingService $productPricingService) {}
+
     public function show(Vendor $vendor): Response
     {
         abort_if($vendor->status !== 'approved', 404);
@@ -33,12 +36,16 @@ class VendorPublicController extends Controller
 
         $products = $vendor->products->map(function (Product $product): array {
             $image = $product->media->firstWhere('type', 'image');
+            $pricing = $this->productPricingService->forProduct($product);
 
             return [
                 'id' => $product->id,
                 'name' => $product->name,
                 'description' => $product->description,
-                'price' => number_format((float) $product->selling_price, 2, '.', ''),
+                'original_price' => $pricing->originalPrice,
+                'price' => $pricing->discountedPrice,
+                'effective_discount_percentage' => $pricing->effectiveDiscountPercentage,
+                'has_discount' => $pricing->hasDiscount,
                 'image_url' => $image ? Storage::disk('public')->url($image->path) : null,
                 'categories' => $product->categories
                     ->map(fn ($category): array => [

@@ -7,7 +7,10 @@ class ProductPublicListItem
     public function __construct(
         public int $id,
         public string $name,
+        public string $originalPrice,
         public string $sellingPrice,
+        public string $effectiveDiscountPercentage,
+        public bool $hasDiscount,
         public string $vendorName,
         public ?string $vendorSlug,
         public ?string $vendorLocation,
@@ -26,7 +29,10 @@ class ProductPublicListItem
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'original_price' => $this->originalPrice,
             'selling_price' => $this->sellingPrice,
+            'effective_discount_percentage' => $this->effectiveDiscountPercentage,
+            'has_discount' => $this->hasDiscount,
             'vendor_name' => $this->vendorName,
             'vendor_slug' => $this->vendorSlug,
             'vendor_location' => $this->vendorLocation,

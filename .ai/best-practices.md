@@ -48,7 +48,7 @@ Always enforce permissions on the backend (policies/gates/middleware).
 
 ## Data Integrity & Pricing
 - Never accept `selling_price` from user input; calculate from `vendor_price`
-- Store commission rate as `7.00` and derive commission amounts from it
+- Store commission rate in `COMMERCE_COMMISSION_RATE` and access it through `config('commerce.commission_rate')`
 - Keep currency fixed to `USD`, `EUR`, `LKR` at order/payment level
 - Enforce one feedback/suggestion record per authenticated user in application flow (upsert, not duplicate insert)
 

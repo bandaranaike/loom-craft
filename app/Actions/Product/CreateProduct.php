@@ -5,30 +5,38 @@ namespace App\Actions\Product;
 use App\DTOs\Product\ProductCreateData;
 use App\DTOs\Product\ProductCreateResult;
 use App\Models\Product;
+use App\Services\ProductPricingService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class CreateProduct
 {
+    public function __construct(private ProductPricingService $productPricingService) {}
+
     public function handle(ProductCreateData $data): ProductCreateResult
     {
         Gate::authorize('create', Product::class);
 
         $vendor = $data->user->vendor;
+        $commissionRate = (string) config('commerce.commission_rate');
+        $discountPercentage = $data->discountPercentage !== null
+            ? $this->productPricingService->normalizePercentage($data->discountPercentage)
+            : null;
 
         if ($vendor === null) {
             throw new \RuntimeException('Vendor profile is required to create products.');
         }
 
-        $sellingPrice = $data->vendorPrice->addPercentage('7.00');
+        $sellingPrice = $data->vendorPrice->addPercentage($commissionRate);
 
         $product = Product::query()->create([
             'vendor_id' => $vendor->id,
             'name' => $data->name,
             'description' => $data->description,
             'vendor_price' => $data->vendorPrice->amount,
-            'commission_rate' => '7.00',
+            'commission_rate' => $commissionRate,
             'selling_price' => $sellingPrice->amount,
+            'discount_percentage' => $discountPercentage,
             'materials' => $data->materials,
             'pieces_count' => $data->piecesCount,
             'production_time_days' => $data->productionTimeDays,

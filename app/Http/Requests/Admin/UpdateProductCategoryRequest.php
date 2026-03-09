@@ -34,6 +34,7 @@ class UpdateProductCategoryRequest extends FormRequest
                 Rule::unique('product_categories', 'name')->ignore($productCategory->id),
             ],
             'description' => ['nullable', 'string', 'max:1000'],
+            'discount_percentage' => ['nullable', 'numeric', 'between:0,100'],
             'is_active' => ['required', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'slug' => [
@@ -53,6 +54,7 @@ class UpdateProductCategoryRequest extends FormRequest
         return [
             'name.required' => 'Category name is required.',
             'name.unique' => 'This category name already exists.',
+            'discount_percentage.between' => 'Discount percentage must be between 0 and 100.',
             'slug.regex' => 'Slug may only contain lowercase letters, numbers, and hyphens.',
         ];
     }

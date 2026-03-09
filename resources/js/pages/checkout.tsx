@@ -15,8 +15,12 @@ type CartItem = {
     vendor_name: string;
     vendor_slug: string | null;
     quantity: number;
+    original_unit_price: string;
     unit_price: string;
+    original_line_total: string;
     line_total: string;
+    effective_discount_percentage: string;
+    has_discount: boolean;
 };
 
 type CartSummary = {
@@ -766,10 +770,20 @@ export default function CheckoutPage({
                                             • {item.quantity}{' '}
                                             × {formatMoney(item.unit_price, cart.currency)}
                                         </p>
+                                        {item.has_discount && (
+                                            <p className="text-xs text-(--welcome-muted-text) line-through decoration-1 decoration-(--welcome-muted-text)">
+                                                {item.quantity} × {formatMoney(item.original_unit_price, cart.currency)} • {item.effective_discount_percentage}% off
+                                            </p>
+                                        )}
                                         <p className="text-sm text-(--welcome-strong)">
                                             Line total{' '}
                                             {formatMoney(item.line_total, cart.currency)}
                                         </p>
+                                        {item.has_discount && (
+                                            <p className="text-xs text-(--welcome-muted-text) line-through decoration-1 decoration-(--welcome-muted-text)">
+                                                {formatMoney(item.original_line_total, cart.currency)}
+                                            </p>
+                                        )}
                                     </div>
                                 ))}
                             </div>

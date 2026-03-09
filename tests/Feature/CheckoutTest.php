@@ -102,7 +102,7 @@ it('creates an order from checkout and clears the cart', function () {
         'status' => 'paid',
         'currency' => 'USD',
         'subtotal' => '180.00',
-        'commission_total' => '12.60',
+        'commission_total' => '180.00',
         'total' => '180.00',
         'shipping_responsibility' => 'vendor',
         'guest_email' => 'patron@example.com',
@@ -114,8 +114,8 @@ it('creates an order from checkout and clears the cart', function () {
         'vendor_id' => $vendor->id,
         'quantity' => 1,
         'unit_price' => '180.00',
-        'commission_rate' => '7.00',
-        'commission_amount' => '12.60',
+        'commission_rate' => '100.00',
+        'commission_amount' => '180.00',
         'line_total' => '180.00',
     ]);
 

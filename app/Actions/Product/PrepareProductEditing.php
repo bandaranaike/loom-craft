@@ -52,7 +52,7 @@ class PrepareProductEditing
             ->all();
 
         return new ProductEditFormResult(
-            '7.00',
+            (string) config('commerce.commission_rate'),
             $data->user->vendor?->display_name,
             $data->user->vendor?->slug,
             [
@@ -60,6 +60,9 @@ class PrepareProductEditing
                 'name' => $product->name,
                 'description' => $product->description,
                 'vendor_price' => (string) $product->vendor_price,
+                'discount_percentage' => $product->discount_percentage !== null
+                    ? number_format((float) $product->discount_percentage, 2, '.', '')
+                    : null,
                 'materials' => $product->materials,
                 'pieces_count' => $product->pieces_count,
                 'production_time_days' => $product->production_time_days,

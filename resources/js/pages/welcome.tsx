@@ -1,10 +1,9 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
-import ProductColorSwatches from '@/components/product-color-swatches';
+import ProductCard, { type ProductCardItem } from '@/components/product-card';
 import PublicSiteLayout from '@/layouts/public-site-layout';
-import { formatMoney } from '@/lib/currency';
 import { dashboard, register } from '@/routes';
-import { index as productsIndex, show as productShow } from '@/routes/products';
+import { index as productsIndex } from '@/routes/products';
 import { store as feedbackStore } from '@/routes/vendor/feedback';
 import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
@@ -83,20 +82,6 @@ type MyFeedback = {
     status: string;
 } | null;
 
-type LatestProduct = {
-    id: number;
-    name: string;
-    selling_price: string;
-    vendor_name: string;
-    vendor_slug: string | null;
-    image_url: string | null;
-    colors: Array<{
-        id: number;
-        name: string;
-        slug: string;
-    }>;
-};
-
 export default function Welcome({
     canRegister = true,
     atelier_ledger,
@@ -107,7 +92,7 @@ export default function Welcome({
     canRegister?: boolean;
     atelier_ledger: LedgerProps;
     vendor_feedback: FeedbackItem[];
-    latest_products: LatestProduct[];
+    latest_products: ProductCardItem[];
     my_feedback: MyFeedback;
 }) {
     const { auth } = usePage<SharedData>().props;
@@ -257,56 +242,9 @@ export default function Welcome({
                             No products available yet.
                         </div>
                     ) : (
-                        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {latest_products.map((product) => (
-                                <article
-                                    key={product.id}
-                                    className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)"
-                                >
-                                    <Link
-                                        href={productShow(product.id)}
-                                        className="relative aspect-4/3 bg-(--welcome-surface-1)"
-                                    >
-                                        {product.image_url ? (
-                                            <img
-                                                src={product.image_url}
-                                                alt={product.name}
-                                                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                                            />
-                                        ) : (
-                                            <div className="flex h-full items-center justify-center text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
-                                                Image forthcoming
-                                            </div>
-                                        )}
-                                    </Link>
-                                    <div className="flex flex-1 flex-col gap-2 p-4">
-                                        <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
-                                            {product.vendor_slug ? (
-                                                <Link href={vendorShow(product.vendor_slug)}>
-                                                    {product.vendor_name}
-                                                </Link>
-                                            ) : (
-                                                product.vendor_name
-                                            )}
-                                        </p>
-                                        <h3 className="font-['Playfair_Display',serif] text-xl">
-                                            <Link href={productShow(product.id)}>
-                                                {product.name}
-                                            </Link>
-                                        </h3>
-                                        <ProductColorSwatches
-                                            colors={product.colors}
-                                            className="mt-1 flex flex-wrap gap-1.5"
-                                            sizeClassName="h-4 w-4"
-                                        />
-                                        <p className="mt-auto text-sm font-semibold text-(--welcome-strong)">
-                                            {formatMoney(
-                                                product.selling_price,
-                                                'LKR',
-                                            )}
-                                        </p>
-                                    </div>
-                                </article>
+                                <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
                     )}

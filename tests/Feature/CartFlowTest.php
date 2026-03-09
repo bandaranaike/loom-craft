@@ -18,6 +18,7 @@ it('allows guests to add items to the cart', function () {
     $product = Product::factory()->for($vendor)->create([
         'status' => 'active',
         'selling_price' => '125.00',
+        'discount_percentage' => '20.00',
     ]);
 
     $response = $this->post(route('cart.items.store'), [
@@ -35,7 +36,7 @@ it('allows guests to add items to the cart', function () {
         'cart_id' => $cart->id,
         'product_id' => $product->id,
         'quantity' => 2,
-        'unit_price' => '125.00',
+        'unit_price' => '100.00',
     ]);
 });
 

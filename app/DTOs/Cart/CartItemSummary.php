@@ -12,8 +12,12 @@ class CartItemSummary
         public ?string $vendorSlug,
         public ?string $imageUrl,
         public int $quantity,
+        public string $originalUnitPrice,
         public string $unitPrice,
+        public string $originalLineTotal,
         public string $lineTotal,
+        public string $effectiveDiscountPercentage,
+        public bool $hasDiscount,
     ) {}
 
     /**
@@ -29,8 +33,12 @@ class CartItemSummary
             'vendor_slug' => $this->vendorSlug,
             'image_url' => $this->imageUrl,
             'quantity' => $this->quantity,
+            'original_unit_price' => $this->originalUnitPrice,
             'unit_price' => $this->unitPrice,
+            'original_line_total' => $this->originalLineTotal,
             'line_total' => $this->lineTotal,
+            'effective_discount_percentage' => $this->effectiveDiscountPercentage,
+            'has_discount' => $this->hasDiscount,
         ];
     }
 }

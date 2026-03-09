@@ -9,13 +9,15 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductColor;
 use App\Models\Vendor;
-use App\ValueObjects\Money;
+use App\Services\ProductPricingService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class ListPublicProducts
 {
+    public function __construct(private ProductPricingService $productPricingService) {}
+
     public function handle(ProductPublicIndexData $data): ProductPublicIndexResult
     {
         Gate::authorize('viewPublicAny', Product::class);
@@ -88,10 +90,15 @@ class ListPublicProducts
                     throw new \RuntimeException('Product vendor is missing.');
                 }
 
+                $pricing = $this->productPricingService->forProduct($product);
+
                 return new ProductPublicListItem(
                     $product->id,
                     $product->name,
-                    Money::fromString((string) $product->selling_price)->amount,
+                    $pricing->originalPrice,
+                    $pricing->discountedPrice,
+                    $pricing->effectiveDiscountPercentage,
+                    $pricing->hasDiscount,
                     $vendor->display_name,
                     $vendor->slug,
                     $vendor->location,

@@ -25,6 +25,7 @@ it('allows approved vendors to view their product edit page', function () {
 
     $product = Product::factory()->for($vendor)->create([
         'name' => 'Editable Loom Piece',
+        'discount_percentage' => '18.00',
     ]);
 
     $this->actingAs($vendorUser)
@@ -32,8 +33,10 @@ it('allows approved vendors to view their product edit page', function () {
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('vendor/products/edit')
+            ->where('commission_rate', '100.00')
             ->where('product.id', $product->id)
             ->where('product.name', 'Editable Loom Piece')
+            ->where('product.discount_percentage', '18.00')
         );
 });
 
@@ -66,6 +69,7 @@ it('updates vendor owned products and recalculates selling price', function () {
             'name' => 'Updated Name',
             'description' => 'Updated description.',
             'vendor_price' => '200.00',
+            'discount_percentage' => '25.00',
             'materials' => 'Cotton',
             'pieces_count' => 3,
             'production_time_days' => 14,
@@ -84,8 +88,9 @@ it('updates vendor owned products and recalculates selling price', function () {
         'id' => $product->id,
         'name' => 'Updated Name',
         'vendor_price' => '200.00',
-        'commission_rate' => '7.00',
-        'selling_price' => '214.00',
+        'commission_rate' => '100.00',
+        'selling_price' => '400.00',
+        'discount_percentage' => '25.00',
         'status' => 'active',
     ]);
     expect($product->fresh()->categories()->pluck('product_categories.id')->all())

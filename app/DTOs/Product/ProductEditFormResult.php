@@ -10,6 +10,7 @@ class ProductEditFormResult
      *     name: string,
      *     description: string,
      *     vendor_price: string,
+     *     discount_percentage: string|null,
      *     materials: string|null,
      *     pieces_count: int|null,
      *     production_time_days: int|null,

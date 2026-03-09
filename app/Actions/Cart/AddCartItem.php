@@ -6,13 +6,15 @@ use App\DTOs\Cart\CartItemStoreData;
 use App\DTOs\Cart\CartMutationResult;
 use App\Models\Cart;
 use App\Models\Product;
-use App\ValueObjects\Money;
+use App\Services\ProductPricingService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AddCartItem
 {
+    public function __construct(private ProductPricingService $productPricingService) {}
+
     public function handle(CartItemStoreData $data): CartMutationResult
     {
         Gate::authorize('access', Cart::class);
@@ -27,7 +29,7 @@ class AddCartItem
             ]);
         }
 
-        $product = Product::query()->with('vendor')->findOrFail($data->productId);
+        $product = Product::query()->with(['vendor', 'categories'])->findOrFail($data->productId);
 
         if ($product->status !== 'active' || $product->vendor?->status !== 'approved') {
             throw ValidationException::withMessages([
@@ -35,7 +37,7 @@ class AddCartItem
             ]);
         }
 
-        $unitPrice = Money::fromString((string) $product->selling_price)->amount;
+        $unitPrice = $this->productPricingService->forProduct($product)->discountedPrice;
 
         $existing = $cart->items()->where('product_id', $product->id)->first();
 

@@ -14,6 +14,7 @@ type CategoryItem = {
     name: string;
     slug: string;
     description: string | null;
+    discount_percentage: string | null;
     is_active: boolean;
     sort_order: number;
     products_count: number;
@@ -111,23 +112,43 @@ export default function ProductCategoriesIndex() {
                                     <InputError message={errors.description} className="text-xs" />
                                 </div>
 
-                                <div className="grid gap-4 sm:grid-cols-[10rem_1fr] sm:items-center">
-                                    <div className="grid gap-2">
-                                        <label
-                                            htmlFor="new-sort-order"
-                                            className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
-                                        >
-                                            Sort order
-                                        </label>
-                                        <input
-                                            id="new-sort-order"
-                                            type="number"
-                                            name="sort_order"
-                                            min={0}
-                                            defaultValue={0}
-                                            className={inputClassName}
-                                        />
-                                        <InputError message={errors.sort_order} className="text-xs" />
+                                <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
+                                    <div className="grid gap-4 sm:grid-cols-2">
+                                        <div className="grid gap-2">
+                                            <label
+                                                htmlFor="new-sort-order"
+                                                className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                            >
+                                                Sort order
+                                            </label>
+                                            <input
+                                                id="new-sort-order"
+                                                type="number"
+                                                name="sort_order"
+                                                min={0}
+                                                defaultValue={0}
+                                                className={inputClassName}
+                                            />
+                                            <InputError message={errors.sort_order} className="text-xs" />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <label
+                                                htmlFor="new-discount-percentage"
+                                                className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                            >
+                                                Discount %
+                                            </label>
+                                            <input
+                                                id="new-discount-percentage"
+                                                type="number"
+                                                name="discount_percentage"
+                                                min={0}
+                                                max={100}
+                                                step="0.01"
+                                                className={inputClassName}
+                                            />
+                                            <InputError message={errors.discount_percentage} className="text-xs" />
+                                        </div>
                                     </div>
                                     <label className="flex items-center gap-2 rounded-full border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-2 text-sm text-(--welcome-strong)">
                                         <input type="checkbox" name="is_active" value="1" defaultChecked />
@@ -221,23 +242,44 @@ export default function ProductCategoriesIndex() {
                                                 </div>
                                             </div>
 
-                                            <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
-                                                <div className="grid gap-2">
-                                                    <label
-                                                        htmlFor={`sort-order-${category.id}`}
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
-                                                    >
-                                                        Sort order
-                                                    </label>
-                                                    <input
-                                                        id={`sort-order-${category.id}`}
-                                                        type="number"
-                                                        name="sort_order"
-                                                        min={0}
-                                                        defaultValue={category.sort_order}
-                                                        className={inputClassName}
-                                                    />
-                                                    <InputError message={errors.sort_order} className="text-xs" />
+                                            <div className="grid gap-3 sm:grid-cols-[12rem_1fr]">
+                                                <div className="grid gap-3">
+                                                    <div className="grid gap-2">
+                                                        <label
+                                                            htmlFor={`sort-order-${category.id}`}
+                                                            className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                                        >
+                                                            Sort order
+                                                        </label>
+                                                        <input
+                                                            id={`sort-order-${category.id}`}
+                                                            type="number"
+                                                            name="sort_order"
+                                                            min={0}
+                                                            defaultValue={category.sort_order}
+                                                            className={inputClassName}
+                                                        />
+                                                        <InputError message={errors.sort_order} className="text-xs" />
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <label
+                                                            htmlFor={`discount-percentage-${category.id}`}
+                                                            className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                                        >
+                                                            Discount %
+                                                        </label>
+                                                        <input
+                                                            id={`discount-percentage-${category.id}`}
+                                                            type="number"
+                                                            name="discount_percentage"
+                                                            min={0}
+                                                            max={100}
+                                                            step="0.01"
+                                                            defaultValue={category.discount_percentage ?? ''}
+                                                            className={inputClassName}
+                                                        />
+                                                        <InputError message={errors.discount_percentage} className="text-xs" />
+                                                    </div>
                                                 </div>
                                                 <div className="grid gap-2">
                                                     <label

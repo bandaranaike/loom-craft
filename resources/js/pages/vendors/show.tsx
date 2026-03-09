@@ -17,7 +17,10 @@ type ProductItem = {
     id: number;
     name: string;
     description: string;
+    original_price: string;
     price: string;
+    effective_discount_percentage: string;
+    has_discount: boolean;
     image_url: string | null;
     categories: {
         id: number;
@@ -225,6 +228,11 @@ export default function VendorShow() {
                                     className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)"
                                 >
                                     <div className="relative aspect-4/3 bg-(--welcome-surface-1)">
+                                        {product.has_discount && (
+                                            <span className="absolute right-3 top-3 z-10 rounded-full bg-(--welcome-strong) px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-(--welcome-on-strong)">
+                                                {product.effective_discount_percentage}% Off
+                                            </span>
+                                        )}
                                         {product.image_url ? (
                                             <img
                                                 src={product.image_url}
@@ -241,8 +249,15 @@ export default function VendorShow() {
                                     <div className="flex flex-1 flex-col gap-2 p-4">
                                         <h3 className="font-['Playfair_Display',serif] text-xl">{product.name}</h3>
                                         <p className="text-sm text-(--welcome-body-text)">{product.description}</p>
-                                        <div className="mt-auto flex items-center justify-between">
-                                            <p className="text-sm font-semibold text-(--welcome-strong)">USD {product.price}</p>
+                                        <div className="mt-auto flex items-center justify-between gap-3">
+                                            <div className="flex flex-col gap-1">
+                                                <p className="text-sm font-semibold text-(--welcome-strong)">USD {product.price}</p>
+                                                {product.has_discount && (
+                                                    <p className="text-xs text-(--welcome-muted-text) line-through decoration-1 decoration-(--welcome-muted-text)">
+                                                        USD {product.original_price}
+                                                    </p>
+                                                )}
+                                            </div>
                                             <Link
                                                 href={productShow(product.id)}
                                                 className="rounded-full border border-(--welcome-border) px-3 py-1 text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)"

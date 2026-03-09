@@ -9,5 +9,3 @@
 
 ## Task to do
 
-### Product images on the product details page
-Reference: `product-detail-image-slider.md`

@@ -21,7 +21,10 @@ type ProductDetails = {
     name: string;
     description: string;
     vendor_price: string;
+    original_price: string;
     selling_price: string;
+    effective_discount_percentage: string;
+    has_discount: boolean;
     materials: string | null;
     pieces_count: number | null;
     production_time_days: number | null;
@@ -294,12 +297,24 @@ export default function ProductShow({
                             <ProductColorSwatches colors={product.colors} />
                         </div>
                         <div className="rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                Selling Price
-                            </p>
+                            <div className="flex items-center justify-between gap-3">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                    Selling Price
+                                </p>
+                                {product.has_discount && (
+                                    <span className="rounded-full bg-(--welcome-strong) px-3 py-1 text-[10px] font-semibold tracking-[0.3em] text-(--welcome-on-strong) uppercase">
+                                        {product.effective_discount_percentage}% Off
+                                    </span>
+                                )}
+                            </div>
                             <p className="mt-3 font-['Playfair_Display',serif] text-3xl">
                                 {formatMoney(product.selling_price, DEFAULT_CURRENCY)}
                             </p>
+                            {product.has_discount && (
+                                <p className="mt-2 text-sm text-(--welcome-muted-text) line-through decoration-1 decoration-(--welcome-muted-text)">
+                                    {formatMoney(product.original_price, DEFAULT_CURRENCY)}
+                                </p>
+                            )}
                             <p className="mt-2 text-sm text-(--welcome-body-text)">
                                 Crafted by verified artisans and prepared for collector-grade
                                 delivery.

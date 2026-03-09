@@ -45,12 +45,13 @@ test('home page renders', function () {
             ->has('latest_products', 1)
             ->where('latest_products.0.id', $product->id)
             ->where('latest_products.0.name', $product->name)
+            ->where('latest_products.0.categories', [])
             ->where('latest_products.0.colors.0.slug', 'beige')
             ->where('my_feedback', null)
         );
 });
 
-test('home page shows up to eight latest active products from approved vendors', function () {
+test('home page shows up to six latest active products from approved vendors', function () {
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $vendor = Vendor::factory()->for($vendorUser)->create([
         'status' => 'approved',
@@ -83,7 +84,7 @@ test('home page shows up to eight latest active products from approved vendors',
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('welcome')
-            ->has('latest_products', 8)
+            ->has('latest_products', 6)
         );
 
     $latestProductIds = collect($response->viewData('page')['props']['latest_products'])
@@ -95,7 +96,9 @@ test('home page shows up to eight latest active products from approved vendors',
     $latestVisibleProductId = $visibleProducts[8]->id;
 
     expect($latestProductIds)
-        ->toHaveCount(8)
+        ->toHaveCount(6)
         ->toContain($latestVisibleProductId)
-        ->not->toContain($oldestVisibleProductId);
+        ->not->toContain($oldestVisibleProductId)
+        ->not->toContain($visibleProducts[1]->id)
+        ->not->toContain($visibleProducts[2]->id);
 });

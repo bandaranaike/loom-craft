@@ -49,6 +49,7 @@ class ProductController extends Controller
 
         return Inertia::render('vendor/products/create', [
             ...$result->toArray(),
+            'commission_rate' => (string) config('commerce.commission_rate'),
             'status' => session('status'),
         ]);
     }

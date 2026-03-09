@@ -37,8 +37,9 @@ const fileInputClassName =
 export default function ProductCreate() {
     const { commission_rate, vendor_name, vendor_slug, categories, colors, status } = usePage<Props>().props;
     const [vendorPrice, setVendorPrice] = useState('');
+    const [discountPercentage, setDiscountPercentage] = useState('');
 
-    const sellingPrice = useMemo(() => {
+    const baseSellingPrice = useMemo(() => {
         const parsed = Number.parseFloat(vendorPrice);
         if (!vendorPrice || Number.isNaN(parsed)) {
             return '—';
@@ -47,6 +48,20 @@ export default function ProductCreate() {
         const rate = Number.parseFloat(commission_rate || '7');
         return (parsed * (1 + rate / 100)).toFixed(2);
     }, [commission_rate, vendorPrice]);
+
+    const discountedSellingPrice = useMemo(() => {
+        if (baseSellingPrice === '—') {
+            return '—';
+        }
+
+        const discount = Number.parseFloat(discountPercentage || '0');
+
+        if (Number.isNaN(discount) || discount <= 0) {
+            return baseSellingPrice;
+        }
+
+        return (Number.parseFloat(baseSellingPrice) * (1 - discount / 100)).toFixed(2);
+    }, [baseSellingPrice, discountPercentage]);
 
     return (
         <>
@@ -115,12 +130,12 @@ export default function ProductCreate() {
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm text-(--welcome-body-text)">
-                                    <span>Selling price</span>
-                                    <span>
-                                        {sellingPrice === '—'
-                                            ? '—'
-                                            : `$${sellingPrice}`}
-                                    </span>
+                                    <span>Catalog price</span>
+                                    <span>{baseSellingPrice === '—' ? '—' : `$${baseSellingPrice}`}</span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm text-(--welcome-body-text)">
+                                    <span>Customer price</span>
+                                    <span>{discountedSellingPrice === '—' ? '—' : `$${discountedSellingPrice}`}</span>
                                 </div>
                             </div>
                         </div>
@@ -153,7 +168,7 @@ export default function ProductCreate() {
                                     {({ processing, errors }) => (
                                         <>
                                             <div className="grid gap-2 lg:col-span-2">
-                                                <div className="grid gap-5 lg:grid-cols-2">
+                                                <div className="grid gap-5 lg:grid-cols-3">
                                                     <div className="grid gap-2">
                                                         <label
                                                             htmlFor="name"
@@ -199,6 +214,30 @@ export default function ProductCreate() {
                                                         />
                                                         <InputError
                                                             message={errors.vendor_price}
+                                                            className="text-xs"
+                                                        />
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <label
+                                                            htmlFor="discount_percentage"
+                                                            className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                                        >
+                                                            Product discount %
+                                                        </label>
+                                                        <input
+                                                            id="discount_percentage"
+                                                            type="number"
+                                                            name="discount_percentage"
+                                                            step="0.01"
+                                                            min="0"
+                                                            max="100"
+                                                            value={discountPercentage}
+                                                            onChange={(event) => setDiscountPercentage(event.target.value)}
+                                                            placeholder="0.00"
+                                                            className={inputClassName}
+                                                        />
+                                                        <InputError
+                                                            message={errors.discount_percentage}
                                                             className="text-xs"
                                                         />
                                                     </div>

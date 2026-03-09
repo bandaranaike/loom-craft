@@ -7,6 +7,7 @@ use App\DTOs\Order\OrderPlacementResult;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\ProductPricingService;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -14,11 +15,14 @@ use Illuminate\Validation\ValidationException;
 
 class PlaceOrder
 {
+    public function __construct(private ProductPricingService $productPricingService) {}
+
     public function handle(
         CheckoutStoreData $data,
         ?string $paymentProviderReference = null,
     ): OrderPlacementResult {
         Gate::authorize('create', Order::class);
+        $commissionRate = (string) config('commerce.commission_rate');
 
         $cart = $this->resolveCart($data);
 
@@ -30,7 +34,7 @@ class PlaceOrder
             ]);
         }
 
-        $cart->load('items.product.vendor');
+        $cart->load('items.product.vendor', 'items.product.categories');
 
         if ($cart->items->isEmpty()) {
             throw ValidationException::withMessages([
@@ -38,7 +42,7 @@ class PlaceOrder
             ]);
         }
 
-        return DB::transaction(function () use ($cart, $data, $paymentProviderReference): OrderPlacementResult {
+        return DB::transaction(function () use ($cart, $data, $paymentProviderReference, $commissionRate): OrderPlacementResult {
             $lineItems = [];
             $subtotal = 0.0;
             $commissionTotal = 0.0;
@@ -56,16 +60,17 @@ class PlaceOrder
                     ]);
                 }
 
-                $unitPrice = Money::fromString((string) $product->selling_price);
+                $pricing = $this->productPricingService->forProduct($product);
+                $unitPrice = Money::fromString($pricing->discountedPrice);
                 $lineTotal = $unitPrice->multiply($item->quantity);
-                $commissionAmount = $lineTotal->percentageOf('7.00');
+                $commissionAmount = $lineTotal->percentageOf($commissionRate);
 
                 $lineItems[] = [
                     'product_id' => $product->id,
                     'vendor_id' => $product->vendor_id,
                     'quantity' => $item->quantity,
                     'unit_price' => $unitPrice->amount,
-                    'commission_rate' => '7.00',
+                    'commission_rate' => $commissionRate,
                     'commission_amount' => $commissionAmount->amount,
                     'line_total' => $lineTotal->amount,
                 ];

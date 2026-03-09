@@ -9,6 +9,7 @@ use App\DTOs\Cart\CartSummaryResult;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Services\ProductPricingService;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -17,6 +18,8 @@ use Illuminate\Support\Str;
 
 class ShowCart
 {
+    public function __construct(private ProductPricingService $productPricingService) {}
+
     public function handle(CartSessionData $data): CartShowResult
     {
         Gate::authorize('access', Cart::class);
@@ -25,6 +28,7 @@ class ShowCart
 
         $cart->load([
             'items.product.vendor',
+            'items.product.categories',
             'items.product.media' => fn ($query) => $query->orderBy('sort_order'),
         ]);
 
@@ -42,7 +46,10 @@ class ShowCart
             }
 
             $image = $product->media->firstWhere('type', 'image');
+            $pricing = $this->productPricingService->forProduct($product);
             $lineTotal = Money::fromString((string) $item->unit_price)
+                ->multiply($item->quantity);
+            $originalLineTotal = Money::fromString($pricing->originalPrice)
                 ->multiply($item->quantity);
 
             return new CartItemSummary(
@@ -53,8 +60,12 @@ class ShowCart
                 $vendor->slug,
                 $image ? Storage::disk('public')->url($image->path) : null,
                 $item->quantity,
+                $pricing->originalPrice,
                 Money::fromString((string) $item->unit_price)->amount,
+                $originalLineTotal->amount,
                 $lineTotal->amount,
+                $pricing->effectiveDiscountPercentage,
+                $pricing->hasDiscount,
             );
         })->all();
 
@@ -131,7 +142,7 @@ class ShowCart
                 return $cart;
             }
 
-            $guestCart->load('items.product');
+            $guestCart->load('items.product.categories');
 
             foreach ($guestCart->items as $item) {
                 $product = $item->product;
@@ -140,7 +151,7 @@ class ShowCart
                     continue;
                 }
 
-                $unitPrice = Money::fromString((string) $product->selling_price)->amount;
+                $unitPrice = $this->productPricingService->forProduct($product)->discountedPrice;
                 $existing = $cart->items()->where('product_id', $product->id)->first();
 
                 if ($existing) {

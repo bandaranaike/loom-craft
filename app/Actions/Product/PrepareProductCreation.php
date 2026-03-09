@@ -40,6 +40,12 @@ class PrepareProductCreation
             ])
             ->all();
 
-        return new ProductCreateFormResult('7.00', $vendorName, $vendorSlug, $categories, $colors);
+        return new ProductCreateFormResult(
+            (string) config('commerce.commission_rate'),
+            $vendorName,
+            $vendorSlug,
+            $categories,
+            $colors,
+        );
     }
 }

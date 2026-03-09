@@ -20,6 +20,7 @@ class ProductCreateData
         public string $name,
         public string $description,
         public Money $vendorPrice,
+        public ?string $discountPercentage,
         public ?string $materials,
         public ?int $piecesCount,
         public ?int $productionTimeDays,
@@ -56,6 +57,9 @@ class ProductCreateData
             $request->string('name')->toString(),
             $request->string('description')->toString(),
             Money::fromString($request->string('vendor_price')->toString()),
+            $request->filled('discount_percentage')
+                ? $request->string('discount_percentage')->toString()
+                : null,
             $request->string('materials')->toString() ?: null,
             $request->integer('pieces_count') ?: null,
             $request->integer('production_time_days') ?: null,

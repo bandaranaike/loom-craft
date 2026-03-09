@@ -14,8 +14,12 @@ type CartItem = {
     vendor_slug: string | null;
     image_url: string | null;
     quantity: number;
+    original_unit_price: string;
     unit_price: string;
+    original_line_total: string;
     line_total: string;
+    effective_discount_percentage: string;
+    has_discount: boolean;
 };
 
 type CartSummary = {
@@ -107,10 +111,17 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                                     <p className="font-['Playfair_Display',serif] text-xl">
                                                         {item.name}
                                                     </p>
-                                                    <p className="text-sm text-(--welcome-body-text)">
-                                                        Unit price{' '}
-                                                        {formatMoney(item.unit_price, cart.currency)}
-                                                    </p>
+                                                    <div className="text-sm text-(--welcome-body-text)">
+                                                        <p>
+                                                            Unit price{' '}
+                                                            {formatMoney(item.unit_price, cart.currency)}
+                                                        </p>
+                                                        {item.has_discount && (
+                                                            <p className="text-xs text-(--welcome-muted-text) line-through decoration-1 decoration-(--welcome-muted-text)">
+                                                                {formatMoney(item.original_unit_price, cart.currency)} • {item.effective_discount_percentage}% off
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="mt-4 flex flex-col gap-4 border-t border-(--welcome-border-soft) pt-4 sm:flex-row sm:items-center sm:justify-between">
@@ -142,6 +153,11 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                                     <span className="text-lg font-semibold">
                                                         {formatMoney(item.line_total, cart.currency)}
                                                     </span>
+                                                    {item.has_discount && (
+                                                        <span className="text-xs text-(--welcome-muted-text) line-through decoration-1 decoration-(--welcome-muted-text)">
+                                                            {formatMoney(item.original_line_total, cart.currency)}
+                                                        </span>
+                                                    )}
                                                     <Form {...cartItemDestroy.form(item.id)}>
                                                         <button
                                                             type="submit"

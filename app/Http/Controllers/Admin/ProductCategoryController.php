@@ -29,6 +29,9 @@ class ProductCategoryController extends Controller
                 'name' => $category->name,
                 'slug' => $category->slug,
                 'description' => $category->description,
+                'discount_percentage' => $category->discount_percentage !== null
+                    ? number_format((float) $category->discount_percentage, 2, '.', '')
+                    : null,
                 'is_active' => $category->is_active,
                 'sort_order' => $category->sort_order,
                 'products_count' => $category->products_count,
@@ -53,6 +56,9 @@ class ProductCategoryController extends Controller
             'name' => $name,
             'slug' => $slug,
             'description' => $request->string('description')->toString() ?: null,
+            'discount_percentage' => $request->filled('discount_percentage')
+                ? number_format((float) $request->input('discount_percentage'), 2, '.', '')
+                : null,
             'is_active' => $request->boolean('is_active', true),
             'sort_order' => $request->integer('sort_order'),
         ]);
@@ -77,6 +83,9 @@ class ProductCategoryController extends Controller
             'name' => $name,
             'slug' => $slug,
             'description' => $request->string('description')->toString() ?: null,
+            'discount_percentage' => $request->filled('discount_percentage')
+                ? number_format((float) $request->input('discount_percentage'), 2, '.', '')
+                : null,
             'is_active' => $request->boolean('is_active'),
             'sort_order' => $request->integer('sort_order'),
         ])->save();

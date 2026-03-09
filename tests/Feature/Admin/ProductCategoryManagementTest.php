@@ -38,6 +38,7 @@ test('admins can create product categories and receive unique slug', function ()
             'name' => 'Premium Pillow Covers',
             'slug' => 'pillow-covers',
             'description' => 'Seasonal pillow collection',
+            'discount_percentage' => '15.00',
             'is_active' => true,
             'sort_order' => 5,
         ]);
@@ -47,6 +48,7 @@ test('admins can create product categories and receive unique slug', function ()
     $this->assertDatabaseHas('product_categories', [
         'name' => 'Premium Pillow Covers',
         'slug' => 'pillow-covers-2',
+        'discount_percentage' => '15.00',
         'is_active' => true,
         'sort_order' => 5,
     ]);
@@ -66,6 +68,7 @@ test('admins can update and archive categories', function () {
             'name' => 'Wall Art Hangings',
             'slug' => 'wall-art-hangings',
             'description' => 'Updated category description.',
+            'discount_percentage' => '22.50',
             'is_active' => false,
             'sort_order' => 9,
         ]);
@@ -76,6 +79,7 @@ test('admins can update and archive categories', function () {
         'id' => $category->id,
         'name' => 'Wall Art Hangings',
         'slug' => 'wall-art-hangings',
+        'discount_percentage' => '22.50',
         'is_active' => false,
         'sort_order' => 9,
     ]);

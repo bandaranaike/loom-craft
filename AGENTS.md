@@ -66,11 +66,6 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 - Be concise in your explanations - focus on what's important rather than explaining obvious details.
 
-## Task Workflow Preferences
-
-- After creating a separate task file from a subsection in `.ai/tasks/todo-list.md`, that subsection may be removed from `todo-list.md`.
-- Before proceeding, ask for clarification whenever requirements are unclear or extra details are needed.
-
 === boost rules ===
 
 # Laravel Boost
@@ -307,11 +302,13 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 
 - New public Inertia page "Build your own woven" is available at `/loom-weave-demo` (route name: `loom-weave-demo`).
 - The page implementation source is `resources/js/pages/loom-weave-demo.tsx`, based on `.ai/LoomWeaveDemoPage.tsx`.
+- Vendor product create/edit flows and backend commission calculations use `COMMERCE_COMMISSION_RATE` from `.env` via `config/commerce.php`. Current default is `100.00`.
 - PayPal checkout integration is available via:
   - `POST /checkout/paypal/create` (`checkout.paypal.create`)
   - `GET /checkout/paypal/approved` (`checkout.paypal.approved`)
   - `GET /checkout/paypal/cancelled` (`checkout.paypal.cancelled`)
-- Required PayPal environment variables:
+- Required environment variables:
   - `PAYPAL_CLIENT_ID`
   - `PAYPAL_CLIENT_SECRET`
   - `PAYPAL_BASE_URL` (optional, defaults to sandbox API URL)
+  - `COMMERCE_COMMISSION_RATE` (current default `100.00`)

@@ -1,31 +1,9 @@
 import { Head, Link, router } from '@inertiajs/react';
-import ProductColorSwatches from '@/components/product-color-swatches';
+import ProductCard, { type ProductCardItem } from '@/components/product-card';
 import { Spinner } from '@/components/ui/spinner';
-import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
-import { index as productsIndex, show as productShow } from '@/routes/products';
-import { show as vendorShow } from '@/routes/vendors';
+import { index as productsIndex } from '@/routes/products';
 import { useEffect, useState } from 'react';
-
-type ProductItem = {
-    id: number;
-    name: string;
-    selling_price: string;
-    vendor_name: string;
-    vendor_slug: string | null;
-    vendor_location: string | null;
-    image_url: string | null;
-    categories: Array<{
-        id: number;
-        name: string;
-        slug: string;
-    }>;
-    colors: Array<{
-        id: number;
-        name: string;
-        slug: string;
-    }>;
-};
 
 type FilterOption = {
     id: number;
@@ -50,7 +28,7 @@ type Pagination = {
 };
 
 type ProductIndexProps = {
-    products: ProductItem[];
+    products: ProductCardItem[];
     categories: FilterOption[];
     vendors: FilterOption[];
     colors: FilterOption[];
@@ -504,73 +482,7 @@ export default function ProductIndex({
                     ) : (
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {products.map((product) => (
-                                <article
-                                    key={product.id}
-                                    className="group flex h-full flex-col overflow-hidden rounded-[32px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)"
-                                >
-                                    <Link
-                                        href={productShow(product.id)}
-                                        className="relative aspect-[4/3] overflow-hidden bg-(--welcome-surface-1)"
-                                    >
-                                        {product.image_url ? (
-                                            <img
-                                                src={product.image_url}
-                                                alt={product.name}
-                                                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                                            />
-                                        ) : (
-                                            <div className="flex h-full w-full items-center justify-center text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                                Image forthcoming
-                                            </div>
-                                        )}
-                                    </Link>
-                                    <div className="flex flex-1 flex-col gap-3 p-5">
-                                        <div className="space-y-2">
-                                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                                {product.vendor_slug ? (
-                                                    <Link href={vendorShow(product.vendor_slug)}>
-                                                        {product.vendor_name}
-                                                    </Link>
-                                                ) : (
-                                                    product.vendor_name
-                                                )}
-                                                {product.vendor_location
-                                                    ? ` • ${product.vendor_location}`
-                                                    : ''}
-                                            </p>
-                                            <h3 className="font-['Playfair_Display',serif] text-xl">
-                                                <Link href={productShow(product.id)}>
-                                                    {product.name}
-                                                </Link>
-                                            </h3>
-                                            {product.categories.length > 0 && (
-                                                <div className="flex flex-wrap gap-2">
-                                                    {product.categories.map((category) => (
-                                                        <span
-                                                            key={category.id}
-                                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-(--welcome-muted-text)"
-                                                        >
-                                                            {category.name}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
-                                            <ProductColorSwatches
-                                                colors={product.colors}
-                                                className="mt-2 flex flex-wrap gap-1.5"
-                                                sizeClassName="h-5 w-5"
-                                            />
-                                        </div>
-                                        <div className="mt-auto flex items-center justify-between text-sm">
-                                            <span className="text-(--welcome-body-text)">
-                                                Selling price
-                                            </span>
-                                            <span className="font-semibold text-(--welcome-strong)">
-                                                {formatMoney(product.selling_price, 'LKR')}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </article>
+                                <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
                     )}

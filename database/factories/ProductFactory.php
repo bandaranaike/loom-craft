@@ -24,6 +24,7 @@ class ProductFactory extends Factory
             'vendor_price' => fake()->randomFloat(2, 50, 5000),
             'commission_rate' => 7.00,
             'selling_price' => fake()->randomFloat(2, 60, 5500),
+            'discount_percentage' => null,
             'materials' => fake()->words(4, true),
             'pieces_count' => fake()->numberBetween(1, 10),
             'production_time_days' => fake()->numberBetween(7, 60),

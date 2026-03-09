@@ -24,6 +24,7 @@ class Product extends Model
         'vendor_price',
         'commission_rate',
         'selling_price',
+        'discount_percentage',
         'materials',
         'pieces_count',
         'production_time_days',
@@ -33,6 +34,16 @@ class Product extends Model
         'dimension_unit',
         'status',
     ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'discount_percentage' => 'decimal:2',
+        ];
+    }
 
     public function vendor(): BelongsTo
     {

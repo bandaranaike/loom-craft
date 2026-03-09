@@ -11,12 +11,15 @@ use App\DTOs\Product\ProductVendorSummary;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductColor;
+use App\Services\ProductPricingService;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class ShowPublicProduct
 {
+    public function __construct(private ProductPricingService $productPricingService) {}
+
     public function handle(ProductShowData $data): ProductShowResult
     {
         Gate::authorize('viewPublicAny', Product::class);
@@ -58,13 +61,18 @@ class ShowPublicProduct
             throw new \RuntimeException('Product vendor is missing.');
         }
 
+        $pricing = $this->productPricingService->forProduct($product);
+
         return new ProductShowResult(
             new ProductShowItem(
                 $product->id,
                 $product->name,
                 $product->description,
                 Money::fromString((string) $product->vendor_price)->amount,
-                Money::fromString((string) $product->selling_price)->amount,
+                $pricing->originalPrice,
+                $pricing->discountedPrice,
+                $pricing->effectiveDiscountPercentage,
+                $pricing->hasDiscount,
                 number_format((float) $product->commission_rate, 2, '.', ''),
                 $product->materials,
                 $product->pieces_count,

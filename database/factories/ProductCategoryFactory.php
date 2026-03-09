@@ -31,6 +31,7 @@ class ProductCategoryFactory extends Factory
             'name' => Str::title($name),
             'slug' => Str::slug($name),
             'description' => fake()->optional()->sentence(),
+            'discount_percentage' => null,
             'is_active' => true,
             'sort_order' => fake()->numberBetween(0, 100),
         ];

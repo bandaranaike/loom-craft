@@ -9,6 +9,7 @@ use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
 
@@ -24,7 +25,11 @@ it('allows approved vendors to view the product creation page', function () {
 
     $this->actingAs($vendorUser)
         ->get(route('vendor.products.create'))
-        ->assertSuccessful();
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('vendor/products/create')
+            ->where('commission_rate', '100.00')
+        );
 });
 
 it('creates products for approved vendors', function () {
@@ -51,6 +56,7 @@ it('creates products for approved vendors', function () {
         'name' => 'Heritage Runner',
         'description' => 'Handwoven in Dumbara Rataa with heirloom dyes.',
         'vendor_price' => '100.00',
+        'discount_percentage' => '12.50',
         'materials' => 'Cotton, natural dyes',
         'pieces_count' => 4,
         'production_time_days' => 21,
@@ -74,8 +80,9 @@ it('creates products for approved vendors', function () {
     $this->assertDatabaseHas('products', [
         'name' => 'Heritage Runner',
         'vendor_price' => '100.00',
-        'commission_rate' => '7.00',
-        'selling_price' => '107.00',
+        'commission_rate' => '100.00',
+        'selling_price' => '200.00',
+        'discount_percentage' => '12.50',
         'status' => 'pending_review',
     ]);
 

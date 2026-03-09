@@ -19,6 +19,7 @@ class ProductCategory extends Model
         'name',
         'slug',
         'description',
+        'discount_percentage',
         'is_active',
         'sort_order',
     ];
@@ -29,6 +30,7 @@ class ProductCategory extends Model
     protected function casts(): array
     {
         return [
+            'discount_percentage' => 'decimal:2',
             'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
