@@ -35,6 +35,11 @@ type ProductDetails = {
         slug: string | null;
         location: string | null;
     };
+    categories: Array<{
+        id: number;
+        name: string;
+        slug: string;
+    }>;
     images: ProductImage[];
     video_url: string | null;
 };
@@ -266,6 +271,18 @@ export default function ProductShow({
                                     ? ` • ${product.vendor.location}`
                                     : ''}
                             </p>
+                            {product.categories.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                    {product.categories.map((category) => (
+                                        <span
+                                            key={category.id}
+                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-(--welcome-muted-text)"
+                                        >
+                                            {category.name}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                         <div className="rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                             <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">

@@ -6,6 +6,7 @@ class ProductShowItem
 {
     /**
      * @param  list<ProductMediaItem>  $images
+     * @param  list<array{id: int, name: string, slug: string}>  $categories
      */
     public function __construct(
         public int $id,
@@ -20,6 +21,7 @@ class ProductShowItem
         public ProductDimensions $dimensions,
         public ProductVendorSummary $vendor,
         public array $images,
+        public array $categories,
         public ?string $videoUrl,
     ) {}
 
@@ -44,6 +46,7 @@ class ProductShowItem
                 static fn (ProductMediaItem $media): array => $media->toArray(),
                 $this->images,
             ),
+            'categories' => $this->categories,
             'video_url' => $this->videoUrl,
         ];
     }

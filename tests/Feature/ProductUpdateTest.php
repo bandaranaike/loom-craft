@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\ProductMedia;
 use App\Models\User;
 use App\Models\Vendor;
@@ -51,6 +52,9 @@ it('updates vendor owned products and recalculates selling price', function () {
         'selling_price' => '107.00',
         'status' => 'active',
     ]);
+    $initialCategory = ProductCategory::factory()->create();
+    $product->categories()->sync([$initialCategory->id]);
+    $updatedCategories = ProductCategory::factory()->count(2)->create();
 
     $response = $this->actingAs($vendorUser)->patch(
         route('vendor.products.update', $product),
@@ -65,6 +69,7 @@ it('updates vendor owned products and recalculates selling price', function () {
             'dimension_width' => 40,
             'dimension_height' => 2,
             'dimension_unit' => 'cm',
+            'category_ids' => $updatedCategories->pluck('id')->all(),
         ]
     );
 
@@ -78,6 +83,8 @@ it('updates vendor owned products and recalculates selling price', function () {
         'selling_price' => '214.00',
         'status' => 'active',
     ]);
+    expect($product->fresh()->categories()->pluck('product_categories.id')->all())
+        ->toEqualCanonicalizing($updatedCategories->pluck('id')->all());
 });
 
 it('prevents vendors from editing products they do not own', function () {
@@ -108,6 +115,7 @@ it('prevents vendors from editing products they do not own', function () {
             'name' => 'Not Allowed',
             'description' => 'Blocked.',
             'vendor_price' => '99.00',
+            'category_ids' => ProductCategory::factory()->count(1)->create()->pluck('id')->all(),
         ])
         ->assertForbidden();
 });

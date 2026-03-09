@@ -35,6 +35,7 @@ class CreateProduct
             ...$data->dimensions->toArray(),
             'status' => 'pending_review',
         ]);
+        $product->categories()->sync($data->categoryIds);
 
         if ($data->images !== []) {
             $paths = array_map(

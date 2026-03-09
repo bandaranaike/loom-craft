@@ -12,6 +12,8 @@ class ProductPublicListItem
         public ?string $vendorSlug,
         public ?string $vendorLocation,
         public ?string $imageUrl,
+        /** @var list<array{id: int, name: string, slug: string}> */
+        public array $categories,
     ) {}
 
     /**
@@ -27,6 +29,7 @@ class ProductPublicListItem
             'vendor_slug' => $this->vendorSlug,
             'vendor_location' => $this->vendorLocation,
             'image_url' => $this->imageUrl,
+            'categories' => $this->categories,
         ];
     }
 }

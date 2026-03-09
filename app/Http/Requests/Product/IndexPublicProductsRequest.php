@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class IndexPublicProductsRequest extends FormRequest
 {
@@ -24,6 +25,11 @@ class IndexPublicProductsRequest extends FormRequest
         return [
             'search' => ['nullable', 'string', 'max:100'],
             'per_page' => ['nullable', 'integer', 'in:9,12,24'],
+            'category' => [
+                'nullable',
+                'string',
+                Rule::exists('product_categories', 'slug')->where('is_active', true),
+            ],
         ];
     }
 }

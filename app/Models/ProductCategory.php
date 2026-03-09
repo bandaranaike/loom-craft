@@ -20,6 +20,7 @@ class ProductCategory extends Model
         'slug',
         'description',
         'is_active',
+        'sort_order',
     ];
 
     /**
@@ -29,6 +30,7 @@ class ProductCategory extends Model
     {
         return [
             'is_active' => 'boolean',
+            'sort_order' => 'integer',
         ];
     }
 

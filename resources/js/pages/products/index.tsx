@@ -12,6 +12,11 @@ type ProductItem = {
     vendor_slug: string | null;
     vendor_location: string | null;
     image_url: string | null;
+    categories: Array<{
+        id: number;
+        name: string;
+        slug: string;
+    }>;
 };
 
 type PaginationLink = {
@@ -32,9 +37,15 @@ type Pagination = {
 
 type ProductIndexProps = {
     products: ProductItem[];
+    categories: Array<{
+        id: number;
+        name: string;
+        slug: string;
+    }>;
     pagination: Pagination;
     per_page: number;
     search: string | null;
+    selected_category: string | null;
     canRegister?: boolean;
 };
 
@@ -42,9 +53,11 @@ const perPageOptions = [9, 12, 24];
 
 export default function ProductIndex({
     products,
+    categories,
     pagination,
     per_page,
     search,
+    selected_category,
     canRegister = true,
 }: ProductIndexProps) {
     return (
@@ -101,6 +114,26 @@ export default function ProductIndex({
                                     >
                                         Explore
                                     </button>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                            Category
+                                        </span>
+                                        <select
+                                            name="category"
+                                            defaultValue={selected_category ?? ''}
+                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
+                                            onChange={(event) => {
+                                                event.currentTarget.form?.requestSubmit();
+                                            }}
+                                        >
+                                            <option value="">All</option>
+                                            {categories.map((category) => (
+                                                <option key={category.id} value={category.slug}>
+                                                    {category.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                             Per page
@@ -172,6 +205,18 @@ export default function ProductIndex({
                                                     {product.name}
                                                 </Link>
                                             </h3>
+                                            {product.categories.length > 0 && (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {product.categories.map((category) => (
+                                                        <span
+                                                            key={category.id}
+                                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-(--welcome-muted-text)"
+                                                        >
+                                                            {category.name}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="mt-auto flex items-center justify-between text-sm">
                                             <span className="text-(--welcome-body-text)">

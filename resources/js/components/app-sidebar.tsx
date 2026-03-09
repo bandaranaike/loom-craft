@@ -7,6 +7,7 @@ import {
     MessageSquareQuote,
     Package,
     ShieldCheck,
+    Tags,
     Video,
 } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
@@ -23,6 +24,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { pending as adminFeedbackPending } from '@/routes/admin/feedback';
+import { index as adminProductCategoriesIndex } from '@/routes/admin/product-categories';
 import { pending as adminProductsPending } from '@/routes/admin/products';
 import { pending as adminVendorInquiriesPending } from '@/routes/admin/vendor-inquiries';
 import { connect as adminYouTubeConnect } from '@/routes/admin/youtube';
@@ -74,6 +76,11 @@ export function AppSidebar() {
                       title: 'Product Approvals',
                       href: adminProductsPending(),
                       icon: Package,
+                  },
+                  {
+                      title: 'Product Categories',
+                      href: adminProductCategoriesIndex(),
+                      icon: Tags,
                   },
                   {
                       title: 'YouTube Connect',

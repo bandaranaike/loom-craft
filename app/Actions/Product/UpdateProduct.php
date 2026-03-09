@@ -24,5 +24,7 @@ class UpdateProduct
             'production_time_days' => $data->productionTimeDays,
             ...$data->dimensions->toArray(),
         ])->save();
+
+        $data->product->categories()->sync($data->categoryIds);
     }
 }

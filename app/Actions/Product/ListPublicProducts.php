@@ -6,6 +6,7 @@ use App\DTOs\Product\ProductPublicIndexData;
 use App\DTOs\Product\ProductPublicIndexResult;
 use App\DTOs\Product\ProductPublicListItem;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\ValueObjects\Money;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
@@ -21,11 +22,22 @@ class ListPublicProducts
             ->with([
                 'vendor',
                 'media' => fn ($query) => $query->orderBy('sort_order'),
+                'categories' => fn ($query) => $query
+                    ->where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->orderBy('name'),
             ])
             ->where('status', 'active')
             ->whereHas('vendor', fn ($query) => $query->where('status', 'approved'))
             ->when($data->search, function ($query, string $search): void {
                 $query->where('name', 'like', '%'.$search.'%');
+            })
+            ->when($data->category, function ($query, string $categorySlug): void {
+                $query->whereHas('categories', function ($categoryQuery) use ($categorySlug): void {
+                    $categoryQuery
+                        ->where('slug', $categorySlug)
+                        ->where('is_active', true);
+                });
             })
             ->latest();
 
@@ -33,6 +45,7 @@ class ListPublicProducts
             ->paginate($data->perPage)
             ->appends(array_filter([
                 'search' => $data->search,
+                'category' => $data->category,
                 'per_page' => $data->perPage,
             ]));
 
@@ -53,12 +66,37 @@ class ListPublicProducts
                     $vendor->slug,
                     $vendor->location,
                     $image ? Storage::disk('public')->url($image->path) : null,
+                    $product->categories
+                        ->map(static fn (ProductCategory $category): array => [
+                            'id' => $category->id,
+                            'name' => $category->name,
+                            'slug' => $category->slug,
+                        ])
+                        ->values()
+                        ->all(),
                 );
             })
         );
+        $categories = ProductCategory::query()
+            ->where('is_active', true)
+            ->whereHas('products', function ($productQuery): void {
+                $productQuery
+                    ->where('status', 'active')
+                    ->whereHas('vendor', fn ($vendorQuery) => $vendorQuery->where('status', 'approved'));
+            })
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->map(static fn (ProductCategory $category): array => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+            ])
+            ->all();
 
         return new ProductPublicIndexResult(
             $paginator->getCollection()->all(),
+            $categories,
             $this->paginationData($paginator),
         );
     }

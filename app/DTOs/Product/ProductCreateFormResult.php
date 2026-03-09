@@ -8,6 +8,8 @@ class ProductCreateFormResult
         public string $commissionRate,
         public ?string $vendorName,
         public ?string $vendorSlug,
+        /** @var list<array{id: int, name: string, slug: string}> */
+        public array $categories,
     ) {}
 
     /**
@@ -19,6 +21,7 @@ class ProductCreateFormResult
             'commission_rate' => $this->commissionRate,
             'vendor_name' => $this->vendorName,
             'vendor_slug' => $this->vendorSlug,
+            'categories' => $this->categories,
         ];
     }
 }

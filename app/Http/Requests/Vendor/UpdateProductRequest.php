@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Vendor;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -32,6 +33,11 @@ class UpdateProductRequest extends FormRequest
             'dimension_width' => ['nullable', 'numeric', 'min:0.01'],
             'dimension_height' => ['nullable', 'numeric', 'min:0.01'],
             'dimension_unit' => ['nullable', 'string', 'max:20'],
+            'category_ids' => ['required', 'array', 'min:1'],
+            'category_ids.*' => [
+                'integer',
+                Rule::exists('product_categories', 'id')->where('is_active', true),
+            ],
         ];
     }
 
@@ -45,6 +51,9 @@ class UpdateProductRequest extends FormRequest
             'description.required' => 'Please provide a product description.',
             'vendor_price.required' => 'Please provide a vendor price.',
             'vendor_price.min' => 'Vendor price must be at least 0.01.',
+            'category_ids.required' => 'Please select at least one category.',
+            'category_ids.min' => 'Please select at least one category.',
+            'category_ids.*.exists' => 'Selected category is invalid or inactive.',
         ];
     }
 }

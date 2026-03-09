@@ -6,6 +6,7 @@ class ProductPublicIndexResult
 {
     /**
      * @param  list<ProductPublicListItem>  $products
+     * @param  list<array{id: int, name: string, slug: string}>  $categories
      * @param  array{
      *     total: int,
      *     per_page: int,
@@ -18,6 +19,7 @@ class ProductPublicIndexResult
      */
     public function __construct(
         public array $products,
+        public array $categories,
         public array $pagination,
     ) {}
 
@@ -31,6 +33,7 @@ class ProductPublicIndexResult
                 static fn (ProductPublicListItem $item): array => $item->toArray(),
                 $this->products,
             ),
+            'categories' => $this->categories,
             'pagination' => $this->pagination,
         ];
     }

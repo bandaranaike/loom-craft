@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\Vendor;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -14,6 +15,11 @@ test('guests can view active products', function () {
         'status' => 'active',
         'name' => 'Dumbara Signature Weave',
     ]);
+    $category = ProductCategory::factory()->create([
+        'name' => 'Cushion Covers',
+        'slug' => 'cushion-covers',
+    ]);
+    $product->categories()->sync([$category->id]);
 
     $response = $this->get(route('products.show', $product));
 
@@ -24,6 +30,7 @@ test('guests can view active products', function () {
             ->where('product.id', $product->id)
             ->where('product.name', $product->name)
             ->where('product.vendor.display_name', $vendor->display_name)
+            ->where('product.categories.0.slug', 'cushion-covers')
         );
 });
 

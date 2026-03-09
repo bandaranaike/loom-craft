@@ -32,6 +32,7 @@ class ProductCategoryFactory extends Factory
             'slug' => Str::slug($name),
             'description' => fake()->optional()->sentence(),
             'is_active' => true,
+            'sort_order' => fake()->numberBetween(0, 100),
         ];
     }
 }

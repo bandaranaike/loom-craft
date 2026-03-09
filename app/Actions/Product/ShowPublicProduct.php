@@ -9,6 +9,7 @@ use App\DTOs\Product\ProductShowItem;
 use App\DTOs\Product\ProductShowResult;
 use App\DTOs\Product\ProductVendorSummary;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +24,10 @@ class ShowPublicProduct
             ->with([
                 'vendor',
                 'media' => fn ($query) => $query->orderBy('sort_order'),
+                'categories' => fn ($query) => $query
+                    ->where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->orderBy('name'),
             ])
             ->where('status', 'active')
             ->whereHas('vendor', fn ($query) => $query->where('status', 'approved'))
@@ -71,6 +76,14 @@ class ShowPublicProduct
                     $vendor->location,
                 ),
                 $images,
+                $product->categories
+                    ->map(static fn (ProductCategory $category): array => [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'slug' => $category->slug,
+                    ])
+                    ->values()
+                    ->all(),
                 $video?->path,
             )
         );

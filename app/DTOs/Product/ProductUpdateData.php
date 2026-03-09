@@ -20,6 +20,8 @@ class ProductUpdateData
         public ?int $piecesCount,
         public ?int $productionTimeDays,
         public Dimensions $dimensions,
+        /** @var list<int> */
+        public array $categoryIds,
     ) {}
 
     public static function fromRequest(UpdateProductRequest $request, Product $product): self
@@ -27,6 +29,10 @@ class ProductUpdateData
         $length = $request->input('dimension_length');
         $width = $request->input('dimension_width');
         $height = $request->input('dimension_height');
+        $categoryIds = array_values(array_unique(array_filter(
+            $request->array('category_ids'),
+            static fn (mixed $categoryId): bool => is_numeric($categoryId)
+        )));
 
         return new self(
             $request->user(),
@@ -43,6 +49,7 @@ class ProductUpdateData
                 is_numeric($height) ? (float) $height : null,
                 $request->string('dimension_unit')->toString() ?: null,
             ),
+            array_map(static fn (int|string $categoryId): int => (int) $categoryId, $categoryIds),
         );
     }
 }

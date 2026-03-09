@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductApprovalController;
+use App\Http\Controllers\Admin\ProductCategoryController as AdminProductCategoryController;
 use App\Http\Controllers\Admin\VendorApprovalController;
 use App\Http\Controllers\Admin\VendorInquiryController as AdminVendorInquiryController;
 use App\Http\Controllers\Admin\YouTubeAuthorizationController;
@@ -126,6 +127,12 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.products.pending');
         Route::post('products/{product}/approve', [ProductApprovalController::class, 'approve'])
             ->name('admin.products.approve');
+        Route::get('product-categories', [AdminProductCategoryController::class, 'index'])
+            ->name('admin.product-categories.index');
+        Route::post('product-categories', [AdminProductCategoryController::class, 'store'])
+            ->name('admin.product-categories.store');
+        Route::patch('product-categories/{productCategory}', [AdminProductCategoryController::class, 'update'])
+            ->name('admin.product-categories.update');
         Route::get('vendor-inquiries/pending', [AdminVendorInquiryController::class, 'pending'])
             ->name('admin.vendor-inquiries.pending');
         Route::post('vendor-inquiries/{inquiry}/approve', [AdminVendorInquiryController::class, 'approve'])

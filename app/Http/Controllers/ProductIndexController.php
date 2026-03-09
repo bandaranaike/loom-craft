@@ -21,6 +21,7 @@ class ProductIndexController extends Controller
             ...$result->toArray(),
             'canRegister' => Features::enabled(Features::registration()),
             'search' => $request->string('search')->toString() ?: null,
+            'selected_category' => $request->string('category')->toString() ?: null,
             'per_page' => $request->integer('per_page') ?: 9,
         ]);
     }
