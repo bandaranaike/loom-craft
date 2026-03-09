@@ -72,10 +72,11 @@ Primary product catalog record.
 
 - `id` (bigint, PK)
 - `vendor_id` (bigint, FK → vendors.id)
+- `product_code` (varchar) — required, unique across all products
 - `name` (varchar)
 - `description` (text)
 - `vendor_price` (decimal(10,2))
-- `commission_rate` (decimal(5,2)) — default 7.00
+- `commission_rate` (decimal(5,2)) — sourced from `COMMERCE_COMMISSION_RATE`, current default 100.00
 - `selling_price` (decimal(10,2))
 - `materials` (text, nullable)
 - `pieces_count` (int, nullable)
@@ -89,6 +90,7 @@ Primary product catalog record.
 - `updated_at` (timestamp, nullable)
 
 Indexes:
+- `products_product_code_unique` on `product_code`
 - `products_vendor_id_index` on `vendor_id`
 - `products_status_index` on `status`
 

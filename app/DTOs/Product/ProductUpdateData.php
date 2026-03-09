@@ -13,6 +13,7 @@ class ProductUpdateData
     public function __construct(
         public User $user,
         public Product $product,
+        public string $productCode,
         public string $name,
         public string $description,
         public Money $vendorPrice,
@@ -44,6 +45,7 @@ class ProductUpdateData
         return new self(
             $request->user(),
             $product,
+            $request->string('product_code')->toString(),
             $request->string('name')->toString(),
             $request->string('description')->toString(),
             Money::fromString($request->string('vendor_price')->toString()),

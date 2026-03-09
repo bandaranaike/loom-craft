@@ -21,6 +21,7 @@ class UpdateProduct
         $sellingPrice = $data->vendorPrice->addPercentage($commissionRate);
 
         $data->product->forceFill([
+            'product_code' => $data->productCode,
             'name' => $data->name,
             'description' => $data->description,
             'vendor_price' => $data->vendorPrice->amount,

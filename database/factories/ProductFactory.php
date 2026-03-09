@@ -19,6 +19,7 @@ class ProductFactory extends Factory
     {
         return [
             'vendor_id' => Vendor::factory(),
+            'product_code' => strtoupper(fake()->unique()->bothify('LC-#####-???')),
             'name' => fake()->words(3, true),
             'description' => fake()->paragraph(),
             'vendor_price' => fake()->randomFloat(2, 50, 5000),

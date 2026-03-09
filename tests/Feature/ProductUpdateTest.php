@@ -14,6 +14,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 uses(RefreshDatabase::class);
 
 it('allows approved vendors to view their product edit page', function () {
+    $commissionRate = (string) config('commerce.commission_rate');
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $admin = User::factory()->create(['role' => 'admin']);
 
@@ -33,14 +34,16 @@ it('allows approved vendors to view their product edit page', function () {
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('vendor/products/edit')
-            ->where('commission_rate', '100.00')
+            ->where('commission_rate', $commissionRate)
             ->where('product.id', $product->id)
+            ->where('product.product_code', $product->product_code)
             ->where('product.name', 'Editable Loom Piece')
             ->where('product.discount_percentage', '18.00')
         );
 });
 
 it('updates vendor owned products and recalculates selling price', function () {
+    $commissionRate = (string) config('commerce.commission_rate');
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $admin = User::factory()->create(['role' => 'admin']);
 
@@ -66,6 +69,7 @@ it('updates vendor owned products and recalculates selling price', function () {
     $response = $this->actingAs($vendorUser)->patch(
         route('vendor.products.update', $product),
         [
+            'product_code' => 'LC-20002',
             'name' => 'Updated Name',
             'description' => 'Updated description.',
             'vendor_price' => '200.00',
@@ -84,12 +88,15 @@ it('updates vendor owned products and recalculates selling price', function () {
 
     $response->assertRedirect(route('vendor.products.index'));
 
+    $expectedSellingPrice = number_format(200 * (1 + ((float) $commissionRate / 100)), 2, '.', '');
+
     $this->assertDatabaseHas('products', [
         'id' => $product->id,
+        'product_code' => 'LC-20002',
         'name' => 'Updated Name',
         'vendor_price' => '200.00',
-        'commission_rate' => '100.00',
-        'selling_price' => '400.00',
+        'commission_rate' => $commissionRate,
+        'selling_price' => $expectedSellingPrice,
         'discount_percentage' => '25.00',
         'status' => 'active',
     ]);
@@ -124,6 +131,7 @@ it('prevents vendors from editing products they do not own', function () {
 
     $this->actingAs($vendorUser)
         ->patch(route('vendor.products.update', $product), [
+            'product_code' => 'LC-NOT-ALLOWED',
             'name' => 'Not Allowed',
             'description' => 'Blocked.',
             'vendor_price' => '99.00',
@@ -131,6 +139,71 @@ it('prevents vendors from editing products they do not own', function () {
             'color_ids' => ProductColor::factory()->count(1)->create()->pluck('id')->all(),
         ])
         ->assertForbidden();
+});
+
+it('requires a unique product code when updating products', function () {
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+        'approved_at' => now(),
+        'approved_by' => $admin->id,
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'product_code' => 'LC-EDIT-001',
+        'status' => 'active',
+    ]);
+    $otherProduct = Product::factory()->for($vendor)->create([
+        'product_code' => 'LC-EDIT-002',
+        'status' => 'active',
+    ]);
+
+    $response = $this->actingAs($vendorUser)->patch(route('vendor.products.update', $product), [
+        'product_code' => $otherProduct->product_code,
+        'name' => 'Updated Name',
+        'description' => 'Updated description.',
+        'vendor_price' => '200.00',
+        'category_ids' => ProductCategory::factory()->count(1)->create()->pluck('id')->all(),
+        'color_ids' => ProductColor::factory()->count(1)->create()->pluck('id')->all(),
+    ]);
+
+    $response
+        ->assertSessionHasErrors(['product_code'])
+        ->assertRedirect();
+});
+
+it('allows vendors to keep the same product code when updating products', function () {
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+        'approved_at' => now(),
+        'approved_by' => $admin->id,
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'product_code' => 'LC-KEEP-001',
+        'status' => 'active',
+    ]);
+
+    $response = $this->actingAs($vendorUser)->patch(route('vendor.products.update', $product), [
+        'product_code' => 'LC-KEEP-001',
+        'name' => 'Updated Name',
+        'description' => 'Updated description.',
+        'vendor_price' => '200.00',
+        'category_ids' => ProductCategory::factory()->count(1)->create()->pluck('id')->all(),
+        'color_ids' => ProductColor::factory()->count(1)->create()->pluck('id')->all(),
+    ]);
+
+    $response->assertRedirect(route('vendor.products.index'));
+
+    $this->assertDatabaseHas('products', [
+        'id' => $product->id,
+        'product_code' => 'LC-KEEP-001',
+    ]);
 });
 
 it('allows vendors to upload additional product images', function () {

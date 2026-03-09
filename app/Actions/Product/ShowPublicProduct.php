@@ -66,6 +66,7 @@ class ShowPublicProduct
         return new ProductShowResult(
             new ProductShowItem(
                 $product->id,
+                $product->resolveProductCode(),
                 $product->name,
                 $product->description,
                 Money::fromString((string) $product->vendor_price)->amount,

@@ -31,6 +31,7 @@ class CreateProduct
 
         $product = Product::query()->create([
             'vendor_id' => $vendor->id,
+            'product_code' => $data->productCode,
             'name' => $data->name,
             'description' => $data->description,
             'vendor_price' => $data->vendorPrice->amount,

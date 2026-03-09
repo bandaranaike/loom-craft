@@ -14,6 +14,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 uses(RefreshDatabase::class);
 
 it('allows approved vendors to view the product creation page', function () {
+    $commissionRate = (string) config('commerce.commission_rate');
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $admin = User::factory()->create(['role' => 'admin']);
 
@@ -28,11 +29,12 @@ it('allows approved vendors to view the product creation page', function () {
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('vendor/products/create')
-            ->where('commission_rate', '100.00')
+            ->where('commission_rate', $commissionRate)
         );
 });
 
 it('creates products for approved vendors', function () {
+    $commissionRate = (string) config('commerce.commission_rate');
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $admin = User::factory()->create(['role' => 'admin']);
 
@@ -53,6 +55,7 @@ it('creates products for approved vendors', function () {
     });
 
     $payload = [
+        'product_code' => 'LC-10001',
         'name' => 'Heritage Runner',
         'description' => 'Handwoven in Dumbara Rataa with heirloom dyes.',
         'vendor_price' => '100.00',
@@ -77,11 +80,14 @@ it('creates products for approved vendors', function () {
         ->post(route('vendor.products.store'), $payload)
         ->assertRedirect(route('vendor.products.create'));
 
+    $expectedSellingPrice = number_format(100 * (1 + ((float) $commissionRate / 100)), 2, '.', '');
+
     $this->assertDatabaseHas('products', [
+        'product_code' => 'LC-10001',
         'name' => 'Heritage Runner',
         'vendor_price' => '100.00',
-        'commission_rate' => '100.00',
-        'selling_price' => '200.00',
+        'commission_rate' => $commissionRate,
+        'selling_price' => $expectedSellingPrice,
         'discount_percentage' => '12.50',
         'status' => 'pending_review',
     ]);
@@ -113,6 +119,7 @@ it('prevents non-vendors from creating products', function () {
 
     $this->actingAs($customer)
         ->post(route('vendor.products.store'), [
+            'product_code' => 'LC-BLOCKED',
             'name' => 'Blocked',
             'description' => 'Not allowed.',
             'vendor_price' => '50.00',
@@ -121,4 +128,33 @@ it('prevents non-vendors from creating products', function () {
             'images' => [UploadedFile::fake()->image('blocked.jpg')],
         ])
         ->assertForbidden();
+});
+
+it('requires a unique product code when creating products', function () {
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+        'approved_at' => now(),
+        'approved_by' => $admin->id,
+    ]);
+
+    Product::factory()->for($vendor)->create([
+        'product_code' => 'LC-DUPLICATE',
+    ]);
+
+    $response = $this->actingAs($vendorUser)->post(route('vendor.products.store'), [
+        'product_code' => 'LC-DUPLICATE',
+        'name' => 'Duplicate Code Product',
+        'description' => 'Handwoven in Dumbara Rataa with heirloom dyes.',
+        'vendor_price' => '100.00',
+        'category_ids' => ProductCategory::factory()->count(1)->create()->pluck('id')->all(),
+        'color_ids' => ProductColor::factory()->count(1)->create()->pluck('id')->all(),
+        'images' => [UploadedFile::fake()->image('duplicate-code.jpg')],
+    ]);
+
+    $response
+        ->assertSessionHasErrors(['product_code'])
+        ->assertRedirect();
 });

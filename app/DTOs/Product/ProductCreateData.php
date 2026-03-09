@@ -17,6 +17,7 @@ class ProductCreateData
      */
     public function __construct(
         public User $user,
+        public string $productCode,
         public string $name,
         public string $description,
         public Money $vendorPrice,
@@ -54,6 +55,7 @@ class ProductCreateData
 
         return new self(
             $request->user(),
+            $request->string('product_code')->toString(),
             $request->string('name')->toString(),
             $request->string('description')->toString(),
             Money::fromString($request->string('vendor_price')->toString()),

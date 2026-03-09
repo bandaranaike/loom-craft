@@ -171,6 +171,26 @@ export default function ProductCreate() {
                                                 <div className="grid gap-5 lg:grid-cols-3">
                                                     <div className="grid gap-2">
                                                         <label
+                                                            htmlFor="product_code"
+                                                            className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                                        >
+                                                            Product code
+                                                        </label>
+                                                        <input
+                                                            id="product_code"
+                                                            type="text"
+                                                            name="product_code"
+                                                            placeholder="LC-00001"
+                                                            className={inputClassName}
+                                                            required
+                                                        />
+                                                        <InputError
+                                                            message={errors.product_code}
+                                                            className="text-xs"
+                                                        />
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <label
                                                             htmlFor="name"
                                                             className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                         >

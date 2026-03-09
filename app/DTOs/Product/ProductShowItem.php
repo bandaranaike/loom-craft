@@ -11,6 +11,7 @@ class ProductShowItem
      */
     public function __construct(
         public int $id,
+        public string $productCode,
         public string $name,
         public string $description,
         public string $vendorPrice,
@@ -37,6 +38,7 @@ class ProductShowItem
     {
         return [
             'id' => $this->id,
+            'product_code' => $this->productCode,
             'name' => $this->name,
             'description' => $this->description,
             'vendor_price' => $this->vendorPrice,

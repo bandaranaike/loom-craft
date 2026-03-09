@@ -23,6 +23,12 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'product_code' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('products', 'product_code')->ignore($this->route('product')),
+            ],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:2000'],
             'vendor_price' => ['required', 'numeric', 'min:0.01'],
@@ -53,6 +59,8 @@ class UpdateProductRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'product_code.required' => 'Please provide a product code.',
+            'product_code.unique' => 'This product code is already in use.',
             'name.required' => 'Please provide a product name.',
             'description.required' => 'Please provide a product description.',
             'vendor_price.required' => 'Please provide a vendor price.',

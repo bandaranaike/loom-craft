@@ -46,6 +46,7 @@ test('guests can view active products', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('products/show')
             ->where('product.id', $product->id)
+            ->where('product.product_code', $product->product_code)
             ->where('product.name', $product->name)
             ->where('product.vendor.display_name', $vendor->display_name)
             ->where('product.categories.0.slug', 'cushion-covers')
@@ -113,4 +114,11 @@ test('product show returns only image media ordered by sort order and id', funct
                     && isset($resolvedImages[0]['url'], $resolvedImages[0]['alt_text'], $resolvedImages[0]['type']);
             })
         );
+});
+
+test('products can resolve a fallback code when product_code is missing', function () {
+    $product = new Product;
+    $product->id = 42;
+
+    expect($product->resolveProductCode())->toBe('PRD-000042');
 });

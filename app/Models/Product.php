@@ -19,6 +19,7 @@ class Product extends Model
      */
     protected $fillable = [
         'vendor_id',
+        'product_code',
         'name',
         'description',
         'vendor_price',
@@ -43,6 +44,15 @@ class Product extends Model
         return [
             'discount_percentage' => 'decimal:2',
         ];
+    }
+
+    public function resolveProductCode(): string
+    {
+        if (is_string($this->product_code) && $this->product_code !== '') {
+            return $this->product_code;
+        }
+
+        return sprintf('PRD-%06d', (int) $this->id);
     }
 
     public function vendor(): BelongsTo

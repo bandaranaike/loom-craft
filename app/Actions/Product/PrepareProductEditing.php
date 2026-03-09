@@ -57,6 +57,7 @@ class PrepareProductEditing
             $data->user->vendor?->slug,
             [
                 'id' => $product->id,
+                'product_code' => $product->resolveProductCode(),
                 'name' => $product->name,
                 'description' => $product->description,
                 'vendor_price' => (string) $product->vendor_price,

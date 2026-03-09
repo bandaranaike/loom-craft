@@ -7,6 +7,7 @@ class ProductEditFormResult
     /**
      * @param  array{
      *     id: int,
+     *     product_code: string,
      *     name: string,
      *     description: string,
      *     vendor_price: string,

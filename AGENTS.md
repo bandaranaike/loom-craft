@@ -303,6 +303,7 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - New public Inertia page "Build your own woven" is available at `/loom-weave-demo` (route name: `loom-weave-demo`).
 - The page implementation source is `resources/js/pages/loom-weave-demo.tsx`, based on `.ai/LoomWeaveDemoPage.tsx`.
 - Vendor product create/edit flows and backend commission calculations use `COMMERCE_COMMISSION_RATE` from `.env` via `config/commerce.php`. Current default is `100.00`.
+- Products use a required `product_code` field. It must be unique across all products, is vendor-managed in create/edit flows, and should be validated with Laravel Form Requests.
 - PayPal checkout integration is available via:
   - `POST /checkout/paypal/create` (`checkout.paypal.create`)
   - `GET /checkout/paypal/approved` (`checkout.paypal.approved`)

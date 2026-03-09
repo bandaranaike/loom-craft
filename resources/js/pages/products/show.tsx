@@ -18,6 +18,7 @@ type ProductImage = {
 
 type ProductDetails = {
     id: number;
+    product_code: string;
     name: string;
     description: string;
     vendor_price: string;
@@ -267,6 +268,9 @@ export default function ProductShow({
                             Heritage Product
                         </div>
                         <div>
+                            <p className="mb-3 text-xs tracking-[0.35em] text-(--welcome-muted-text) uppercase">
+                                Product code: {product.product_code}
+                            </p>
                             <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
                                 {product.name}
                             </h1>

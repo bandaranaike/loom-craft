@@ -25,12 +25,13 @@ This file operationalizes the architecture and must stay aligned with:
 
 ## Core Business Rules (Must Enforce)
 - Multi‑vendor marketplace
-- Platform commission is **always 7%**
-- Vendors set a base price; selling price = vendor price + 7%
+- Platform commission is configured via `COMMERCE_COMMISSION_RATE` and currently defaults to **100.00%**
+- Vendors set a base price; selling price = vendor price + configured commission
 - Vendor approval is manual (admin‑controlled)
 - Guest checkout is allowed
 - Shipping responsibility per order: `vendor` or `platform`
 - Refunds are manual only (via disputes)
+- Every product must have a vendor-provided `product_code` that is unique across all products
 - Product media handling:
   - Images are uploaded to **application storage** and stored as local paths.
   - Videos are uploaded to **YouTube** using the **Google API Client for PHP** and stored as YouTube URLs.
