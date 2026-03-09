@@ -30,28 +30,42 @@ class VendorPublicController extends Controller
                     'media' => fn ($mediaQuery) => $mediaQuery->orderBy('sort_order'),
                     'categories' => fn ($categoryQuery) => $categoryQuery
                         ->where('is_active', true),
+                    'colors' => fn ($colorQuery) => $colorQuery
+                        ->where('is_active', true)
+                        ->orderBy('sort_order')
+                        ->orderBy('name'),
                 ])
                 ->latest(),
         ]);
 
-        $products = $vendor->products->map(function (Product $product): array {
+        $products = $vendor->products->map(function (Product $product) use ($vendor): array {
             $image = $product->media->firstWhere('type', 'image');
             $pricing = $this->productPricingService->forProduct($product);
 
             return [
                 'id' => $product->id,
                 'name' => $product->name,
-                'description' => $product->description,
                 'original_price' => $pricing->originalPrice,
-                'price' => $pricing->discountedPrice,
+                'selling_price' => $pricing->discountedPrice,
                 'effective_discount_percentage' => $pricing->effectiveDiscountPercentage,
                 'has_discount' => $pricing->hasDiscount,
+                'vendor_name' => $vendor->display_name,
+                'vendor_slug' => $vendor->slug,
+                'vendor_location' => $vendor->location,
                 'image_url' => $image ? Storage::disk('public')->url($image->path) : null,
                 'categories' => $product->categories
                     ->map(fn ($category): array => [
                         'id' => $category->id,
                         'name' => $category->name,
                         'slug' => $category->slug,
+                    ])
+                    ->values()
+                    ->all(),
+                'colors' => $product->colors
+                    ->map(fn ($color): array => [
+                        'id' => $color->id,
+                        'name' => $color->name,
+                        'slug' => $color->slug,
                     ])
                     ->values()
                     ->all(),

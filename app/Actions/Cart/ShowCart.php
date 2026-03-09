@@ -10,6 +10,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Services\ProductPricingService;
+use App\Services\ProductStockAvailabilityService;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -18,7 +19,10 @@ use Illuminate\Support\Str;
 
 class ShowCart
 {
-    public function __construct(private ProductPricingService $productPricingService) {}
+    public function __construct(
+        private ProductPricingService $productPricingService,
+        private ProductStockAvailabilityService $productStockAvailabilityService,
+    ) {}
 
     public function handle(CartSessionData $data): CartShowResult
     {
@@ -47,6 +51,7 @@ class ShowCart
 
             $image = $product->media->firstWhere('type', 'image');
             $pricing = $this->productPricingService->forProduct($product);
+            $stockAvailability = $this->productStockAvailabilityService->forProduct($product, $item->quantity);
             $lineTotal = Money::fromString((string) $item->unit_price)
                 ->multiply($item->quantity);
             $originalLineTotal = Money::fromString($pricing->originalPrice)
@@ -66,6 +71,10 @@ class ShowCart
                 $lineTotal->amount,
                 $pricing->effectiveDiscountPercentage,
                 $pricing->hasDiscount,
+                $stockAvailability->availableQuantity,
+                $stockAvailability->productionTimeDays,
+                $stockAvailability->exceedsAvailableStock,
+                $stockAvailability->stockDelayMessage,
             );
         })->all();
 

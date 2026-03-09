@@ -1,4 +1,5 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-alert';
 import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { show as checkoutShow } from '@/routes/checkout';
@@ -20,6 +21,10 @@ type CartItem = {
     line_total: string;
     effective_discount_percentage: string;
     has_discount: boolean;
+    available_quantity: number | null;
+    production_time_days: number | null;
+    exceeds_available_stock: boolean;
+    stock_delay_message: string | null;
 };
 
 type CartSummary = {
@@ -168,6 +173,11 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                                     </Form>
                                                 </div>
                                             </div>
+                                            <DismissibleStockDelayAlert
+                                                pageKey={`cart-item-${item.id}`}
+                                                message={item.stock_delay_message}
+                                                className="mt-4 border-(--welcome-border-soft) bg-(--welcome-surface-1) text-(--welcome-strong)"
+                                            />
                                         </div>
                                     ))}
                                 </div>

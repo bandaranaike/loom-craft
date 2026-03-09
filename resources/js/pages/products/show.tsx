@@ -1,6 +1,7 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent, JSX, KeyboardEvent, TouchEvent } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-alert';
 import InputError from '@/components/input-error';
 import ProductColorSwatches from '@/components/product-color-swatches';
 import VendorInquiryForm from '@/components/vendor-inquiry-form';
@@ -13,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { DEFAULT_CURRENCY, formatMoney } from '@/lib/currency';
+import { resolveProductStockAvailability } from '@/lib/product-stock-availability';
 import { show as cartShow } from '@/routes/cart';
 import { store as cartItemStore } from '@/routes/cart/items';
 import { show as vendorShow } from '@/routes/vendors';
@@ -107,6 +109,15 @@ export default function ProductShow({
     });
     const hasInquiryErrors = ['name', 'email', 'phone', 'subject', 'message'].some(
         (field) => Boolean(errors[field]),
+    );
+    const stockAvailability = useMemo(
+        () =>
+            resolveProductStockAvailability(
+                form.data.quantity,
+                product.pieces_count,
+                product.production_time_days,
+            ),
+        [form.data.quantity, product.pieces_count, product.production_time_days],
     );
 
     useEffect(() => {
@@ -401,6 +412,10 @@ export default function ProductShow({
                                         : 'Add to cart'}
                                 </button>
                             </div>
+                            <DismissibleStockDelayAlert
+                                pageKey={`product-${product.id}`}
+                                message={stockAvailability.stockDelayMessage}
+                            />
                             <InputError message={form.errors.quantity} />
                             <InputError message={form.errors.product_id} />
                         </form>
@@ -419,10 +434,10 @@ export default function ProductShow({
                             </div>
                             <div className="flex items-center justify-between gap-4 text-sm">
                                 <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">
-                                    Pieces
+                                    Available now
                                 </span>
                                 <span className="text-(--welcome-strong)">
-                                    {product.pieces_count ?? 'Limited run'}
+                                    {product.pieces_count ?? 'Made to order'}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between gap-4 text-sm">

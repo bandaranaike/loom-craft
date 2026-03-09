@@ -43,7 +43,47 @@ it('shows checkout for guests and preserves the guest token cookie', function ()
         ->assertInertia(fn (Assert $page) => $page->component('checkout'));
 });
 
+it('shows stock delay warnings during checkout when quantity exceeds available pieces', function () {
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'pieces_count' => 1,
+        'production_time_days' => 10,
+        'selling_price' => '180.00',
+    ]);
+
+    $cart = Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'USD',
+    ]);
+
+    $cart->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 3,
+        'unit_price' => '180.00',
+    ]);
+
+    $this->withCookie('loomcraft_guest_token', 'guest-token')
+        ->get(route('checkout.show'))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('checkout')
+            ->where('cart.items.0.exceeds_available_stock', true)
+            ->where('cart.items.0.available_quantity', 1)
+            ->where('cart.items.0.production_time_days', 10)
+            ->where(
+                'cart.items.0.stock_delay_message',
+                'This quantity is not currently in stock. Your order will require additional production time and is expected to take about 10 days.',
+            )
+        );
+});
+
 it('creates an order from checkout and clears the cart', function () {
+    $commissionRate = (string) config('commerce.commission_rate');
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $vendor = Vendor::factory()->for($vendorUser)->create([
         'status' => 'approved',
@@ -97,12 +137,14 @@ it('creates an order from checkout and clears the cart', function () {
 
     $response->assertRedirect(route('orders.confirmation', ['order' => $order->id]));
 
+    $expectedCommissionAmount = number_format(180 * ((float) $commissionRate / 100), 2, '.', '');
+
     $this->assertDatabaseHas('orders', [
         'id' => $order->id,
         'status' => 'paid',
         'currency' => 'USD',
         'subtotal' => '180.00',
-        'commission_total' => '180.00',
+        'commission_total' => $expectedCommissionAmount,
         'total' => '180.00',
         'shipping_responsibility' => 'vendor',
         'guest_email' => 'patron@example.com',
@@ -114,8 +156,8 @@ it('creates an order from checkout and clears the cart', function () {
         'vendor_id' => $vendor->id,
         'quantity' => 1,
         'unit_price' => '180.00',
-        'commission_rate' => '100.00',
-        'commission_amount' => '180.00',
+        'commission_rate' => $commissionRate,
+        'commission_amount' => $expectedCommissionAmount,
         'line_total' => '180.00',
     ]);
 
@@ -136,6 +178,75 @@ it('creates an order from checkout and clears the cart', function () {
 
     $this->assertDatabaseMissing('cart_items', [
         'cart_id' => $cart->id,
+    ]);
+});
+
+it('still places an order when requested quantity exceeds available pieces', function () {
+    $commissionRate = (string) config('commerce.commission_rate');
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'pieces_count' => 1,
+        'production_time_days' => 12,
+        'selling_price' => '180.00',
+    ]);
+
+    $cart = Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'USD',
+    ]);
+
+    $cart->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 3,
+        'unit_price' => '180.00',
+    ]);
+
+    $payload = [
+        'guest_name' => 'Heritage Patron',
+        'guest_email' => 'patron@example.com',
+        'currency' => 'USD',
+        'shipping_responsibility' => 'vendor',
+        'payment_method' => 'stripe',
+        'shipping_full_name' => 'Heritage Patron',
+        'shipping_line1' => '1 Loom Street',
+        'shipping_line2' => 'Suite 2',
+        'shipping_city' => 'Kandy',
+        'shipping_region' => 'Central',
+        'shipping_postal_code' => '20000',
+        'shipping_country_code' => 'LK',
+        'shipping_phone' => '0770000000',
+        'billing_full_name' => 'Heritage Patron',
+        'billing_line1' => '1 Loom Street',
+        'billing_line2' => null,
+        'billing_city' => 'Kandy',
+        'billing_region' => 'Central',
+        'billing_postal_code' => '20000',
+        'billing_country_code' => 'LK',
+        'billing_phone' => '0770000000',
+    ];
+
+    $response = $this
+        ->withCookie('loomcraft_guest_token', 'guest-token')
+        ->post(route('checkout.store'), $payload);
+
+    $order = Order::query()->firstOrFail();
+    $expectedCommissionAmount = number_format(540 * ((float) $commissionRate / 100), 2, '.', '');
+
+    $response->assertRedirect(route('orders.confirmation', ['order' => $order->id]));
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->id,
+        'product_id' => $product->id,
+        'quantity' => 3,
+        'unit_price' => '180.00',
+        'commission_rate' => $commissionRate,
+        'commission_amount' => $expectedCommissionAmount,
+        'line_total' => '540.00',
     ]);
 });
 

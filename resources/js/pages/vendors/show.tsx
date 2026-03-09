@@ -1,30 +1,14 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import ProductCard, { type ProductCardItem } from '@/components/product-card';
 import VendorInquiryForm from '@/components/vendor-inquiry-form';
 import PublicSiteLayout from '@/layouts/public-site-layout';
-import { show as productShow } from '@/routes/products';
 
 type CategorySummary = {
     id: number;
     name: string;
     slug: string;
     count: number;
-};
-
-type ProductItem = {
-    id: number;
-    name: string;
-    description: string;
-    original_price: string;
-    price: string;
-    effective_discount_percentage: string;
-    has_discount: boolean;
-    image_url: string | null;
-    categories: {
-        id: number;
-        name: string;
-        slug: string;
-    }[];
 };
 
 type LocationItem = {
@@ -63,7 +47,7 @@ type VendorData = {
 
 type Props = {
     vendor: VendorData;
-    products: ProductItem[];
+    products: ProductCardItem[];
     categories: CategorySummary[];
     status?: string;
 };
@@ -78,7 +62,7 @@ export default function VendorShow() {
         }
 
         return products.filter((product) =>
-            product.categories.some((category) => category.slug === selectedCategory),
+            (product.categories ?? []).some((category) => category.slug === selectedCategory),
         );
     }, [products, selectedCategory]);
 
@@ -219,52 +203,9 @@ export default function VendorShow() {
                             No products available for this category yet.
                         </div>
                     ) : (
-                        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {filteredProducts.map((product) => (
-                                <article
-                                    key={product.id}
-                                    className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)"
-                                >
-                                    <div className="relative aspect-4/3 bg-(--welcome-surface-1)">
-                                        {product.has_discount && (
-                                            <span className="absolute right-3 top-3 z-10 rounded-full bg-(--welcome-strong) px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-(--welcome-on-strong)">
-                                                {product.effective_discount_percentage}% Off
-                                            </span>
-                                        )}
-                                        {product.image_url ? (
-                                            <img
-                                                src={product.image_url}
-                                                alt={product.name}
-                                                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                                                loading="lazy"
-                                            />
-                                        ) : (
-                                            <div className="flex h-full items-center justify-center text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
-                                                Image forthcoming
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="flex flex-1 flex-col gap-2 p-4">
-                                        <h3 className="font-['Playfair_Display',serif] text-xl">{product.name}</h3>
-                                        <p className="text-sm text-(--welcome-body-text)">{product.description}</p>
-                                        <div className="mt-auto flex items-center justify-between gap-3">
-                                            <div className="flex flex-col gap-1">
-                                                <p className="text-sm font-semibold text-(--welcome-strong)">USD {product.price}</p>
-                                                {product.has_discount && (
-                                                    <p className="text-xs text-(--welcome-muted-text) line-through decoration-1 decoration-(--welcome-muted-text)">
-                                                        USD {product.original_price}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <Link
-                                                href={productShow(product.id)}
-                                                className="rounded-full border border-(--welcome-border) px-3 py-1 text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)"
-                                            >
-                                                View Product
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </article>
+                                <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
                     )}

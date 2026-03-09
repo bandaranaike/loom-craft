@@ -18,6 +18,10 @@ class CartItemSummary
         public string $lineTotal,
         public string $effectiveDiscountPercentage,
         public bool $hasDiscount,
+        public ?int $availableQuantity,
+        public ?int $productionTimeDays,
+        public bool $exceedsAvailableStock,
+        public ?string $stockDelayMessage,
     ) {}
 
     /**
@@ -39,6 +43,10 @@ class CartItemSummary
             'line_total' => $this->lineTotal,
             'effective_discount_percentage' => $this->effectiveDiscountPercentage,
             'has_discount' => $this->hasDiscount,
+            'available_quantity' => $this->availableQuantity,
+            'production_time_days' => $this->productionTimeDays,
+            'exceeds_available_stock' => $this->exceedsAvailableStock,
+            'stock_delay_message' => $this->stockDelayMessage,
         ];
     }
 }

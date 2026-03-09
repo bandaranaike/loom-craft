@@ -52,3 +52,42 @@ it('shows the cart page for guests and queues a guest token cookie', function ()
             ->where('cart.currency', 'LKR')
         );
 });
+
+it('shows a stock delay warning in the cart when quantity exceeds available pieces', function () {
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'pieces_count' => 1,
+        'production_time_days' => 14,
+        'selling_price' => '180.00',
+    ]);
+
+    $cart = Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'USD',
+    ]);
+
+    $cart->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 3,
+        'unit_price' => '180.00',
+    ]);
+
+    $this->withCookie('loomcraft_guest_token', 'guest-token')
+        ->get(route('cart.show'))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('cart')
+            ->where('cart.items.0.exceeds_available_stock', true)
+            ->where('cart.items.0.available_quantity', 1)
+            ->where('cart.items.0.production_time_days', 14)
+            ->where(
+                'cart.items.0.stock_delay_message',
+                'This quantity is not currently in stock. Your order will require additional production time and is expected to take about 14 days.',
+            )
+        );
+});
