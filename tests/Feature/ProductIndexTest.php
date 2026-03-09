@@ -150,3 +150,209 @@ test('users can filter public products by colors', function () {
             ->where('selected_colors', ['beige'])
         );
 });
+
+test('users can filter public products by vendor slug', function () {
+    $matchingVendor = Vendor::factory()->create([
+        'status' => 'approved',
+        'slug' => 'heritage-loom',
+    ]);
+    $otherVendor = Vendor::factory()->create([
+        'status' => 'approved',
+        'slug' => 'mountain-weavers',
+    ]);
+
+    $matchingProduct = Product::factory()->create([
+        'vendor_id' => $matchingVendor->id,
+        'status' => 'active',
+        'name' => 'Heritage Loom Runner',
+    ]);
+
+    Product::factory()->create([
+        'vendor_id' => $otherVendor->id,
+        'status' => 'active',
+        'name' => 'Mountain Weavers Runner',
+    ]);
+
+    $response = $this->get(route('products.index', [
+        'vendor' => 'heritage-loom',
+    ]));
+
+    $response
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('products/index')
+            ->has('products', 1)
+            ->where('products.0.id', $matchingProduct->id)
+            ->where('selected_vendor', 'heritage-loom')
+        );
+});
+
+test('users can filter public products by price range', function () {
+    $approvedVendor = Vendor::factory()->create([
+        'status' => 'approved',
+    ]);
+
+    Product::factory()->create([
+        'vendor_id' => $approvedVendor->id,
+        'status' => 'active',
+        'selling_price' => 120.00,
+        'name' => 'Entry Textile',
+    ]);
+
+    $matchingProduct = Product::factory()->create([
+        'vendor_id' => $approvedVendor->id,
+        'status' => 'active',
+        'selling_price' => 500.00,
+        'name' => 'Mid Textile',
+    ]);
+
+    Product::factory()->create([
+        'vendor_id' => $approvedVendor->id,
+        'status' => 'active',
+        'selling_price' => 980.00,
+        'name' => 'Premium Textile',
+    ]);
+
+    $response = $this->get(route('products.index', [
+        'min_price' => 200,
+        'max_price' => 700,
+    ]));
+
+    $response
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('products/index')
+            ->has('products', 1)
+            ->where('products.0.id', $matchingProduct->id)
+            ->where('min_price', '200')
+            ->where('max_price', '700')
+        );
+});
+
+test('users can combine filters and receive intersection results', function () {
+    $matchingVendor = Vendor::factory()->create([
+        'status' => 'approved',
+        'slug' => 'artisan-vendor',
+    ]);
+    $otherVendor = Vendor::factory()->create([
+        'status' => 'approved',
+        'slug' => 'other-vendor',
+    ]);
+
+    $category = ProductCategory::factory()->create([
+        'name' => 'Runners',
+        'slug' => 'runners',
+    ]);
+    $blue = ProductColor::factory()->create([
+        'name' => 'Blue',
+        'slug' => 'blue',
+    ]);
+    $red = ProductColor::factory()->create([
+        'name' => 'Red',
+        'slug' => 'red',
+    ]);
+
+    $matchingProduct = Product::factory()->create([
+        'vendor_id' => $matchingVendor->id,
+        'status' => 'active',
+        'name' => 'Blue Runner',
+        'selling_price' => 450.00,
+    ]);
+    $matchingProduct->categories()->sync([$category->id]);
+    $matchingProduct->colors()->sync([$blue->id]);
+
+    $wrongColorProduct = Product::factory()->create([
+        'vendor_id' => $matchingVendor->id,
+        'status' => 'active',
+        'name' => 'Red Runner',
+        'selling_price' => 450.00,
+    ]);
+    $wrongColorProduct->categories()->sync([$category->id]);
+    $wrongColorProduct->colors()->sync([$red->id]);
+
+    $wrongVendorProduct = Product::factory()->create([
+        'vendor_id' => $otherVendor->id,
+        'status' => 'active',
+        'name' => 'Blue Runner by Other Vendor',
+        'selling_price' => 450.00,
+    ]);
+    $wrongVendorProduct->categories()->sync([$category->id]);
+    $wrongVendorProduct->colors()->sync([$blue->id]);
+
+    $response = $this->get(route('products.index', [
+        'search' => 'Blue',
+        'vendor' => 'artisan-vendor',
+        'category' => 'runners',
+        'colors' => ['blue'],
+        'min_price' => 300,
+        'max_price' => 600,
+    ]));
+
+    $response
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('products/index')
+            ->has('products', 1)
+            ->where('products.0.id', $matchingProduct->id)
+            ->where('search', 'Blue')
+            ->where('selected_vendor', 'artisan-vendor')
+            ->where('selected_category', 'runners')
+            ->where('selected_colors', ['blue'])
+            ->where('min_price', '300')
+            ->where('max_price', '600')
+        );
+});
+
+test('pagination links keep filter query parameters', function () {
+    $approvedVendor = Vendor::factory()->create([
+        'status' => 'approved',
+        'slug' => 'heritage-loom',
+    ]);
+
+    $category = ProductCategory::factory()->create([
+        'name' => 'Throws',
+        'slug' => 'throws',
+    ]);
+    $beige = ProductColor::factory()->create([
+        'name' => 'Beige',
+        'slug' => 'beige',
+    ]);
+
+    Product::factory()->count(12)->create([
+        'vendor_id' => $approvedVendor->id,
+        'status' => 'active',
+        'name' => 'Heritage Throw',
+        'selling_price' => 500.00,
+    ])->each(function (Product $product) use ($category, $beige): void {
+        $product->categories()->sync([$category->id]);
+        $product->colors()->sync([$beige->id]);
+    });
+
+    $response = $this->get(route('products.index', [
+        'search' => 'Heritage',
+        'vendor' => 'heritage-loom',
+        'category' => 'throws',
+        'colors' => ['beige'],
+        'min_price' => 400,
+        'max_price' => 700,
+        'per_page' => 9,
+    ]));
+
+    $response->assertSuccessful();
+
+    $pageData = $response->viewData('page');
+    $links = collect($pageData['props']['pagination']['links']);
+    $nextPageUrl = $links
+        ->pluck('url')
+        ->filter()
+        ->first(fn (string $url): bool => str_contains($url, 'page=2'));
+
+    expect($nextPageUrl)->not->toBeNull();
+    expect($nextPageUrl)->toContain('search=Heritage');
+    expect($nextPageUrl)->toContain('vendor=heritage-loom');
+    expect($nextPageUrl)->toContain('category=throws');
+    expect($nextPageUrl)->toContain('min_price=400');
+    expect($nextPageUrl)->toContain('max_price=700');
+    expect($nextPageUrl)->toContain('per_page=9');
+    expect($nextPageUrl)->toContain('colors%5B0%5D=beige');
+});

@@ -8,6 +8,7 @@ use App\DTOs\Product\ProductPublicListItem;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductColor;
+use App\Models\Vendor;
 use App\ValueObjects\Money;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
@@ -44,12 +45,25 @@ class ListPublicProducts
                         ->where('is_active', true);
                 });
             })
+            ->when($data->vendor, function ($query, string $vendorSlug): void {
+                $query->whereHas('vendor', function ($vendorQuery) use ($vendorSlug): void {
+                    $vendorQuery
+                        ->where('slug', $vendorSlug)
+                        ->where('status', 'approved');
+                });
+            })
             ->when($data->colors !== [], function ($query) use ($data): void {
                 $query->whereHas('colors', function ($colorQuery) use ($data): void {
                     $colorQuery
                         ->whereIn('slug', $data->colors)
                         ->where('is_active', true);
                 });
+            })
+            ->when($data->minPrice !== null, function ($query) use ($data): void {
+                $query->where('selling_price', '>=', $data->minPrice);
+            })
+            ->when($data->maxPrice !== null, function ($query) use ($data): void {
+                $query->where('selling_price', '<=', $data->maxPrice);
             })
             ->latest();
 
@@ -58,9 +72,12 @@ class ListPublicProducts
             ->appends(array_filter([
                 'search' => $data->search,
                 'category' => $data->category,
+                'vendor' => $data->vendor,
                 'colors' => $data->colors !== [] ? $data->colors : null,
+                'min_price' => $data->minPrice,
+                'max_price' => $data->maxPrice,
                 'per_page' => $data->perPage,
-            ]));
+            ], static fn (mixed $value): bool => $value !== null));
 
         $paginator->setCollection(
             $paginator->getCollection()->map(function (Product $product): ProductPublicListItem {
@@ -114,6 +131,19 @@ class ListPublicProducts
                 'slug' => $category->slug,
             ])
             ->all();
+        $vendors = Vendor::query()
+            ->where('status', 'approved')
+            ->whereHas('products', fn ($productQuery) => $productQuery->where('status', 'active'))
+            ->orderBy('display_name')
+            ->get()
+            ->map(static fn (Vendor $vendor): array => [
+                'id' => $vendor->id,
+                'name' => $vendor->display_name,
+                'slug' => $vendor->slug ?? '',
+            ])
+            ->filter(static fn (array $vendor): bool => $vendor['slug'] !== '')
+            ->values()
+            ->all();
         $colors = ProductColor::query()
             ->where('is_active', true)
             ->whereHas('products', function ($productQuery): void {
@@ -134,6 +164,7 @@ class ListPublicProducts
         return new ProductPublicIndexResult(
             $paginator->getCollection()->all(),
             $categories,
+            $vendors,
             $colors,
             $this->paginationData($paginator),
         );

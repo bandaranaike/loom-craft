@@ -7,6 +7,7 @@ class ProductPublicIndexResult
     /**
      * @param  list<ProductPublicListItem>  $products
      * @param  list<array{id: int, name: string, slug: string}>  $categories
+     * @param  list<array{id: int, name: string, slug: string}>  $vendors
      * @param  list<array{id: int, name: string, slug: string}>  $colors
      * @param  array{
      *     total: int,
@@ -21,6 +22,7 @@ class ProductPublicIndexResult
     public function __construct(
         public array $products,
         public array $categories,
+        public array $vendors,
         public array $colors,
         public array $pagination,
     ) {}
@@ -36,6 +38,7 @@ class ProductPublicIndexResult
                 $this->products,
             ),
             'categories' => $this->categories,
+            'vendors' => $this->vendors,
             'colors' => $this->colors,
             'pagination' => $this->pagination,
         ];

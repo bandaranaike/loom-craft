@@ -99,24 +99,24 @@ export default function ProductEdit() {
                     </div>
                 }
             >
-                <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-4 lg:grid-cols-[1.05fr_0.95fr]">
-                    <div className="space-y-6">
+                <section className="relative z-10 mx-auto grid w-full max-w-7xl gap-8 px-6 pb-16 pt-4 lg:grid-cols-[0.8fr_1.2fr]">
+                    <div className="space-y-5">
                         <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                             Product Atelier
                         </p>
-                        <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
+                        <h1 className="font-['Playfair_Display',serif] text-3xl leading-tight md:text-4xl">
                             Edit your heritage listing.
                         </h1>
-                        <p className="max-w-xl text-sm text-(--welcome-body-text) md:text-base">
+                        <p className="max-w-lg text-sm text-(--welcome-body-text)">
                             Update dossier details and pricing while preserving LoomCraft's
                             fixed commission model.
                         </p>
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
                                 <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                     Vendor Atelier
                                 </p>
-                                <p className="mt-3 text-sm text-(--welcome-body-text)">
+                                <p className="mt-2 text-sm text-(--welcome-body-text)">
                                     {vendor_name && vendor_slug ? (
                                         <Link href={vendorShow(vendor_slug)}>
                                             {vendor_name}
@@ -126,16 +126,16 @@ export default function ProductEdit() {
                                     )}
                                 </p>
                             </div>
-                            <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                            <div className="rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
                                 <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                     Commission
                                 </p>
-                                <p className="mt-3 text-sm text-(--welcome-body-text)">
+                                <p className="mt-2 text-sm text-(--welcome-body-text)">
                                     A fixed {commission_rate}% supports platform curation.
                                 </p>
                             </div>
                         </div>
-                        <div className="grid gap-3 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                        <div className="grid gap-3 rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
                             <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                 Pricing Preview
                             </p>
@@ -151,7 +151,7 @@ export default function ProductEdit() {
                     </div>
 
                     <div className="relative">
-                        <div className="relative rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
+                        <div className="relative rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-6 shadow-[0_30px_80px_-45px_var(--welcome-shadow)] lg:p-8">
                             <div className="space-y-2">
                                 <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                     Product dossier
@@ -245,28 +245,52 @@ export default function ProductEdit() {
                                 </Form>
                             </div>
 
-                            <Form {...update.form(product.id)} className="mt-6 grid gap-5">
+                            <Form {...update.form(product.id)} className="mt-6 grid gap-5 lg:grid-cols-2">
                                 {({ processing, errors }) => (
                                     <>
-                                        <div className="grid gap-2">
-                                            <label
-                                                htmlFor="name"
-                                                className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
-                                            >
-                                                Product name
-                                            </label>
-                                            <input
-                                                id="name"
-                                                type="text"
-                                                name="name"
-                                                defaultValue={product.name}
-                                                className={inputClassName}
-                                                required
-                                            />
-                                            <InputError message={errors.name} className="text-xs" />
+                                        <div className="grid gap-2 lg:col-span-2">
+                                            <div className="grid gap-5 lg:grid-cols-2">
+                                                <div className="grid gap-2">
+                                                    <label
+                                                        htmlFor="name"
+                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                                    >
+                                                        Product name
+                                                    </label>
+                                                    <input
+                                                        id="name"
+                                                        type="text"
+                                                        name="name"
+                                                        defaultValue={product.name}
+                                                        className={inputClassName}
+                                                        required
+                                                    />
+                                                    <InputError message={errors.name} className="text-xs" />
+                                                </div>
+                                                <div className="grid gap-2">
+                                                    <label
+                                                        htmlFor="vendor_price"
+                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                                    >
+                                                        Vendor price
+                                                    </label>
+                                                    <input
+                                                        id="vendor_price"
+                                                        type="number"
+                                                        name="vendor_price"
+                                                        step="0.01"
+                                                        min="0"
+                                                        defaultValue={product.vendor_price}
+                                                        onChange={(event) => setVendorPrice(event.target.value)}
+                                                        className={inputClassName}
+                                                        required
+                                                    />
+                                                    <InputError message={errors.vendor_price} className="text-xs" />
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div className="grid gap-2">
+                                        <div className="grid gap-2 lg:col-span-2">
                                             <label
                                                 htmlFor="description"
                                                 className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
@@ -284,7 +308,7 @@ export default function ProductEdit() {
                                             <InputError message={errors.description} className="text-xs" />
                                         </div>
 
-                                        <div className="grid gap-2">
+                                        <div className="grid gap-2 lg:col-span-2">
                                             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                                 Categories
                                             </p>
@@ -318,35 +342,16 @@ export default function ProductEdit() {
                                             <InputError message={errors['category_ids.0']} className="text-xs" />
                                         </div>
 
-                                        <ProductColorSelector
-                                            colors={colors}
-                                            selectedColorIds={product.color_ids}
-                                            errorMessage={errors.color_ids}
-                                            itemErrorMessage={errors['color_ids.0']}
-                                        />
-
-                                        <div className="grid gap-2">
-                                            <label
-                                                htmlFor="vendor_price"
-                                                className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
-                                            >
-                                                Vendor price
-                                            </label>
-                                            <input
-                                                id="vendor_price"
-                                                type="number"
-                                                name="vendor_price"
-                                                step="0.01"
-                                                min="0"
-                                                defaultValue={product.vendor_price}
-                                                onChange={(event) => setVendorPrice(event.target.value)}
-                                                className={inputClassName}
-                                                required
+                                        <div className="lg:col-span-2">
+                                            <ProductColorSelector
+                                                colors={colors}
+                                                selectedColorIds={product.color_ids}
+                                                errorMessage={errors.color_ids}
+                                                itemErrorMessage={errors['color_ids.0']}
                                             />
-                                            <InputError message={errors.vendor_price} className="text-xs" />
                                         </div>
 
-                                        <div className="grid gap-4 sm:grid-cols-2">
+                                        <div className="grid gap-4 lg:col-span-2 sm:grid-cols-2">
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="materials"
@@ -382,7 +387,7 @@ export default function ProductEdit() {
                                             </div>
                                         </div>
 
-                                        <div className="grid gap-4 sm:grid-cols-2">
+                                        <div className="grid gap-4 lg:col-span-2 sm:grid-cols-2">
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="production_time_days"
@@ -421,7 +426,7 @@ export default function ProductEdit() {
                                             </div>
                                         </div>
 
-                                        <div className="grid gap-4 sm:grid-cols-3">
+                                        <div className="grid gap-4 lg:col-span-2 sm:grid-cols-3">
                                             <div className="grid gap-2">
                                                 <label
                                                     htmlFor="dimension_length"
@@ -480,7 +485,7 @@ export default function ProductEdit() {
 
                                         <button
                                             type="submit"
-                                            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-(--welcome-strong) px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
+                                            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-(--welcome-strong) px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70 lg:col-span-2"
                                             disabled={processing}
                                         >
                                             {processing && <Spinner className="text-(--welcome-on-strong)" />}

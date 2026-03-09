@@ -30,11 +30,18 @@ class IndexPublicProductsRequest extends FormRequest
                 'string',
                 Rule::exists('product_categories', 'slug')->where('is_active', true),
             ],
+            'vendor' => [
+                'nullable',
+                'string',
+                Rule::exists('vendors', 'slug')->where('status', 'approved'),
+            ],
             'colors' => ['nullable', 'array'],
             'colors.*' => [
                 'string',
                 Rule::exists('product_colors', 'slug')->where('is_active', true),
             ],
+            'min_price' => ['nullable', 'numeric', 'min:0', 'lte:max_price'],
+            'max_price' => ['nullable', 'numeric', 'min:0', 'gte:min_price'],
         ];
     }
 }

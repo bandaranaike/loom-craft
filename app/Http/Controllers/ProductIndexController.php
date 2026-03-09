@@ -22,10 +22,13 @@ class ProductIndexController extends Controller
             'canRegister' => Features::enabled(Features::registration()),
             'search' => $request->string('search')->toString() ?: null,
             'selected_category' => $request->string('category')->toString() ?: null,
+            'selected_vendor' => $request->string('vendor')->toString() ?: null,
             'selected_colors' => array_values(array_filter(
                 $request->array('colors'),
                 static fn (mixed $color): bool => is_string($color) && $color !== ''
             )),
+            'min_price' => $request->input('min_price'),
+            'max_price' => $request->input('max_price'),
             'per_page' => $request->integer('per_page') ?: 9,
         ]);
     }
