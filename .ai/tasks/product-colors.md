@@ -79,11 +79,12 @@ Introduce standardized product colors so customers can discover products visuall
 
 ## Frontend Work
 1. Product listing/search
-- Render color chips on product cards.
+- Render color boxes/swatches on product cards (instead of color names) in `/products`.
+- Render same color boxes/swatches on home page product cards.
 - Add color filter UI (multi-select chips/checks).
 
 2. Product detail
-- Render assigned colors near metadata.
+- Render assigned colors as color boxes/swatches near metadata.
 
 3. Product create/edit
 - Multi-select colors from standard color list.
@@ -93,8 +94,11 @@ Introduce standardized product colors so customers can discover products visuall
 
 ## UX Rules
 - Keep color names simple and standard (e.g., Red, Blue, Green, Brown, Beige, Black, White, Gold).
-- Use consistent chip style and contrast.
+- Use consistent color box/swatch style and contrast across `/products`, home page, and product detail.
 - Avoid exposing technical color codes in customer UI.
+
+## Component Reuse
+- Prefer a shared frontend component for color swatch rendering so product cards and product detail stay visually consistent.
 
 ## Testing
 1. Feature tests

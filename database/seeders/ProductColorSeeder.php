@@ -24,7 +24,17 @@ class ProductColorSeeder extends Seeder
                 'Blue-Green',
                 'Yellow-Green',
             ],
-            'catalog' => ['Black', 'White', 'Beige', 'Brown', 'Pink', 'Teal', 'Amber'],
+            'catalog' => [
+                'Black',
+                'White',
+                'Gray',
+                'Beige',
+                'Brown',
+                'Pink',
+                'Teal',
+                'Amber',
+                'Gold',
+            ],
         ];
 
         $sortOrder = 0;

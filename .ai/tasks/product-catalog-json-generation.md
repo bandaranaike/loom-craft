@@ -21,6 +21,12 @@ Each item must include:
 - `colors`
 - `categories`
 
+Color role rule:
+- `colors` must be ordered by role priority:
+1. Primary color first (dominant visual color).
+2. Secondary color(s) next (supporting but clearly visible colors).
+3. Tertiary color(s) last (minor accent colors).
+
 Example:
 ```json
 [
@@ -45,8 +51,13 @@ Example:
 
 3. Color resolution
 - Infer dominant standard colors from image.
+- Classify inferred colors into primary, secondary, and tertiary roles.
 - Map to project color dictionary (e.g., Black, White, Gray, Brown, Beige, Red, Blue, Green, Yellow, Gold).
+- Use product image folders below as reference sources for color inference quality:
+  - `.ai/resources/cushion-cover/`
+  - `.ai/resources/wall-hangers/`
 - Add new standardized colors only when genuinely necessary.
+- Keep `colors` array role-ordered: primary first, then secondary, then tertiary.
 
 4. Name/description generation
 - Generate concise shopper-friendly values from visual cues and category context.
@@ -59,9 +70,10 @@ Example:
 ## Validation
 1. Ensure every JSON object has all required fields.
 2. Ensure `colors` is a non-empty array.
-3. Ensure `categories` is a non-empty array and each value matches known/created categories.
-4. Reject duplicate `code` values.
-5. Validate generated JSON against `.ai/resources/products.generated.schema.json` before import.
+3. Ensure `colors` is role-ordered (primary → secondary → tertiary).
+4. Ensure `categories` is a non-empty array and each value matches known/created categories.
+5. Reject duplicate `code` values.
+6. Validate generated JSON against `.ai/resources/products.generated.schema.json` before import.
 
 ## Follow-up Integration
 1. Use generated JSON to seed/import products and attach:

@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import ProductColorSwatches from '@/components/product-color-swatches';
 import { Spinner } from '@/components/ui/spinner';
 import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
@@ -554,18 +555,11 @@ export default function ProductIndex({
                                                     ))}
                                                 </div>
                                             )}
-                                            {product.colors.length > 0 && (
-                                                <div className="flex flex-wrap gap-2">
-                                                    {product.colors.map((color) => (
-                                                        <span
-                                                            key={color.id}
-                                                            className="rounded-full border border-(--welcome-strong-50) bg-(--welcome-surface-1) px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-(--welcome-strong)"
-                                                        >
-                                                            {color.name}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
+                                            <ProductColorSwatches
+                                                colors={product.colors}
+                                                className="mt-2 flex flex-wrap gap-1.5"
+                                                sizeClassName="h-5 w-5"
+                                            />
                                         </div>
                                         <div className="mt-auto flex items-center justify-between text-sm">
                                             <span className="text-(--welcome-body-text)">

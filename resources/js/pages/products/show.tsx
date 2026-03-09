@@ -1,7 +1,8 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import type { FormEvent, JSX } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import type { FormEvent, JSX, KeyboardEvent, TouchEvent } from 'react';
+import { useRef, useState } from 'react';
 import InputError from '@/components/input-error';
+import ProductColorSwatches from '@/components/product-color-swatches';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { DEFAULT_CURRENCY, formatMoney } from '@/lib/currency';
 import { show as cartShow } from '@/routes/cart';
@@ -9,6 +10,7 @@ import { store as cartItemStore } from '@/routes/cart/items';
 import { show as vendorShow } from '@/routes/vendors';
 
 type ProductImage = {
+    id: number;
     type: 'image';
     url: string;
     alt_text: string | null;
@@ -70,53 +72,15 @@ const formatDimensions = (dimensions: ProductDetails['dimensions']) => {
     return `${parts.join(' × ')}${unit}`;
 };
 
-const colorSwatchMap: Record<string, string> = {
-    red: '#dc2626',
-    yellow: '#eab308',
-    blue: '#2563eb',
-    orange: '#ea580c',
-    green: '#16a34a',
-    purple: '#7c3aed',
-    'yellow-orange': '#f59e0b',
-    'red-orange': '#f97316',
-    'red-purple': '#c026d3',
-    'blue-purple': '#6366f1',
-    'blue-green': '#0f766e',
-    'yellow-green': '#65a30d',
-    black: '#111827',
-    white: '#ffffff',
-    beige: '#d6c2a1',
-    brown: '#8b5e3c',
-    pink: '#ec4899',
-    teal: '#0d9488',
-    amber: '#f59e0b',
-};
-
-const resolveColorSwatch = (slug: string): string => {
-    return colorSwatchMap[slug] ?? '#9ca3af';
-};
-
 export default function ProductShow({
     product,
     canRegister = true,
 }: ProductShowProps) {
-    const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
-        product.images[0]?.url ?? null,
-    );
-    const selectedImage =
-        product.images.find((image) => image.url === selectedImageUrl) ??
-        product.images[0] ??
-        null;
-    const selectedImageRef = useRef<HTMLImageElement | null>(null);
-    const selectedImageContainerRef = useRef<HTMLDivElement | null>(null);
-    const [thumbnailDockState, setThumbnailDockState] = useState<{
-        isDocked: boolean;
-        leftX: number;
-    }>({
-        isDocked: false,
-        leftX: 0,
-    });
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const touchStartXRef = useRef<number | null>(null);
     const dimensionLabel = formatDimensions(product.dimensions);
+    const hasMultipleImages = product.images.length > 1;
+    const selectedImage = product.images[activeImageIndex] ?? null;
     const form = useForm({
         product_id: product.id,
         quantity: 1,
@@ -130,74 +94,80 @@ export default function ProductShow({
         });
     };
 
-    const updateThumbnailDockState = (): void => {
-        if (!selectedImageRef.current || !selectedImageContainerRef.current) {
-            setThumbnailDockState({
-                isDocked: false,
-                leftX: 0,
-            });
-
+    const selectImageAt = (index: number): void => {
+        if (product.images.length === 0) {
             return;
         }
 
-        const containerRect =
-            selectedImageContainerRef.current.getBoundingClientRect();
-        const viewportBottom = window.innerHeight;
-        const imageIsBelowViewportBottom =
-            containerRect.bottom > viewportBottom;
-        const imageIsInViewport =
-            containerRect.top < viewportBottom && containerRect.bottom > 0;
-        const shouldDock = imageIsBelowViewportBottom && imageIsInViewport;
-        const nextLeftX = Math.round(containerRect.left);
+        const nextIndex =
+            (index + product.images.length) % product.images.length;
 
-        setThumbnailDockState((currentState) => {
-            if (
-                currentState.isDocked === shouldDock &&
-                currentState.leftX === nextLeftX
-            ) {
-                return currentState;
-            }
-
-            return {
-                isDocked: shouldDock,
-                leftX: nextLeftX,
-            };
-        });
+        setActiveImageIndex(nextIndex);
     };
 
-    useEffect(() => {
-        const handleScroll = (): void => {
-            updateThumbnailDockState();
-        };
-        const handleResize = (): void => {
-            updateThumbnailDockState();
-        };
+    const goToPreviousImage = (): void => {
+        selectImageAt(activeImageIndex - 1);
+    };
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        window.addEventListener('resize', handleResize);
+    const goToNextImage = (): void => {
+        selectImageAt(activeImageIndex + 1);
+    };
 
-        const animationFrameId = window.requestAnimationFrame(() => {
-            updateThumbnailDockState();
-        });
+    const handleImageTouchStart = (event: TouchEvent<HTMLDivElement>): void => {
+        touchStartXRef.current = event.touches[0]?.clientX ?? null;
+    };
 
-        return () => {
-            window.cancelAnimationFrame(animationFrameId);
-            window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('resize', handleResize);
-        };
-    }, [selectedImage?.url]);
+    const handleImageTouchEnd = (event: TouchEvent<HTMLDivElement>): void => {
+        const touchStartX = touchStartXRef.current;
+        const touchEndX = event.changedTouches[0]?.clientX ?? null;
+
+        touchStartXRef.current = null;
+
+        if (touchStartX === null || touchEndX === null) {
+            return;
+        }
+
+        const deltaX = touchEndX - touchStartX;
+        const minimumSwipeDistance = 40;
+
+        if (Math.abs(deltaX) < minimumSwipeDistance) {
+            return;
+        }
+
+        if (deltaX > 0) {
+            goToPreviousImage();
+        } else {
+            goToNextImage();
+        }
+    };
+
+    const handleImageKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
+        if (!hasMultipleImages) {
+            return;
+        }
+
+        if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            goToPreviousImage();
+        }
+
+        if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            goToNextImage();
+        }
+    };
 
     const renderThumbnails = (): JSX.Element => {
         return (
             <div className="flex flex-wrap items-center gap-3">
-                {product.images.map((image) => {
-                    const isSelected = image.url === selectedImage?.url;
+                {product.images.map((image, index) => {
+                    const isSelected = index === activeImageIndex;
 
                     return (
                         <button
-                            key={image.url}
+                            key={image.id}
                             type="button"
-                            onClick={() => setSelectedImageUrl(image.url)}
+                            onClick={() => selectImageAt(index)}
                             className={`h-16 w-16 cursor-pointer overflow-hidden rounded-lg transition-opacity ${
                                 isSelected
                                     ? 'opacity-100'
@@ -218,9 +188,6 @@ export default function ProductShow({
         );
     };
 
-    const shouldDockThumbnails =
-        product.images.length > 1 && thumbnailDockState.isDocked;
-
     return (
         <>
             <Head title={`${product.name} — LoomCraft`}>
@@ -234,40 +201,50 @@ export default function ProductShow({
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-6 pb-16 lg:grid-cols-[1.05fr_0.95fr]">
                     <div className="grid gap-6">
                         <div className="grid gap-4">
-                            <div ref={selectedImageContainerRef}>
+                            <div
+                                className="group relative w-full overflow-hidden rounded-4xl bg-(--welcome-surface-1) touch-pan-y"
+                                onTouchStart={handleImageTouchStart}
+                                onTouchEnd={handleImageTouchEnd}
+                                onKeyDown={handleImageKeyDown}
+                                tabIndex={hasMultipleImages ? 0 : -1}
+                                aria-label={`Product image gallery for ${product.name}`}
+                            >
                                 {selectedImage ? (
-                                    <img
-                                        ref={selectedImageRef}
-                                        src={selectedImage.url}
-                                        alt={
-                                            selectedImage.alt_text ??
-                                            product.name
-                                        }
-                                        onLoad={updateThumbnailDockState}
-                                        className="h-auto w-full rounded-4xl"
-                                    />
+                                    <>
+                                        <img
+                                            src={selectedImage.url}
+                                            alt={selectedImage.alt_text ?? product.name}
+                                            className="h-auto w-full object-contain"
+                                        />
+                                        {hasMultipleImages && (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    onClick={goToPreviousImage}
+                                                    className="absolute left-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-lg font-semibold text-white opacity-0 backdrop-blur-sm transition hover:bg-black/50 group-hover:opacity-100 group-focus-within:opacity-100 md:inline-flex"
+                                                    aria-label="Show previous image"
+                                                >
+                                                    ‹
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={goToNextImage}
+                                                    className="absolute right-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-lg font-semibold text-white opacity-0 backdrop-blur-sm transition hover:bg-black/50 group-hover:opacity-100 group-focus-within:opacity-100 md:inline-flex"
+                                                    aria-label="Show next image"
+                                                >
+                                                    ›
+                                                </button>
+                                            </>
+                                        )}
+                                    </>
                                 ) : (
                                     <div className="flex min-h-72 w-full items-center justify-center text-sm tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                         Image forthcoming
                                     </div>
                                 )}
                             </div>
-                            {product.images.length > 1 &&
-                                !shouldDockThumbnails &&
-                                renderThumbnails()}
+                            {hasMultipleImages && renderThumbnails()}
                         </div>
-                        {shouldDockThumbnails && (
-                            <div
-                                className="pointer-events-none fixed bottom-4 z-20"
-                                style={{
-                                    left: `${thumbnailDockState.leftX}px`,
-                                }}
-                            >
-                                <div className="pointer-events-auto">
-                                    {renderThumbnails()}
-                                </div>
-                            </div>
-                        )}
                         <div className="flex flex-wrap items-center gap-4 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
                             <span>Approved LoomCraft Release</span>
                             <span>
@@ -314,20 +291,7 @@ export default function ProductShow({
                                     ))}
                                 </div>
                             )}
-                            {product.colors.length > 0 && (
-                                <div className="mt-2 flex flex-wrap gap-1.5">
-                                    {product.colors.map((color) => (
-                                        <span
-                                            key={color.id}
-                                            title={color.name}
-                                            className="block h-6 w-6 rounded-sm border border-black/10"
-                                            style={{
-                                                backgroundColor: resolveColorSwatch(color.slug),
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-                            )}
+                            <ProductColorSwatches colors={product.colors} />
                         </div>
                         <div className="rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                             <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">

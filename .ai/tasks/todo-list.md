@@ -4,11 +4,10 @@
 - [x] `product-categories.md` completed on 2026-03-09
 - [x] `product-colors.md` completed on 2026-03-09
 - [x] `product-search-upgrade.md` completed on 2026-03-09
-- [ ] `product-catalog-json-generation.md` pending
+- [x] `product-catalog-json-generation.md` completed on 2026-03-09
+- [x] `product-detail-image-slider.md` completed on 2026-03-09
 
 ## Task to do
 
 ### Product images on the product details page
-1. The product images should be slider if there is more than one image.
-2. In mobile devices, user can slide the images using finger.
-3. 
+Reference: `product-detail-image-slider.md`

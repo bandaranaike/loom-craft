@@ -24,7 +24,7 @@ class ShowPublicProduct
         $product = Product::query()
             ->with([
                 'vendor',
-                'media' => fn ($query) => $query->orderBy('sort_order'),
+                'media' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
                 'categories' => fn ($query) => $query
                     ->where('is_active', true)
                     ->orderBy('sort_order')
@@ -42,6 +42,7 @@ class ShowPublicProduct
             ->where('type', 'image')
             ->map(
                 static fn ($media) => new ProductMediaItem(
+                    $media->id,
                     'image',
                     Storage::disk('public')->url($media->path),
                     $media->alt_text,

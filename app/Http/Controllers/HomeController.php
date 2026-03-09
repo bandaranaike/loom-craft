@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductColor;
 use App\Models\Suggestion;
 use App\Models\User;
 use App\ValueObjects\Money;
@@ -18,6 +19,10 @@ class HomeController extends Controller
             ->with([
                 'vendor',
                 'media' => fn ($query) => $query->orderBy('sort_order'),
+                'colors' => fn ($query) => $query
+                    ->where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->orderBy('name'),
             ])
             ->where('status', 'active')
             ->whereHas('vendor', fn ($query) => $query->where('status', 'approved'))
@@ -34,6 +39,14 @@ class HomeController extends Controller
                     'vendor_name' => $product->vendor?->display_name ?? 'Unknown vendor',
                     'vendor_slug' => $product->vendor?->slug,
                     'image_url' => $image ? asset('storage/'.$image->path) : null,
+                    'colors' => $product->colors
+                        ->map(static fn (ProductColor $color): array => [
+                            'id' => $color->id,
+                            'name' => $color->name,
+                            'slug' => $color->slug,
+                        ])
+                        ->values()
+                        ->all(),
                 ];
             })
             ->values()

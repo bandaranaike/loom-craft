@@ -1,5 +1,6 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
+import ProductColorSwatches from '@/components/product-color-swatches';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { formatMoney } from '@/lib/currency';
 import { dashboard, register } from '@/routes';
@@ -89,6 +90,11 @@ type LatestProduct = {
     vendor_name: string;
     vendor_slug: string | null;
     image_url: string | null;
+    colors: Array<{
+        id: number;
+        name: string;
+        slug: string;
+    }>;
 };
 
 export default function Welcome({
@@ -288,6 +294,11 @@ export default function Welcome({
                                                 {product.name}
                                             </Link>
                                         </h3>
+                                        <ProductColorSwatches
+                                            colors={product.colors}
+                                            className="mt-1 flex flex-wrap gap-1.5"
+                                            sizeClassName="h-4 w-4"
+                                        />
                                         <p className="mt-auto text-sm font-semibold text-(--welcome-strong)">
                                             {formatMoney(
                                                 product.selling_price,

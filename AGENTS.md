@@ -66,6 +66,11 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 - Be concise in your explanations - focus on what's important rather than explaining obvious details.
 
+## Task Workflow Preferences
+
+- After creating a separate task file from a subsection in `.ai/tasks/todo-list.md`, that subsection may be removed from `todo-list.md`.
+- Before proceeding, ask for clarification whenever requirements are unclear or extra details are needed.
+
 === boost rules ===
 
 # Laravel Boost

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Product;
+use App\Models\ProductColor;
 use App\Models\Suggestion;
 use App\Models\User;
 use App\Models\Vendor;
@@ -19,6 +20,11 @@ test('home page renders', function () {
         'status' => 'active',
         'name' => 'Signed Heritage Textile',
     ]);
+    $color = ProductColor::factory()->create([
+        'name' => 'Beige',
+        'slug' => 'beige',
+    ]);
+    $product->colors()->sync([$color->id]);
 
     $suggestion = Suggestion::factory()->for($vendorUser)->create([
         'status' => 'approved',
@@ -39,6 +45,7 @@ test('home page renders', function () {
             ->has('latest_products', 1)
             ->where('latest_products.0.id', $product->id)
             ->where('latest_products.0.name', $product->name)
+            ->where('latest_products.0.colors.0.slug', 'beige')
             ->where('my_feedback', null)
         );
 });
