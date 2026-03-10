@@ -30,6 +30,7 @@ class HomeController extends Controller
             ->where('status', 'active')
             ->whereHas('vendor', fn ($query) => $query->where('status', 'approved'))
             ->latest()
+            ->inRandomOrder()
             ->limit(6)
             ->get()
             ->map(function (Product $product): array {
@@ -38,6 +39,7 @@ class HomeController extends Controller
 
                 return [
                     'id' => $product->id,
+                    'slug' => $product->resolveSlug(),
                     'name' => $product->name,
                     'original_price' => $pricing->originalPrice,
                     'selling_price' => $pricing->discountedPrice,

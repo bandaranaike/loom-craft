@@ -79,7 +79,7 @@ This document translates the approved architecture into concrete implementation 
 - Build Your Own Woven (`/loom-weave-demo`)
   - Interactive pixel-grid editor with undo/redo, compile preview, and PNG export
 - Product listing
-- Product details (images + optional video)
+- Product details (`/product/{slug}`; images + optional video)
 - Vendor profile
 - Cart
 - Checkout
@@ -117,6 +117,7 @@ This document translates the approved architecture into concrete implementation 
 ## 5. Product Data Model Requirements (Minimum Fields)
 
 - Product name
+- Product slug (auto-generated from product name, unique, public URL key)
 - Description
 - Vendor price
 - Platform commission (7%)
@@ -130,6 +131,7 @@ This document translates the approved architecture into concrete implementation 
 
 **Implementation note:** selling price should be derived from vendor price and fixed commission (not user‑editable).
 **Implementation note:** store image paths in application storage; store video as a YouTube URL created via Google API Client for PHP.
+**Implementation note:** vendors do not manually manage the product slug; it must be generated automatically and conflicts must be resolved by appending an incrementing numeric suffix.
 
 ---
 

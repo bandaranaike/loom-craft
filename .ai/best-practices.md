@@ -32,6 +32,7 @@ This file operationalizes the architecture and must stay aligned with:
 - Shipping responsibility per order: `vendor` or `platform`
 - Refunds are manual only (via disputes)
 - Every product must have a vendor-provided `product_code` that is unique across all products
+- Every product must also have an application-managed unique `slug` generated from the product name for public URLs
 - Product media handling:
   - Images are uploaded to **application storage** and stored as local paths.
   - Videos are uploaded to **YouTube** using the **Google API Client for PHP** and stored as YouTube URLs.
@@ -50,6 +51,7 @@ Always enforce permissions on the backend (policies/gates/middleware).
 ## Data Integrity & Pricing
 - Never accept `selling_price` from user input; calculate from `vendor_price`
 - Store commission rate in `COMMERCE_COMMISSION_RATE` and access it through `config('commerce.commission_rate')`
+- Public product URLs must use `/product/{slug}`
 - Keep currency fixed to `USD`, `EUR`, `LKR` at order/payment level
 - Enforce one feedback/suggestion record per authenticated user in application flow (upsert, not duplicate insert)
 

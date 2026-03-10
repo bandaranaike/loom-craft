@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-alert';
 import InputError from '@/components/input-error';
 import ProductColorSwatches from '@/components/product-color-swatches';
-import VendorInquiryForm from '@/components/vendor-inquiry-form';
 import {
     Dialog,
     DialogContent,
@@ -12,6 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import VendorInquiryForm from '@/components/vendor-inquiry-form';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { DEFAULT_CURRENCY, formatMoney } from '@/lib/currency';
 import { resolveProductStockAvailability } from '@/lib/product-stock-availability';
@@ -28,6 +28,7 @@ type ProductImage = {
 
 type ProductDetails = {
     id: number;
+    slug: string;
     product_code: string;
     name: string;
     description: string;
@@ -98,7 +99,11 @@ export default function ProductShow({
     const { errors } = usePage<{ errors: Record<string, string> }>().props;
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [isInquiryOpen, setIsInquiryOpen] = useState(false);
+    const [isThumbnailDocked, setIsThumbnailDocked] = useState(false);
+    const galleryFrameRef = useRef<HTMLDivElement | null>(null);
     const touchStartXRef = useRef<number | null>(null);
+    const previousFrameBottomRef = useRef<number | null>(null);
+    const previousScrollYRef = useRef(0);
     const dimensionLabel = formatDimensions(product.dimensions);
     const hasMultipleImages = product.images.length > 1;
     const selectedImage = product.images[activeImageIndex] ?? null;
@@ -107,9 +112,13 @@ export default function ProductShow({
         quantity: 1,
         currency: DEFAULT_CURRENCY,
     });
-    const hasInquiryErrors = ['name', 'email', 'phone', 'subject', 'message'].some(
-        (field) => Boolean(errors[field]),
-    );
+    const hasInquiryErrors = [
+        'name',
+        'email',
+        'phone',
+        'subject',
+        'message',
+    ].some((field) => Boolean(errors[field]));
     const stockAvailability = useMemo(
         () =>
             resolveProductStockAvailability(
@@ -117,20 +126,81 @@ export default function ProductShow({
                 product.pieces_count,
                 product.production_time_days,
             ),
-        [form.data.quantity, product.pieces_count, product.production_time_days],
+        [
+            form.data.quantity,
+            product.pieces_count,
+            product.production_time_days,
+        ],
     );
 
-    useEffect(() => {
-        if (hasInquiryErrors) {
-            setIsInquiryOpen(true);
-        }
-    }, [hasInquiryErrors]);
+    const isInquiryDialogOpen = status
+        ? false
+        : hasInquiryErrors
+          ? true
+          : isInquiryOpen;
 
     useEffect(() => {
-        if (status) {
-            setIsInquiryOpen(false);
+        if (!hasMultipleImages) {
+            return;
         }
-    }, [status]);
+
+        const updateThumbnailDock = (): void => {
+            const galleryFrame = galleryFrameRef.current;
+
+            if (galleryFrame === null) {
+                return;
+            }
+
+            const frameRect = galleryFrame.getBoundingClientRect();
+            const viewportBottom = window.innerHeight;
+            const tolerance = 8;
+            const isGalleryVisible =
+                frameRect.top < viewportBottom && frameRect.bottom > 0;
+            const currentScrollY = window.scrollY;
+            const isScrollingDown = currentScrollY > previousScrollYRef.current;
+            const previousBottom = previousFrameBottomRef.current;
+
+            previousScrollYRef.current = currentScrollY;
+            previousFrameBottomRef.current = frameRect.bottom;
+
+            if (!isGalleryVisible || frameRect.bottom <= 0) {
+                setIsThumbnailDocked(false);
+
+                return;
+            }
+
+            if (
+                isScrollingDown &&
+                previousBottom !== null &&
+                previousBottom > viewportBottom + tolerance &&
+                frameRect.bottom <= viewportBottom + tolerance
+            ) {
+                setIsThumbnailDocked(true);
+
+                return;
+            }
+
+            if (
+                !isScrollingDown &&
+                frameRect.bottom > viewportBottom + tolerance
+            ) {
+                setIsThumbnailDocked(false);
+            }
+        };
+
+        const frame = window.requestAnimationFrame(updateThumbnailDock);
+
+        window.addEventListener('scroll', updateThumbnailDock, {
+            passive: true,
+        });
+        window.addEventListener('resize', updateThumbnailDock);
+
+        return () => {
+            window.cancelAnimationFrame(frame);
+            window.removeEventListener('scroll', updateThumbnailDock);
+            window.removeEventListener('resize', updateThumbnailDock);
+        };
+    }, [hasMultipleImages]);
 
     const submit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -202,9 +272,11 @@ export default function ProductShow({
         }
     };
 
-    const renderThumbnails = (): JSX.Element => {
+    const renderThumbnails = (className = ''): JSX.Element => {
         return (
-            <div className="flex flex-wrap items-center gap-3">
+            <div
+                className={`flex flex-wrap items-center gap-3 ${className}`.trim()}
+            >
                 {product.images.map((image, index) => {
                     const isSelected = index === activeImageIndex;
 
@@ -247,7 +319,8 @@ export default function ProductShow({
                     <div className="grid gap-6">
                         <div className="grid gap-4">
                             <div
-                                className="group relative w-full overflow-hidden rounded-4xl bg-(--welcome-surface-1) touch-pan-y"
+                                ref={galleryFrameRef}
+                                className="group relative w-full touch-pan-y overflow-hidden rounded-4xl"
                                 onTouchStart={handleImageTouchStart}
                                 onTouchEnd={handleImageTouchEnd}
                                 onKeyDown={handleImageKeyDown}
@@ -258,15 +331,18 @@ export default function ProductShow({
                                     <>
                                         <img
                                             src={selectedImage.url}
-                                            alt={selectedImage.alt_text ?? product.name}
-                                            className="h-auto w-full object-contain"
+                                            alt={
+                                                selectedImage.alt_text ??
+                                                product.name
+                                            }
+                                            className="h-auto w-full rounded-4xl object-contain"
                                         />
                                         {hasMultipleImages && (
                                             <>
                                                 <button
                                                     type="button"
                                                     onClick={goToPreviousImage}
-                                                    className="absolute left-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-lg font-semibold text-white opacity-0 backdrop-blur-sm transition hover:bg-black/50 group-hover:opacity-100 group-focus-within:opacity-100 md:inline-flex"
+                                                    className="absolute top-1/2 left-3 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-lg font-semibold text-white opacity-0 backdrop-blur-sm transition group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-black/50 md:inline-flex"
                                                     aria-label="Show previous image"
                                                 >
                                                     ‹
@@ -274,11 +350,16 @@ export default function ProductShow({
                                                 <button
                                                     type="button"
                                                     onClick={goToNextImage}
-                                                    className="absolute right-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-lg font-semibold text-white opacity-0 backdrop-blur-sm transition hover:bg-black/50 group-hover:opacity-100 group-focus-within:opacity-100 md:inline-flex"
+                                                    className="absolute top-1/2 right-3 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/30 text-lg font-semibold text-white opacity-0 backdrop-blur-sm transition group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-black/50 md:inline-flex"
                                                     aria-label="Show next image"
                                                 >
                                                     ›
                                                 </button>
+                                                {!isThumbnailDocked && (
+                                                    <div className="fixed bottom-0 flex justify-start p-4 z-20">
+                                                        {renderThumbnails()}
+                                                    </div>
+                                                )}
                                             </>
                                         )}
                                     </>
@@ -288,14 +369,28 @@ export default function ProductShow({
                                     </div>
                                 )}
                             </div>
-                            {hasMultipleImages && renderThumbnails()}
+                            {hasMultipleImages && (
+                                <div className="relative min-h-16">
+                                    <div
+                                        className={
+                                            !isThumbnailDocked
+                                                ? 'pointer-events-none opacity-0'
+                                                : 'transition-opacity duration-200'
+                                        }
+                                    >
+                                        {renderThumbnails()}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         <div className="flex flex-wrap items-center gap-4 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
                             <span>Approved LoomCraft Release</span>
                             <span>
                                 Curated by{' '}
                                 {product.vendor.slug ? (
-                                    <Link href={vendorShow(product.vendor.slug)}>
+                                    <Link
+                                        href={vendorShow(product.vendor.slug)}
+                                    >
                                         {product.vendor.display_name}
                                     </Link>
                                 ) : (
@@ -317,7 +412,9 @@ export default function ProductShow({
                             </h1>
                             <p className="mt-3 text-sm tracking-[0.35em] text-(--welcome-muted-text) uppercase">
                                 {product.vendor.slug ? (
-                                    <Link href={vendorShow(product.vendor.slug)}>
+                                    <Link
+                                        href={vendorShow(product.vendor.slug)}
+                                    >
                                         {product.vendor.display_name}
                                     </Link>
                                 ) : (
@@ -332,7 +429,7 @@ export default function ProductShow({
                                     {product.categories.map((category) => (
                                         <span
                                             key={category.id}
-                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-(--welcome-muted-text)"
+                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-3 py-1 text-[10px] tracking-[0.2em] text-(--welcome-muted-text) uppercase"
                                         >
                                             {category.name}
                                         </span>
@@ -348,21 +445,28 @@ export default function ProductShow({
                                 </p>
                                 {product.has_discount && (
                                     <span className="rounded-full bg-(--welcome-strong) px-3 py-1 text-[10px] font-semibold tracking-[0.3em] text-(--welcome-on-strong) uppercase">
-                                        {product.effective_discount_percentage}% Off
+                                        {product.effective_discount_percentage}%
+                                        Off
                                     </span>
                                 )}
                             </div>
                             <p className="mt-3 font-['Playfair_Display',serif] text-3xl">
-                                {formatMoney(product.selling_price, DEFAULT_CURRENCY)}
+                                {formatMoney(
+                                    product.selling_price,
+                                    DEFAULT_CURRENCY,
+                                )}
                             </p>
                             {product.has_discount && (
-                                <p className="mt-2 text-sm text-(--welcome-muted-text) line-through decoration-1 decoration-(--welcome-muted-text)">
-                                    {formatMoney(product.original_price, DEFAULT_CURRENCY)}
+                                <p className="mt-2 text-sm text-(--welcome-muted-text) line-through decoration-(--welcome-muted-text) decoration-1">
+                                    {formatMoney(
+                                        product.original_price,
+                                        DEFAULT_CURRENCY,
+                                    )}
                                 </p>
                             )}
                             <p className="mt-2 text-sm text-(--welcome-body-text)">
-                                Crafted by verified artisans and prepared for collector-grade
-                                delivery.
+                                Crafted by verified artisans and prepared for
+                                collector-grade delivery.
                             </p>
                         </div>
                         <form
@@ -481,12 +585,16 @@ export default function ProductShow({
                     </div>
                 </section>
 
-                <Dialog open={isInquiryOpen} onOpenChange={setIsInquiryOpen}>
+                <Dialog
+                    open={isInquiryDialogOpen}
+                    onOpenChange={setIsInquiryOpen}
+                >
                     <DialogContent className="max-h-[92vh] overflow-y-auto border-(--welcome-border-soft) bg-(--welcome-surface-1) p-0 sm:max-w-2xl">
                         <DialogHeader className="sr-only">
                             <DialogTitle>Contact Vendor</DialogTitle>
                             <DialogDescription>
-                                Send an inquiry directly to this vendor about the selected product.
+                                Send an inquiry directly to this vendor about
+                                the selected product.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="p-8">

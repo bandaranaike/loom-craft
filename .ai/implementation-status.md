@@ -58,6 +58,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
   - optional video upload through `VideoUploader` contract.
 - Vendor feedback submission page and create action (`/vendor/feedback`) implemented.
 - Feedback writes are upserted by `user_id` (single feedback record per authenticated user).
+- Public product pages resolve by slug at `/product/{slug}` with automatically generated unique product slugs.
 
 ### Admin Features
 - Pending vendor queue with search, pagination, per-page persistence, approve, and reject.
@@ -78,6 +79,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Auth + account settings (including two-factor challenge/settings and rate limiting).
 - Public pages and dashboard access.
 - Public loom weave demo route/component availability.
+- Product detail gallery navigation, swipe support, and image-anchored floating thumbnail behavior when the gallery reaches the viewport edge.
 - Product index/show visibility rules.
 - Vendor registration and vendor product workflows.
 - Cart flow and checkout order creation.

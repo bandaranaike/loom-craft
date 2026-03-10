@@ -1,9 +1,9 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import ProductCard, { type ProductCardItem } from '@/components/product-card';
 import { Spinner } from '@/components/ui/spinner';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { index as productsIndex } from '@/routes/products';
-import { useEffect, useState } from 'react';
 
 type FilterOption = {
     id: number;
@@ -62,9 +62,12 @@ export default function ProductIndex({
     canRegister = true,
 }: ProductIndexProps) {
     const [searchInput, setSearchInput] = useState(search ?? '');
-    const [categoryFilter, setCategoryFilter] = useState(selected_category ?? '');
+    const [categoryFilter, setCategoryFilter] = useState(
+        selected_category ?? '',
+    );
     const [vendorFilter, setVendorFilter] = useState(selected_vendor ?? '');
-    const [selectedColorFilters, setSelectedColorFilters] = useState<string[]>(selected_colors);
+    const [selectedColorFilters, setSelectedColorFilters] =
+        useState<string[]>(selected_colors);
     const [minPriceFilter, setMinPriceFilter] = useState(
         min_price !== null && min_price !== undefined ? String(min_price) : '',
     );
@@ -74,24 +77,6 @@ export default function ProductIndex({
     const [perPageFilter, setPerPageFilter] = useState(per_page);
     const [isLoading, setIsLoading] = useState(false);
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-
-    useEffect(() => {
-        setSearchInput(search ?? '');
-        setCategoryFilter(selected_category ?? '');
-        setVendorFilter(selected_vendor ?? '');
-        setSelectedColorFilters(selected_colors);
-        setMinPriceFilter(min_price !== null && min_price !== undefined ? String(min_price) : '');
-        setMaxPriceFilter(max_price !== null && max_price !== undefined ? String(max_price) : '');
-        setPerPageFilter(per_page);
-    }, [
-        max_price,
-        min_price,
-        per_page,
-        search,
-        selected_category,
-        selected_colors,
-        selected_vendor,
-    ]);
 
     const applyFilters = (overrides?: {
         search?: string;
@@ -192,17 +177,18 @@ export default function ProductIndex({
                 />
             </Head>
             <PublicSiteLayout canRegister={canRegister}>
-                <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-6 pb-12 pt-6 lg:grid-cols-[1.1fr_0.9fr]">
+                <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-6 pt-6 pb-12 lg:grid-cols-[1.1fr_0.9fr]">
                     <div className="space-y-4">
-                        <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                        <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                             Approved Collection
                         </div>
                         <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
                             Discover heritage pieces curated for collectors.
                         </h1>
                         <p className="max-w-xl text-sm text-(--welcome-body-text) md:text-base">
-                            Only LoomCraft-approved textiles are presented here, each woven by
-                            verified artisans with documented provenance.
+                            Only LoomCraft-approved textiles are presented here,
+                            each woven by verified artisans with documented
+                            provenance.
                         </p>
                     </div>
 
@@ -211,17 +197,19 @@ export default function ProductIndex({
                             <div className="flex items-center justify-between gap-3">
                                 <label
                                     htmlFor="search"
-                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                    className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase"
                                 >
                                     Search the catalog
                                 </label>
                                 <div className="flex items-center gap-2">
-                                    {isLoading && <Spinner className="text-(--welcome-strong)" />}
+                                    {isLoading && (
+                                        <Spinner className="text-(--welcome-strong)" />
+                                    )}
                                     {hasActiveFilters && (
                                         <button
                                             type="button"
                                             onClick={clearAllFilters}
-                                            className="text-[10px] font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text) transition hover:text-(--welcome-strong)"
+                                            className="text-[10px] font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase transition hover:text-(--welcome-strong)"
                                         >
                                             Clear all
                                         </button>
@@ -233,17 +221,25 @@ export default function ProductIndex({
                                 type="search"
                                 placeholder="Search by product name"
                                 value={searchInput}
-                                onChange={(event) => setSearchInput(event.currentTarget.value)}
-                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
+                                onChange={(event) =>
+                                    setSearchInput(event.currentTarget.value)
+                                }
+                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                             />
 
                             <button
                                 type="button"
-                                onClick={() => setIsMobileFilterOpen((currentState) => !currentState)}
-                                className="inline-flex w-full items-center justify-between rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) md:hidden"
+                                onClick={() =>
+                                    setIsMobileFilterOpen(
+                                        (currentState) => !currentState,
+                                    )
+                                }
+                                className="inline-flex w-full items-center justify-between rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase md:hidden"
                             >
                                 Filters
-                                <span>{isMobileFilterOpen ? 'Hide' : 'Show'}</span>
+                                <span>
+                                    {isMobileFilterOpen ? 'Hide' : 'Show'}
+                                </span>
                             </button>
 
                             <div
@@ -255,21 +251,27 @@ export default function ProductIndex({
                             >
                                 <div className="grid gap-3 md:grid-cols-2">
                                     <div className="grid gap-2">
-                                        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                        <span className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Category
                                         </span>
                                         <select
                                             value={categoryFilter}
                                             onChange={(event) => {
-                                                const nextCategory = event.currentTarget.value;
+                                                const nextCategory =
+                                                    event.currentTarget.value;
                                                 setCategoryFilter(nextCategory);
-                                                applyFilters({ category: nextCategory });
+                                                applyFilters({
+                                                    category: nextCategory,
+                                                });
                                             }}
-                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
+                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         >
                                             <option value="">All</option>
                                             {categories.map((category) => (
-                                                <option key={category.id} value={category.slug}>
+                                                <option
+                                                    key={category.id}
+                                                    value={category.slug}
+                                                >
                                                     {category.name}
                                                 </option>
                                             ))}
@@ -277,21 +279,27 @@ export default function ProductIndex({
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                        <span className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Vendor
                                         </span>
                                         <select
                                             value={vendorFilter}
                                             onChange={(event) => {
-                                                const nextVendor = event.currentTarget.value;
+                                                const nextVendor =
+                                                    event.currentTarget.value;
                                                 setVendorFilter(nextVendor);
-                                                applyFilters({ vendor: nextVendor });
+                                                applyFilters({
+                                                    vendor: nextVendor,
+                                                });
                                             }}
-                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
+                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         >
                                             <option value="">All</option>
                                             {vendors.map((vendor) => (
-                                                <option key={vendor.id} value={vendor.slug}>
+                                                <option
+                                                    key={vendor.id}
+                                                    value={vendor.slug}
+                                                >
                                                     {vendor.name}
                                                 </option>
                                             ))}
@@ -299,7 +307,7 @@ export default function ProductIndex({
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                        <span className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Min price
                                         </span>
                                         <input
@@ -308,17 +316,20 @@ export default function ProductIndex({
                                             step="0.01"
                                             value={minPriceFilter}
                                             onChange={(event) => {
-                                                const nextMinPrice = event.currentTarget.value;
+                                                const nextMinPrice =
+                                                    event.currentTarget.value;
                                                 setMinPriceFilter(nextMinPrice);
-                                                applyFilters({ minPrice: nextMinPrice });
+                                                applyFilters({
+                                                    minPrice: nextMinPrice,
+                                                });
                                             }}
                                             placeholder="0.00"
-                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         />
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                        <span className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Max price
                                         </span>
                                         <input
@@ -327,28 +338,35 @@ export default function ProductIndex({
                                             step="0.01"
                                             value={maxPriceFilter}
                                             onChange={(event) => {
-                                                const nextMaxPrice = event.currentTarget.value;
+                                                const nextMaxPrice =
+                                                    event.currentTarget.value;
                                                 setMaxPriceFilter(nextMaxPrice);
-                                                applyFilters({ maxPrice: nextMaxPrice });
+                                                applyFilters({
+                                                    maxPrice: nextMaxPrice,
+                                                });
                                             }}
                                             placeholder="0.00"
-                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                    <span className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                         Per page
                                     </span>
                                     <select
                                         value={perPageFilter}
                                         onChange={(event) => {
-                                            const nextPerPage = Number(event.currentTarget.value);
+                                            const nextPerPage = Number(
+                                                event.currentTarget.value,
+                                            );
                                             setPerPageFilter(nextPerPage);
-                                            applyFilters({ perPage: nextPerPage });
+                                            applyFilters({
+                                                perPage: nextPerPage,
+                                            });
                                         }}
-                                        className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
+                                        className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                     >
                                         {perPageOptions.map((option) => (
                                             <option key={option} value={option}>
@@ -360,18 +378,25 @@ export default function ProductIndex({
 
                                 {colors.length > 0 && (
                                     <div className="grid gap-2">
-                                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                        <p className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Colors
                                         </p>
                                         <div className="flex flex-wrap gap-2">
                                             {colors.map((color) => {
-                                                const checked = selectedColorFilters.includes(color.slug);
+                                                const checked =
+                                                    selectedColorFilters.includes(
+                                                        color.slug,
+                                                    );
 
                                                 return (
                                                     <button
                                                         key={color.id}
                                                         type="button"
-                                                        onClick={() => toggleColor(color.slug)}
+                                                        onClick={() =>
+                                                            toggleColor(
+                                                                color.slug,
+                                                            )
+                                                        }
                                                         className={`rounded-full border px-3 py-1.5 text-xs transition ${
                                                             checked
                                                                 ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
@@ -414,7 +439,12 @@ export default function ProductIndex({
                                     }}
                                     className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-3 py-1 text-xs text-(--welcome-strong)"
                                 >
-                                    Category: {categories.find((category) => category.slug === categoryFilter)?.name ?? categoryFilter} ×
+                                    Category:{' '}
+                                    {categories.find(
+                                        (category) =>
+                                            category.slug === categoryFilter,
+                                    )?.name ?? categoryFilter}{' '}
+                                    ×
                                 </button>
                             )}
                             {vendorFilter !== '' && (
@@ -426,7 +456,12 @@ export default function ProductIndex({
                                     }}
                                     className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-3 py-1 text-xs text-(--welcome-strong)"
                                 >
-                                    Vendor: {vendors.find((vendor) => vendor.slug === vendorFilter)?.name ?? vendorFilter} ×
+                                    Vendor:{' '}
+                                    {vendors.find(
+                                        (vendor) =>
+                                            vendor.slug === vendorFilter,
+                                    )?.name ?? vendorFilter}{' '}
+                                    ×
                                 </button>
                             )}
                             {minPriceFilter.trim() !== '' && (
@@ -460,7 +495,10 @@ export default function ProductIndex({
                                     onClick={() => toggleColor(slug)}
                                     className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-3 py-1 text-xs text-(--welcome-strong)"
                                 >
-                                    Color: {colors.find((color) => color.slug === slug)?.name ?? slug} ×
+                                    Color:{' '}
+                                    {colors.find((color) => color.slug === slug)
+                                        ?.name ?? slug}{' '}
+                                    ×
                                 </button>
                             ))}
                         </div>
@@ -474,7 +512,7 @@ export default function ProductIndex({
                             <button
                                 type="button"
                                 onClick={clearAllFilters}
-                                className="mt-4 rounded-full border border-(--welcome-strong) px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                                className="mt-4 rounded-full border border-(--welcome-strong) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
                             >
                                 Reset filters
                             </button>
@@ -482,7 +520,10 @@ export default function ProductIndex({
                     ) : (
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {products.map((product) => (
-                                <ProductCard key={product.id} product={product} />
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                />
                             ))}
                         </div>
                     )}
@@ -492,8 +533,8 @@ export default function ProductIndex({
                     <section className="mx-auto w-full max-w-6xl px-6 pb-20">
                         <div className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-xs text-(--welcome-muted-text)">
                             <div>
-                                Showing {pagination.from ?? 0} - {pagination.to ?? 0} of{' '}
-                                {pagination.total}
+                                Showing {pagination.from ?? 0} -{' '}
+                                {pagination.to ?? 0} of {pagination.total}
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {pagination.links.map((link) => {
@@ -506,9 +547,10 @@ export default function ProductIndex({
                                             <span
                                                 key={key}
                                                 className={`${baseClass} border-(--welcome-border) text-(--welcome-muted-60)`}
-                                            >
-                                                {link.label}
-                                            </span>
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label,
+                                                }}
+                                            />
                                         );
                                     }
 
@@ -521,9 +563,10 @@ export default function ProductIndex({
                                                     ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
                                                     : 'border-(--welcome-strong-50) text-(--welcome-strong) hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)'
                                             }`}
-                                        >
-                                            {link.label}
-                                        </Link>
+                                            dangerouslySetInnerHTML={{
+                                                __html: link.label,
+                                            }}
+                                        />
                                     );
                                 })}
                             </div>

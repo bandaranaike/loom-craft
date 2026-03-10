@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import { resolveProductColorSwatch } from '@/lib/product-color-swatches';
 
 type ProductColorOption = {
     id: number;
@@ -11,32 +12,6 @@ type ProductColorSelectorProps = {
     selectedColorIds?: number[];
     errorMessage?: string;
     itemErrorMessage?: string;
-};
-
-const colorSwatchMap: Record<string, string> = {
-    red: '#dc2626',
-    yellow: '#eab308',
-    blue: '#2563eb',
-    orange: '#ea580c',
-    green: '#16a34a',
-    purple: '#7c3aed',
-    'yellow-orange': '#f59e0b',
-    'red-orange': '#f97316',
-    'red-purple': '#c026d3',
-    'blue-purple': '#6366f1',
-    'blue-green': '#0f766e',
-    'yellow-green': '#65a30d',
-    black: '#111827',
-    white: '#ffffff',
-    beige: '#d6c2a1',
-    brown: '#8b5e3c',
-    pink: '#ec4899',
-    teal: '#0d9488',
-    amber: '#f59e0b',
-};
-
-const resolveColorSwatch = (slug: string): string => {
-    return colorSwatchMap[slug] ?? '#9ca3af';
 };
 
 export default function ProductColorSelector({
@@ -73,7 +48,7 @@ export default function ProductColorSelector({
                                 <span
                                     className="block h-5 w-5 rounded-sm border border-black/10 peer-checked:ring-2 peer-checked:ring-(--welcome-strong)"
                                     style={{
-                                        backgroundColor: resolveColorSwatch(color.slug),
+                                        backgroundColor: resolveProductColorSwatch(color.slug),
                                     }}
                                 />
                                 <span className="pointer-events-none absolute inset-0 grid place-items-center text-xs font-bold text-white opacity-0 mix-blend-difference peer-checked:opacity-100">

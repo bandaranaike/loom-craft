@@ -93,6 +93,7 @@ it('updates vendor owned products and recalculates selling price', function () {
     $this->assertDatabaseHas('products', [
         'id' => $product->id,
         'product_code' => 'LC-20002',
+        'slug' => 'updated-name',
         'name' => 'Updated Name',
         'vendor_price' => '200.00',
         'commission_rate' => $commissionRate,

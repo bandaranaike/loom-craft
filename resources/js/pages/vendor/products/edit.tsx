@@ -129,7 +129,7 @@ export default function ProductEdit() {
                             fixed commission model.
                         </p>
                         <div className="grid gap-3 sm:grid-cols-2">
-                            <div className="rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
+                            <div className="rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
                                 <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                     Vendor Atelier
                                 </p>
@@ -143,7 +143,7 @@ export default function ProductEdit() {
                                     )}
                                 </p>
                             </div>
-                            <div className="rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
+                            <div className="rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
                                 <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                     Commission
                                 </p>
@@ -152,7 +152,7 @@ export default function ProductEdit() {
                                 </p>
                             </div>
                         </div>
-                        <div className="grid gap-3 rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
+                        <div className="grid gap-3 rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
                             <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                 Pricing Preview
                             </p>
@@ -186,12 +186,12 @@ export default function ProductEdit() {
                             </div>
 
                             {status && (
-                                <div className="mt-4 rounded-[24px] border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-muted-text)">
+                                <div className="mt-4 rounded-3xl border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-muted-text)">
                                     {status}
                                 </div>
                             )}
 
-                            <div className="mt-6 grid gap-4 rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                            <div className="mt-6 grid gap-4 rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
                                 <p className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                     Product images
                                 </p>
@@ -209,7 +209,7 @@ export default function ProductEdit() {
                                                 <img
                                                     src={image.url}
                                                     alt="Product"
-                                                    className="h-32 w-full rounded-[16px] object-cover"
+                                                    className="h-32 w-full rounded-2xl object-cover"
                                                 />
                                                 <Form
                                                     {...destroy.form({
@@ -288,7 +288,7 @@ export default function ProductEdit() {
                                                     />
                                                     <InputError message={errors.product_code} className="text-xs" />
                                                 </div>
-                                                <div className="grid gap-2">
+                                                <div className="grid gap-2 lg:col-span-2">
                                                     <label
                                                         htmlFor="name"
                                                         className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
@@ -305,45 +305,47 @@ export default function ProductEdit() {
                                                     />
                                                     <InputError message={errors.name} className="text-xs" />
                                                 </div>
-                                                <div className="grid gap-2">
-                                                    <label
-                                                        htmlFor="vendor_price"
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
-                                                    >
-                                                        Vendor price
-                                                    </label>
-                                                    <input
-                                                        id="vendor_price"
-                                                        type="number"
-                                                        name="vendor_price"
-                                                        step="0.01"
-                                                        min="0"
-                                                        defaultValue={product.vendor_price}
-                                                        onChange={(event) => setVendorPrice(event.target.value)}
-                                                        className={inputClassName}
-                                                        required
-                                                    />
-                                                    <InputError message={errors.vendor_price} className="text-xs" />
-                                                </div>
-                                                <div className="grid gap-2">
-                                                    <label
-                                                        htmlFor="discount_percentage"
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
-                                                    >
-                                                        Product discount %
-                                                    </label>
-                                                    <input
-                                                        id="discount_percentage"
-                                                        type="number"
-                                                        name="discount_percentage"
-                                                        step="0.01"
-                                                        min="0"
-                                                        max="100"
-                                                        value={discountPercentage}
-                                                        onChange={(event) => setDiscountPercentage(event.target.value)}
-                                                        className={inputClassName}
-                                                    />
-                                                    <InputError message={errors.discount_percentage} className="text-xs" />
+                                                <div className="grid gap-5 lg:col-span-3 lg:grid-cols-2">
+                                                    <div className="grid gap-2">
+                                                        <label
+                                                            htmlFor="vendor_price"
+                                                            className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                                        >
+                                                            Vendor price
+                                                        </label>
+                                                        <input
+                                                            id="vendor_price"
+                                                            type="number"
+                                                            name="vendor_price"
+                                                            step="0.01"
+                                                            min="0"
+                                                            defaultValue={product.vendor_price}
+                                                            onChange={(event) => setVendorPrice(event.target.value)}
+                                                            className={inputClassName}
+                                                            required
+                                                        />
+                                                        <InputError message={errors.vendor_price} className="text-xs" />
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <label
+                                                            htmlFor="discount_percentage"
+                                                            className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                                        >
+                                                            Product discount %
+                                                        </label>
+                                                        <input
+                                                            id="discount_percentage"
+                                                            type="number"
+                                                            name="discount_percentage"
+                                                            step="0.01"
+                                                            min="0"
+                                                            max="100"
+                                                            value={discountPercentage}
+                                                            onChange={(event) => setDiscountPercentage(event.target.value)}
+                                                            className={inputClassName}
+                                                        />
+                                                        <InputError message={errors.discount_percentage} className="text-xs" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

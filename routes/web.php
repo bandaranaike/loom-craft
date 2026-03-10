@@ -38,7 +38,7 @@ Route::get('terms-of-service', fn () => Inertia::render('terms-of-service'))
 
 Route::get('products', [ProductIndexController::class, 'index'])
     ->name('products.index');
-Route::get('products/{product}', [ProductShowController::class, 'show'])
+Route::get('product/{product:slug}', [ProductShowController::class, 'show'])
     ->name('products.show');
 Route::get('vendors/{vendor:slug}', [VendorPublicController::class, 'show'])
     ->name('vendors.show');

@@ -52,11 +52,17 @@ Example:
 3. Color resolution
 - Infer dominant standard colors from image.
 - Classify inferred colors into primary, secondary, and tertiary roles.
-- Map to project color dictionary (e.g., Black, White, Gray, Brown, Beige, Red, Blue, Green, Yellow, Gold).
+- Map to the shared project color registry in `resources/data/product-colors.json`.
 - Use product image folders below as reference sources for color inference quality:
   - `.ai/resources/cushion-cover/`
   - `.ai/resources/wall-hangers/`
 - Add new standardized colors only when genuinely necessary.
+- When a genuinely new standardized color is required, update `resources/data/product-colors.json` in the same task run.
+- Each new color added to `resources/data/product-colors.json` must include:
+  - `name`
+  - `slug`
+  - `hex`
+- Preserve deterministic ordering in `resources/data/product-colors.json` so downstream seeding and frontend swatches remain stable.
 - Keep `colors` array role-ordered: primary first, then secondary, then tertiary.
 
 4. Name/description generation
@@ -80,10 +86,15 @@ Example:
 - categories (many-to-many)
 - colors (many-to-many)
 
-2. Log unmatched/ambiguous items for manual review.
+2. Treat `resources/data/product-colors.json` as the single source of truth for available product colors.
+
+3. If new colors were added to `resources/data/product-colors.json`, ensure the updated catalog uses those exact color names consistently.
+
+4. Log unmatched/ambiguous items for manual review.
 
 ## Acceptance Criteria
 1. JSON file is generated successfully from uploaded folders.
 2. All entries include `name, code, description, colors, categories`.
 3. Duplicate codes and invalid entries are reported.
-4. Output is ready for product import pipeline.
+4. Any newly discovered standardized colors are added to `resources/data/product-colors.json`.
+5. Output is ready for product import pipeline.

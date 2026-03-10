@@ -73,6 +73,7 @@ Primary product catalog record.
 - `id` (bigint, PK)
 - `vendor_id` (bigint, FK → vendors.id)
 - `product_code` (varchar) — required, unique across all products
+- `slug` (varchar) — required, unique across all products, auto-generated from `name`
 - `name` (varchar)
 - `description` (text)
 - `vendor_price` (decimal(10,2))
@@ -91,6 +92,7 @@ Primary product catalog record.
 
 Indexes:
 - `products_product_code_unique` on `product_code`
+- `products_slug_unique` on `slug`
 - `products_vendor_id_index` on `vendor_id`
 - `products_status_index` on `status`
 

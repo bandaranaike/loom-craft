@@ -39,13 +39,14 @@ test('guests can view active products', function () {
         'sort_order' => 2,
     ]);
 
-    $response = $this->get(route('products.show', $product));
+    $response = $this->get(route('products.show', ['product' => $product->slug]));
 
     $response
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('products/show')
             ->where('product.id', $product->id)
+            ->where('product.slug', $product->slug)
             ->where('product.product_code', $product->product_code)
             ->where('product.name', $product->name)
             ->where('product.vendor.display_name', $vendor->display_name)
@@ -66,7 +67,7 @@ test('non-active products are not visible to guests', function () {
         'status' => 'pending_review',
     ]);
 
-    $response = $this->get(route('products.show', $product));
+    $response = $this->get(route('products.show', ['product' => $product->slug]));
 
     $response->assertNotFound();
 });
@@ -99,7 +100,7 @@ test('product show returns only image media ordered by sort order and id', funct
         'sort_order' => 1,
     ]);
 
-    $response = $this->get(route('products.show', $product));
+    $response = $this->get(route('products.show', ['product' => $product->slug]));
 
     $response
         ->assertSuccessful()

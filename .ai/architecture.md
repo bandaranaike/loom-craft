@@ -146,7 +146,7 @@ If something is not defined, state the limitation instead of inventing details.
   * Includes approved community feedback and authenticated feedback composer (single editable entry per user)
 * Build Your Own Woven (interactive design playground)
 * Product listing
-* Product details (images + optional video)
+* Product details at `/product/{slug}` (images + optional video)
 * Vendor profile
 * Cart
 * Checkout
@@ -191,6 +191,7 @@ If something is not defined, state the limitation instead of inventing details.
 ## 8. Product Data Requirements (Minimum)
 
 * Product name
+* Product slug (unique, auto-generated from product name, used for public URLs)
 * Description
 * Vendor price
 * Platform commission (7%)

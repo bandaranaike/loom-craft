@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Services\ProductSlugGenerator;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\App;
 
 class Product extends Model
 {
@@ -20,6 +22,7 @@ class Product extends Model
     protected $fillable = [
         'vendor_id',
         'product_code',
+        'slug',
         'name',
         'description',
         'vendor_price',
@@ -46,6 +49,19 @@ class Product extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::saving(function (self $product): void {
+            if (
+                ($product->slug === null || $product->slug === '')
+                || $product->isDirty('name')
+            ) {
+                $product->slug = App::make(ProductSlugGenerator::class)
+                    ->generate($product->name, $product->exists ? $product->id : null);
+            }
+        });
+    }
+
     public function resolveProductCode(): string
     {
         if (is_string($this->product_code) && $this->product_code !== '') {
@@ -53,6 +69,16 @@ class Product extends Model
         }
 
         return sprintf('PRD-%06d', (int) $this->id);
+    }
+
+    public function resolveSlug(): string
+    {
+        if (is_string($this->slug) && $this->slug !== '') {
+            return $this->slug;
+        }
+
+        return App::make(ProductSlugGenerator::class)
+            ->generate($this->name, $this->exists ? $this->id : null);
     }
 
     public function vendor(): BelongsTo

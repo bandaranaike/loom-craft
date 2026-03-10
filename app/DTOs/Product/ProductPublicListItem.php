@@ -6,6 +6,7 @@ class ProductPublicListItem
 {
     public function __construct(
         public int $id,
+        public string $slug,
         public string $name,
         public string $originalPrice,
         public string $sellingPrice,
@@ -28,6 +29,7 @@ class ProductPublicListItem
     {
         return [
             'id' => $this->id,
+            'slug' => $this->slug,
             'name' => $this->name,
             'original_price' => $this->originalPrice,
             'selling_price' => $this->sellingPrice,

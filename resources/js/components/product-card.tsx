@@ -6,6 +6,7 @@ import { show as vendorShow } from '@/routes/vendors';
 
 export type ProductCardItem = {
     id: number;
+    slug: string;
     name: string;
     description?: string | null;
     original_price: string;
@@ -38,7 +39,7 @@ export default function ProductCard({
     return (
         <article className="group flex h-full flex-col overflow-hidden rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)">
             <Link
-                href={productShow(product.id)}
+                href={productShow(product.slug)}
                 className="relative aspect-4/3 overflow-hidden bg-(--welcome-surface-1)"
             >
                 {product.has_discount && (
@@ -73,7 +74,7 @@ export default function ProductCard({
                             : ''}
                     </p>
                     <h3 className="font-['Playfair_Display',serif] text-xl">
-                        <Link href={productShow(product.id)}>
+                        <Link href={productShow(product.slug)}>
                             {product.name}
                         </Link>
                     </h3>

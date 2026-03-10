@@ -1,14 +1,13 @@
 # TODO List
 
 ## Task completion tracker
+
 - [x] `product-categories.md` completed on 2026-03-09
 - [x] `product-colors.md` completed on 2026-03-09
 - [x] `product-search-upgrade.md` completed on 2026-03-09
 - [x] `product-catalog-json-generation.md` completed on 2026-03-09
 - [x] `product-detail-image-slider.md` completed on 2026-03-09
 - [x] `product-quantity.md` completed on 2026-03-09
+- [x] product slug public URL migration and auto-generation completed on 2026-03-10
 
 ## Task to do
-
-1. Product edit/create page: product name should have long text input
-2. Home page should have random products

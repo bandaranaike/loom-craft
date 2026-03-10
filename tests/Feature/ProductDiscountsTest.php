@@ -34,7 +34,7 @@ test('public product pages use the highest available discount', function () {
             ->where('products.0.has_discount', true)
         );
 
-    $this->get(route('products.show', $product))
+    $this->get(route('products.show', ['product' => $product->slug]))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('products/show')

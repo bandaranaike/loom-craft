@@ -39,7 +39,7 @@ class ShowPublicProduct
             ])
             ->where('status', 'active')
             ->whereHas('vendor', fn ($query) => $query->where('status', 'approved'))
-            ->findOrFail($data->productId);
+            ->findOrFail($data->product->id);
 
         $images = $product->media
             ->where('type', 'image')
@@ -66,6 +66,7 @@ class ShowPublicProduct
         return new ProductShowResult(
             new ProductShowItem(
                 $product->id,
+                $product->resolveSlug(),
                 $product->resolveProductCode(),
                 $product->name,
                 $product->description,

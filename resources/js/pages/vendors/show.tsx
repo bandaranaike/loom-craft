@@ -186,7 +186,7 @@ export default function VendorShow() {
                                     <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">
                                         Vendor Mark
                                     </p>
-                                    <p className="mt-2 font-['Playfair_Display',serif] text-2xl">
+                                    <p className="font-['Playfair_Display',serif] text-2xl">
                                         {vendor.display_name}
                                     </p>
                                 </div>

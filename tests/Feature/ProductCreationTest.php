@@ -84,6 +84,7 @@ it('creates products for approved vendors', function () {
 
     $this->assertDatabaseHas('products', [
         'product_code' => 'LC-10001',
+        'slug' => 'heritage-runner',
         'name' => 'Heritage Runner',
         'vendor_price' => '100.00',
         'commission_rate' => $commissionRate,
@@ -93,6 +94,7 @@ it('creates products for approved vendors', function () {
     ]);
 
     $product = Product::query()->where('name', 'Heritage Runner')->firstOrFail();
+    expect($product->slug)->toBe('heritage-runner');
     expect($product->categories()->count())->toBe(2);
     expect($product->colors()->count())->toBe(2);
 

@@ -43,7 +43,7 @@ test('inquiry submission redirects back to the product page when sent from there
         'status' => 'active',
     ]);
 
-    $response = $this->from(route('products.show', $product))
+    $response = $this->from(route('products.show', ['product' => $product->slug]))
         ->post(route('vendors.inquiries.store', ['vendor' => $vendor->slug]), [
             'name' => 'Alex Buyer',
             'email' => 'alex@example.com',
@@ -52,7 +52,7 @@ test('inquiry submission redirects back to the product page when sent from there
             'message' => 'I would like more detail about materials, lead time, and shipping for this piece.',
         ]);
 
-    $response->assertRedirect(route('products.show', $product));
+    $response->assertRedirect(route('products.show', ['product' => $product->slug]));
 });
 
 test('inquiry submission validates required fields', function () {

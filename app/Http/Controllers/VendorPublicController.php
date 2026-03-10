@@ -44,6 +44,7 @@ class VendorPublicController extends Controller
 
             return [
                 'id' => $product->id,
+                'slug' => $product->resolveSlug(),
                 'name' => $product->name,
                 'description' => str($product->description)->limit(120)->toString(),
                 'original_price' => $pricing->originalPrice,

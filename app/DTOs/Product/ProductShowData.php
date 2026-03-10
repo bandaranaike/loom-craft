@@ -2,15 +2,16 @@
 
 namespace App\DTOs\Product;
 
-use App\Http\Requests\Product\ShowProductRequest;
+use App\Models\Product;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class ProductShowData
 {
-    public function __construct(public ?User $user, public int $productId) {}
+    public function __construct(public ?User $user, public Product $product) {}
 
-    public static function fromRequest(ShowProductRequest $request): self
+    public static function fromModel(Request $request, Product $product): self
     {
-        return new self($request->user(), $request->integer('product'));
+        return new self($request->user(), $product);
     }
 }

@@ -94,6 +94,7 @@ class ListPublicProducts
 
                 return new ProductPublicListItem(
                     $product->id,
+                    $product->resolveSlug(),
                     $product->name,
                     $pricing->originalPrice,
                     $pricing->discountedPrice,

@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\ProductColor;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class ProductColorSeeder extends Seeder
 {
@@ -13,45 +13,42 @@ class ProductColorSeeder extends Seeder
      */
     public function run(): void
     {
-        $groups = [
-            'primary' => ['Red', 'Yellow', 'Blue'],
-            'secondary' => ['Orange', 'Green', 'Purple'],
-            'tertiary' => [
-                'Yellow-Orange',
-                'Red-Orange',
-                'Red-Purple',
-                'Blue-Purple',
-                'Blue-Green',
-                'Yellow-Green',
-            ],
-            'catalog' => [
-                'Black',
-                'White',
-                'Gray',
-                'Beige',
-                'Brown',
-                'Pink',
-                'Teal',
-                'Amber',
-                'Gold',
-            ],
-        ];
+        foreach ($this->productColors() as $sortOrder => $color) {
+            ProductColor::query()->updateOrCreate(
+                ['slug' => $color['slug']],
+                [
+                    'name' => $color['name'],
+                    'is_active' => true,
+                    'sort_order' => $sortOrder,
+                ],
+            );
+        }
+    }
 
-        $sortOrder = 0;
+    /**
+     * @return list<array{name: string, slug: string, hex: string}>
+     */
+    private function productColors(): array
+    {
+        $path = resource_path('data/product-colors.json');
+        $colors = json_decode(File::get($path), true, flags: JSON_THROW_ON_ERROR);
 
-        foreach ($groups as $colors) {
-            foreach ($colors as $name) {
-                ProductColor::query()->updateOrCreate(
-                    ['slug' => Str::slug($name)],
-                    [
-                        'name' => $name,
-                        'is_active' => true,
-                        'sort_order' => $sortOrder,
-                    ],
-                );
+        if (! is_array($colors)) {
+            throw new \RuntimeException('The product color registry must decode to an array.');
+        }
 
-                $sortOrder++;
+        foreach ($colors as $index => $color) {
+            if (
+                ! is_array($color)
+                || ! is_string($color['name'] ?? null)
+                || ! is_string($color['slug'] ?? null)
+                || ! is_string($color['hex'] ?? null)
+            ) {
+                throw new \RuntimeException("Invalid product color definition at index {$index}.");
             }
         }
+
+        /** @var list<array{name: string, slug: string, hex: string}> $colors */
+        return array_values($colors);
     }
 }
