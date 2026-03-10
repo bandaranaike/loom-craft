@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import ProductCard, { type ProductCardItem } from '@/components/product-card';
 import { Spinner } from '@/components/ui/spinner';
 import PublicSiteLayout from '@/layouts/public-site-layout';
+import { resolveProductColorSwatch } from '@/lib/product-color-swatches';
 import { index as productsIndex } from '@/routes/products';
 
 type FilterOption = {
@@ -381,7 +382,7 @@ export default function ProductIndex({
                                         <p className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Colors
                                         </p>
-                                        <div className="flex flex-wrap gap-2">
+                                        <div className="flex flex-wrap gap-1">
                                             {colors.map((color) => {
                                                 const checked =
                                                     selectedColorFilters.includes(
@@ -392,18 +393,33 @@ export default function ProductIndex({
                                                     <button
                                                         key={color.id}
                                                         type="button"
+                                                        title={color.name}
                                                         onClick={() =>
                                                             toggleColor(
                                                                 color.slug,
                                                             )
                                                         }
-                                                        className={`rounded-full border px-3 py-1.5 text-xs transition ${
+                                                        className={`relative grid h-8 w-8 cursor-pointer place-items-center rounded-md border p   -1 transition ${
                                                             checked
-                                                                ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
-                                                                : 'border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-strong) hover:border-(--welcome-strong-50)'
+                                                                ? 'border-(--welcome-strong) bg-(--welcome-surface-1)'
+                                                                : 'border-(--welcome-border) bg-(--welcome-surface-3) hover:border-(--welcome-strong-50)'
                                                         }`}
+                                                        aria-label={`Filter by ${color.name}`}
+                                                        aria-pressed={checked}
                                                     >
-                                                        {color.name}
+                                                        <span
+                                                            className="block h-5 w-5 rounded-sm border border-black/10"
+                                                            style={{
+                                                                backgroundColor: resolveProductColorSwatch(color.slug),
+                                                            }}
+                                                        />
+                                                        <span
+                                                            className={`pointer-events-none absolute inset-0 grid place-items-center text-xs font-bold text-white mix-blend-difference transition ${
+                                                                checked ? 'opacity-100' : 'opacity-0'
+                                                            }`}
+                                                        >
+                                                            ✓
+                                                        </span>
                                                     </button>
                                                 );
                                             })}

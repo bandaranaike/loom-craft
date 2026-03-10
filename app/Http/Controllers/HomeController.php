@@ -29,7 +29,6 @@ class HomeController extends Controller
             ])
             ->where('status', 'active')
             ->whereHas('vendor', fn ($query) => $query->where('status', 'approved'))
-            ->latest()
             ->inRandomOrder()
             ->limit(6)
             ->get()

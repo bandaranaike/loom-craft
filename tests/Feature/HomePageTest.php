@@ -51,7 +51,7 @@ test('home page renders', function () {
         );
 });
 
-test('home page shows up to six latest active products from approved vendors', function () {
+test('home page shows up to six random active products from approved vendors', function () {
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $vendor = Vendor::factory()->for($vendorUser)->create([
         'status' => 'approved',
@@ -87,18 +87,20 @@ test('home page shows up to six latest active products from approved vendors', f
             ->has('latest_products', 6)
         );
 
-    $latestProductIds = collect($response->viewData('page')['props']['latest_products'])
+    $visibleProductIds = collect($visibleProducts)
         ->pluck('id')
         ->values()
         ->all();
 
-    $oldestVisibleProductId = $visibleProducts[0]->id;
-    $latestVisibleProductId = $visibleProducts[8]->id;
+    $homeProductIds = collect($response->viewData('page')['props']['latest_products'])
+        ->pluck('id')
+        ->values()
+        ->all();
 
-    expect($latestProductIds)
-        ->toHaveCount(6)
-        ->toContain($latestVisibleProductId)
-        ->not->toContain($oldestVisibleProductId)
-        ->not->toContain($visibleProducts[1]->id)
-        ->not->toContain($visibleProducts[2]->id);
+    expect($homeProductIds)
+        ->toHaveCount(6);
+
+    foreach ($homeProductIds as $productId) {
+        expect($visibleProductIds)->toContain($productId);
+    }
 });

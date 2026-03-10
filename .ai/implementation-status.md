@@ -21,7 +21,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 
 ### Public Storefront
 - Home page (`/`) with:
-  - latest approved active products,
+  - random approved active products,
   - approved community feedback highlights,
   - basic storefront metrics (`atelier_ledger`).
 - Home page now includes authenticated feedback composer for vendor/customer users with edit-in-place behavior.
@@ -80,6 +80,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Public pages and dashboard access.
 - Public loom weave demo route/component availability.
 - Product detail gallery navigation, swipe support, and image-anchored floating thumbnail behavior when the gallery reaches the viewport edge.
+- Product catalog filters include swatch-based color selection using the shared product color palette.
 - Product index/show visibility rules.
 - Vendor registration and vendor product workflows.
 - Cart flow and checkout order creation.
@@ -110,7 +111,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Mobile dropdown navigation now opens as an absolute overlay (with spacing and shadow) so page content does not shift downward when the menu is toggled.
 - Mobile dropdown navigation visuals were refined to read as navigation rows (not input-like cards), and opening the menu now applies a soft backdrop blur over page content for stronger contrast and focus.
 - Production deploy workflow now recreates each release `public/storage` symlink from shared storage directly (instead of `artisan storage:link`) to prevent broken image links in release-based deploys.
-- Home page product merchandising was reprioritized for faster first-glance shopping: `welcome` now shows the New Arrivals product grid immediately after the hero section, and the backend feed limit was increased from 4 to 8 latest approved active products.
+- Home page product merchandising was reprioritized for faster first-glance shopping: `welcome` now shows the New Arrivals product grid immediately after the hero section, and the backend feed limit was increased from 4 to 8 approved active products selected for display.
 - Home page hero-side Atelier Ledger panel is now hidden on mobile viewports and remains visible on `md+` screens for cleaner first-screen product focus on phones.
 - GitHub Actions production deploy workflow now creates the release tarball in `/tmp` before moving it to workspace, preventing `tar: .: file changed as we read it` failures during artifact packaging.
 - Production deploy script now guards `php artisan view:cache` behind a `resources/views` directory existence check to prevent first-deploy failures when the view path is unavailable at runtime.
