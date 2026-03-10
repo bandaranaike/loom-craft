@@ -28,16 +28,16 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.31.0
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'pnpm'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.31.0
 
       - name: Install PHP dependencies
         run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
