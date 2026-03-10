@@ -81,6 +81,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Public loom weave demo route/component availability.
 - Product detail gallery navigation, swipe support, and image-anchored floating thumbnail behavior when the gallery reaches the viewport edge.
 - Product catalog filters include swatch-based color selection using the shared product color palette.
+- GitHub Actions workflows now install frontend dependencies and build assets with pnpm to match the repository package manager configuration.
 - Product index/show visibility rules.
 - Vendor registration and vendor product workflows.
 - Cart flow and checkout order creation.
