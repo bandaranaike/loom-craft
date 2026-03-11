@@ -151,6 +151,12 @@ export default function ProductShow({
                 return;
             }
 
+            const isMobileView = window.innerWidth < 768;
+            if (isMobileView) {
+                setIsThumbnailDocked(false);
+                return;
+            }
+
             const frameRect = galleryFrame.getBoundingClientRect();
             const viewportBottom = window.innerHeight;
             const tolerance = 8;
@@ -356,7 +362,7 @@ export default function ProductShow({
                                                     ›
                                                 </button>
                                                 {!isThumbnailDocked && (
-                                                    <div className="fixed bottom-0 flex justify-start p-4 z-20">
+                                                    <div className="fixed bottom-0 z-20 hidden justify-start p-4 md:flex">
                                                         {renderThumbnails()}
                                                     </div>
                                                 )}
@@ -374,7 +380,7 @@ export default function ProductShow({
                                     <div
                                         className={
                                             !isThumbnailDocked
-                                                ? 'pointer-events-none opacity-0'
+                                                ? 'md:pointer-events-none md:opacity-0'
                                                 : 'transition-opacity duration-200'
                                         }
                                     >
