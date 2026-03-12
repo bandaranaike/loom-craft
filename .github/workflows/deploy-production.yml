@@ -35,7 +35,9 @@ jobs:
           cache: 'pnpm'
 
       - name: Enable Corepack
-        run: corepack enable
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.31.0 --activate
 
       - name: Install PHP dependencies
         run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
