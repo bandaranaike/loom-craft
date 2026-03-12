@@ -71,6 +71,7 @@ type ProductDetails = {
 
 type ProductShowProps = {
     product: ProductDetails;
+    cartCurrency: string;
     canRegister?: boolean;
     status?: string | null;
 };
@@ -93,6 +94,7 @@ const formatDimensions = (dimensions: ProductDetails['dimensions']) => {
 
 export default function ProductShow({
     product,
+    cartCurrency,
     canRegister = true,
     status = null,
 }: ProductShowProps) {
@@ -110,7 +112,7 @@ export default function ProductShow({
     const form = useForm({
         product_id: product.id,
         quantity: 1,
-        currency: DEFAULT_CURRENCY,
+        currency: cartCurrency,
     });
     const hasInquiryErrors = [
         'name',

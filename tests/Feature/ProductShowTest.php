@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Cart;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductColor;
@@ -114,6 +115,32 @@ test('product show returns only image media ordered by sort order and id', funct
                     && $resolvedImages[1]['id'] === $imageA->id
                     && isset($resolvedImages[0]['url'], $resolvedImages[0]['alt_text'], $resolvedImages[0]['type']);
             })
+        );
+});
+
+test('product show uses the existing guest cart currency for add to cart', function () {
+    $vendor = Vendor::factory()->create([
+        'status' => 'approved',
+    ]);
+    $product = Product::factory()->create([
+        'vendor_id' => $vendor->id,
+        'status' => 'active',
+    ]);
+
+    Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'USD',
+    ]);
+
+    $response = $this
+        ->withCookie('loomcraft_guest_token', 'guest-token')
+        ->get(route('products.show', ['product' => $product->slug]));
+
+    $response
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('products/show')
+            ->where('cartCurrency', 'USD')
         );
 });
 

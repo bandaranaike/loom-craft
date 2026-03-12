@@ -43,6 +43,37 @@ it('shows checkout for guests and preserves the guest token cookie', function ()
         ->assertInertia(fn (Assert $page) => $page->component('checkout'));
 });
 
+it('renders the csrf token meta tag on checkout', function () {
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'selling_price' => '180.00',
+    ]);
+
+    $cart = Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'USD',
+    ]);
+
+    $cart->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 1,
+        'unit_price' => '180.00',
+    ]);
+
+    $response = $this
+        ->withCookie('loomcraft_guest_token', 'guest-token')
+        ->get(route('checkout.show'));
+
+    $response
+        ->assertOk()
+        ->assertSee('meta name="csrf-token" content="', false);
+});
+
 it('shows stock delay warnings during checkout when quantity exceeds available pieces', function () {
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $vendor = Vendor::factory()->for($vendorUser)->create([

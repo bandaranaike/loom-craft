@@ -130,6 +130,7 @@ export default function CheckoutPage({
         try {
             const response = await fetch(checkoutPayPalCreate().url, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
