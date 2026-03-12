@@ -28,14 +28,14 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'pnpm'
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install PHP dependencies
         run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
@@ -60,7 +60,7 @@ jobs:
           mv "${RELEASE_ARCHIVE}" release.tar.gz
 
       - name: Upload release artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: release
           path: release.tar.gz
@@ -77,7 +77,7 @@ jobs:
 
     steps:
       - name: Download release artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: release
 
