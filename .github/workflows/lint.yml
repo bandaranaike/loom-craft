@@ -24,12 +24,9 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: 'pnpm'
 
-      - name: Enable Corepack
-        run: |
-          corepack enable
-          corepack prepare pnpm@10.31.0 --activate
+      - name: Install pnpm
+        run: npm install --global pnpm@10.31.0
 
       - name: Install Dependencies
         run: |
