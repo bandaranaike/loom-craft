@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Cart;
+use App\Models\ExchangeRate;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -24,7 +25,7 @@ it('shows checkout for guests and preserves the guest token cookie', function ()
 
     $cart = Cart::query()->create([
         'guest_token' => 'guest-token',
-        'currency' => 'USD',
+        'currency' => 'LKR',
     ]);
 
     $cart->items()->create([
@@ -56,7 +57,7 @@ it('renders the csrf token meta tag on checkout', function () {
 
     $cart = Cart::query()->create([
         'guest_token' => 'guest-token',
-        'currency' => 'USD',
+        'currency' => 'LKR',
     ]);
 
     $cart->items()->create([
@@ -89,7 +90,7 @@ it('shows stock delay warnings during checkout when quantity exceeds available p
 
     $cart = Cart::query()->create([
         'guest_token' => 'guest-token',
-        'currency' => 'USD',
+        'currency' => 'LKR',
     ]);
 
     $cart->items()->create([
@@ -127,7 +128,7 @@ it('creates an order from checkout and clears the cart', function () {
 
     $cart = Cart::query()->create([
         'guest_token' => 'guest-token',
-        'currency' => 'USD',
+        'currency' => 'LKR',
     ]);
 
     $cart->items()->create([
@@ -139,7 +140,7 @@ it('creates an order from checkout and clears the cart', function () {
     $payload = [
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
-        'currency' => 'USD',
+        'currency' => 'LKR',
         'shipping_responsibility' => 'vendor',
         'payment_method' => 'stripe',
         'shipping_full_name' => 'Heritage Patron',
@@ -173,7 +174,7 @@ it('creates an order from checkout and clears the cart', function () {
     $this->assertDatabaseHas('orders', [
         'id' => $order->id,
         'status' => 'paid',
-        'currency' => 'USD',
+        'currency' => 'LKR',
         'subtotal' => '180.00',
         'commission_total' => $expectedCommissionAmount,
         'total' => '180.00',
@@ -204,7 +205,9 @@ it('creates an order from checkout and clears the cart', function () {
         'method' => 'stripe',
         'status' => 'paid',
         'amount' => '180.00',
-        'currency' => 'USD',
+        'currency' => 'LKR',
+        'original_amount' => '180.00',
+        'original_currency' => 'LKR',
     ]);
 
     $this->assertDatabaseMissing('cart_items', [
@@ -228,7 +231,7 @@ it('still places an order when requested quantity exceeds available pieces', fun
 
     $cart = Cart::query()->create([
         'guest_token' => 'guest-token',
-        'currency' => 'USD',
+        'currency' => 'LKR',
     ]);
 
     $cart->items()->create([
@@ -240,7 +243,7 @@ it('still places an order when requested quantity exceeds available pieces', fun
     $payload = [
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
-        'currency' => 'USD',
+        'currency' => 'LKR',
         'shipping_responsibility' => 'vendor',
         'payment_method' => 'stripe',
         'shipping_full_name' => 'Heritage Patron',
@@ -286,6 +289,11 @@ it('creates a PayPal order and stores pending checkout data in session', functio
     config()->set('services.paypal.client_secret', 'paypal-secret');
     config()->set('services.paypal.base_url', 'https://api-m.sandbox.paypal.com');
 
+    ExchangeRate::factory()->create([
+        'rate' => '0.00333333',
+        'fetched_at' => now()->subHour(),
+    ]);
+
     Http::fake([
         'https://api-m.sandbox.paypal.com/v1/oauth2/token' => Http::response([
             'access_token' => 'paypal-access-token',
@@ -313,7 +321,7 @@ it('creates a PayPal order and stores pending checkout data in session', functio
 
     Cart::query()->create([
         'guest_token' => 'guest-token',
-        'currency' => 'USD',
+        'currency' => 'LKR',
     ])->items()->create([
         'product_id' => $product->id,
         'quantity' => 1,
@@ -323,9 +331,10 @@ it('creates a PayPal order and stores pending checkout data in session', functio
     $payload = [
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
-        'currency' => 'USD',
+        'currency' => 'LKR',
         'shipping_responsibility' => 'vendor',
         'payment_method' => 'paypal',
+        'paypal_conversion_confirmed' => true,
         'shipping_full_name' => 'Heritage Patron',
         'shipping_line1' => '1 Loom Street',
         'shipping_line2' => 'Suite 2',
@@ -354,6 +363,136 @@ it('creates a PayPal order and stores pending checkout data in session', functio
         ->assertJsonPath('approve_url', 'https://www.sandbox.paypal.com/checkoutnow?token=PAYPAL-ORDER-1');
 
     $response->assertSessionHas('checkout.paypal.pending.PAYPAL-ORDER-1.data.payment_method', 'paypal');
+    $response->assertSessionHas('checkout.paypal.pending.PAYPAL-ORDER-1.quote.original_amount', '180.00');
+    $response->assertSessionHas('checkout.paypal.pending.PAYPAL-ORDER-1.quote.converted_amount', '0.60');
+    $response->assertSessionHas('checkout.paypal.pending.PAYPAL-ORDER-1.quote.converted_currency', 'USD');
+
+    Http::assertSent(function (\Illuminate\Http\Client\Request $request): bool {
+        return $request->url() === 'https://api-m.sandbox.paypal.com/v2/checkout/orders'
+            && $request['purchase_units'][0]['amount']['currency_code'] === 'USD'
+            && $request['purchase_units'][0]['amount']['value'] === '0.60';
+    });
+});
+
+it('requires paypal conversion confirmation before creating a paypal order', function () {
+    config()->set('services.paypal.client_id', 'paypal-client');
+    config()->set('services.paypal.client_secret', 'paypal-secret');
+
+    ExchangeRate::factory()->create([
+        'fetched_at' => now()->subHour(),
+    ]);
+
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'selling_price' => '180.00',
+    ]);
+
+    Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'LKR',
+    ])->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 1,
+        'unit_price' => '180.00',
+    ]);
+
+    $response = $this
+        ->withCookie('loomcraft_guest_token', 'guest-token')
+        ->postJson(route('checkout.paypal.create'), [
+            'guest_name' => 'Heritage Patron',
+            'guest_email' => 'patron@example.com',
+            'currency' => 'LKR',
+            'shipping_responsibility' => 'vendor',
+            'payment_method' => 'paypal',
+            'shipping_full_name' => 'Heritage Patron',
+            'shipping_line1' => '1 Loom Street',
+            'shipping_line2' => 'Suite 2',
+            'shipping_city' => 'Kandy',
+            'shipping_region' => 'Central',
+            'shipping_postal_code' => '20000',
+            'shipping_country_code' => 'LK',
+            'shipping_phone' => '0770000000',
+            'billing_full_name' => 'Heritage Patron',
+            'billing_line1' => '1 Loom Street',
+            'billing_line2' => null,
+            'billing_city' => 'Kandy',
+            'billing_region' => 'Central',
+            'billing_postal_code' => '20000',
+            'billing_country_code' => 'LK',
+            'billing_phone' => '0770000000',
+        ]);
+
+    $response
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['paypal_conversion_confirmed']);
+
+    Http::assertNothingSent();
+});
+
+it('blocks paypal checkout when the latest exchange rate is stale', function () {
+    config()->set('services.paypal.client_id', 'paypal-client');
+    config()->set('services.paypal.client_secret', 'paypal-secret');
+
+    ExchangeRate::factory()->create([
+        'fetched_at' => now()->subDays(2),
+    ]);
+
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'selling_price' => '180.00',
+    ]);
+
+    Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'LKR',
+    ])->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 1,
+        'unit_price' => '180.00',
+    ]);
+
+    $response = $this
+        ->withCookie('loomcraft_guest_token', 'guest-token')
+        ->postJson(route('checkout.paypal.create'), [
+            'guest_name' => 'Heritage Patron',
+            'guest_email' => 'patron@example.com',
+            'currency' => 'LKR',
+            'shipping_responsibility' => 'vendor',
+            'payment_method' => 'paypal',
+            'paypal_conversion_confirmed' => true,
+            'shipping_full_name' => 'Heritage Patron',
+            'shipping_line1' => '1 Loom Street',
+            'shipping_line2' => 'Suite 2',
+            'shipping_city' => 'Kandy',
+            'shipping_region' => 'Central',
+            'shipping_postal_code' => '20000',
+            'shipping_country_code' => 'LK',
+            'shipping_phone' => '0770000000',
+            'billing_full_name' => 'Heritage Patron',
+            'billing_line1' => '1 Loom Street',
+            'billing_line2' => null,
+            'billing_city' => 'Kandy',
+            'billing_region' => 'Central',
+            'billing_postal_code' => '20000',
+            'billing_country_code' => 'LK',
+            'billing_phone' => '0770000000',
+        ]);
+
+    $response
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['payment_method']);
+
+    Http::assertNothingSent();
 });
 
 it('captures a PayPal order and creates the final order', function () {
@@ -393,7 +532,7 @@ it('captures a PayPal order and creates the final order', function () {
 
     $cart = Cart::query()->create([
         'guest_token' => 'guest-token',
-        'currency' => 'USD',
+        'currency' => 'LKR',
     ]);
 
     $cart->items()->create([
@@ -405,9 +544,10 @@ it('captures a PayPal order and creates the final order', function () {
     $payload = [
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
-        'currency' => 'USD',
+        'currency' => 'LKR',
         'shipping_responsibility' => 'vendor',
         'payment_method' => 'paypal',
+        'paypal_conversion_confirmed' => true,
         'shipping_full_name' => 'Heritage Patron',
         'shipping_line1' => '1 Loom Street',
         'shipping_line2' => 'Suite 2',
@@ -431,6 +571,15 @@ it('captures a PayPal order and creates the final order', function () {
             'checkout.paypal.pending' => [
                 'PAYPAL-ORDER-1' => [
                     'data' => $payload,
+                    'quote' => [
+                        'original_amount' => '180.00',
+                        'original_currency' => 'LKR',
+                        'converted_amount' => '0.60',
+                        'converted_currency' => 'USD',
+                        'exchange_rate' => '0.00333333',
+                        'source' => 'open_er_api',
+                        'fetched_at' => now()->subHour()->toIso8601String(),
+                    ],
                     'guest_token' => 'guest-token',
                     'created_at' => now()->timestamp,
                 ],
@@ -446,6 +595,12 @@ it('captures a PayPal order and creates the final order', function () {
         'order_id' => $order->id,
         'method' => 'paypal',
         'status' => 'paid',
+        'amount' => '0.60',
+        'currency' => 'USD',
+        'original_amount' => '180.00',
+        'original_currency' => 'LKR',
+        'exchange_rate' => '0.00333333',
+        'exchange_rate_source' => 'open_er_api',
         'provider_reference' => 'PAYPAL-CAPTURE-1',
     ]);
 

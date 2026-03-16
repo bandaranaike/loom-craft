@@ -120,7 +120,7 @@ class ShowCart
             return [$cart, $token];
         }
 
-        return [$cart, $cart->guest_token];
+        return [$this->normalizeCurrency($cart, $data->currency->code), $cart->guest_token];
     }
 
     private function resolveUserCart(CartSessionData $data): Cart
@@ -137,6 +137,8 @@ class ShowCart
                 ['currency' => $data->currency->code],
             );
 
+            $cart = $this->normalizeCurrency($cart, $data->currency->code);
+
             if ($data->guestToken === null) {
                 return $cart;
             }
@@ -146,6 +148,8 @@ class ShowCart
             if ($guestCart === null || $guestCart->id === $cart->id) {
                 return $cart;
             }
+
+            $guestCart = $this->normalizeCurrency($guestCart, $data->currency->code);
 
             if ($guestCart->currency !== $cart->currency) {
                 return $cart;
@@ -184,5 +188,14 @@ class ShowCart
 
             return $cart;
         });
+    }
+
+    private function normalizeCurrency(Cart $cart, string $currency): Cart
+    {
+        if ($cart->currency !== $currency) {
+            $cart->update(['currency' => $currency]);
+        }
+
+        return $cart->refresh();
     }
 }

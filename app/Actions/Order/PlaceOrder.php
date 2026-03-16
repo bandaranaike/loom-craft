@@ -4,10 +4,11 @@ namespace App\Actions\Order;
 
 use App\DTOs\Order\CheckoutStoreData;
 use App\DTOs\Order\OrderPlacementResult;
+use App\DTOs\Payment\PayPalPaymentQuote;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
-use App\Services\ProductPricingService;
+use App\ValueObjects\Currency;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -15,16 +16,15 @@ use Illuminate\Validation\ValidationException;
 
 class PlaceOrder
 {
-    public function __construct(private ProductPricingService $productPricingService) {}
-
     public function handle(
         CheckoutStoreData $data,
         ?string $paymentProviderReference = null,
+        ?PayPalPaymentQuote $payPalPaymentQuote = null,
     ): OrderPlacementResult {
         Gate::authorize('create', Order::class);
         $commissionRate = (string) config('commerce.commission_rate');
 
-        $cart = $this->resolveCart($data);
+        $cart = $this->normalizeCurrency($this->resolveCart($data));
 
         Gate::authorize('manage', [$cart, $data->guestToken]);
 
@@ -60,8 +60,7 @@ class PlaceOrder
                     ]);
                 }
 
-                $pricing = $this->productPricingService->forProduct($product);
-                $unitPrice = Money::fromString($pricing->discountedPrice);
+                $unitPrice = Money::fromString((string) $item->unit_price);
                 $lineTotal = $unitPrice->multiply($item->quantity);
                 $commissionAmount = $lineTotal->percentageOf($commissionRate);
 
@@ -82,16 +81,47 @@ class PlaceOrder
             $isInstantPaid = in_array($data->paymentMethod, ['stripe', 'paypal'], true);
             $paymentStatus = $isInstantPaid ? 'paid' : 'pending';
             $orderStatus = $isInstantPaid ? 'paid' : 'pending';
+            $orderSubtotal = Money::fromString((string) $subtotal)->amount;
+            $orderCurrency = $data->currency->code;
+            $paymentAmount = $orderSubtotal;
+            $paymentCurrency = $orderCurrency;
+            $originalAmount = $orderSubtotal;
+            $originalCurrency = $orderCurrency;
+            $exchangeRate = null;
+            $exchangeRateSource = null;
+            $exchangeRateFetchedAt = null;
+
+            if ($data->paymentMethod === 'paypal') {
+                if ($payPalPaymentQuote === null) {
+                    throw ValidationException::withMessages([
+                        'payment_method' => 'PayPal conversion details are missing. Please start checkout again.',
+                    ]);
+                }
+
+                if ($payPalPaymentQuote->originalAmount !== $orderSubtotal || $payPalPaymentQuote->originalCurrency !== $orderCurrency) {
+                    throw ValidationException::withMessages([
+                        'cart' => 'Your cart changed during PayPal checkout. Please review the latest prices and try again.',
+                    ]);
+                }
+
+                $paymentAmount = $payPalPaymentQuote->convertedAmount;
+                $paymentCurrency = $payPalPaymentQuote->convertedCurrency;
+                $originalAmount = $payPalPaymentQuote->originalAmount;
+                $originalCurrency = $payPalPaymentQuote->originalCurrency;
+                $exchangeRate = $payPalPaymentQuote->exchangeRate;
+                $exchangeRateSource = $payPalPaymentQuote->source;
+                $exchangeRateFetchedAt = $payPalPaymentQuote->fetchedAt;
+            }
 
             $order = Order::query()->create([
                 'user_id' => $data->user?->id,
                 'guest_name' => $data->user ? null : $data->guestName,
                 'guest_email' => $data->user ? null : $data->guestEmail,
                 'status' => $orderStatus,
-                'currency' => $data->currency->code,
-                'subtotal' => Money::fromString((string) $subtotal)->amount,
+                'currency' => $orderCurrency,
+                'subtotal' => $orderSubtotal,
                 'commission_total' => Money::fromString((string) $commissionTotal)->amount,
-                'total' => Money::fromString((string) $subtotal)->amount,
+                'total' => $orderSubtotal,
                 'shipping_responsibility' => $data->shippingResponsibility,
                 'placed_at' => now(),
             ]);
@@ -105,8 +135,13 @@ class PlaceOrder
             $order->payment()->create([
                 'method' => $data->paymentMethod,
                 'status' => $paymentStatus,
-                'amount' => Money::fromString((string) $subtotal)->amount,
-                'currency' => $data->currency->code,
+                'amount' => $paymentAmount,
+                'currency' => $paymentCurrency,
+                'original_amount' => $originalAmount,
+                'original_currency' => $originalCurrency,
+                'exchange_rate' => $exchangeRate,
+                'exchange_rate_source' => $exchangeRateSource,
+                'exchange_rate_fetched_at' => $exchangeRateFetchedAt,
                 'provider_reference' => $paymentProviderReference,
             ]);
 
@@ -145,5 +180,16 @@ class PlaceOrder
         }
 
         return $cart;
+    }
+
+    private function normalizeCurrency(Cart $cart): Cart
+    {
+        $currency = Currency::default()->code;
+
+        if ($cart->currency !== $currency) {
+            $cart->update(['currency' => $currency]);
+        }
+
+        return $cart->refresh();
     }
 }

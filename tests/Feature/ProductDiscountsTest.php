@@ -62,7 +62,7 @@ test('checkout persists discounted prices using the highest applicable discount'
 
     $cart = Cart::query()->create([
         'guest_token' => 'guest-token',
-        'currency' => 'USD',
+        'currency' => 'LKR',
     ]);
 
     $cart->items()->create([
@@ -74,7 +74,7 @@ test('checkout persists discounted prices using the highest applicable discount'
     $payload = [
         'guest_name' => 'Discount Buyer',
         'guest_email' => 'buyer@example.com',
-        'currency' => 'USD',
+        'currency' => 'LKR',
         'shipping_responsibility' => 'vendor',
         'payment_method' => 'stripe',
         'shipping_full_name' => 'Discount Buyer',

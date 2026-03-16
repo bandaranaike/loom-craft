@@ -2,11 +2,11 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, type FormEvent } from 'react';
 import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-alert';
 import InputError from '@/components/input-error';
-import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
+import { formatMoney } from '@/lib/currency';
 import { show as cartShow } from '@/routes/cart';
-import { create as checkoutPayPalCreate } from '@/routes/checkout/paypal';
 import { store as checkoutStore } from '@/routes/checkout';
+import { create as checkoutPayPalCreate } from '@/routes/checkout/paypal';
 import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
 
@@ -45,6 +45,16 @@ type CheckoutPageProps = {
     guest_email?: string | null;
     canRegister?: boolean;
     paypal_configured?: boolean;
+    paypal_quote?: {
+        original_amount: string;
+        original_currency: string;
+        converted_amount: string;
+        converted_currency: string;
+        exchange_rate: string;
+        source: string;
+        fetched_at: string;
+    } | null;
+    paypal_unavailable_reason?: string | null;
 };
 
 const defaultPaymentLabel = (method: string) => {
@@ -71,6 +81,8 @@ export default function CheckoutPage({
     guest_email,
     canRegister = true,
     paypal_configured = false,
+    paypal_quote = null,
+    paypal_unavailable_reason = null,
 }: CheckoutPageProps) {
     const { auth } = usePage<SharedData>().props;
     const [mirrorBilling, setMirrorBilling] = useState(true);
@@ -98,6 +110,7 @@ export default function CheckoutPage({
         billing_postal_code: '',
         billing_country_code: 'US',
         billing_phone: '',
+        paypal_conversion_confirmed: false,
     });
 
     const normalizedPayload = () => {
@@ -117,6 +130,9 @@ export default function CheckoutPage({
             billing_phone: form.data.shipping_phone,
         };
     };
+
+    const isPayPalUnavailable =
+        !paypal_configured || paypal_quote === null || paypal_unavailable_reason;
 
     const csrfToken = () =>
         document
@@ -687,10 +703,23 @@ export default function CheckoutPage({
                                                 name="payment_method"
                                                 value={form.data.payment_method}
                                                 onChange={(event) =>
-                                                    form.setData(
-                                                        'payment_method',
-                                                        event.target.value,
-                                                    )
+                                                    {
+                                                        form.setData(
+                                                            'payment_method',
+                                                            event.target.value,
+                                                        );
+
+                                                        if (
+                                                            event.target
+                                                                .value !==
+                                                            'paypal'
+                                                        ) {
+                                                            form.setData(
+                                                                'paypal_conversion_confirmed',
+                                                                false,
+                                                            );
+                                                        }
+                                                    }
                                                 }
                                                 className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             >
@@ -717,6 +746,83 @@ export default function CheckoutPage({
                                     value={form.data.currency}
                                 />
 
+                                {form.data.payment_method === 'paypal' &&
+                                paypal_quote ? (
+                                    <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-5">
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                            PayPal conversion
+                                        </p>
+                                        <div className="mt-4 space-y-3 text-sm text-(--welcome-strong)">
+                                            <div className="flex items-center justify-between">
+                                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                    Total
+                                                </span>
+                                                <span>
+                                                    {formatMoney(
+                                                        paypal_quote.original_amount,
+                                                        paypal_quote.original_currency,
+                                                    )}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                    Approx. USD
+                                                </span>
+                                                <span>
+                                                    {formatMoney(
+                                                        paypal_quote.converted_amount,
+                                                        paypal_quote.converted_currency,
+                                                    )}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                    Rate
+                                                </span>
+                                                <span>
+                                                    1 LKR ={' '}
+                                                    {paypal_quote.exchange_rate}{' '}
+                                                    {paypal_quote.converted_currency}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <p className="mt-4 text-sm text-(--welcome-body-text)">
+                                            PayPal does not support LKR, so
+                                            your payment will be converted to
+                                            USD automatically using the latest
+                                            stored market rate.
+                                        </p>
+                                        <label className="mt-4 flex items-start gap-3 text-sm text-(--welcome-strong)">
+                                            <input
+                                                type="checkbox"
+                                                checked={
+                                                    form.data
+                                                        .paypal_conversion_confirmed
+                                                }
+                                                onChange={(event) =>
+                                                    form.setData(
+                                                        'paypal_conversion_confirmed',
+                                                        event.target.checked,
+                                                    )
+                                                }
+                                                className="mt-1 h-4 w-4 rounded border-(--welcome-border)"
+                                            />
+                                            <span>
+                                                I understand that my LoomCraft
+                                                total stays in LKR and PayPal
+                                                will charge the approximate USD
+                                                amount shown above.
+                                            </span>
+                                        </label>
+                                        <InputError
+                                            message={
+                                                form.errors
+                                                    .paypal_conversion_confirmed
+                                            }
+                                        />
+                                    </div>
+                                ) : null}
+
                                 <button
                                     type="submit"
                                     disabled={
@@ -724,7 +830,7 @@ export default function CheckoutPage({
                                         paypalProcessing ||
                                         (form.data.payment_method ===
                                             'paypal' &&
-                                            !paypal_configured)
+                                            Boolean(isPayPalUnavailable))
                                     }
                                     className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:cursor-not-allowed disabled:opacity-70"
                                 >
@@ -738,10 +844,10 @@ export default function CheckoutPage({
                                             : 'Place order'}
                                 </button>
                                 {form.data.payment_method === 'paypal' &&
-                                !paypal_configured ? (
+                                isPayPalUnavailable ? (
                                     <p className="text-xs text-(--welcome-danger)">
-                                        PayPal is not configured yet. Add
-                                        PayPal keys in `.env` and reload.
+                                        {paypal_unavailable_reason ??
+                                            'PayPal is not configured yet. Add PayPal keys in `.env` and reload.'}
                                     </p>
                                 ) : null}
                             </form>

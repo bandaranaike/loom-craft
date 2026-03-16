@@ -18,14 +18,12 @@ class CartItemStoreData
 
     public static function fromRequest(StoreCartItemRequest $request): self
     {
-        $currency = $request->string('currency')->toString();
-
         return new self(
             $request->user(),
             $request->cookie('loomcraft_guest_token'),
             $request->integer('product_id'),
             $request->integer('quantity'),
-            Currency::fromString($currency !== '' ? $currency : 'LKR'),
+            Currency::default(),
         );
     }
 }

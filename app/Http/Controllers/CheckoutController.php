@@ -8,6 +8,7 @@ use App\DTOs\Cart\CartSessionData;
 use App\DTOs\Order\CheckoutStoreData;
 use App\Http\Requests\Order\StoreCheckoutRequest;
 use App\Services\Payments\PayPalOrderService;
+use App\Services\Payments\PayPalPaymentQuoteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -17,8 +18,11 @@ use Laravel\Fortify\Features;
 
 class CheckoutController extends Controller
 {
-    public function show(Request $request, ShowCheckout $action): Response|RedirectResponse
-    {
+    public function show(
+        Request $request,
+        ShowCheckout $action,
+        PayPalPaymentQuoteService $payPalPaymentQuoteService,
+    ): Response|RedirectResponse {
         $result = $action->handle(CartSessionData::fromRequest($request));
 
         if ($result->cart->itemCount === 0) {
@@ -27,10 +31,24 @@ class CheckoutController extends Controller
                 ->with('status', 'Your cart is empty.');
         }
 
+        $paypalConfigured = app(PayPalOrderService::class)->isConfigured();
+        $paypalQuote = null;
+        $paypalUnavailableReason = null;
+
+        if ($paypalConfigured) {
+            try {
+                $paypalQuote = $payPalPaymentQuoteService->quote($result->cart->subtotal)->toArray();
+            } catch (\RuntimeException $exception) {
+                $paypalUnavailableReason = $exception->getMessage();
+            }
+        }
+
         $response = Inertia::render('checkout', [
             ...$result->toArray(),
             'canRegister' => Features::enabled(Features::registration()),
-            'paypal_configured' => app(PayPalOrderService::class)->isConfigured(),
+            'paypal_configured' => $paypalConfigured,
+            'paypal_quote' => $paypalQuote,
+            'paypal_unavailable_reason' => $paypalUnavailableReason,
         ]);
 
         if ($request->user() === null && $result->guestToken !== null) {

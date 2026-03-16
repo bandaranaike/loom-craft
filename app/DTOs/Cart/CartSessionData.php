@@ -16,12 +16,10 @@ class CartSessionData
 
     public static function fromRequest(Request $request): self
     {
-        $currency = $request->string('currency')->toString();
-
         return new self(
             $request->user(),
             $request->cookie('loomcraft_guest_token'),
-            Currency::fromString($currency !== '' ? $currency : 'LKR'),
+            Currency::default(),
         );
     }
 }

@@ -118,7 +118,7 @@ test('product show returns only image media ordered by sort order and id', funct
         );
 });
 
-test('product show uses the existing guest cart currency for add to cart', function () {
+test('product show uses the canonical lkr currency for add to cart', function () {
     $vendor = Vendor::factory()->create([
         'status' => 'approved',
     ]);
@@ -140,7 +140,7 @@ test('product show uses the existing guest cart currency for add to cart', funct
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('products/show')
-            ->where('cartCurrency', 'USD')
+            ->where('cartCurrency', 'LKR')
         );
 });
 

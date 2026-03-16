@@ -24,7 +24,7 @@ it('allows guests to add items to the cart', function () {
     $response = $this->post(route('cart.items.store'), [
         'product_id' => $product->id,
         'quantity' => 2,
-        'currency' => 'USD',
+        'currency' => 'LKR',
     ]);
 
     $response->assertRedirect(route('cart.show'));
@@ -68,7 +68,7 @@ it('shows a stock delay warning in the cart when quantity exceeds available piec
 
     $cart = Cart::query()->create([
         'guest_token' => 'guest-token',
-        'currency' => 'USD',
+        'currency' => 'LKR',
     ]);
 
     $cart->items()->create([

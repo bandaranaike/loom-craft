@@ -2,6 +2,8 @@
 
 namespace App\ValueObjects;
 
+use RuntimeException;
+
 final readonly class Currency
 {
     /**
@@ -20,11 +22,22 @@ final readonly class Currency
         return new self($normalized);
     }
 
+    public static function default(): self
+    {
+        $configured = config('commerce.base_currency', 'LKR');
+
+        if (! is_string($configured)) {
+            throw new RuntimeException('Configured base currency is invalid.');
+        }
+
+        return self::fromString($configured);
+    }
+
     /**
-     * @return list<'USD'|'EUR'|'LKR'>
+     * @return list<'LKR'>
      */
     public static function supported(): array
     {
-        return ['USD', 'EUR', 'LKR'];
+        return ['LKR'];
     }
 }

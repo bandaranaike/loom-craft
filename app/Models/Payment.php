@@ -21,6 +21,11 @@ class Payment extends Model
         'status',
         'amount',
         'currency',
+        'original_amount',
+        'original_currency',
+        'exchange_rate',
+        'exchange_rate_source',
+        'exchange_rate_fetched_at',
         'provider_reference',
         'verified_by',
         'verified_at',
@@ -33,6 +38,7 @@ class Payment extends Model
     {
         return [
             'verified_at' => 'datetime',
+            'exchange_rate_fetched_at' => 'datetime',
         ];
     }
 

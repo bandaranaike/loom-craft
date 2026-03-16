@@ -6,8 +6,10 @@ use App\Actions\Order\PlaceOrder;
 use App\Actions\Order\ShowCheckout;
 use App\DTOs\Cart\CartSessionData;
 use App\DTOs\Order\CheckoutStoreData;
+use App\DTOs\Payment\PayPalPaymentQuote;
 use App\Http\Requests\Order\StoreCheckoutRequest;
 use App\Services\Payments\PayPalOrderService;
+use App\Services\Payments\PayPalPaymentQuoteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,6 +22,7 @@ class CheckoutPayPalController extends Controller
     public function create(
         StoreCheckoutRequest $request,
         ShowCheckout $showCheckout,
+        PayPalPaymentQuoteService $payPalPaymentQuoteService,
         PayPalOrderService $payPalOrderService,
     ): JsonResponse {
         if (! $payPalOrderService->isConfigured()) {
@@ -45,9 +48,17 @@ class CheckoutPayPalController extends Controller
             ]);
         }
 
+        try {
+            $quote = $payPalPaymentQuoteService->quote($checkoutResult->cart->subtotal);
+        } catch (RuntimeException $exception) {
+            throw ValidationException::withMessages([
+                'payment_method' => $exception->getMessage(),
+            ]);
+        }
+
         $paypalOrder = $payPalOrderService->createOrder(
-            $checkoutCurrency,
-            $checkoutResult->cart->subtotal,
+            $quote->convertedCurrency,
+            $quote->convertedAmount,
             route('checkout.paypal.approved'),
             route('checkout.paypal.cancelled'),
         );
@@ -55,6 +66,7 @@ class CheckoutPayPalController extends Controller
         $pendingCheckout = $request->session()->get('checkout.paypal.pending', []);
         $pendingCheckout[$paypalOrder['order_id']] = [
             'data' => $validated,
+            'quote' => $quote->toArray(),
             'guest_token' => $request->cookie('loomcraft_guest_token'),
             'created_at' => now()->timestamp,
         ];
@@ -99,7 +111,11 @@ class CheckoutPayPalController extends Controller
                 $request->user(),
                 $pendingCheckout['guest_token'],
             );
-            $result = $placeOrder->handle($checkoutData, $captureResult['capture_id']);
+            $result = $placeOrder->handle(
+                $checkoutData,
+                $captureResult['capture_id'],
+                PayPalPaymentQuote::fromArray($pendingCheckout['quote']),
+            );
         } catch (Throwable) {
             return redirect()
                 ->route('checkout.show')
@@ -131,7 +147,7 @@ class CheckoutPayPalController extends Controller
     }
 
     /**
-     * @return array{data: array<string, mixed>, guest_token: ?string, created_at: int}|null
+     * @return array{data: array<string, mixed>, quote: array<string, string>, guest_token: ?string, created_at: int}|null
      */
     private function pendingCheckoutPayload(Request $request, string $paypalOrderId): ?array
     {
@@ -148,10 +164,11 @@ class CheckoutPayPalController extends Controller
         }
 
         $data = $payload['data'] ?? null;
+        $quote = $payload['quote'] ?? null;
         $guestToken = $payload['guest_token'] ?? null;
         $createdAt = $payload['created_at'] ?? null;
 
-        if (! is_array($data) || ! is_int($createdAt)) {
+        if (! is_array($data) || ! is_array($quote) || ! is_int($createdAt)) {
             return null;
         }
 
@@ -161,6 +178,7 @@ class CheckoutPayPalController extends Controller
 
         return [
             'data' => $data,
+            'quote' => $quote,
             'guest_token' => $guestToken,
             'created_at' => $createdAt,
         ];

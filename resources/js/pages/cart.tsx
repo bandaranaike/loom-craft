@@ -1,11 +1,11 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-alert';
-import { formatMoney } from '@/lib/currency';
 import PublicSiteLayout from '@/layouts/public-site-layout';
+import { formatMoney } from '@/lib/currency';
+import { destroy as cartItemDestroy, update as cartItemUpdate } from '@/routes/cart/items';
 import { show as checkoutShow } from '@/routes/checkout';
 import { index as productsIndex } from '@/routes/products';
 import { show as vendorShow } from '@/routes/vendors';
-import { destroy as cartItemDestroy, update as cartItemUpdate } from '@/routes/cart/items';
 
 type CartItem = {
     id: number;

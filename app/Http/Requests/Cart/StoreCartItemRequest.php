@@ -25,7 +25,7 @@ class StoreCartItemRequest extends FormRequest
         return [
             'product_id' => ['required', 'integer', 'exists:products,id'],
             'quantity' => ['required', 'integer', 'min:1', 'max:25'],
-            'currency' => ['nullable', 'string', Rule::in(['USD', 'EUR', 'LKR'])],
+            'currency' => ['nullable', 'string', Rule::in(['LKR'])],
         ];
     }
 
@@ -40,7 +40,7 @@ class StoreCartItemRequest extends FormRequest
             'quantity.required' => 'Select a quantity.',
             'quantity.min' => 'Quantity must be at least 1.',
             'quantity.max' => 'Quantity exceeds the maximum allowed.',
-            'currency.in' => 'Please choose a supported currency.',
+            'currency.in' => 'Orders are processed in LKR.',
         ];
     }
 }

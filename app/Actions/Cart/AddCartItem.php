@@ -68,7 +68,7 @@ class AddCartItem
                 ['currency' => $data->currency->code],
             );
 
-            return [$cart, null];
+            return [$this->normalizeCurrency($cart, $data->currency->code), null];
         }
 
         $cart = null;
@@ -87,6 +87,15 @@ class AddCartItem
             return [$cart, $token];
         }
 
-        return [$cart, $cart->guest_token];
+        return [$this->normalizeCurrency($cart, $data->currency->code), $cart->guest_token];
+    }
+
+    private function normalizeCurrency(Cart $cart, string $currency): Cart
+    {
+        if ($cart->currency !== $currency) {
+            $cart->update(['currency' => $currency]);
+        }
+
+        return $cart->refresh();
     }
 }
