@@ -13,6 +13,11 @@ class PayPalOrderService
         return $this->clientId() !== '' && $this->clientSecret() !== '';
     }
 
+    public function sdkClientId(): string
+    {
+        return $this->clientId();
+    }
+
     /**
      * @return array{order_id: string, approve_url: string}
      */
@@ -22,25 +27,12 @@ class PayPalOrderService
         string $returnUrl,
         string $cancelUrl,
     ): array {
-        $response = $this->api()
-            ->post('/v2/checkout/orders', [
-                'intent' => 'CAPTURE',
-                'purchase_units' => [
-                    [
-                        'amount' => [
-                            'currency_code' => strtoupper($currencyCode),
-                            'value' => $amount,
-                        ],
-                    ],
-                ],
-                'application_context' => [
-                    'return_url' => $returnUrl,
-                    'cancel_url' => $cancelUrl,
-                    'user_action' => 'PAY_NOW',
-                ],
-            ])
-            ->throw()
-            ->json();
+        $response = $this->createOrderPayload(
+            $currencyCode,
+            $amount,
+            $returnUrl,
+            $cancelUrl,
+        );
 
         $orderId = $response['id'] ?? null;
         $approveUrl = $this->extractLink($response, 'approve');
@@ -53,6 +45,18 @@ class PayPalOrderService
             'order_id' => $orderId,
             'approve_url' => $approveUrl,
         ];
+    }
+
+    public function createCardOrder(string $currencyCode, string $amount): string
+    {
+        $response = $this->createOrderPayload($currencyCode, $amount);
+        $orderId = $response['id'] ?? null;
+
+        if (! is_string($orderId) || $orderId === '') {
+            throw new RuntimeException('PayPal create order response is invalid.');
+        }
+
+        return $orderId;
     }
 
     /**
@@ -84,6 +88,41 @@ class PayPalOrderService
             ->acceptJson()
             ->withToken($this->accessToken())
             ->timeout(15);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function createOrderPayload(
+        string $currencyCode,
+        string $amount,
+        ?string $returnUrl = null,
+        ?string $cancelUrl = null,
+    ): array {
+        $payload = [
+            'intent' => 'CAPTURE',
+            'purchase_units' => [
+                [
+                    'amount' => [
+                        'currency_code' => strtoupper($currencyCode),
+                        'value' => $amount,
+                    ],
+                ],
+            ],
+        ];
+
+        if ($returnUrl !== null && $cancelUrl !== null) {
+            $payload['application_context'] = [
+                'return_url' => $returnUrl,
+                'cancel_url' => $cancelUrl,
+                'user_action' => 'PAY_NOW',
+            ];
+        }
+
+        return $this->api()
+            ->post('/v2/checkout/orders', $payload)
+            ->throw()
+            ->json();
     }
 
     private function accessToken(): string

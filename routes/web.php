@@ -61,6 +61,10 @@ Route::post('checkout', [CheckoutController::class, 'store'])
     ->name('checkout.store');
 Route::post('checkout/paypal/create', [CheckoutPayPalController::class, 'create'])
     ->name('checkout.paypal.create');
+Route::post('checkout/paypal/card/create', [CheckoutPayPalController::class, 'createCard'])
+    ->name('checkout.paypal.card.create');
+Route::post('checkout/paypal/card/capture', [CheckoutPayPalController::class, 'captureCard'])
+    ->name('checkout.paypal.card.capture');
 Route::get('checkout/paypal/approved', [CheckoutPayPalController::class, 'approved'])
     ->name('checkout.paypal.approved');
 Route::get('checkout/paypal/cancelled', [CheckoutPayPalController::class, 'cancelled'])

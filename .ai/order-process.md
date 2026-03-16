@@ -17,8 +17,8 @@ This document defines the end-to-end ordering workflow for LoomCraft, aligned wi
 
 - Multi‑vendor marketplace with a fixed **7%** platform commission on every item.
 - Guest checkout is allowed.
-- Supported currencies: **USD**, **EUR**, **LKR**.
-- Payment methods: **PayPal**, **Stripe**, **Manual bank transfer (admin‑verified)**, **Cash on delivery**.
+- Storefront and checkout pricing are canonical in **LKR**.
+- Payment methods: **PayPal wallet**, **PayPal card**, **Stripe**, **Manual bank transfer (admin‑verified)**, **Cash on delivery**.
 - Refunds are **manual only** via disputes (no automated refunds).
 - Shipping responsibility per order: **vendor** or **platform**.
 - All controllers return **Inertia** responses.
@@ -66,7 +66,7 @@ No additional fields are introduced beyond `.ai/dbschema.md`.
 
 ### 3.4 Cart Validation Rules
 
-- Ensure currency consistency across items in a single cart.
+- Ensure cart currency remains canonical in LKR.
 - Re‑validate pricing and availability during checkout.
 
 ---
@@ -96,6 +96,7 @@ No additional fields are introduced beyond `.ai/dbschema.md`.
   - `subtotal` = sum of `line_total`
   - `commission_total` = sum of `commission_amount`
   - `total` = `subtotal` (plus shipping if applicable; handled externally)
+- If PayPal is selected, the customer also sees a stored `LKR -> USD` conversion summary before payment starts.
 
 ### 4.4 Shipping Responsibility
 
@@ -104,11 +105,16 @@ No additional fields are introduced beyond `.ai/dbschema.md`.
 
 ### 4.5 Payment Selection
 
-- User chooses one method: **PayPal**, **Stripe**, **Bank Transfer**, **Cash on Delivery**.
-- PayPal redirects for approval and returns for capture before order finalization.
+- User chooses one method: **PayPal wallet**, **PayPal card**, **Stripe**, **Bank Transfer**, **Cash on Delivery**.
+- PayPal wallet redirects for approval and returns for capture before order finalization.
+- PayPal card uses PayPal Card Fields on the checkout page, but still creates and captures a PayPal order server-side.
 - Stripe proceeds to payment capture.
 - Bank transfer is **pending** until admin verification.
 - COD is marked as pending/processing until fulfillment.
+- For both PayPal methods:
+  - the customer confirms the LKR to USD conversion first
+  - the converted USD amount is created from the latest stored exchange-rate snapshot
+  - the final payment record stores both original LKR and settled USD values
 
 ---
 
@@ -119,7 +125,7 @@ No additional fields are introduced beyond `.ai/dbschema.md`.
 - Create `orders` with:
   - `user_id` or `guest_name` / `guest_email`
   - `status` (initial: `pending` or `paid` depending on method)
-  - `currency`
+  - `currency` = `LKR`
   - `subtotal`, `commission_total`, `total`
   - `shipping_responsibility`
   - `placed_at`

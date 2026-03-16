@@ -78,7 +78,7 @@ class PlaceOrder
                 $commissionTotal += (float) $commissionAmount->amount;
             }
 
-            $isInstantPaid = in_array($data->paymentMethod, ['stripe', 'paypal'], true);
+            $isInstantPaid = in_array($data->paymentMethod, ['stripe', 'paypal', 'paypal_card'], true);
             $paymentStatus = $isInstantPaid ? 'paid' : 'pending';
             $orderStatus = $isInstantPaid ? 'paid' : 'pending';
             $orderSubtotal = Money::fromString((string) $subtotal)->amount;
@@ -91,7 +91,7 @@ class PlaceOrder
             $exchangeRateSource = null;
             $exchangeRateFetchedAt = null;
 
-            if ($data->paymentMethod === 'paypal') {
+            if (in_array($data->paymentMethod, ['paypal', 'paypal_card'], true)) {
                 if ($payPalPaymentQuote === null) {
                     throw ValidationException::withMessages([
                         'payment_method' => 'PayPal conversion details are missing. Please start checkout again.',

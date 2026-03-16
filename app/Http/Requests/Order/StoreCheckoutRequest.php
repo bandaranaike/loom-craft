@@ -29,8 +29,11 @@ class StoreCheckoutRequest extends FormRequest
             'guest_email' => [Rule::requiredIf($requiresGuest), 'email', 'max:255'],
             'currency' => ['required', Rule::in(['LKR'])],
             'shipping_responsibility' => ['required', Rule::in(['vendor', 'platform'])],
-            'payment_method' => ['required', Rule::in(['paypal', 'stripe', 'bank_transfer', 'cod'])],
-            'paypal_conversion_confirmed' => ['exclude_unless:payment_method,paypal', 'accepted'],
+            'payment_method' => ['required', Rule::in(['paypal', 'paypal_card', 'stripe', 'bank_transfer', 'cod'])],
+            'paypal_conversion_confirmed' => [
+                Rule::excludeIf(! in_array($this->input('payment_method'), ['paypal', 'paypal_card'], true)),
+                'accepted',
+            ],
 
             'shipping_full_name' => ['required', 'string', 'max:150'],
             'shipping_line1' => ['required', 'string', 'max:255'],

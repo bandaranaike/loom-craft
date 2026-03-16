@@ -2,11 +2,16 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, type FormEvent } from 'react';
 import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-alert';
 import InputError from '@/components/input-error';
+import PayPalCardFields from '@/components/paypal-card-fields';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { formatMoney } from '@/lib/currency';
 import { show as cartShow } from '@/routes/cart';
 import { store as checkoutStore } from '@/routes/checkout';
 import { create as checkoutPayPalCreate } from '@/routes/checkout/paypal';
+import {
+    capture as checkoutPayPalCardCapture,
+    create as checkoutPayPalCardCreate,
+} from '@/routes/checkout/paypal/card';
 import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
 
@@ -45,6 +50,7 @@ type CheckoutPageProps = {
     guest_email?: string | null;
     canRegister?: boolean;
     paypal_configured?: boolean;
+    paypal_client_id?: string;
     paypal_quote?: {
         original_amount: string;
         original_currency: string;
@@ -61,6 +67,8 @@ const defaultPaymentLabel = (method: string) => {
     switch (method) {
         case 'paypal':
             return 'PayPal';
+        case 'paypal_card':
+            return 'Credit / Debit card';
         case 'stripe':
             return 'Stripe (card)';
         case 'bank_transfer':
@@ -81,6 +89,7 @@ export default function CheckoutPage({
     guest_email,
     canRegister = true,
     paypal_configured = false,
+    paypal_client_id = '',
     paypal_quote = null,
     paypal_unavailable_reason = null,
 }: CheckoutPageProps) {
@@ -206,10 +215,27 @@ export default function CheckoutPage({
             return;
         }
 
+        if (form.data.payment_method === 'paypal_card') {
+            return;
+        }
+
         form.transform(() => normalizedPayload());
 
         form.post(checkoutStore().url, {
             preserveScroll: true,
+        });
+    };
+
+    const applyValidationErrors = (
+        errors: Record<string, string | string[]>,
+    ): void => {
+        form.clearErrors();
+
+        Object.entries(errors).forEach(([field, value]) => {
+            form.setError(
+                field as keyof typeof form.errors,
+                Array.isArray(value) ? value[0] : value,
+            );
         });
     };
 
@@ -718,7 +744,10 @@ export default function CheckoutPage({
                                                         if (
                                                             event.target
                                                                 .value !==
-                                                            'paypal'
+                                                            'paypal' &&
+                                                            event.target
+                                                                .value !==
+                                                                'paypal_card'
                                                         ) {
                                                             form.setData(
                                                                 'paypal_conversion_confirmed',
@@ -752,7 +781,9 @@ export default function CheckoutPage({
                                     value={form.data.currency}
                                 />
 
-                                {form.data.payment_method === 'paypal' &&
+                                {(form.data.payment_method === 'paypal' ||
+                                    form.data.payment_method ===
+                                        'paypal_card') &&
                                 paypal_quote ? (
                                     <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-5">
                                         <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
@@ -827,27 +858,57 @@ export default function CheckoutPage({
                                     </div>
                                 ) : null}
 
-                                <button
-                                    type="submit"
-                                    disabled={
-                                        form.processing ||
-                                        paypalProcessing ||
-                                        (form.data.payment_method ===
-                                            'paypal' &&
-                                            Boolean(isPayPalUnavailable))
-                                    }
-                                    className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:cursor-not-allowed disabled:opacity-70"
-                                >
-                                    {paypalProcessing
-                                        ? 'Redirecting to PayPal...'
-                                        : form.processing
-                                          ? 'Securing order...'
-                                          : form.data.payment_method ===
-                                              'paypal'
-                                            ? 'Continue to PayPal'
-                                            : 'Place order'}
-                                </button>
-                                {form.data.payment_method === 'paypal' &&
+                                {form.data.payment_method === 'paypal_card' ? (
+                                    <PayPalCardFields
+                                        enabled={!isPayPalUnavailable}
+                                        clientId={paypal_client_id}
+                                        createOrderUrl={
+                                            checkoutPayPalCardCreate().url
+                                        }
+                                        captureOrderUrl={
+                                            checkoutPayPalCardCapture().url
+                                        }
+                                        csrfToken={csrfToken()}
+                                        payload={normalizedPayload()}
+                                        onValidationErrors={
+                                            applyValidationErrors
+                                        }
+                                        onSuccess={(redirectUrl) => {
+                                            window.location.assign(
+                                                redirectUrl,
+                                            );
+                                        }}
+                                    />
+                                ) : null}
+
+                                {form.data.payment_method !==
+                                'paypal_card' ? (
+                                    <button
+                                        type="submit"
+                                        disabled={
+                                            form.processing ||
+                                            paypalProcessing ||
+                                            (form.data.payment_method ===
+                                                'paypal' &&
+                                                Boolean(
+                                                    isPayPalUnavailable,
+                                                ))
+                                        }
+                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:cursor-not-allowed disabled:opacity-70"
+                                    >
+                                        {paypalProcessing
+                                            ? 'Redirecting to PayPal...'
+                                            : form.processing
+                                              ? 'Securing order...'
+                                              : form.data.payment_method ===
+                                                  'paypal'
+                                                ? 'Continue to PayPal'
+                                                : 'Place order'}
+                                    </button>
+                                ) : null}
+                                {(form.data.payment_method === 'paypal' ||
+                                    form.data.payment_method ===
+                                        'paypal_card') &&
                                 isPayPalUnavailable ? (
                                     <p className="text-xs text-(--welcome-danger)">
                                         {paypal_unavailable_reason ??

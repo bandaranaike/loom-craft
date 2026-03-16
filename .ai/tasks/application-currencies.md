@@ -50,9 +50,9 @@ Keep product pricing canonical in LKR, while allowing PayPal checkout by convert
    - original LKR amount
    - approximate USD amount
    - exchange rate used
-   - clear message that PayPal will be charged in the supported foreign currency
+   - clear message that PayPal wallet and PayPal card payments are both charged in the supported foreign currency
 5. The customer must explicitly confirm this conversion before the PayPal order is created.
-6. The PayPal order is created using the converted amount, rounded to 2 decimal places.
+6. The PayPal order is created using the converted amount, rounded to 2 decimal places, for both the redirect-based wallet flow and the on-page card flow.
 7. After approval/capture, the final order/payment records retain both LKR and converted payment details.
 8. Non-PayPal checkout paths continue to operate with LKR as the application checkout currency after the simplification.
 
@@ -120,6 +120,9 @@ Keep product pricing canonical in LKR, while allowing PayPal checkout by convert
 3. Create the PayPal order using the supported foreign currency amount.
 4. Store the conversion snapshot in the pending PayPal session payload so approval/capture uses the same values.
 5. On final order placement, persist that same snapshot to the database.
+6. Support two PayPal execution paths:
+   - wallet checkout by redirecting to PayPal approval
+   - direct card checkout using PayPal Card Fields and server-side capture
 
 ### Persistence Integrity
 1. Historical orders must not depend on future exchange-rate changes.
@@ -131,16 +134,18 @@ Keep product pricing canonical in LKR, while allowing PayPal checkout by convert
    - payment provider reference
 
 ## Frontend Work
-1. Update the checkout page only where PayPal is selected.
+1. Update the checkout page only where a PayPal option is selected.
 2. Add a conversion summary panel that shows:
    - `Total: LKR ...`
    - `Approx. USD ...`
-   - `Rate: 1 USD = ... LKR` or `1 LKR = ... USD`
+   - `Rate: 1 USD = ... LKR`
 3. Add a short trust message explaining that LKR is converted automatically because PayPal does not support LKR.
-4. Add a required confirmation control before the PayPal redirect action is allowed.
-5. Keep the UI clear that the amount is approximate until the PayPal order is created with the stored rate snapshot.
-6. If rate data is unavailable or stale, disable PayPal and show a useful message.
-7. Remove or adjust any cart/checkout currency picker so the simplified LKR-first flow is clear.
+4. Add a required confirmation control before either PayPal action is allowed.
+5. For PayPal wallet, continue redirecting to PayPal after creating the converted order.
+6. For PayPal card, render PayPal Card Fields on the checkout page and capture the approved order without leaving the site.
+7. Keep the UI clear that the amount is approximate until the PayPal order is created with the stored rate snapshot.
+8. If rate data is unavailable or stale, disable both PayPal wallet and PayPal card flows and show a useful message.
+9. Remove or adjust any cart/checkout currency picker so the simplified LKR-first flow is clear.
 
 ## API / Provider Choice
 1. Use one free exchange-rate provider behind an internal abstraction.
@@ -165,9 +170,9 @@ Keep product pricing canonical in LKR, while allowing PayPal checkout by convert
 3. Add conversion service and stale-rate rules.
 4. Extend PayPal checkout flow to use conversion snapshot data.
 5. Extend order/payment persistence for exchange-rate audit fields.
-6. Update checkout UI with PayPal conversion summary and confirmation.
+6. Update checkout UI with PayPal conversion summary, confirmation, and PayPal Card Fields support.
 7. Simplify cart and checkout away from customer-selected currencies.
-8. Add or update feature tests for the full flow.
+8. Add or update feature tests for wallet checkout, card checkout, and persistence.
 
 ## Tests
 1. Exchange-rate refresh stores the latest rate correctly.
@@ -177,21 +182,28 @@ Keep product pricing canonical in LKR, while allowing PayPal checkout by convert
 5. PayPal checkout fails gracefully when the latest rate is older than 24 hours.
 6. Customer confirmation is required before PayPal order creation.
 7. Pending PayPal session data stores the conversion snapshot.
-8. Approved PayPal checkout persists:
+8. Approved PayPal wallet checkout persists:
    - original LKR amount
    - converted amount
    - converted currency `USD`
    - rate used
    - source
-9. Historical order/payment data remains unchanged even after rates are refreshed later.
-10. Cart and checkout no longer expose customer-selectable `USD` or `EUR` flows after the simplification.
+9. Approved PayPal card checkout persists:
+   - original LKR amount
+   - converted amount
+   - converted currency `USD`
+   - rate used
+   - source
+10. Historical order/payment data remains unchanged even after rates are refreshed later.
+11. Cart and checkout no longer expose customer-selectable `USD` or `EUR` flows after the simplification.
 
 ## Acceptance Criteria
 1. Product pricing remains canonical in LKR.
 2. PayPal checkout never attempts to charge LKR.
-3. The customer sees and confirms the conversion details before redirecting to PayPal.
+3. The customer sees and confirms the conversion details before starting either PayPal checkout path.
 4. The exact exchange-rate snapshot used for the PayPal charge is stored permanently.
 5. Exchange rates are refreshed automatically on a schedule.
 6. PayPal is blocked when rate data is missing or stale.
 7. Cart and checkout are simplified to the LKR-first flow for customers, with USD used only when settling PayPal.
-8. The flow is covered by automated tests.
+8. Both PayPal wallet and PayPal card checkouts use the same conversion snapshot rules.
+9. The flow is covered by automated tests.

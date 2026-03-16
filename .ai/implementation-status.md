@@ -35,6 +35,9 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Cart item create/update/delete endpoints implemented.
 - Checkout page enforces non-empty cart before rendering.
 - Checkout store flow creates order aggregate and clears cart items.
+- Checkout now shows PayPal LKR to USD conversion details before payment starts.
+- PayPal checkout supports both wallet redirect approval and on-page direct card entry via PayPal Card Fields.
+- Exchange-rate snapshots are stored historically and used to block stale PayPal conversions.
 
 ### Orders
 - Order placement persists to:
@@ -91,7 +94,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 
 ## Partial / Gaps vs Architecture Scope
 
-- PayPal approval/capture checkout flow is implemented; Stripe remains record/status-only and bank transfer admin verification workflow UI is still missing.
+- PayPal wallet approval/capture flow and PayPal direct card checkout are implemented; Stripe remains record/status-only and bank transfer admin verification workflow UI is still missing.
 - Shipment, disputes, complaints, and product reports are modeled at DB level but not surfaced as completed user/admin workflows.
 - Vendor shipping management and vendor payments/earnings pages are not implemented.
 - Admin vendor CRUD beyond pending/approve/reject is not implemented.
@@ -124,6 +127,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Production deployment workflow created at `.github/workflows/deploy-production.yml` to auto-deploy `main` to the VPS using build artifact + SSH release deployment.
 - Price display now uses formatted currency labels in major storefront and order views.
 - LKR prices render as `Rs. 5,000.00` style formatting instead of raw amount + currency code.
+- Checkout now presents PayPal settlement as `1 USD = ... LKR` and requires customer confirmation before wallet or card processing.
 - Vendor product edit image deletion now uses corrected Wayfinder argument mapping for `/vendor/products/{product}/images/{image}`.
 - Public/buyer-facing commission messaging has been removed; commission details remain visible in vendor product create/edit flows only.
 - Dashboard now loads authenticated users' recent order histories via `DashboardController` + `ListDashboardOrderHistories` and displays them in a `/vendor/products`-style card layout with click-to-open detailed order popup.

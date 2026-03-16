@@ -47,6 +47,7 @@ class CheckoutController extends Controller
             ...$result->toArray(),
             'canRegister' => Features::enabled(Features::registration()),
             'paypal_configured' => $paypalConfigured,
+            'paypal_client_id' => app(PayPalOrderService::class)->sdkClientId(),
             'paypal_quote' => $paypalQuote,
             'paypal_unavailable_reason' => $paypalUnavailableReason,
         ]);
