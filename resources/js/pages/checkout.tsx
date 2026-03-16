@@ -133,6 +133,12 @@ export default function CheckoutPage({
 
     const isPayPalUnavailable =
         !paypal_configured || paypal_quote === null || paypal_unavailable_reason;
+    const paypalExchangeRateLabel =
+        paypal_quote === null
+            ? null
+            : `1 ${paypal_quote.converted_currency} = ${Math.round(
+                  1 / Number.parseFloat(paypal_quote.exchange_rate),
+              ).toLocaleString('en-LK')} ${paypal_quote.original_currency}`;
 
     const csrfToken = () =>
         document
@@ -780,9 +786,7 @@ export default function CheckoutPage({
                                                     Rate
                                                 </span>
                                                 <span>
-                                                    1 LKR ={' '}
-                                                    {paypal_quote.exchange_rate}{' '}
-                                                    {paypal_quote.converted_currency}
+                                                    {paypalExchangeRateLabel}
                                                 </span>
                                             </div>
                                         </div>
