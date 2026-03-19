@@ -9,3 +9,14 @@ export function cn(...inputs: ClassValue[]) {
 export function toUrl(url: NonNullable<InertiaLinkProps['href']>): string {
     return typeof url === 'string' ? url : url.url;
 }
+
+export function truncatePublicId(
+    value: string | null,
+    fallback: string,
+): string {
+    if (value === null || value.length <= 20) {
+        return value ?? fallback;
+    }
+
+    return `${value.slice(0, 12)}...${value.slice(-6)}`;
+}

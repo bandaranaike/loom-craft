@@ -27,8 +27,8 @@ class BuildOrderProgress
         }
 
         $paymentState = match (true) {
-            $paymentStatus === 'paid' && in_array($orderStatus, ['confirmed', 'delivered'], true) => 'complete',
-            in_array($paymentStatus, ['paid', 'pending', 'failed'], true) => 'current',
+            $paymentStatus === 'paid' => 'complete',
+            in_array($paymentStatus, ['pending', 'failed'], true) => 'current',
             default => 'upcoming',
         };
 

@@ -82,6 +82,24 @@ it('exposes delivered progress states on the order page', function () {
         );
 });
 
+it('marks payment as complete once payment succeeds even before confirmation', function () {
+    $order = createTrackedOrder([
+        'status' => 'pending',
+    ], [
+        'status' => 'paid',
+    ]);
+
+    $this->get(route('orders.show', ['order' => $order->public_id]))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('orders/show')
+            ->where('order.progress.steps.0.state', 'complete')
+            ->where('order.progress.steps.1.state', 'complete')
+            ->where('order.progress.steps.2.state', 'upcoming')
+            ->where('order.progress.steps.3.state', 'upcoming')
+        );
+});
+
 it('exposes a distinct cancelled summary card payload', function () {
     $order = createTrackedOrder([
         'status' => 'cancelled',

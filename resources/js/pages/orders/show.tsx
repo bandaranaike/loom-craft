@@ -2,6 +2,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { store as storeBankTransferSlip } from '@/actions/App/Http/Controllers/OrderBankTransferSlipController';
 import InputError from '@/components/input-error';
 import OrderProgress from '@/components/order-progress';
+import { usePublicOrderReference } from '@/hooks/use-public-order-reference';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { formatMoney } from '@/lib/currency';
 import { index as ordersIndex } from '@/routes/orders';
@@ -82,6 +83,15 @@ export default function OrderShow() {
     const shipping = order.addresses.find((address) => address.type === 'shipping');
     const billing = order.addresses.find((address) => address.type === 'billing');
     const proofIsImage = order.payment_proof?.mime_type.startsWith('image/') ?? false;
+    const {
+        copied,
+        copyPublicOrderReference,
+        publicOrderReference,
+        truncatedPublicOrderReference,
+    } = usePublicOrderReference({
+        id: order.id,
+        publicId: order.public_id,
+    });
     const paymentRecordedInDifferentCurrency =
         order.payment_currency !== null &&
         order.payment_amount !== null &&
@@ -99,11 +109,25 @@ export default function OrderShow() {
                                     <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Public order reference
                                     </p>
-                                    <h1 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong) md:text-4xl">
-                                        {order.public_id ?? `Order #${order.id}`}
+                                    <h1 className="font-['Playfair_Display',serif] text-xl text-(--welcome-strong) md:text-2xl">
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                void copyPublicOrderReference()
+                                            }
+                                            className="max-w-full cursor-pointer truncate text-left underline decoration-(--welcome-border) underline-offset-4"
+                                            title={`Copy ${publicOrderReference}`}
+                                        >
+                                            {truncatedPublicOrderReference}
+                                        </button>
                                     </h1>
                                     <p className="text-sm text-(--welcome-body-text)">
                                         {order.placed_at ?? 'Pending placement'} • {order.payment_method} • payment {order.payment_status}
+                                    </p>
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                        {copied
+                                            ? 'Reference copied'
+                                            : 'Tap the reference to copy'}
                                     </p>
                                 </div>
                                 <div className="space-y-3 text-left md:text-right">
@@ -277,7 +301,16 @@ export default function OrderShow() {
                         <div className="mt-4 space-y-3">
                             <div className="flex items-center justify-between">
                                 <span className="text-(--welcome-body-text)">Order reference</span>
-                                <span className="text-(--welcome-strong)">{order.public_id ?? `#${order.id}`}</span>
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        void copyPublicOrderReference()
+                                    }
+                                    className="max-w-48 cursor-pointer truncate text-right text-(--welcome-strong) underline decoration-(--welcome-border) underline-offset-4"
+                                    title={`Copy ${publicOrderReference}`}
+                                >
+                                    {truncatedPublicOrderReference}
+                                </button>
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-(--welcome-body-text)">Order subtotal</span>
