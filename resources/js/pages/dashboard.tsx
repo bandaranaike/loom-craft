@@ -54,6 +54,7 @@ type OrderAddress = {
 
 type OrderHistory = {
     id: number;
+    public_id: string | null;
     status: string;
     currency: string;
     subtotal: string;
@@ -136,7 +137,7 @@ export default function Dashboard() {
                             >
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                     <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                        Order #{order.id}
+                                        {order.public_id ?? `Order #${order.id}`}
                                     </p>
                                     <span className="rounded-full border border-sidebar-border/60 px-3 py-1 text-xs uppercase tracking-[0.2em] text-muted-foreground dark:border-sidebar-border">
                                         {order.status}
@@ -194,7 +195,7 @@ export default function Dashboard() {
                             <>
                                 <DialogHeader>
                                     <DialogTitle className="text-xl">
-                                        Order #{selectedOrder.id}
+                                        {selectedOrder.public_id ?? `Order #${selectedOrder.id}`}
                                     </DialogTitle>
                                     <DialogDescription>
                                         {formatMoney(selectedOrder.total, selectedOrder.currency)} •{' '}
@@ -316,7 +317,7 @@ export default function Dashboard() {
 
                                     <div className="flex justify-end">
                                         <Link
-                                            href={ordersShow(selectedOrder.id)}
+                                            href={ordersShow(selectedOrder.public_id ?? `${selectedOrder.id}`)}
                                             className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"
                                         >
                                             Open Full Page

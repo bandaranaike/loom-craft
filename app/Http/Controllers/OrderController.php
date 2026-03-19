@@ -6,6 +6,7 @@ use App\Actions\Order\ListOrders;
 use App\Actions\Order\ShowOrder;
 use App\DTOs\Order\OrderIndexData;
 use App\DTOs\Order\OrderShowData;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,7 +22,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function show(Request $request, int $order, ShowOrder $action): Response
+    public function show(Request $request, Order $order, ShowOrder $action): Response
     {
         $result = $action->handle(OrderShowData::fromRequest($request, $order));
 

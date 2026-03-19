@@ -200,7 +200,7 @@ it('creates a pending order from checkout and clears the cart', function () {
 
     $order = Order::query()->firstOrFail();
 
-    $response->assertRedirect(route('orders.confirmation', ['order' => $order->id]));
+    $response->assertRedirect(route('orders.confirmation', ['order' => $order->public_id]));
 
     $expectedCommissionAmount = number_format(180 * ((float) $commissionRate / 100), 2, '.', '');
 
@@ -304,7 +304,7 @@ it('still places a pending order when requested quantity exceeds available piece
     $order = Order::query()->firstOrFail();
     $expectedCommissionAmount = number_format(540 * ((float) $commissionRate / 100), 2, '.', '');
 
-    $response->assertRedirect(route('orders.confirmation', ['order' => $order->id]));
+    $response->assertRedirect(route('orders.confirmation', ['order' => $order->public_id]));
 
     $this->assertDatabaseHas('order_items', [
         'order_id' => $order->id,
@@ -562,7 +562,7 @@ it('completes a stripe checkout and creates the final order', function () {
 
     $order = Order::query()->firstOrFail();
 
-    $response->assertRedirect(route('orders.confirmation', ['order' => $order->id]));
+    $response->assertRedirect(route('orders.confirmation', ['order' => $order->public_id]));
 
     $this->assertDatabaseHas('payments', [
         'order_id' => $order->id,
@@ -984,7 +984,7 @@ it('captures a PayPal order and creates the final order', function () {
 
     $order = Order::query()->firstOrFail();
 
-    $response->assertRedirect(route('orders.confirmation', ['order' => $order->id]));
+    $response->assertRedirect(route('orders.confirmation', ['order' => $order->public_id]));
 
     $this->assertDatabaseHas('payments', [
         'order_id' => $order->id,
@@ -1102,7 +1102,7 @@ it('captures a PayPal card order and creates the final order', function () {
 
     $response
         ->assertOk()
-        ->assertJsonPath('redirect_url', route('orders.confirmation', ['order' => $order->id]));
+        ->assertJsonPath('redirect_url', route('orders.confirmation', ['order' => $order->public_id]));
 
     $this->assertDatabaseHas('payments', [
         'order_id' => $order->id,

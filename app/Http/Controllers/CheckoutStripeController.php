@@ -126,7 +126,7 @@ class CheckoutStripeController extends Controller
             $request->session()->put('guest_order_id', $result->orderId);
         }
 
-        $response = redirect()->route('orders.confirmation', ['order' => $result->orderId]);
+        $response = redirect()->route('orders.confirmation', ['order' => $result->publicOrderId]);
 
         if ($request->user() === null && $result->guestToken !== null) {
             $response->withCookie(cookie('loomcraft_guest_token', $result->guestToken, 60 * 24 * 30));

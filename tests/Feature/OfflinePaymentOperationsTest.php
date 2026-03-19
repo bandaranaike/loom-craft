@@ -64,12 +64,12 @@ it('stores the final bank transfer slip for guest orders', function () {
     $order = createOfflineOrder(paymentMethod: 'bank_transfer');
     $file = UploadedFile::fake()->image('final-slip.jpg');
 
-    $this->from(route('orders.confirmation', ['order' => $order->id]))
+    $this->from(route('orders.confirmation', ['order' => $order->public_id]))
         ->withSession(['guest_order_id' => $order->id])
-        ->post(route('orders.bank-transfer-slip.store', ['order' => $order->id]), [
+        ->post(route('orders.bank-transfer-slip.store', ['order' => $order->public_id]), [
             'slip' => $file,
         ])
-        ->assertRedirect(route('orders.confirmation', ['order' => $order->id]))
+        ->assertRedirect(route('orders.confirmation', ['order' => $order->public_id]))
         ->assertSessionHas('status', 'Bank transfer slip uploaded successfully.');
 
     $payment = $order->payment()->firstOrFail()->fresh();
@@ -87,12 +87,12 @@ it('rejects invalid bank transfer slip file types', function () {
 
     $order = createOfflineOrder(paymentMethod: 'bank_transfer');
 
-    $this->from(route('orders.confirmation', ['order' => $order->id]))
+    $this->from(route('orders.confirmation', ['order' => $order->public_id]))
         ->withSession(['guest_order_id' => $order->id])
-        ->post(route('orders.bank-transfer-slip.store', ['order' => $order->id]), [
+        ->post(route('orders.bank-transfer-slip.store', ['order' => $order->public_id]), [
             'slip' => UploadedFile::fake()->create('notes.txt', 5, 'text/plain'),
         ])
-        ->assertRedirect(route('orders.confirmation', ['order' => $order->id]))
+        ->assertRedirect(route('orders.confirmation', ['order' => $order->public_id]))
         ->assertSessionHasErrors(['slip']);
 
     $this->assertDatabaseHas('payments', [
@@ -117,11 +117,12 @@ it('shows order details and uploaded proof on the guest confirmation page', func
     ]);
 
     $this->withSession(['guest_order_id' => $order->id])
-        ->get(route('orders.confirmation', ['order' => $order->id]))
+        ->get(route('orders.confirmation', ['order' => $order->public_id]))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('orders/confirmation')
             ->where('order.id', $order->id)
+            ->where('order.public_id', $order->public_id)
             ->where('order.total', '180.00')
             ->where('order.currency', 'LKR')
             ->where('order.payment_method', 'bank_transfer')

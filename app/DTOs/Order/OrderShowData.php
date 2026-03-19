@@ -2,24 +2,26 @@
 
 namespace App\DTOs\Order;
 
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class OrderShowData
 {
     public function __construct(
-        public User $user,
-        public int $orderId,
+        public ?User $user,
+        public Order $order,
+        public ?int $guestOrderId,
     ) {}
 
-    public static function fromRequest(Request $request, int $orderId): self
+    public static function fromRequest(Request $request, Order $order): self
     {
-        $user = $request->user();
+        $guestOrderId = $request->session()->get('guest_order_id');
 
-        if (! $user instanceof User) {
-            throw new \RuntimeException('User is required to view orders.');
-        }
-
-        return new self($user, $orderId);
+        return new self(
+            $request->user(),
+            $order,
+            is_numeric($guestOrderId) ? (int) $guestOrderId : null,
+        );
     }
 }

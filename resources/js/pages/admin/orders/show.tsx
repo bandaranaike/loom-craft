@@ -40,6 +40,7 @@ type OrderProof = {
 
 type AdminOrderSummary = {
     id: number;
+    public_id: string | null;
     status: string;
     currency: string;
     subtotal: string;
@@ -111,6 +112,9 @@ export default function AdminOrderShow() {
                             <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">
                                 Order #{order.id}
                             </h2>
+                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                Public reference {order.public_id ?? 'Pending'}
+                            </p>
                             <p className="text-sm text-(--welcome-body-text)">
                                 {order.customer_name ?? 'Guest customer'} • {order.customer_email ?? 'No email'}
                             </p>

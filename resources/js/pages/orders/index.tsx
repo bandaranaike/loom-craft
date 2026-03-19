@@ -6,6 +6,7 @@ import type { BreadcrumbItem } from '@/types';
 
 type OrderListItem = {
     id: number;
+    public_id: string | null;
     status: string;
     currency: string;
     total: string;
@@ -54,13 +55,13 @@ export default function OrdersIndex() {
                         {orders.map((order) => (
                             <Link
                                 key={order.id}
-                                href={orderShow(order.id)}
+                                href={orderShow(order.public_id ?? `${order.id}`)}
                                 className="rounded-xl border border-sidebar-border/70 bg-background p-6 text-sm text-foreground shadow-xs transition hover:border-foreground/50 dark:border-sidebar-border"
                             >
                                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                                     <div className="space-y-2">
                                         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                            Order #{order.id}
+                                            Reference {order.public_id ?? `#${order.id}`}
                                         </p>
                                         <p className="text-lg font-semibold">
                                             {formatMoney(order.total, order.currency)}

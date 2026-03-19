@@ -6,6 +6,7 @@ class OrderListItem
 {
     public function __construct(
         public int $id,
+        public ?string $publicId,
         public string $status,
         public string $currency,
         public string $total,
@@ -20,6 +21,7 @@ class OrderListItem
     {
         return [
             'id' => $this->id,
+            'public_id' => $this->publicId,
             'status' => $this->status,
             'currency' => $this->currency,
             'total' => $this->total,

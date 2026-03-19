@@ -171,7 +171,7 @@ class CheckoutPayPalController extends Controller
             $request->session()->put('guest_order_id', $result->orderId);
         }
 
-        $response = redirect()->route('orders.confirmation', ['order' => $result->orderId]);
+        $response = redirect()->route('orders.confirmation', ['order' => $result->publicOrderId]);
 
         if ($request->user() === null && $result->guestToken !== null) {
             $response->withCookie(cookie('loomcraft_guest_token', $result->guestToken, 60 * 24 * 30));
@@ -231,7 +231,7 @@ class CheckoutPayPalController extends Controller
         }
 
         $response = response()->json([
-            'redirect_url' => route('orders.confirmation', ['order' => $result->orderId]),
+            'redirect_url' => route('orders.confirmation', ['order' => $result->publicOrderId]),
         ]);
 
         if ($request->user() === null && $result->guestToken !== null) {

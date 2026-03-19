@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 
 class Order extends Model
 {
@@ -30,6 +31,15 @@ class Order extends Model
         'placed_at',
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function (Order $order): void {
+            if (! is_string($order->public_id) || $order->public_id === '') {
+                $order->public_id = self::newPublicId();
+            }
+        });
+    }
+
     /**
      * @return array<string, string>
      */
@@ -38,6 +48,15 @@ class Order extends Model
         return [
             'placed_at' => 'datetime',
         ];
+    }
+
+    private static function newPublicId(): string
+    {
+        do {
+            $publicId = 'ORD-'.Str::upper(Str::random(28));
+        } while (self::query()->where('public_id', $publicId)->exists());
+
+        return $publicId;
     }
 
     public function user(): BelongsTo

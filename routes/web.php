@@ -78,9 +78,11 @@ Route::get('checkout/stripe/approved', [CheckoutStripeController::class, 'approv
 Route::get('checkout/stripe/cancelled', [CheckoutStripeController::class, 'cancelled'])
     ->name('checkout.stripe.cancelled');
 
-Route::get('orders/{order}/confirmation', [OrderConfirmationController::class, 'show'])
+Route::get('orders/{order:public_id}/confirmation', [OrderConfirmationController::class, 'show'])
     ->name('orders.confirmation');
-Route::post('orders/{order}/bank-transfer-slip', [OrderBankTransferSlipController::class, 'store'])
+Route::get('orders/{order:public_id}', [OrderController::class, 'show'])
+    ->name('orders.show');
+Route::post('orders/{order:public_id}/bank-transfer-slip', [OrderBankTransferSlipController::class, 'store'])
     ->name('orders.bank-transfer-slip.store');
 
 Route::get('dashboard', DashboardController::class)
@@ -172,11 +174,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('vendor-inquiries/{inquiry}/reject', [AdminVendorInquiryController::class, 'reject'])
             ->name('admin.vendor-inquiries.reject');
     });
-
     Route::get('orders', [OrderController::class, 'index'])
         ->name('orders.index');
-    Route::get('orders/{order}', [OrderController::class, 'show'])
-        ->name('orders.show');
 });
 
 require __DIR__.'/settings.php';

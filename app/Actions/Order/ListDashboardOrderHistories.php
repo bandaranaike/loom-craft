@@ -56,6 +56,7 @@ class ListDashboardOrderHistories
 
                 return new OrderSummaryResult(
                     $order->id,
+                    $order->public_id,
                     $order->status,
                     $order->currency,
                     Money::fromString((string) $order->subtotal)->amount,
@@ -65,6 +66,10 @@ class ListDashboardOrderHistories
                     $order->placed_at?->toDateTimeString(),
                     $order->payment?->method ?? 'pending',
                     $order->payment?->status ?? 'pending',
+                    $order->payment?->amount,
+                    $order->payment?->currency,
+                    $order->payment?->original_amount,
+                    $order->payment?->original_currency,
                     $items,
                     $addresses,
                     null,

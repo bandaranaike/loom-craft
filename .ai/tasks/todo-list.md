@@ -14,4 +14,4 @@
 
 - [ ] `stripe-checkout.md`
 - [x] `checkout-offline-payment-operations.md` completed on 2026-03-19
-- [ ] `order-details-and-tracking.md`
+- [x] `order-details-and-tracking.md` completed on 2026-03-19

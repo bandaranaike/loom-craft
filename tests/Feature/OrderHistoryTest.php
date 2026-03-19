@@ -47,5 +47,6 @@ it('shows order history for authenticated customers', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('orders/index')
             ->has('orders', 1)
+            ->where('orders.0.public_id', $order->public_id)
         );
 });

@@ -16,23 +16,15 @@ use Illuminate\Support\Facades\Storage;
 
 class ShowOrderConfirmation
 {
+    public function __construct(
+        private BuildOrderProgress $buildOrderProgress,
+    ) {}
+
     public function handle(OrderConfirmationData $data): OrderSummaryResult
     {
         Gate::authorize('viewConfirmation', Order::class);
 
-        $order = Order::query()
-            ->with(['items.product.vendor', 'addresses', 'payment'])
-            ->findOrFail($data->orderId);
-
-        if ($data->user) {
-            Gate::authorize('view', $order);
-        } else {
-            Gate::authorize('viewGuest', $order);
-
-            if ($data->guestOrderId !== $order->id) {
-                abort(403);
-            }
-        }
+        $order = $data->order->load(['items.product.vendor', 'addresses', 'payment']);
 
         $items = $order->items->map(function (OrderItem $item): OrderItemSummary {
             $product = $item->product;
@@ -73,6 +65,7 @@ class ShowOrderConfirmation
 
         return new OrderSummaryResult(
             $order->id,
+            $order->public_id,
             $order->status,
             $order->currency,
             Money::fromString((string) $order->subtotal)->amount,
@@ -82,9 +75,15 @@ class ShowOrderConfirmation
             $order->placed_at?->toDateTimeString(),
             $payment->method,
             $payment->status,
+            Money::fromString((string) $payment->amount)->amount,
+            $payment->currency,
+            Money::fromString((string) $payment->original_amount)->amount,
+            $payment->original_currency,
             $items,
             $addresses,
             $this->paymentProof($payment),
+            $this->buildOrderProgress->handle($order->status, $payment->status),
+            $this->canUploadPaymentProof($data->user, $order, $data->guestOrderId),
         );
     }
 
@@ -103,5 +102,22 @@ class ShowOrderConfirmation
             'mime_type' => $payment->bank_transfer_slip_mime_type ?? 'application/octet-stream',
             'uploaded_at' => $payment->bank_transfer_slip_uploaded_at?->toDateTimeString(),
         ];
+    }
+
+    private function canUploadPaymentProof(?\App\Models\User $user, Order $order, ?int $guestOrderId): bool
+    {
+        if ($order->payment?->method !== 'bank_transfer') {
+            return false;
+        }
+
+        if ($user?->role === 'admin') {
+            return true;
+        }
+
+        if ($user !== null) {
+            return $order->user_id === $user->id;
+        }
+
+        return $guestOrderId === $order->id;
     }
 }

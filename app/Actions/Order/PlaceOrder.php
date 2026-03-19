@@ -147,7 +147,11 @@ class PlaceOrder
 
             $cart->items()->delete();
 
-            return new OrderPlacementResult($order->id, $cart->guest_token);
+            return new OrderPlacementResult(
+                $order->id,
+                $order->public_id,
+                $cart->guest_token,
+            );
         });
     }
 

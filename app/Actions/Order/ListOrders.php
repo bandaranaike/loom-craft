@@ -22,6 +22,7 @@ class ListOrders
             ->get()
             ->map(fn (Order $order): OrderListItem => new OrderListItem(
                 $order->id,
+                $order->public_id,
                 $order->status,
                 $order->currency,
                 Money::fromString((string) $order->total)->amount,
