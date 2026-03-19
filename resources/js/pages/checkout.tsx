@@ -8,6 +8,7 @@ import { formatMoney } from '@/lib/currency';
 import { show as cartShow } from '@/routes/cart';
 import { store as checkoutStore } from '@/routes/checkout';
 import { create as checkoutPayPalCreate } from '@/routes/checkout/paypal';
+import { create as checkoutStripeCreate } from '@/routes/checkout/stripe';
 import {
     capture as checkoutPayPalCardCapture,
     create as checkoutPayPalCardCreate,
@@ -50,6 +51,7 @@ type CheckoutPageProps = {
     guest_email?: string | null;
     canRegister?: boolean;
     paypal_configured?: boolean;
+    stripe_configured?: boolean;
     paypal_client_id?: string;
     paypal_quote?: {
         original_amount: string;
@@ -89,6 +91,7 @@ export default function CheckoutPage({
     guest_email,
     canRegister = true,
     paypal_configured = false,
+    stripe_configured = false,
     paypal_client_id = '',
     paypal_quote = null,
     paypal_unavailable_reason = null,
@@ -96,6 +99,7 @@ export default function CheckoutPage({
     const { auth } = usePage<SharedData>().props;
     const [mirrorBilling, setMirrorBilling] = useState(true);
     const [paypalProcessing, setPaypalProcessing] = useState(false);
+    const [stripeProcessing, setStripeProcessing] = useState(false);
 
     const form = useForm({
         guest_name: guest_name ?? '',
@@ -206,8 +210,59 @@ export default function CheckoutPage({
         }
     };
 
+    const submitStripeCheckout = async (): Promise<void> => {
+        setStripeProcessing(true);
+        form.clearErrors();
+
+        try {
+            const response = await fetch(checkoutStripeCreate().url, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': csrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify(normalizedPayload()),
+            });
+
+            if (response.status === 422) {
+                const payload = (await response.json()) as {
+                    errors?: Record<string, string | string[]>;
+                };
+
+                applyValidationErrors(payload.errors ?? {});
+
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error('Stripe checkout creation failed.');
+            }
+
+            const payload = (await response.json()) as {
+                checkout_url?: string;
+            };
+
+            if (!payload.checkout_url) {
+                throw new Error('Stripe checkout URL is missing.');
+            }
+
+            window.location.assign(payload.checkout_url);
+        } finally {
+            setStripeProcessing(false);
+        }
+    };
+
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
+
+        if (form.data.payment_method === 'stripe') {
+            void submitStripeCheckout();
+
+            return;
+        }
 
         if (form.data.payment_method === 'paypal') {
             void submitPayPalOrder();
@@ -888,6 +943,10 @@ export default function CheckoutPage({
                                         disabled={
                                             form.processing ||
                                             paypalProcessing ||
+                                            stripeProcessing ||
+                                            (form.data.payment_method ===
+                                                'stripe' &&
+                                                !stripe_configured) ||
                                             (form.data.payment_method ===
                                                 'paypal' &&
                                                 Boolean(
@@ -896,15 +955,27 @@ export default function CheckoutPage({
                                         }
                                         className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:cursor-not-allowed disabled:opacity-70"
                                     >
-                                        {paypalProcessing
+                                        {stripeProcessing
+                                            ? 'Redirecting to Stripe...'
+                                            : paypalProcessing
                                             ? 'Redirecting to PayPal...'
                                             : form.processing
                                               ? 'Securing order...'
+                                              : form.data.payment_method ===
+                                                  'stripe'
+                                                ? 'Continue to Stripe'
                                               : form.data.payment_method ===
                                                   'paypal'
                                                 ? 'Continue to PayPal'
                                                 : 'Place order'}
                                     </button>
+                                ) : null}
+                                {form.data.payment_method === 'stripe' &&
+                                !stripe_configured ? (
+                                    <p className="text-xs text-(--welcome-danger)">
+                                        Stripe is not configured yet. Add `STRIPE_KEY`
+                                        and `STRIPE_SECRET` in `.env` and reload.
+                                    </p>
                                 ) : null}
                                 {(form.data.payment_method === 'paypal' ||
                                     form.data.payment_method ===

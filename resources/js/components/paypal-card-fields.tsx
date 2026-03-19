@@ -3,22 +3,26 @@ import { useEffect, useRef, useState } from 'react';
 declare global {
     interface Window {
         paypal?: {
-            CardFields?: (config: {
-                createOrder: () => Promise<string>;
-                onApprove: (data: { orderID: string }) => Promise<void>;
-                onError: (error: unknown) => void;
-            }) => {
-                isEligible: () => boolean;
-                NumberField: () => { render: (selector: string) => Promise<void> };
-                CVVField: () => { render: (selector: string) => Promise<void> };
-                ExpiryField: () => { render: (selector: string) => Promise<void> };
-                submit: () => Promise<void>;
-            };
+            CardFields?: PayPalCardFieldsFactory;
         };
     }
 }
 
 type ValidationErrors = Record<string, string | string[]>;
+
+type PayPalCardFieldsInstance = {
+    isEligible: () => boolean;
+    NumberField: () => { render: (selector: string) => Promise<void> };
+    CVVField: () => { render: (selector: string) => Promise<void> };
+    ExpiryField: () => { render: (selector: string) => Promise<void> };
+    submit: () => Promise<void>;
+};
+
+type PayPalCardFieldsFactory = (config: {
+    createOrder: () => Promise<string>;
+    onApprove: (data: { orderID: string }) => Promise<void>;
+    onError: (error: unknown) => void;
+}) => PayPalCardFieldsInstance;
 
 type PayPalCardFieldsProps = {
     enabled: boolean;
@@ -45,7 +49,7 @@ export default function PayPalCardFields({
     const [isEligible, setIsEligible] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const cardFieldsRef = useRef<ReturnType<NonNullable<typeof window.paypal>['CardFields']> | null>(null);
+    const cardFieldsRef = useRef<PayPalCardFieldsInstance | null>(null);
     const payloadRef = useRef(payload);
 
     payloadRef.current = payload;

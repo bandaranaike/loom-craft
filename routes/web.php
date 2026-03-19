@@ -12,6 +12,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CheckoutPayPalController;
+use App\Http\Controllers\CheckoutStripeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoomWeaveDemoController;
@@ -69,6 +70,12 @@ Route::get('checkout/paypal/approved', [CheckoutPayPalController::class, 'approv
     ->name('checkout.paypal.approved');
 Route::get('checkout/paypal/cancelled', [CheckoutPayPalController::class, 'cancelled'])
     ->name('checkout.paypal.cancelled');
+Route::post('checkout/stripe/create', [CheckoutStripeController::class, 'create'])
+    ->name('checkout.stripe.create');
+Route::get('checkout/stripe/approved', [CheckoutStripeController::class, 'approved'])
+    ->name('checkout.stripe.approved');
+Route::get('checkout/stripe/cancelled', [CheckoutStripeController::class, 'cancelled'])
+    ->name('checkout.stripe.cancelled');
 
 Route::get('orders/{order}/confirmation', [OrderConfirmationController::class, 'show'])
     ->name('orders.confirmation');
