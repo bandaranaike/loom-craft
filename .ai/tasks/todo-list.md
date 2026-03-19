@@ -9,9 +9,8 @@
 - [x] `product-detail-image-slider.md` completed on 2026-03-09
 - [x] `product-quantity.md` completed on 2026-03-09
 - [x] product slug public URL migration and auto-generation completed on 2026-03-10
-
-## Task to do
-
-- [ ] `stripe-checkout.md`
+- [x] `stripe-checkout.md` completed on 2026-03-19
 - [x] `checkout-offline-payment-operations.md` completed on 2026-03-19
 - [x] `order-details-and-tracking.md` completed on 2026-03-19
+
+## Task to do
