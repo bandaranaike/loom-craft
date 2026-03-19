@@ -28,7 +28,7 @@ it('shows order history for authenticated customers', function () {
         'subtotal' => '120.00',
         'commission_total' => '8.40',
         'total' => '120.00',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'placed_at' => now(),
     ]);
 

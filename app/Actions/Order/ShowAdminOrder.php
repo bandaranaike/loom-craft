@@ -2,10 +2,9 @@
 
 namespace App\Actions\Order;
 
+use App\DTOs\Order\AdminOrderSummaryResult;
 use App\DTOs\Order\OrderAddressSummary;
-use App\DTOs\Order\OrderConfirmationData;
 use App\DTOs\Order\OrderItemSummary;
-use App\DTOs\Order\OrderSummaryResult;
 use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
@@ -14,24 +13,20 @@ use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
-class ShowOrderConfirmation
+class ShowAdminOrder
 {
-    public function handle(OrderConfirmationData $data): OrderSummaryResult
+    public function handle(int $orderId): AdminOrderSummaryResult
     {
-        Gate::authorize('viewConfirmation', Order::class);
+        Gate::authorize('viewAny', Order::class);
 
         $order = Order::query()
-            ->with(['items.product.vendor', 'addresses', 'payment'])
-            ->findOrFail($data->orderId);
+            ->with(['items.product.vendor', 'addresses', 'payment', 'user'])
+            ->findOrFail($orderId);
 
-        if ($data->user) {
-            Gate::authorize('view', $order);
-        } else {
-            Gate::authorize('viewGuest', $order);
+        $payment = $order->payment;
 
-            if ($data->guestOrderId !== $order->id) {
-                abort(403);
-            }
+        if (! $payment instanceof Payment) {
+            throw new \RuntimeException('Order payment is missing.');
         }
 
         $items = $order->items->map(function (OrderItem $item): OrderItemSummary {
@@ -65,13 +60,7 @@ class ShowOrderConfirmation
             $address->phone,
         ))->all();
 
-        $payment = $order->payment;
-
-        if ($payment === null) {
-            throw new \RuntimeException('Order payment is missing.');
-        }
-
-        return new OrderSummaryResult(
+        return new AdminOrderSummaryResult(
             $order->id,
             $order->status,
             $order->currency,
@@ -82,9 +71,14 @@ class ShowOrderConfirmation
             $order->placed_at?->toDateTimeString(),
             $payment->method,
             $payment->status,
+            $order->user?->name ?? $order->guest_name,
+            $order->user?->email ?? $order->guest_email,
             $items,
             $addresses,
             $this->paymentProof($payment),
+            ['paid', 'failed'],
+            ['pending', 'paid', 'confirmed', 'delivered', 'cancelled'],
+            in_array($payment->method, ['bank_transfer', 'cod'], true),
         );
     }
 

@@ -67,6 +67,7 @@ class ListDashboardOrderHistories
                     $order->payment?->status ?? 'pending',
                     $items,
                     $addresses,
+                    null,
                 );
             })
             ->all();

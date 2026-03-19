@@ -46,7 +46,6 @@ type CheckoutPageProps = {
     cart: CartSummary;
     currency: string;
     payment_methods: string[];
-    shipping_responsibilities: string[];
     guest_name?: string | null;
     guest_email?: string | null;
     canRegister?: boolean;
@@ -86,7 +85,6 @@ export default function CheckoutPage({
     cart,
     currency,
     payment_methods,
-    shipping_responsibilities,
     guest_name,
     guest_email,
     canRegister = true,
@@ -105,7 +103,7 @@ export default function CheckoutPage({
         guest_name: guest_name ?? '',
         guest_email: guest_email ?? '',
         currency,
-        shipping_responsibility: shipping_responsibilities[0] ?? 'vendor',
+        shipping_responsibility: 'platform',
         payment_method: payment_methods[0] ?? 'stripe',
         shipping_full_name: auth.user?.name ?? '',
         shipping_line1: '',
@@ -553,35 +551,11 @@ export default function CheckoutPage({
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Shipping responsibility
+                                                Shipping handling
                                             </label>
-                                            <select
-                                                name="shipping_responsibility"
-                                                value={
-                                                    form.data
-                                                        .shipping_responsibility
-                                                }
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'shipping_responsibility',
-                                                        event.target.value,
-                                                    )
-                                                }
-                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
-                                            >
-                                                {shipping_responsibilities.map(
-                                                    (option) => (
-                                                        <option
-                                                            key={option}
-                                                            value={option}
-                                                        >
-                                                            {option === 'vendor'
-                                                                ? 'Vendor handled'
-                                                                : 'Platform handled'}
-                                                        </option>
-                                                    ),
-                                                )}
-                                            </select>
+                                            <div className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs">
+                                                Platform handled
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -829,6 +803,12 @@ export default function CheckoutPage({
                                         </div>
                                     </div>
                                 </div>
+
+                                <input
+                                    type="hidden"
+                                    name="shipping_responsibility"
+                                    value={form.data.shipping_responsibility}
+                                />
 
                                 <input
                                     type="hidden"

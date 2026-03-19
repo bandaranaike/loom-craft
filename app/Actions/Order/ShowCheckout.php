@@ -22,7 +22,6 @@ class ShowCheckout
             $cartResult->cart,
             $cartResult->cart->currency,
             ['paypal', 'paypal_card', 'stripe', 'bank_transfer', 'cod'],
-            ['vendor', 'platform'],
             $data->user?->name,
             $data->user?->email,
             $cartResult->guestToken,

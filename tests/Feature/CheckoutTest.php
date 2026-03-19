@@ -46,6 +46,37 @@ it('shows checkout for guests and preserves the guest token cookie', function ()
         ->assertInertia(fn (Assert $page) => $page->component('checkout'));
 });
 
+it('does not expose shipping responsibility options on checkout', function () {
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'selling_price' => '180.00',
+    ]);
+
+    $cart = Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'LKR',
+    ]);
+
+    $cart->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 1,
+        'unit_price' => '180.00',
+    ]);
+
+    $this->withCookie('loomcraft_guest_token', 'guest-token')
+        ->get(route('checkout.show'))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('checkout')
+            ->missing('shipping_responsibilities')
+        );
+});
+
 it('renders the csrf token meta tag on checkout', function () {
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $vendor = Vendor::factory()->for($vendorUser)->create([
@@ -143,7 +174,7 @@ it('creates a pending order from checkout and clears the cart', function () {
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
         'currency' => 'LKR',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'payment_method' => 'cod',
         'shipping_full_name' => 'Heritage Patron',
         'shipping_line1' => '1 Loom Street',
@@ -180,7 +211,7 @@ it('creates a pending order from checkout and clears the cart', function () {
         'subtotal' => '180.00',
         'commission_total' => $expectedCommissionAmount,
         'total' => '180.00',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'guest_email' => 'patron@example.com',
     ]);
 
@@ -246,7 +277,7 @@ it('still places a pending order when requested quantity exceeds available piece
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
         'currency' => 'LKR',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'payment_method' => 'bank_transfer',
         'shipping_full_name' => 'Heritage Patron',
         'shipping_line1' => '1 Loom Street',
@@ -313,7 +344,7 @@ it('does not place a stripe order through the generic checkout endpoint', functi
             'guest_name' => 'Heritage Patron',
             'guest_email' => 'patron@example.com',
             'currency' => 'LKR',
-            'shipping_responsibility' => 'vendor',
+            'shipping_responsibility' => 'platform',
             'payment_method' => 'stripe',
             'shipping_full_name' => 'Heritage Patron',
             'shipping_line1' => '1 Loom Street',
@@ -375,7 +406,7 @@ it('returns a stripe checkout url and stores pending checkout data in session', 
             'guest_name' => 'Heritage Patron',
             'guest_email' => 'patron@example.com',
             'currency' => 'LKR',
-            'shipping_responsibility' => 'vendor',
+            'shipping_responsibility' => 'platform',
             'payment_method' => 'stripe',
             'shipping_full_name' => 'Heritage Patron',
             'shipping_line1' => '1 Loom Street',
@@ -431,7 +462,7 @@ it('fails gracefully when stripe is not configured', function () {
             'guest_name' => 'Heritage Patron',
             'guest_email' => 'patron@example.com',
             'currency' => 'LKR',
-            'shipping_responsibility' => 'vendor',
+            'shipping_responsibility' => 'platform',
             'payment_method' => 'stripe',
             'shipping_full_name' => 'Heritage Patron',
             'shipping_line1' => '1 Loom Street',
@@ -495,7 +526,7 @@ it('completes a stripe checkout and creates the final order', function () {
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
         'currency' => 'LKR',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'payment_method' => 'stripe',
         'shipping_full_name' => 'Heritage Patron',
         'shipping_line1' => '1 Loom Street',
@@ -613,7 +644,7 @@ it('creates a PayPal order and stores pending checkout data in session', functio
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
         'currency' => 'LKR',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'payment_method' => 'paypal',
         'paypal_conversion_confirmed' => true,
         'shipping_full_name' => 'Heritage Patron',
@@ -697,7 +728,7 @@ it('creates a PayPal card order and stores pending checkout data in session', fu
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
         'currency' => 'LKR',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'payment_method' => 'paypal_card',
         'paypal_conversion_confirmed' => true,
         'shipping_full_name' => 'Heritage Patron',
@@ -771,7 +802,7 @@ it('requires paypal conversion confirmation before creating a paypal order', fun
             'guest_name' => 'Heritage Patron',
             'guest_email' => 'patron@example.com',
             'currency' => 'LKR',
-            'shipping_responsibility' => 'vendor',
+            'shipping_responsibility' => 'platform',
             'payment_method' => 'paypal',
             'shipping_full_name' => 'Heritage Patron',
             'shipping_line1' => '1 Loom Street',
@@ -831,7 +862,7 @@ it('blocks paypal checkout when the latest exchange rate is stale', function () 
             'guest_name' => 'Heritage Patron',
             'guest_email' => 'patron@example.com',
             'currency' => 'LKR',
-            'shipping_responsibility' => 'vendor',
+            'shipping_responsibility' => 'platform',
             'payment_method' => 'paypal',
             'paypal_conversion_confirmed' => true,
             'shipping_full_name' => 'Heritage Patron',
@@ -909,7 +940,7 @@ it('captures a PayPal order and creates the final order', function () {
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
         'currency' => 'LKR',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'payment_method' => 'paypal',
         'paypal_conversion_confirmed' => true,
         'shipping_full_name' => 'Heritage Patron',
@@ -1023,7 +1054,7 @@ it('captures a PayPal card order and creates the final order', function () {
         'guest_name' => 'Heritage Patron',
         'guest_email' => 'patron@example.com',
         'currency' => 'LKR',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'payment_method' => 'paypal_card',
         'paypal_conversion_confirmed' => true,
         'shipping_full_name' => 'Heritage Patron',

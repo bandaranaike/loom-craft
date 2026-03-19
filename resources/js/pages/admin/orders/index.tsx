@@ -1,4 +1,5 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { show as adminOrderShow } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import type { BreadcrumbItem } from '@/types';
@@ -83,6 +84,12 @@ export default function AdminOrdersIndex() {
                                         <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                             {order.placed_at ?? 'Pending'}
                                         </p>
+                                        <Link
+                                            href={adminOrderShow(order.id)}
+                                            className="inline-flex text-xs uppercase tracking-[0.3em] text-(--welcome-strong) underline"
+                                        >
+                                            Review order
+                                        </Link>
                                     </div>
                                 </div>
                             </div>

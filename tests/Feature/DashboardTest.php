@@ -55,7 +55,7 @@ test('dashboard includes order histories for authenticated users', function () {
         'subtotal' => '245.00',
         'commission_total' => '17.15',
         'total' => '245.00',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'placed_at' => now(),
     ]);
 

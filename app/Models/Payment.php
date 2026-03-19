@@ -27,6 +27,10 @@ class Payment extends Model
         'exchange_rate_source',
         'exchange_rate_fetched_at',
         'provider_reference',
+        'bank_transfer_slip_path',
+        'bank_transfer_slip_original_name',
+        'bank_transfer_slip_mime_type',
+        'bank_transfer_slip_uploaded_at',
         'verified_by',
         'verified_at',
     ];
@@ -39,6 +43,7 @@ class Payment extends Model
         return [
             'verified_at' => 'datetime',
             'exchange_rate_fetched_at' => 'datetime',
+            'bank_transfer_slip_uploaded_at' => 'datetime',
         ];
     }
 

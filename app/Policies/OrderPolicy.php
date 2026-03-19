@@ -52,4 +52,10 @@ class OrderPolicy
     {
         return true;
     }
+
+    public function manageOffline(User $user, Order $order): bool
+    {
+        return $user->role === 'admin'
+            && in_array($order->payment?->method, ['bank_transfer', 'cod'], true);
+    }
 }

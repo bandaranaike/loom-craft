@@ -9,8 +9,10 @@ use App\DTOs\Order\OrderSummaryResult;
 use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
+use App\Models\Payment;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class ShowOrder
 {
@@ -74,6 +76,24 @@ class ShowOrder
             $payment->status,
             $items,
             $addresses,
+            $this->paymentProof($payment),
         );
+    }
+
+    /**
+     * @return array{url: string, original_name: string, mime_type: string, uploaded_at: ?string}|null
+     */
+    private function paymentProof(Payment $payment): ?array
+    {
+        if (! is_string($payment->bank_transfer_slip_path) || $payment->bank_transfer_slip_path === '') {
+            return null;
+        }
+
+        return [
+            'url' => Storage::disk('public')->url($payment->bank_transfer_slip_path),
+            'original_name' => $payment->bank_transfer_slip_original_name ?? 'bank-transfer-slip',
+            'mime_type' => $payment->bank_transfer_slip_mime_type ?? 'application/octet-stream',
+            'uploaded_at' => $payment->bank_transfer_slip_uploaded_at?->toDateTimeString(),
+        ];
     }
 }

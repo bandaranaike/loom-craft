@@ -1,4 +1,6 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { store as storeBankTransferSlip } from '@/actions/App/Http/Controllers/OrderBankTransferSlipController';
+import InputError from '@/components/input-error';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { formatMoney } from '@/lib/currency';
 import { index as ordersIndex } from '@/routes/orders';
@@ -38,6 +40,12 @@ type OrderSummary = {
     placed_at: string | null;
     payment_method: string;
     payment_status: string;
+    payment_proof: {
+        url: string;
+        original_name: string;
+        mime_type: string;
+        uploaded_at: string | null;
+    } | null;
     items: OrderItem[];
     addresses: OrderAddress[];
 };
@@ -55,8 +63,12 @@ export default function OrderConfirmation({
     canRegister = true,
 }: OrderConfirmationProps) {
     const { auth } = usePage<SharedData>().props;
+    const slipForm = useForm<{ slip: File | null }>({
+        slip: null,
+    });
     const shipping = order.addresses.find((address) => address.type === 'shipping');
     const billing = order.addresses.find((address) => address.type === 'billing');
+    const proofIsImage = order.payment_proof?.mime_type.startsWith('image/') ?? false;
 
     return (
         <>
@@ -163,6 +175,66 @@ export default function OrderConfirmation({
                                     </div>
                                 )}
                             </div>
+                            {order.payment_method === 'bank_transfer' && (
+                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
+                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                        Final bank transfer slip
+                                    </p>
+                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
+                                        Upload the final transfer slip for order #{order.id}. This page already shows
+                                        the exact order details so the proof stays tied to the correct payment.
+                                    </p>
+                                    {order.payment_proof && (
+                                        <div className="mt-4 space-y-3">
+                                            <a
+                                                href={order.payment_proof.url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="inline-flex text-sm text-(--welcome-strong) underline"
+                                            >
+                                                {order.payment_proof.original_name}
+                                            </a>
+                                            <p className="text-xs text-(--welcome-body-text)">
+                                                Uploaded {order.payment_proof.uploaded_at ?? 'recently'}
+                                            </p>
+                                            {proofIsImage && (
+                                                <img
+                                                    src={order.payment_proof.url}
+                                                    alt={order.payment_proof.original_name}
+                                                    className="rounded-[20px] border border-(--welcome-border) object-cover"
+                                                />
+                                            )}
+                                        </div>
+                                    )}
+                                    <form
+                                        onSubmit={(event) => {
+                                            event.preventDefault();
+                                            slipForm.post(storeBankTransferSlip(order.id).url, {
+                                                forceFormData: true,
+                                                preserveScroll: true,
+                                            });
+                                        }}
+                                        className="mt-4 space-y-3"
+                                    >
+                                        <input
+                                            type="file"
+                                            accept=".pdf,image/*"
+                                            onChange={(event) =>
+                                                slipForm.setData('slip', event.target.files?.[0] ?? null)
+                                            }
+                                            className="block w-full text-sm text-(--welcome-body-text)"
+                                        />
+                                        <InputError message={slipForm.errors.slip} />
+                                        <button
+                                            type="submit"
+                                            disabled={slipForm.processing}
+                                            className="inline-flex items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
+                                        >
+                                            {slipForm.processing ? 'Uploading...' : order.payment_proof ? 'Replace slip' : 'Upload slip'}
+                                        </button>
+                                    </form>
+                                </div>
+                            )}
                         </div>
                         <aside className="rounded-[32px] border border-(--welcome-border) bg-(--welcome-surface-1) p-6 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
                             <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">

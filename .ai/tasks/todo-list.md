@@ -11,4 +11,7 @@
 - [x] product slug public URL migration and auto-generation completed on 2026-03-10
 
 ## Task to do
+
 - [ ] `stripe-checkout.md`
+- [x] `checkout-offline-payment-operations.md` completed on 2026-03-19
+- [ ] `order-details-and-tracking.md`

@@ -1,5 +1,7 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { store as storeBankTransferSlip } from '@/actions/App/Http/Controllers/OrderBankTransferSlipController';
 import AppLayout from '@/layouts/app-layout';
+import InputError from '@/components/input-error';
 import { formatMoney } from '@/lib/currency';
 import { index as ordersIndex } from '@/routes/orders';
 import { show as vendorShow } from '@/routes/vendors';
@@ -38,6 +40,12 @@ type OrderSummary = {
     placed_at: string | null;
     payment_method: string;
     payment_status: string;
+    payment_proof: {
+        url: string;
+        original_name: string;
+        mime_type: string;
+        uploaded_at: string | null;
+    } | null;
     items: OrderItem[];
     addresses: OrderAddress[];
 };
@@ -53,9 +61,13 @@ export default function OrderShow() {
         { title: 'Orders', href: ordersIndex().url },
         { title: `Order #${order.id}`, href: '#' },
     ];
+    const slipForm = useForm<{ slip: File | null }>({
+        slip: null,
+    });
 
     const shipping = order.addresses.find((address) => address.type === 'shipping');
     const billing = order.addresses.find((address) => address.type === 'billing');
+    const proofIsImage = order.payment_proof?.mime_type.startsWith('image/') ?? false;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -168,6 +180,66 @@ export default function OrderShow() {
                                 </div>
                             )}
                         </div>
+                        {order.payment_method === 'bank_transfer' && (
+                            <div className="rounded-xl border border-sidebar-border/70 bg-background p-6 text-sm dark:border-sidebar-border">
+                                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                                    Final bank transfer slip
+                                </p>
+                                <p className="mt-3 text-sm text-muted-foreground">
+                                    Upload the final transfer slip for order #{order.id}. Keep the amount and order
+                                    number visible in the document if possible.
+                                </p>
+                                {order.payment_proof && (
+                                    <div className="mt-4 space-y-3">
+                                        <a
+                                            href={order.payment_proof.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="inline-flex text-sm text-foreground underline"
+                                        >
+                                            {order.payment_proof.original_name}
+                                        </a>
+                                        <p className="text-xs text-muted-foreground">
+                                            Uploaded {order.payment_proof.uploaded_at ?? 'recently'}
+                                        </p>
+                                        {proofIsImage && (
+                                            <img
+                                                src={order.payment_proof.url}
+                                                alt={order.payment_proof.original_name}
+                                                className="rounded-xl border border-sidebar-border/70 object-cover dark:border-sidebar-border"
+                                            />
+                                        )}
+                                    </div>
+                                )}
+                                <form
+                                    onSubmit={(event) => {
+                                        event.preventDefault();
+                                        slipForm.post(storeBankTransferSlip(order.id).url, {
+                                            forceFormData: true,
+                                            preserveScroll: true,
+                                        });
+                                    }}
+                                    className="mt-4 space-y-3"
+                                >
+                                    <input
+                                        type="file"
+                                        accept=".pdf,image/*"
+                                        onChange={(event) =>
+                                            slipForm.setData('slip', event.target.files?.[0] ?? null)
+                                        }
+                                        className="block w-full text-sm text-muted-foreground"
+                                    />
+                                    <InputError message={slipForm.errors.slip} />
+                                    <button
+                                        type="submit"
+                                        disabled={slipForm.processing}
+                                        className="inline-flex items-center justify-center rounded-full border border-foreground px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background disabled:opacity-70"
+                                    >
+                                        {slipForm.processing ? 'Uploading...' : order.payment_proof ? 'Replace slip' : 'Upload slip'}
+                                    </button>
+                                </form>
+                            </div>
+                        )}
                     </div>
                     <aside className="rounded-xl border border-sidebar-border/70 bg-background p-6 text-sm dark:border-sidebar-border">
                         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">

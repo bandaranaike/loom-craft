@@ -75,7 +75,7 @@ test('checkout persists discounted prices using the highest applicable discount'
         'guest_name' => 'Discount Buyer',
         'guest_email' => 'buyer@example.com',
         'currency' => 'LKR',
-        'shipping_responsibility' => 'vendor',
+        'shipping_responsibility' => 'platform',
         'payment_method' => 'stripe',
         'shipping_full_name' => 'Discount Buyer',
         'shipping_line1' => '1 Loom Street',

@@ -16,6 +16,7 @@ use App\Http\Controllers\CheckoutStripeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoomWeaveDemoController;
+use App\Http\Controllers\OrderBankTransferSlipController;
 use App\Http\Controllers\OrderConfirmationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductIndexController;
@@ -79,6 +80,8 @@ Route::get('checkout/stripe/cancelled', [CheckoutStripeController::class, 'cance
 
 Route::get('orders/{order}/confirmation', [OrderConfirmationController::class, 'show'])
     ->name('orders.confirmation');
+Route::post('orders/{order}/bank-transfer-slip', [OrderBankTransferSlipController::class, 'store'])
+    ->name('orders.bank-transfer-slip.store');
 
 Route::get('dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
@@ -134,6 +137,10 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('orders', [AdminOrderController::class, 'index'])
             ->name('admin.orders.index');
+        Route::get('orders/{order}', [AdminOrderController::class, 'show'])
+            ->name('admin.orders.show');
+        Route::patch('orders/{order}/offline', [AdminOrderController::class, 'updateOffline'])
+            ->name('admin.orders.offline.update');
 
         Route::get('feedback/pending', [AdminFeedbackController::class, 'pending'])
             ->name('admin.feedback.pending');
