@@ -1,7 +1,9 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { store as storeBankTransferSlip } from '@/actions/App/Http/Controllers/OrderBankTransferSlipController';
-import InputError from '@/components/input-error';
+import OrderAddressCard from '@/components/order-address-card';
+import OrderBankTransferSlipPanel from '@/components/order-bank-transfer-slip-panel';
 import OrderProgress from '@/components/order-progress';
+import OrderSummaryCard from '@/components/order-summary-card';
 import { usePublicOrderReference } from '@/hooks/use-public-order-reference';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { formatMoney } from '@/lib/currency';
@@ -74,9 +76,6 @@ type OrderConfirmationProps = {
     order: OrderSummary;
     canRegister?: boolean;
 };
-
-const addressLabel = (type: OrderAddress['type']) =>
-    type === 'shipping' ? 'Shipping address' : 'Billing address';
 
 export default function OrderConfirmation({
     order,
@@ -194,246 +193,91 @@ export default function OrderConfirmation({
 
                         <div className="grid gap-4 md:grid-cols-2">
                             {shipping && (
-                                <div className="rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
-                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                        {addressLabel(shipping.type)}
-                                    </p>
-                                    <p className="mt-3 text-sm font-semibold">
-                                        {shipping.full_name}
-                                    </p>
-                                    <p className="text-sm text-(--welcome-body-text)">
-                                        {shipping.line1}
-                                        {shipping.line2
-                                            ? `, ${shipping.line2}`
-                                            : ''}
-                                    </p>
-                                    <p className="text-sm text-(--welcome-body-text)">
-                                        {shipping.city}
-                                        {shipping.region
-                                            ? `, ${shipping.region}`
-                                            : ''}{' '}
-                                        {shipping.postal_code ?? ''}
-                                    </p>
-                                    <p className="text-sm text-(--welcome-body-text)">
-                                        {shipping.country_code}
-                                    </p>
-                                </div>
+                                <OrderAddressCard
+                                    address={shipping}
+                                    className="rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5"
+                                />
                             )}
                             {billing && (
-                                <div className="rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
-                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                        {addressLabel(billing.type)}
-                                    </p>
-                                    <p className="mt-3 text-sm font-semibold">
-                                        {billing.full_name}
-                                    </p>
-                                    <p className="text-sm text-(--welcome-body-text)">
-                                        {billing.line1}
-                                        {billing.line2
-                                            ? `, ${billing.line2}`
-                                            : ''}
-                                    </p>
-                                    <p className="text-sm text-(--welcome-body-text)">
-                                        {billing.city}
-                                        {billing.region
-                                            ? `, ${billing.region}`
-                                            : ''}{' '}
-                                        {billing.postal_code ?? ''}
-                                    </p>
-                                    <p className="text-sm text-(--welcome-body-text)">
-                                        {billing.country_code}
-                                    </p>
-                                </div>
+                                <OrderAddressCard
+                                    address={billing}
+                                    className="rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5"
+                                />
                             )}
                         </div>
 
                         {order.payment_method === 'bank_transfer' && (
-                            <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Final bank transfer slip
-                                </p>
-                                <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                    Upload the final transfer slip for{' '}
-                                    {order.public_id ?? `order #${order.id}`}.
-                                    This page already shows the exact order
-                                    details so the proof stays tied to the
-                                    correct payment.
-                                </p>
-                                {order.payment_proof && (
-                                    <div className="mt-4 space-y-3">
-                                        <a
-                                            href={order.payment_proof.url}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="inline-flex text-sm text-(--welcome-strong) underline"
-                                        >
-                                            {order.payment_proof.original_name}
-                                        </a>
-                                        <p className="text-xs text-(--welcome-body-text)">
-                                            Uploaded{' '}
-                                            {order.payment_proof.uploaded_at ??
-                                                'recently'}
-                                        </p>
-                                        {proofIsImage && (
-                                            <img
-                                                src={order.payment_proof.url}
-                                                alt={
-                                                    order.payment_proof
-                                                        .original_name
-                                                }
-                                                className="rounded-[20px] border border-(--welcome-border) object-cover"
-                                            />
-                                        )}
-                                    </div>
-                                )}
-                                {order.can_upload_payment_proof ? (
-                                    <form
-                                        onSubmit={(event) => {
-                                            event.preventDefault();
-                                            slipForm.post(
-                                                storeBankTransferSlip(
-                                                    order.public_id ??
-                                                        `${order.id}`,
-                                                ).url,
-                                                {
-                                                    forceFormData: true,
-                                                    preserveScroll: true,
-                                                },
-                                            );
-                                        }}
-                                        className="mt-4 space-y-3"
-                                    >
-                                        <input
-                                            type="file"
-                                            accept=".pdf,image/*"
-                                            onChange={(event) =>
-                                                slipForm.setData(
-                                                    'slip',
-                                                    event.target.files?.[0] ??
-                                                        null,
-                                                )
-                                            }
-                                            className="block w-full text-sm text-(--welcome-body-text)"
-                                        />
-                                        <InputError
-                                            message={slipForm.errors.slip}
-                                        />
-                                        <button
-                                            type="submit"
-                                            disabled={slipForm.processing}
-                                            className="inline-flex items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
-                                        >
-                                            {slipForm.processing
-                                                ? 'Uploading...'
-                                                : order.payment_proof
-                                                  ? 'Replace slip'
-                                                  : 'Upload slip'}
-                                        </button>
-                                    </form>
-                                ) : (
-                                    <p className="mt-4 text-sm text-(--welcome-body-text)">
-                                        Proof upload is available only to the
-                                        order owner or the original guest
-                                        checkout session.
-                                    </p>
-                                )}
-                            </div>
+                            <OrderBankTransferSlipPanel
+                                canUploadPaymentProof={
+                                    order.can_upload_payment_proof
+                                }
+                                orderId={order.id}
+                                orderPublicId={order.public_id}
+                                paymentProof={order.payment_proof}
+                                proofIsImage={proofIsImage}
+                                processing={slipForm.processing}
+                                slipError={slipForm.errors.slip}
+                                onFileChange={(file) =>
+                                    slipForm.setData('slip', file)
+                                }
+                                onSubmit={(event) => {
+                                    event.preventDefault();
+                                    slipForm.post(
+                                        storeBankTransferSlip(
+                                            order.public_id ?? `${order.id}`,
+                                        ).url,
+                                        {
+                                            forceFormData: true,
+                                            preserveScroll: true,
+                                        },
+                                    );
+                                }}
+                                className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
+                                buttonClassName="inline-flex items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
+                                description={`Upload the final transfer slip for ${order.public_id ?? `order #${order.id}`}. This page already shows the exact order details so the proof stays tied to the correct payment.`}
+                            />
                         )}
                     </div>
 
-                    <aside className="rounded-4xl border border-(--welcome-border) bg-(--welcome-surface-1) p-6 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
-                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                            Summary
-                        </p>
-                        <div className="mt-4 space-y-3 text-sm">
-                            <div className="flex items-center justify-between">
-                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Reference
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        void copyPublicOrderReference()
-                                    }
-                                    className="max-w-[12rem] cursor-pointer truncate text-right underline decoration-(--welcome-border) underline-offset-4"
-                                    title={`Copy ${publicOrderReference}`}
+                    <OrderSummaryCard
+                        copiedReference={publicOrderReference}
+                        onCopyReference={() =>
+                            void copyPublicOrderReference()
+                        }
+                        orderCurrency={order.currency}
+                        orderStatus={order.status}
+                        orderSubtotal={order.subtotal}
+                        orderTotal={order.total}
+                        paymentAmount={order.payment_amount}
+                        paymentCurrency={order.payment_currency}
+                        paymentMethod={order.payment_method}
+                        paymentOriginalAmount={order.payment_original_amount}
+                        paymentOriginalCurrency={order.payment_original_currency}
+                        paymentRecordedInDifferentCurrency={
+                            paymentRecordedInDifferentCurrency
+                        }
+                        paymentStatus={order.payment_status}
+                        shippingResponsibility={
+                            order.shipping_responsibility
+                        }
+                        truncatedReference={truncatedPublicOrderReference}
+                        titleClassName="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase"
+                        bodyClassName="mt-4 space-y-3 text-sm"
+                        labelClassName="tracking-[0.3em] text-(--welcome-muted-text) uppercase"
+                        referenceButtonClassName="max-w-48 cursor-pointer truncate text-right underline decoration-(--welcome-border) underline-offset-4"
+                        footer={
+                            <div className="space-y-3">
+                                <Link
+                                    href={auth.user ? ordersIndex() : '/'}
+                                    className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
                                 >
-                                    {truncatedPublicOrderReference}
-                                </button>
+                                    {auth.user
+                                        ? 'Review order history'
+                                        : 'Continue browsing'}
+                                </Link>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Subtotal
-                                </span>
-                                <span>
-                                    {formatMoney(
-                                        order.subtotal,
-                                        order.currency,
-                                    )}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Shipping
-                                </span>
-                                <span>{order.shipping_responsibility}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Total
-                                </span>
-                                <span>
-                                    {formatMoney(order.total, order.currency)}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Payment
-                                </span>
-                                <span>
-                                    {order.payment_method} (
-                                    {order.payment_status})
-                                </span>
-                            </div>
-                            {order.payment_amount && order.payment_currency && (
-                                <div className="flex items-center justify-between">
-                                    <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                        Recorded
-                                    </span>
-                                    <span>
-                                        {formatMoney(
-                                            order.payment_amount,
-                                            order.payment_currency,
-                                        )}
-                                    </span>
-                                </div>
-                            )}
-                            {paymentRecordedInDifferentCurrency &&
-                                order.payment_original_amount &&
-                                order.payment_original_currency && (
-                                    <p className="rounded-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-xs text-(--welcome-body-text)">
-                                        This payment was processed in{' '}
-                                        {order.payment_currency}. The original
-                                        order total remains{' '}
-                                        {formatMoney(
-                                            order.payment_original_amount,
-                                            order.payment_original_currency,
-                                        )}
-                                        .
-                                    </p>
-                                )}
-                        </div>
-                        <div className="mt-6 space-y-3">
-                            <Link
-                                href={auth.user ? ordersIndex() : '/'}
-                                className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
-                            >
-                                {auth.user
-                                    ? 'Review order history'
-                                    : 'Continue browsing'}
-                            </Link>
-                        </div>
-                    </aside>
+                        }
+                    />
                 </section>
             </PublicSiteLayout>
         </>
