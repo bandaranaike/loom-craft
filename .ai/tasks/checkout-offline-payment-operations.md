@@ -3,7 +3,7 @@
 ## Status
 
 - Implementation completed on 2026-03-19
-- Pending final runtime verification after enabling the SQLite PDO driver for Pest in this environment
+- Focused Pest coverage re-run successfully on 2026-03-20 after enabling the SQLite PDO driver
 
 ## Goal
 
@@ -15,6 +15,7 @@ Simplify checkout so shipping responsibility is always platform-handled, and com
 1. Bank transfer proof uses one final slip only. Latest upload replaces the previous file.
 2. Admin payment review options are `Payment success` and `Payment failed`.
 3. COD payment status changes are allowed at any admin-reviewed step. There is no delivery-only restriction.
+4. Offline payment review is available to admin and to vendors for orders containing their own products.
 
 ## Implementation Summary
 
@@ -27,11 +28,12 @@ Simplify checkout so shipping responsibility is always platform-handled, and com
    - original filename
    - mime type
    - uploaded timestamp
-4. Admin-only offline review routes now support:
+4. Offline review routes now support:
    - payment status updates for `bank_transfer` and `cod`
-   - order status updates for `bank_transfer` and `cod`
    - verification metadata via `verified_by` and `verified_at`
-5. Order DTOs and actions now expose payment-proof data to customer and admin pages.
+5. Admin and eligible vendors can now review offline payments for orders they are allowed to operate on.
+6. Order DTOs and actions now expose payment-proof data to customer, admin, and vendor pages.
+7. Order operations now keep offline payment review separate from order-status changes.
 
 ### Completed Frontend Work
 
@@ -40,8 +42,12 @@ Simplify checkout so shipping responsibility is always platform-handled, and com
 3. Customer order pages now include a bank transfer slip upload surface with clear order context.
 4. The admin order page now includes:
    - offline payment review controls
-   - offline order status controls
    - uploaded bank transfer proof preview/download
+   - separate order-status controls
+5. The vendor order page now includes:
+   - offline payment review controls
+   - uploaded bank transfer proof preview/download
+   - shipped-status controls for eligible orders
 
 ## Verification Notes
 
@@ -52,10 +58,7 @@ Simplify checkout so shipping responsibility is always platform-handled, and com
 3. `npm run types`
 4. `npm run build`
 5. `php -l` on the changed PHP files
-
-### Environment Blocker
-
-1. `php artisan test --compact tests/Feature/OfflinePaymentOperationsTest.php` could not run successfully because the current environment is missing the SQLite PDO driver required by the test suite's `sqlite :memory:` connection.
+6. `php artisan test --compact tests/Feature/OfflinePaymentOperationsTest.php`
 
 ## Files Added Or Updated
 
@@ -72,5 +75,4 @@ Simplify checkout so shipping responsibility is always platform-handled, and com
 
 ## Remaining Follow-Up
 
-1. Re-run the new Pest coverage after `pdo_sqlite` is available in the environment.
-2. If needed later, add stricter business transition rules for offline order statuses. Current admin review intentionally allows the approved broad update path you requested.
+1. If needed later, add stricter business transition rules for offline payment review outcomes and related order-state progression.

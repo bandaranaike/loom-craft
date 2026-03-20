@@ -31,7 +31,7 @@ export default function OrdersIndex() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Order History" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full min-w-0 flex-1 flex-col gap-4 overflow-x-hidden rounded-xl p-4">
                 <div className="rounded-xl border border-sidebar-border/70 bg-sidebar/30 p-6 dark:border-sidebar-border">
                     <div className="flex flex-col gap-2">
                         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
@@ -59,7 +59,7 @@ export default function OrdersIndex() {
                                 className="rounded-xl border border-sidebar-border/70 bg-background p-6 text-sm text-foreground shadow-xs transition hover:border-foreground/50 dark:border-sidebar-border"
                             >
                                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                                    <div className="space-y-2">
+                                    <div className="min-w-0 space-y-2">
                                         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
                                             Reference {order.public_id ?? `#${order.id}`}
                                         </p>
@@ -70,7 +70,7 @@ export default function OrdersIndex() {
                                             {order.item_count} items • {order.status}
                                         </p>
                                     </div>
-                                    <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                                    <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground md:text-right">
                                         {order.placed_at ?? 'Pending'}
                                     </div>
                                 </div>

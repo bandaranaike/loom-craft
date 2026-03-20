@@ -34,6 +34,12 @@ class BuildOrderProgress
 
         $confirmedState = match ($orderStatus) {
             'confirmed' => 'current',
+            'shipped', 'delivered' => 'complete',
+            default => 'upcoming',
+        };
+
+        $shippedState = match ($orderStatus) {
+            'shipped' => 'current',
             'delivered' => 'complete',
             default => 'upcoming',
         };
@@ -58,6 +64,11 @@ class BuildOrderProgress
                     'key' => 'confirmed',
                     'label' => 'Order confirmed',
                     'state' => $confirmedState,
+                ],
+                [
+                    'key' => 'shipped',
+                    'label' => 'Order shipped',
+                    'state' => $shippedState,
                 ],
                 [
                     'key' => 'delivered',

@@ -19,10 +19,6 @@ class OrderPolicy
 
     public function view(User $user, Order $order): bool
     {
-        if ($user->role === 'admin') {
-            return true;
-        }
-
         return $order->user_id === $user->id;
     }
 
@@ -53,9 +49,58 @@ class OrderPolicy
         return true;
     }
 
+    public function viewVendor(User $user, Order $order): bool
+    {
+        return $this->hasApprovedVendorProfile($user)
+            && $this->vendorOwnsOrder($user, $order);
+    }
+
+    public function updateStatus(User $user, Order $order): bool
+    {
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        return $this->hasApprovedVendorProfile($user)
+            && $this->vendorOwnsOrder($user, $order);
+    }
+
+    public function delete(User $user, Order $order): bool
+    {
+        return $user->role === 'admin';
+    }
+
     public function manageOffline(User $user, Order $order): bool
     {
-        return $user->role === 'admin'
-            && in_array($order->payment?->method, ['bank_transfer', 'cod'], true);
+        if (! in_array($order->payment?->method, ['bank_transfer', 'cod'], true)) {
+            return false;
+        }
+
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        return $this->hasApprovedVendorProfile($user)
+            && $this->vendorOwnsOrder($user, $order);
+    }
+
+    private function hasApprovedVendorProfile(User $user): bool
+    {
+        return $user->role === 'vendor'
+            && $user->vendor !== null
+            && $user->vendor->status === 'approved';
+    }
+
+    private function vendorOwnsOrder(User $user, Order $order): bool
+    {
+        $vendor = $user->vendor;
+
+        if ($vendor === null) {
+            return false;
+        }
+
+        return $order->items()
+            ->where('vendor_id', $vendor->id)
+            ->exists();
     }
 }

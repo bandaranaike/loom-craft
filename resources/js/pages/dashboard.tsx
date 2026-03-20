@@ -86,7 +86,7 @@ export default function Dashboard() {
                     rel="stylesheet"
                 />
             </Head>
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full min-w-0 flex-1 flex-col gap-4 overflow-x-hidden rounded-xl p-4">
                 {status && (
                     <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-sm text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/40 dark:text-emerald-100">
                         {status}
@@ -105,7 +105,7 @@ export default function Dashboard() {
                                 Click any order card to see full details in a popup.
                             </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                             <Link
                                 href={ordersIndex()}
                                 className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"

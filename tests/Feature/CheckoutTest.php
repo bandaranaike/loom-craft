@@ -43,7 +43,46 @@ it('shows checkout for guests and preserves the guest token cookie', function ()
     $response
         ->assertOk()
         ->assertCookie('loomcraft_guest_token')
-        ->assertInertia(fn (Assert $page) => $page->component('checkout'));
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('checkout')
+            ->where('default_payment_method', 'stripe')
+            ->where('payment_methods.0', 'stripe')
+        );
+});
+
+it('falls back to the first available checkout payment method when stripe is not configured', function () {
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'selling_price' => '180.00',
+    ]);
+
+    $cart = Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'LKR',
+    ]);
+
+    $cart->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 1,
+        'unit_price' => '180.00',
+    ]);
+
+    $stripeCheckoutService = \Mockery::mock(StripeCheckoutService::class);
+    $stripeCheckoutService->shouldReceive('isConfigured')->once()->andReturn(false);
+    app()->instance(StripeCheckoutService::class, $stripeCheckoutService);
+
+    $this->withCookie('loomcraft_guest_token', 'guest-token')
+        ->get(route('checkout.show'))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('checkout')
+            ->where('default_payment_method', 'paypal')
+        );
 });
 
 it('does not expose shipping responsibility options on checkout', function () {

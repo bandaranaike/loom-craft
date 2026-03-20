@@ -1,13 +1,12 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { index as adminOrdersIndex } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import {
-    destroy as adminOrderDestroy,
-    updateOffline as adminOrderUpdateOffline,
-    updateStatus as adminOrderUpdateStatus,
-} from '@/actions/App/Http/Controllers/Admin/OrderController';
+    updateOffline as vendorOrderUpdateOffline,
+    updateStatus as vendorOrderUpdateStatus,
+} from '@/actions/App/Http/Controllers/Vendor/OrderController';
 import AppLayout from '@/layouts/app-layout';
 import InputError from '@/components/input-error';
 import { formatMoney } from '@/lib/currency';
+import { show as vendorOrdersShow, index as vendorOrdersIndex } from '@/routes/vendor/orders';
 import { show as vendorShow } from '@/routes/vendors';
 import type { BreadcrumbItem } from '@/types';
 
@@ -19,6 +18,7 @@ type OrderItem = {
     quantity: number;
     unit_price: string;
     line_total: string;
+    is_vendor_owned: boolean;
 };
 
 type OrderAddress = {
@@ -40,7 +40,7 @@ type OrderProof = {
     uploaded_at: string | null;
 };
 
-type AdminOrderSummary = {
+type VendorOrderSummary = {
     id: number;
     public_id: string | null;
     status: string;
@@ -58,50 +58,31 @@ type AdminOrderSummary = {
     addresses: OrderAddress[];
     payment_proof: OrderProof | null;
     payment_status_options: string[];
-    order_status_options: string[];
     can_manage_offline: boolean;
-    can_delete: boolean;
+    can_mark_shipped: boolean;
 };
 
-type AdminOrderShowProps = {
-    order: AdminOrderSummary;
+type VendorOrderShowProps = {
+    order: VendorOrderSummary;
 };
 
 const paymentStatusLabel = (status: string) =>
     status === 'paid' ? 'Payment success' : 'Payment failed';
 
-const orderStatusLabel = (status: string) => {
-    switch (status) {
-        case 'confirmed':
-            return 'Confirmed';
-        case 'delivered':
-            return 'Delivered';
-        case 'shipped':
-            return 'Shipped';
-        case 'cancelled':
-            return 'Cancelled';
-        case 'paid':
-            return 'Paid';
-        default:
-            return 'Pending';
-    }
-};
-
-export default function AdminOrderShow() {
-    const { order } = usePage<AdminOrderShowProps>().props;
+export default function VendorOrderShow() {
+    const { order } = usePage<VendorOrderShowProps>().props;
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Orders', href: adminOrdersIndex().url },
-        { title: `Order #${order.id}`, href: '#' },
+        { title: 'Orders', href: vendorOrdersIndex().url },
+        { title: order.public_id ?? `Order #${order.id}`, href: vendorOrdersShow(order.id).url },
     ];
 
-    const form = useForm({
+    const paymentForm = useForm({
         payment_status: order.payment_status === 'failed' ? 'failed' : 'paid',
     });
-    const statusForm = useForm({
-        order_status: order.status,
+    const shipForm = useForm({
+        order_status: 'shipped',
     });
-    const deleteForm = useForm({});
 
     const shipping = order.addresses.find((address) => address.type === 'shipping');
     const billing = order.addresses.find((address) => address.type === 'billing');
@@ -109,20 +90,17 @@ export default function AdminOrderShow() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Admin Order #${order.id}`} />
+            <Head title={`Vendor Order ${order.public_id ?? `#${order.id}`}`} />
             <div className="flex h-full min-w-0 flex-1 flex-col gap-6 overflow-x-hidden rounded-[24px] bg-(--welcome-on-strong) p-5 text-(--welcome-strong)">
                 <div className="rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-1) p-7 shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]">
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="min-w-0 space-y-2">
                             <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Admin review
+                                Vendor fulfillment view
                             </p>
                             <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">
-                                Order #{order.id}
+                                {order.public_id ?? `Order #${order.id}`}
                             </h2>
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Public reference {order.public_id ?? 'Pending'}
-                            </p>
                             <p className="text-sm text-(--welcome-body-text)">
                                 {order.customer_name ?? 'Guest customer'} • {order.customer_email ?? 'No email'}
                             </p>
@@ -132,7 +110,7 @@ export default function AdminOrderShow() {
                                 {formatMoney(order.total, order.currency)}
                             </p>
                             <p className="text-sm text-(--welcome-body-text)">
-                                {order.payment_method} • {order.payment_status}
+                                {order.payment_method} • {order.payment_status} • {order.status}
                             </p>
                         </div>
                     </div>
@@ -142,11 +120,21 @@ export default function AdminOrderShow() {
                     <div className="min-w-0 space-y-6">
                         <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                             <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Items
+                                Order items
+                            </p>
+                            <p className="mt-2 text-sm text-(--welcome-body-text)">
+                                Your products stay vivid. Other vendors&apos; products remain visible with muted styling for context.
                             </p>
                             <div className="mt-4 space-y-4">
                                 {order.items.map((item) => (
-                                    <div key={item.id} className="rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-1) p-4">
+                                    <div
+                                        key={item.id}
+                                        className={
+                                            item.is_vendor_owned
+                                                ? 'rounded-[20px] border border-amber-300 bg-amber-50 p-4 shadow-[0_20px_40px_-35px_rgba(146,64,14,0.6)]'
+                                                : 'rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-1) p-4 opacity-65 grayscale'
+                                        }
+                                    >
                                         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                                             <div className="min-w-0">
                                                 <p className="font-semibold">{item.product_name}</p>
@@ -235,58 +223,45 @@ export default function AdminOrderShow() {
                             </div>
                         </div>
 
-                        <form
-                            onSubmit={(event) => {
-                                event.preventDefault();
-                                statusForm.patch(adminOrderUpdateStatus(order.id).url, {
-                                    preserveScroll: true,
-                                });
-                            }}
-                            className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
-                        >
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Order status
-                            </p>
-                            <div className="mt-4 space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Order status
-                                    </label>
-                                    <select
-                                        value={statusForm.data.order_status}
-                                        onChange={(event) => statusForm.setData('order_status', event.target.value)}
-                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
-                                    >
-                                        {order.order_status_options.map((status) => (
-                                            <option key={status} value={status}>
-                                                {orderStatusLabel(status)}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <InputError message={statusForm.errors.order_status} />
-                                </div>
+                        {order.can_mark_shipped && (
+                            <form
+                                onSubmit={(event) => {
+                                    event.preventDefault();
+                                    shipForm.patch(vendorOrderUpdateStatus(order.id).url, {
+                                        preserveScroll: true,
+                                    });
+                                }}
+                                className="rounded-[28px] border border-amber-200 bg-amber-50 p-6"
+                            >
+                                <p className="text-xs uppercase tracking-[0.3em] text-amber-800">
+                                    Shipping update
+                                </p>
+                                <p className="mt-3 text-sm text-amber-900">
+                                    Mark this order as shipped once your studio&apos;s fulfillment is ready to leave.
+                                </p>
+                                <InputError message={shipForm.errors.order_status} />
                                 <button
                                     type="submit"
-                                    disabled={statusForm.processing}
-                                    className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
+                                    disabled={shipForm.processing}
+                                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-amber-900 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-amber-900 transition hover:bg-amber-900 hover:text-amber-50 disabled:opacity-70"
                                 >
-                                    {statusForm.processing ? 'Saving...' : 'Save order status'}
+                                    {shipForm.processing ? 'Saving...' : 'Mark as shipped'}
                                 </button>
-                            </div>
-                        </form>
+                            </form>
+                        )}
 
                         {order.can_manage_offline && (
                             <form
                                 onSubmit={(event) => {
                                     event.preventDefault();
-                                    form.patch(adminOrderUpdateOffline(order.id).url, {
+                                    paymentForm.patch(vendorOrderUpdateOffline(order.id).url, {
                                         preserveScroll: true,
                                     });
                                 }}
                                 className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
                             >
                                 <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                    Offline review
+                                    Offline payment review
                                 </p>
                                 <div className="mt-4 space-y-4">
                                     <div className="space-y-2">
@@ -294,8 +269,8 @@ export default function AdminOrderShow() {
                                             Payment status
                                         </label>
                                         <select
-                                            value={form.data.payment_status}
-                                            onChange={(event) => form.setData('payment_status', event.target.value)}
+                                            value={paymentForm.data.payment_status}
+                                            onChange={(event) => paymentForm.setData('payment_status', event.target.value)}
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
                                         >
                                             {order.payment_status_options.map((status) => (
@@ -304,44 +279,17 @@ export default function AdminOrderShow() {
                                                 </option>
                                             ))}
                                         </select>
-                                        <InputError message={form.errors.payment_status} />
+                                        <InputError message={paymentForm.errors.payment_status} />
                                     </div>
                                     <button
                                         type="submit"
-                                        disabled={form.processing}
+                                        disabled={paymentForm.processing}
                                         className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
                                     >
-                                        {form.processing ? 'Saving...' : 'Save payment review'}
+                                        {paymentForm.processing ? 'Saving...' : 'Save payment review'}
                                     </button>
                                 </div>
                             </form>
-                        )}
-
-                        {order.can_delete && (
-                            <div className="rounded-[28px] border border-rose-200 bg-rose-50 p-6">
-                                <p className="text-xs uppercase tracking-[0.3em] text-rose-700">
-                                    Soft delete
-                                </p>
-                                <p className="mt-3 text-sm text-rose-900">
-                                    This removes the order from standard admin, vendor, and customer views without permanently erasing the row.
-                                </p>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        if (! window.confirm('Soft delete this order?')) {
-                                            return;
-                                        }
-
-                                        deleteForm.delete(adminOrderDestroy(order.id).url, {
-                                            preserveScroll: true,
-                                        });
-                                    }}
-                                    disabled={deleteForm.processing}
-                                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-rose-700 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-rose-700 transition hover:bg-rose-700 hover:text-rose-50 disabled:opacity-70"
-                                >
-                                    {deleteForm.processing ? 'Deleting...' : 'Soft delete order'}
-                                </button>
-                            </div>
                         )}
 
                         {order.payment_method === 'bank_transfer' && (

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests\Vendor;
 
 use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
@@ -21,7 +21,7 @@ class UpdateOfflineOrderRequest extends FormRequest
 
         return $payment !== null
             && in_array($payment->method, ['bank_transfer', 'cod'], true)
-            && $this->user()?->role === 'admin'
+            && Gate::allows('viewVendor', $order)
             && Gate::allows('manageOffline', $order);
     }
 

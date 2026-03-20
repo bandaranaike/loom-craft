@@ -46,6 +46,7 @@ type CheckoutPageProps = {
     cart: CartSummary;
     currency: string;
     payment_methods: string[];
+    default_payment_method?: string | null;
     guest_name?: string | null;
     guest_email?: string | null;
     canRegister?: boolean;
@@ -71,7 +72,7 @@ const defaultPaymentLabel = (method: string) => {
         case 'paypal_card':
             return 'Credit / Debit card';
         case 'stripe':
-            return 'Stripe (card)';
+            return 'Stripe (Card)';
         case 'bank_transfer':
             return 'Bank transfer';
         case 'cod':
@@ -85,6 +86,7 @@ export default function CheckoutPage({
     cart,
     currency,
     payment_methods,
+    default_payment_method = null,
     guest_name,
     guest_email,
     canRegister = true,
@@ -104,7 +106,7 @@ export default function CheckoutPage({
         guest_email: guest_email ?? '',
         currency,
         shipping_responsibility: 'platform',
-        payment_method: payment_methods[0] ?? 'stripe',
+        payment_method: default_payment_method ?? payment_methods[0] ?? 'stripe',
         shipping_full_name: auth.user?.name ?? '',
         shipping_line1: '',
         shipping_line2: '',

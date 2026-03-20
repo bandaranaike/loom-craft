@@ -21,7 +21,8 @@ it('assigns a durable public identifier when an order is created', function () {
 it('resolves the customer order page by public identifier', function () {
     $order = createTrackedOrder();
 
-    $this->get(route('orders.show', ['order' => $order->public_id]))
+    $this->withSession(['guest_order_id' => $order->id])
+        ->get(route('orders.show', ['order' => $order->public_id]))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('orders/show')
@@ -52,7 +53,8 @@ it('shares order and payment currencies separately on the order page', function 
         'original_currency' => 'LKR',
     ]);
 
-    $this->get(route('orders.show', ['order' => $order->public_id]))
+    $this->withSession(['guest_order_id' => $order->id])
+        ->get(route('orders.show', ['order' => $order->public_id]))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('orders/show')
@@ -70,7 +72,8 @@ it('exposes delivered progress states on the order page', function () {
         'status' => 'paid',
     ]);
 
-    $this->get(route('orders.show', ['order' => $order->public_id]))
+    $this->withSession(['guest_order_id' => $order->id])
+        ->get(route('orders.show', ['order' => $order->public_id]))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('orders/show')
@@ -78,7 +81,8 @@ it('exposes delivered progress states on the order page', function () {
             ->where('order.progress.steps.0.state', 'complete')
             ->where('order.progress.steps.1.state', 'complete')
             ->where('order.progress.steps.2.state', 'complete')
-            ->where('order.progress.steps.3.state', 'current')
+            ->where('order.progress.steps.3.state', 'complete')
+            ->where('order.progress.steps.4.state', 'current')
         );
 });
 
@@ -89,7 +93,8 @@ it('marks payment as complete once payment succeeds even before confirmation', f
         'status' => 'paid',
     ]);
 
-    $this->get(route('orders.show', ['order' => $order->public_id]))
+    $this->withSession(['guest_order_id' => $order->id])
+        ->get(route('orders.show', ['order' => $order->public_id]))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('orders/show')
@@ -97,6 +102,7 @@ it('marks payment as complete once payment succeeds even before confirmation', f
             ->where('order.progress.steps.1.state', 'complete')
             ->where('order.progress.steps.2.state', 'upcoming')
             ->where('order.progress.steps.3.state', 'upcoming')
+            ->where('order.progress.steps.4.state', 'upcoming')
         );
 });
 
@@ -107,7 +113,8 @@ it('exposes a distinct cancelled summary card payload', function () {
         'status' => 'pending',
     ]);
 
-    $this->get(route('orders.show', ['order' => $order->public_id]))
+    $this->withSession(['guest_order_id' => $order->id])
+        ->get(route('orders.show', ['order' => $order->public_id]))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('orders/show')

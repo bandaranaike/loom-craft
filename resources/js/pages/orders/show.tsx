@@ -103,11 +103,11 @@ export default function OrderShow() {
         <>
             <Head title={`${order.public_id ?? `Order ${order.id}`} — LoomCraft`} />
             <PublicSiteLayout canRegister={!auth.user}>
-                <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-6 pb-16 pt-4 lg:grid-cols-[1.1fr_0.9fr]">
-                    <div className="space-y-6">
+                <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-4 pb-16 pt-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
+                    <div className="min-w-0 space-y-6">
                         <div className="rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-1) p-7 shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]">
                             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                                <div className="space-y-2">
+                                <div className="min-w-0 space-y-2">
                                     <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                                         Public order reference
                                     </p>
@@ -132,7 +132,7 @@ export default function OrderShow() {
                                             : 'Tap the reference to copy'}
                                     </p>
                                 </div>
-                                <div className="space-y-3 text-left md:text-right">
+                                <div className="min-w-0 space-y-3 text-left md:text-right">
                                     <p className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">
                                         {formatMoney(order.total, order.currency)}
                                     </p>
@@ -161,7 +161,7 @@ export default function OrderShow() {
                                         className="rounded-[22px] border border-(--welcome-border) bg-(--welcome-surface-1) p-4 text-sm"
                                     >
                                         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                                            <div>
+                                            <div className="min-w-0">
                                                 <p className="font-semibold text-(--welcome-strong)">
                                                     {item.product_name}
                                                 </p>
@@ -248,7 +248,7 @@ export default function OrderShow() {
                             order.shipping_responsibility
                         }
                         truncatedReference={truncatedPublicOrderReference}
-                        className="rounded-4xl border border-(--welcome-border) bg-(--welcome-surface-1) p-6 text-sm shadow-[0_30px_80px_-45px_var(--welcome-shadow)]"
+                        className="min-w-0 rounded-4xl border border-(--welcome-border) bg-(--welcome-surface-1) p-6 text-sm shadow-[0_30px_80px_-45px_var(--welcome-shadow)]"
                         showOrderStatus
                         valueClassName="text-(--welcome-strong)"
                         referenceButtonClassName="max-w-48 cursor-pointer truncate text-right text-(--welcome-strong) underline decoration-(--welcome-border) underline-offset-4"

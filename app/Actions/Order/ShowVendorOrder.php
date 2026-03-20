@@ -2,26 +2,31 @@
 
 namespace App\Actions\Order;
 
-use App\DTOs\Order\AdminOrderSummaryResult;
 use App\DTOs\Order\OrderAddressSummary;
 use App\DTOs\Order\OrderItemSummary;
+use App\DTOs\Order\VendorOrderSummaryResult;
 use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\User;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
-class ShowAdminOrder
+class ShowVendorOrder
 {
-    public function handle(int $orderId): AdminOrderSummaryResult
+    public function handle(User $user, Order $order): VendorOrderSummaryResult
     {
-        Gate::authorize('viewAny', Order::class);
+        Gate::authorize('viewVendor', $order);
 
-        $order = Order::query()
-            ->with(['items.product.vendor', 'addresses', 'payment', 'user'])
-            ->findOrFail($orderId);
+        $vendor = $user->vendor;
+
+        if ($vendor === null) {
+            throw new \RuntimeException('Vendor profile is required to view orders.');
+        }
+
+        $order->load(['items.product.vendor', 'addresses', 'payment', 'user']);
 
         $payment = $order->payment;
 
@@ -29,22 +34,23 @@ class ShowAdminOrder
             throw new \RuntimeException('Order payment is missing.');
         }
 
-        $items = $order->items->map(function (OrderItem $item): OrderItemSummary {
+        $items = $order->items->map(function (OrderItem $item) use ($vendor): OrderItemSummary {
             $product = $item->product;
-            $vendor = $product?->vendor;
+            $itemVendor = $product?->vendor;
 
-            if ($product === null || $vendor === null) {
+            if ($product === null || $itemVendor === null) {
                 throw new \RuntimeException('Order item references missing product or vendor.');
             }
 
             return new OrderItemSummary(
                 $item->id,
                 $product->name,
-                $vendor->display_name,
-                $vendor->slug,
+                $itemVendor->display_name,
+                $itemVendor->slug,
                 $item->quantity,
                 Money::fromString((string) $item->unit_price)->amount,
                 Money::fromString((string) $item->line_total)->amount,
+                $item->vendor_id === $vendor->id,
             );
         })->all();
 
@@ -60,7 +66,7 @@ class ShowAdminOrder
             $address->phone,
         ))->all();
 
-        return new AdminOrderSummaryResult(
+        return new VendorOrderSummaryResult(
             $order->id,
             $order->public_id,
             $order->status,
@@ -78,9 +84,8 @@ class ShowAdminOrder
             $addresses,
             $this->paymentProof($payment),
             ['paid', 'failed'],
-            ['pending', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'],
             Gate::allows('manageOffline', $order),
-            Gate::allows('delete', $order),
+            in_array($order->status, ['paid', 'confirmed'], true),
         );
     }
 

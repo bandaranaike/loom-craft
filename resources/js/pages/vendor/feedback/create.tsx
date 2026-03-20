@@ -22,7 +22,7 @@ export default function VendorFeedbackCreate() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Vendor Feedback" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full min-w-0 flex-1 flex-col gap-4 overflow-x-hidden rounded-xl p-4">
                 {status && (
                     <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-sm text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/40 dark:text-emerald-100">
                         {status}

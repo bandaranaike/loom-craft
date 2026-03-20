@@ -7,9 +7,11 @@ use App\Actions\Order\ShowAdminOrder;
 use App\DTOs\Order\OrderIndexData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateOfflineOrderRequest;
+use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,13 +26,24 @@ class OrderController extends Controller
         ]);
     }
 
-    public function show(int $order, ShowAdminOrder $action): Response
+    public function show(Order $order, ShowAdminOrder $action): Response
     {
-        $result = $action->handle($order);
+        $result = $action->handle($order->id);
 
         return Inertia::render('admin/orders/show', [
             'order' => $result->toArray(),
         ]);
+    }
+
+    public function updateStatus(
+        UpdateOrderStatusRequest $request,
+        Order $order,
+    ): RedirectResponse {
+        $order->update([
+            'status' => $request->validated('order_status'),
+        ]);
+
+        return back()->with('status', 'Order status updated.');
     }
 
     public function updateOffline(
@@ -43,19 +56,22 @@ class OrderController extends Controller
             abort(404);
         }
 
-        $validated = $request->validated();
-
-        $order->update([
-            'status' => $validated['order_status'],
-            'shipping_responsibility' => 'platform',
-        ]);
-
         $payment->update([
-            'status' => $validated['payment_status'],
+            'status' => $request->validated('payment_status'),
             'verified_by' => $request->user()?->id,
             'verified_at' => now(),
         ]);
 
-        return back()->with('status', 'Offline order statuses updated.');
+        return back()->with('status', 'Offline payment status updated.');
+    }
+
+    public function destroy(Order $order): RedirectResponse
+    {
+        Gate::authorize('delete', $order);
+
+        $order->delete();
+
+        return redirect()->route('admin.orders.index')
+            ->with('status', 'Order deleted.');
     }
 }

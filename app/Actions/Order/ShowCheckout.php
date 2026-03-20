@@ -21,7 +21,7 @@ class ShowCheckout
         return new CheckoutViewResult(
             $cartResult->cart,
             $cartResult->cart->currency,
-            ['paypal', 'paypal_card', 'stripe', 'bank_transfer', 'cod'],
+            ['stripe', 'paypal', 'paypal_card', 'bank_transfer', 'cod'],
             $data->user?->name,
             $data->user?->email,
             $cartResult->guestToken,

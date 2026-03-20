@@ -2,14 +2,13 @@
 
 namespace App\DTOs\Order;
 
-class AdminOrderSummaryResult
+class VendorOrderSummaryResult
 {
     /**
      * @param  list<OrderItemSummary>  $items
      * @param  list<OrderAddressSummary>  $addresses
      * @param  array{url: string, original_name: string, mime_type: string, uploaded_at: ?string}|null  $paymentProof
      * @param  list<string>  $paymentStatusOptions
-     * @param  list<string>  $orderStatusOptions
      */
     public function __construct(
         public int $id,
@@ -29,9 +28,8 @@ class AdminOrderSummaryResult
         public array $addresses,
         public ?array $paymentProof,
         public array $paymentStatusOptions,
-        public array $orderStatusOptions,
         public bool $canManageOffline,
-        public bool $canDelete,
+        public bool $canMarkShipped,
     ) {}
 
     /**
@@ -55,9 +53,8 @@ class AdminOrderSummaryResult
             'customer_email' => $this->customerEmail,
             'payment_proof' => $this->paymentProof,
             'payment_status_options' => $this->paymentStatusOptions,
-            'order_status_options' => $this->orderStatusOptions,
             'can_manage_offline' => $this->canManageOffline,
-            'can_delete' => $this->canDelete,
+            'can_mark_shipped' => $this->canMarkShipped,
             'items' => array_map(
                 static fn (OrderItemSummary $item): array => $item->toArray(),
                 $this->items,

@@ -116,6 +116,12 @@ Route::middleware(['auth'])->group(function () {
             ->name('products.images.destroy');
         Route::get('orders', [VendorOrderController::class, 'index'])
             ->name('orders.index');
+        Route::get('orders/{order}', [VendorOrderController::class, 'show'])
+            ->name('orders.show');
+        Route::patch('orders/{order}/status', [VendorOrderController::class, 'updateStatus'])
+            ->name('orders.status.update');
+        Route::patch('orders/{order}/offline', [VendorOrderController::class, 'updateOffline'])
+            ->name('orders.offline.update');
         Route::get('inquiries', [VendorInquiryController::class, 'index'])
             ->name('inquiries.index');
         Route::get('feedback', [VendorFeedbackController::class, 'create'])
@@ -141,8 +147,12 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.orders.index');
         Route::get('orders/{order}', [AdminOrderController::class, 'show'])
             ->name('admin.orders.show');
+        Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])
+            ->name('admin.orders.status.update');
         Route::patch('orders/{order}/offline', [AdminOrderController::class, 'updateOffline'])
             ->name('admin.orders.offline.update');
+        Route::delete('orders/{order}', [AdminOrderController::class, 'destroy'])
+            ->name('admin.orders.destroy');
 
         Route::get('feedback/pending', [AdminFeedbackController::class, 'pending'])
             ->name('admin.feedback.pending');

@@ -3,7 +3,7 @@
 ## Status
 
 - Implementation completed on 2026-03-19
-- Pending final runtime verification after enabling the SQLite PDO driver for Pest in this environment
+- Focused Pest coverage re-run successfully on 2026-03-20 after enabling the SQLite PDO driver
 
 ## Goal
 
@@ -14,7 +14,10 @@ details page, accurate currency display, and a visual status timeline that refle
 
 1. Public order identifiers use a platform-generated opaque token in the form `ORD-` plus a long cryptographically random uppercase string.
 2. Canceled orders use a distinct canceled summary card instead of remaining on the normal progress timeline.
-3. The order details page is public for now, using the opaque public identifier as the lookup key.
+3. The order details page uses the opaque public identifier as the lookup key, but access is now limited to:
+   - the authenticated order owner
+   - the guest session associated with the order
+4. The normal progress lifecycle now includes a dedicated `shipped` step before completion.
 
 ## Implementation Summary
 
@@ -30,15 +33,18 @@ details page, accurate currency display, and a visual status timeline that refle
    - payment currency and original payment currency
    - centralized progress payload
    - payment-proof upload capability flag
+6. The order progress lifecycle now includes a `shipped` step.
+7. Order detail access is now owner/session restricted instead of generally public.
 
 ### Completed Frontend Work
 
-1. The main order tracking page now uses the public-facing site layout so it can be viewed publicly.
+1. The main order tracking page now uses the public-facing site layout while still enforcing owner/session access.
 2. The order pages now show the public order identifier prominently.
 3. Added a visual order progress component for normal order flow.
 4. Added a distinct canceled summary card.
 5. Updated order summaries to show payment currency separately when it differs from the order currency.
 6. Updated order history and dashboard links to open the public tracking page via the public identifier.
+7. Updated the progress UI layout so the five-step lifecycle remains readable on mobile.
 
 ## Verification Notes
 
@@ -49,10 +55,7 @@ details page, accurate currency display, and a visual status timeline that refle
 3. `npm run types`
 4. `npm run build`
 5. `php -l` on the changed PHP files
-
-### Environment Blocker
-
-1. `php artisan test --compact tests/Feature/OrderTrackingTest.php` could not run successfully because the current environment is missing the SQLite PDO driver required by the test suite's `sqlite :memory:` connection.
+6. `php artisan test --compact tests/Feature/OrderTrackingTest.php`
 
 ## Files Added Or Updated
 
@@ -74,5 +77,4 @@ details page, accurate currency display, and a visual status timeline that refle
 
 ## Remaining Follow-Up
 
-1. Re-run the new Pest coverage after `pdo_sqlite` is available in the environment.
-2. If guest-order write actions should also become public later, add a dedicated review of upload and state-change authorization before widening that scope.
+1. If guest-order write actions should become more broadly shareable later, review upload and state-change authorization before widening access beyond the guest session model.

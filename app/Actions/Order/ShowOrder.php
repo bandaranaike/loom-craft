@@ -10,7 +10,9 @@ use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\User;
 use App\ValueObjects\Money;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class ShowOrder
@@ -21,6 +23,8 @@ class ShowOrder
 
     public function handle(OrderShowData $data): OrderSummaryResult
     {
+        $this->authorize($data->user, $data->order, $data->guestOrderId);
+
         $order = $data->order->load(['items.product.vendor', 'addresses', 'payment']);
 
         $items = $order->items->map(function (OrderItem $item): OrderItemSummary {
@@ -82,6 +86,17 @@ class ShowOrder
             $this->buildOrderProgress->handle($order->status, $payment->status),
             $this->canUploadPaymentProof($data->user, $order, $data->guestOrderId),
         );
+    }
+
+    private function authorize(?User $user, Order $order, ?int $guestOrderId): void
+    {
+        if ($user !== null) {
+            Gate::authorize('view', $order);
+
+            return;
+        }
+
+        abort_unless($guestOrderId === $order->id, 403);
     }
 
     /**

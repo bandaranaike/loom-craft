@@ -55,20 +55,20 @@ export default function OrderProgress({ progress }: OrderProgressProps) {
             <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
                 Order progress
             </p>
-            <div className="mt-5 grid gap-4 md:grid-cols-4">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
                 {progress.steps.map((step, index) => (
-                    <div key={step.key} className="flex items-start gap-3 md:flex-col md:gap-4">
-                        <div className="flex items-center md:w-full">
+                    <div key={step.key} className="flex min-w-0 items-start gap-3 xl:flex-col xl:gap-4">
+                        <div className="flex items-center xl:w-full">
                             <div
                                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-semibold uppercase tracking-[0.2em] ${stepClasses(step.state)}`}
                             >
                                 {index + 1}
                             </div>
                             {index < progress.steps.length - 1 && (
-                                <div className="ml-3 h-px flex-1 bg-(--welcome-border) md:ml-0 md:block md:h-px" />
+                                <div className="ml-3 h-px min-w-0 flex-1 bg-(--welcome-border) xl:ml-0 xl:block xl:h-px" />
                             )}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <p className="text-sm font-semibold text-(--welcome-strong)">
                                 {step.label}
                             </p>

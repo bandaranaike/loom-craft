@@ -19,14 +19,13 @@ it('allows admins to update offline payment and order statuses', function () {
         ->from(route('admin.orders.show', ['order' => $order->id]))
         ->patch(route('admin.orders.offline.update', ['order' => $order->id]), [
             'payment_status' => 'paid',
-            'order_status' => 'confirmed',
         ])
         ->assertRedirect(route('admin.orders.show', ['order' => $order->id]))
-        ->assertSessionHas('status', 'Offline order statuses updated.');
+        ->assertSessionHas('status', 'Offline payment status updated.');
 
     $this->assertDatabaseHas('orders', [
         'id' => $order->id,
-        'status' => 'confirmed',
+        'status' => 'pending',
         'shipping_responsibility' => 'platform',
     ]);
 
@@ -47,7 +46,6 @@ it('prevents non-admins from updating offline payment and order statuses', funct
     $this->actingAs($customer)
         ->patch(route('admin.orders.offline.update', ['order' => $order->id]), [
             'payment_status' => 'paid',
-            'order_status' => 'delivered',
         ])
         ->assertForbidden();
 
@@ -62,7 +60,7 @@ it('stores the final bank transfer slip for guest orders', function () {
     Storage::fake('public');
 
     $order = createOfflineOrder(paymentMethod: 'bank_transfer');
-    $file = UploadedFile::fake()->image('final-slip.jpg');
+    $file = UploadedFile::fake()->create('final-slip.jpg', 12, 'image/jpeg');
 
     $this->from(route('orders.confirmation', ['order' => $order->public_id]))
         ->withSession(['guest_order_id' => $order->id])
@@ -137,7 +135,7 @@ it('shows offline review options and payment proof on the admin order page', fun
     $admin = User::factory()->create(['role' => 'admin']);
     $order = createOfflineOrder(paymentMethod: 'bank_transfer');
     $payment = $order->payment()->firstOrFail();
-    $path = UploadedFile::fake()->image('review-slip.png')
+    $path = UploadedFile::fake()->create('review-slip.png', 12, 'image/png')
         ->store('bank-transfer-slips', 'public');
 
     $payment->update([
@@ -154,8 +152,9 @@ it('shows offline review options and payment proof on the admin order page', fun
             ->component('admin/orders/show')
             ->where('order.id', $order->id)
             ->where('order.can_manage_offline', true)
+            ->where('order.can_delete', true)
             ->where('order.payment_status_options', ['paid', 'failed'])
-            ->where('order.order_status_options', ['pending', 'paid', 'confirmed', 'delivered', 'cancelled'])
+            ->where('order.order_status_options', ['pending', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'])
             ->where('order.payment_proof.original_name', 'review-slip.png')
         );
 });

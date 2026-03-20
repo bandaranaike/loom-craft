@@ -12,5 +12,8 @@
 - [x] `stripe-checkout.md` completed on 2026-03-19
 - [x] `checkout-offline-payment-operations.md` completed on 2026-03-19
 - [x] `order-details-and-tracking.md` completed on 2026-03-19
+- [x] `order-history-and-operations.md` completed on 2026-03-20
+- [x] `dashboard-navigation-and-mobile-overflow.md` completed on 2026-03-20
+- [x] `ui-defaults-and-checkout-selection.md` completed on 2026-03-20
 
 ## Task to do

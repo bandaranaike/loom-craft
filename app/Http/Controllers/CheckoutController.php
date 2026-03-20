@@ -35,6 +35,7 @@ class CheckoutController extends Controller
         }
 
         $paypalConfigured = app(PayPalOrderService::class)->isConfigured();
+        $stripeConfigured = $stripeCheckoutService->isConfigured();
         $paypalQuote = null;
         $paypalUnavailableReason = null;
 
@@ -49,11 +50,12 @@ class CheckoutController extends Controller
         $response = Inertia::render('checkout', [
             ...$result->toArray(),
             'canRegister' => Features::enabled(Features::registration()),
+            'default_payment_method' => $this->defaultPaymentMethod($result->paymentMethods, $stripeConfigured),
             'paypal_configured' => $paypalConfigured,
             'paypal_client_id' => app(PayPalOrderService::class)->sdkClientId(),
             'paypal_quote' => $paypalQuote,
             'paypal_unavailable_reason' => $paypalUnavailableReason,
-            'stripe_configured' => $stripeCheckoutService->isConfigured(),
+            'stripe_configured' => $stripeConfigured,
         ]);
 
         if ($request->user() === null && $result->guestToken !== null) {
@@ -61,6 +63,24 @@ class CheckoutController extends Controller
         }
 
         return $response;
+    }
+
+    /**
+     * @param  list<string>  $paymentMethods
+     */
+    private function defaultPaymentMethod(array $paymentMethods, bool $stripeConfigured): ?string
+    {
+        if ($stripeConfigured && in_array('stripe', $paymentMethods, true)) {
+            return 'stripe';
+        }
+
+        foreach ($paymentMethods as $paymentMethod) {
+            if ($paymentMethod !== 'stripe') {
+                return $paymentMethod;
+            }
+        }
+
+        return $paymentMethods[0] ?? null;
     }
 
     public function store(

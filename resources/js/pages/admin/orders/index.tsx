@@ -7,6 +7,7 @@ import { index as adminOrdersIndex } from '@/routes/admin/orders';
 
 type AdminOrderItem = {
     id: number;
+    public_id: string | null;
     status: string;
     currency: string;
     total: string;
@@ -14,6 +15,7 @@ type AdminOrderItem = {
     placed_at: string | null;
     payment_method: string;
     payment_status: string;
+    customer_name: string | null;
 };
 
 type AdminOrdersProps = {
@@ -39,7 +41,7 @@ export default function AdminOrdersIndex() {
                     rel="stylesheet"
                 />
             </Head>
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-[24px] bg-(--welcome-on-strong) p-5 text-(--welcome-strong)">
+            <div className="flex h-full min-w-0 flex-1 flex-col gap-6 overflow-x-hidden rounded-[24px] bg-(--welcome-on-strong) p-5 text-(--welcome-strong)">
                 <div className="rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-1) p-7 shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]">
                     <div className="flex flex-col gap-2">
                         <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
@@ -66,9 +68,9 @@ export default function AdminOrdersIndex() {
                                 className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6 text-sm text-(--welcome-strong) shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]"
                             >
                                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                                    <div>
+                                    <div className="min-w-0">
                                         <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                            Order #{order.id}
+                                            {order.public_id ?? `Order #${order.id}`}
                                         </p>
                                         <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">
                                             {formatMoney(order.total, order.currency)}
@@ -76,8 +78,11 @@ export default function AdminOrdersIndex() {
                                         <p className="text-sm text-(--welcome-body-text)">
                                             {order.item_count} items • {order.status}
                                         </p>
+                                        <p className="text-sm text-(--welcome-body-text)">
+                                            {order.customer_name ?? 'Guest customer'}
+                                        </p>
                                     </div>
-                                    <div className="space-y-2 text-right">
+                                    <div className="space-y-2 md:text-right">
                                         <p className="text-sm text-(--welcome-body-text)">
                                             {order.payment_method} • {order.payment_status}
                                         </p>

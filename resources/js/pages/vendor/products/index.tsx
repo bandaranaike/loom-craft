@@ -53,7 +53,7 @@ export default function VendorProductsIndex() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="My Products" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full min-w-0 flex-1 flex-col gap-4 overflow-x-hidden rounded-xl p-4">
                 {status && (
                     <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-sm text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/40 dark:text-emerald-100">
                         {status}
@@ -73,10 +73,10 @@ export default function VendorProductsIndex() {
                                 Track submitted listings and pricing status.
                             </p>
                         </div>
-                        <div className="flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                        <div className="flex w-full flex-col gap-3 xl:max-w-xl sm:flex-row sm:items-center sm:justify-end">
                             <Form
                                 {...vendorProductsIndex.form()}
-                                className="flex w-full max-w-md items-center gap-3"
+                                className="flex w-full min-w-0 max-w-md items-center gap-3"
                             >
                                 <input
                                     type="hidden"
@@ -99,7 +99,7 @@ export default function VendorProductsIndex() {
                             </Form>
                             <Form
                                 {...vendorProductsIndex.form()}
-                                className="flex items-center gap-2"
+                                className="flex flex-wrap items-center gap-2"
                             >
                                 <input
                                     type="hidden"
@@ -143,7 +143,7 @@ export default function VendorProductsIndex() {
                         No products yet. Submit your first listing.
                     </div>
                 ) : (
-                    <div className="grid gap-4 lg:grid-cols-2">
+                    <div className="grid min-w-0 gap-4 lg:grid-cols-2">
                         {products.map((product) => (
                             <div
                                 key={product.id}

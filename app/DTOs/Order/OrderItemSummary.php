@@ -12,6 +12,7 @@ class OrderItemSummary
         public int $quantity,
         public string $unitPrice,
         public string $lineTotal,
+        public bool $isVendorOwned = false,
     ) {}
 
     /**
@@ -27,6 +28,7 @@ class OrderItemSummary
             'quantity' => $this->quantity,
             'unit_price' => $this->unitPrice,
             'line_total' => $this->lineTotal,
+            'is_vendor_owned' => $this->isVendorOwned,
         ];
     }
 }
