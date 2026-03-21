@@ -7,14 +7,19 @@ use App\Actions\Order\ShowOrder;
 use App\DTOs\Order\OrderIndexData;
 use App\DTOs\Order\OrderShowData;
 use App\Models\Order;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class OrderController extends Controller
 {
-    public function index(Request $request, ListOrders $action): Response
+    public function index(Request $request, ListOrders $action): Response|RedirectResponse
     {
+        if ($request->user()?->role === 'admin') {
+            return redirect()->route('admin.orders.index');
+        }
+
         $result = $action->handle(OrderIndexData::fromRequest($request));
 
         return Inertia::render('orders/index', [

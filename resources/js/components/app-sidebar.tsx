@@ -30,6 +30,7 @@ import { index as adminProductColorsIndex } from '@/routes/admin/product-colors'
 import { pending as adminProductsPending } from '@/routes/admin/products';
 import { pending as adminVendorInquiriesPending } from '@/routes/admin/vendor-inquiries';
 import { connect as adminYouTubeConnect } from '@/routes/admin/youtube';
+import { index as adminOrdersIndex } from '@/routes/admin/orders';
 import { pending as adminVendorsPending } from '@/routes/admin/vendors';
 import { create as vendorFeedbackCreate } from '@/routes/vendor/feedback';
 import { index as vendorInquiriesIndex } from '@/routes/vendor/inquiries';
@@ -63,8 +64,8 @@ export function AppSidebar() {
             icon: LayoutGrid,
         },
         {
-            title: 'Order History',
-            href: ordersIndex(),
+            title: isAdmin ? 'Order Management' : 'Order History',
+            href: isAdmin ? adminOrdersIndex() : ordersIndex(),
             icon: Package,
         },
         ...(isAdmin

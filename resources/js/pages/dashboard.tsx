@@ -9,6 +9,7 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import { dashboard } from '@/routes';
+import { index as adminOrdersIndex } from '@/routes/admin/orders';
 import { index as ordersIndex, show as ordersShow } from '@/routes/orders';
 import { pending as adminVendorPending } from '@/routes/admin/vendors';
 import { edit as vendorProfileEdit } from '@/routes/vendor/profile';
@@ -107,10 +108,10 @@ export default function Dashboard() {
                         </div>
                         <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                             <Link
-                                href={ordersIndex()}
+                                href={isAdmin ? adminOrdersIndex() : ordersIndex()}
                                 className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"
                             >
-                                Full Order History
+                                {isAdmin ? 'All Orders' : 'Full Order History'}
                             </Link>
                             <Link
                                 href={auth?.vendor ? vendorProfileEdit() : vendorRegister()}

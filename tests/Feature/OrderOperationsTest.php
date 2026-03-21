@@ -37,6 +37,14 @@ it('allows admins to update order statuses including shipped', function () {
     ]);
 });
 
+it('redirects admins from the customer orders route to the admin orders route', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $this->actingAs($admin)
+        ->get(route('orders.index'))
+        ->assertRedirect(route('admin.orders.index'));
+});
+
 it('lists all orders for admins and supports filtering by status', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $pendingOrder = createManagedOrder();
