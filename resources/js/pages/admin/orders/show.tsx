@@ -87,6 +87,30 @@ const orderStatusLabel = (status: string) => {
     }
 };
 
+const paymentProofHeading = (paymentMethod: string): string => {
+    if (paymentMethod === 'bank_transfer') {
+        return 'Final bank transfer slip';
+    }
+
+    if (paymentMethod === 'cod') {
+        return 'Uploaded proof of payment';
+    }
+
+    return 'Payment proof';
+};
+
+const paymentProofEmptyState = (paymentMethod: string): string => {
+    if (paymentMethod === 'bank_transfer') {
+        return 'No bank transfer slip uploaded yet.';
+    }
+
+    if (paymentMethod === 'cod') {
+        return 'No proof of payment uploaded yet.';
+    }
+
+    return 'No payment proof uploaded yet.';
+};
+
 export default function AdminOrderShow() {
     const { order } = usePage<AdminOrderShowProps>().props;
 
@@ -344,10 +368,10 @@ export default function AdminOrderShow() {
                             </div>
                         )}
 
-                        {order.payment_method === 'bank_transfer' && (
+                        {order.can_manage_offline && (
                             <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                                 <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                    Final bank transfer slip
+                                    {paymentProofHeading(order.payment_method)}
                                 </p>
                                 {order.payment_proof ? (
                                     <div className="mt-4 space-y-3">
@@ -372,7 +396,7 @@ export default function AdminOrderShow() {
                                     </div>
                                 ) : (
                                     <p className="mt-4 text-sm text-(--welcome-body-text)">
-                                        No bank transfer slip uploaded yet.
+                                        {paymentProofEmptyState(order.payment_method)}
                                     </p>
                                 )}
                             </div>

@@ -159,6 +159,33 @@ it('shows offline review options and payment proof on the admin order page', fun
         );
 });
 
+it('shows uploaded proof for cod orders on the admin order page', function () {
+    Storage::fake('public');
+
+    $admin = User::factory()->create(['role' => 'admin']);
+    $order = createOfflineOrder(paymentMethod: 'cod');
+    $payment = $order->payment()->firstOrFail();
+    $path = UploadedFile::fake()->create('cod-proof.jpg', 12, 'image/jpeg')
+        ->store('bank-transfer-slips', 'public');
+
+    $payment->update([
+        'bank_transfer_slip_path' => $path,
+        'bank_transfer_slip_original_name' => 'cod-proof.jpg',
+        'bank_transfer_slip_mime_type' => 'image/jpeg',
+        'bank_transfer_slip_uploaded_at' => now(),
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.orders.show', ['order' => $order->id]))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/orders/show')
+            ->where('order.payment_method', 'cod')
+            ->where('order.can_manage_offline', true)
+            ->where('order.payment_proof.original_name', 'cod-proof.jpg')
+        );
+});
+
 function createOfflineOrder(?User $user = null, string $paymentMethod = 'bank_transfer'): Order
 {
     $vendor = Vendor::factory()->create([

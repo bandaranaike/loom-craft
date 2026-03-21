@@ -15,10 +15,16 @@ class ListAdminOrders
     {
         Gate::authorize('viewAny', Order::class);
 
-        $orders = Order::query()
+        $query = Order::query()
             ->withCount('items')
             ->with(['payment', 'user'])
-            ->latest('placed_at')
+            ->latest('placed_at');
+
+        if ($data->status !== null) {
+            $query->where('status', $data->status);
+        }
+
+        $orders = $query
             ->get()
             ->map(function (Order $order): AdminOrderListItem {
                 $payment = $order->payment;
@@ -42,6 +48,10 @@ class ListAdminOrders
             })
             ->all();
 
-        return new AdminOrderListResult($orders);
+        return new AdminOrderListResult(
+            $orders,
+            $data->status,
+            OrderIndexData::ORDER_STATUSES,
+        );
     }
 }

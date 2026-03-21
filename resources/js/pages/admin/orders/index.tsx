@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { show as adminOrderShow } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
@@ -20,6 +20,8 @@ type AdminOrderItem = {
 
 type AdminOrdersProps = {
     orders: AdminOrderItem[];
+    selected_status: string | null;
+    status_options: string[];
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -30,7 +32,21 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function AdminOrdersIndex() {
-    const { orders } = usePage<AdminOrdersProps>().props;
+    const { orders, selected_status: selectedStatus, status_options: statusOptions } = usePage<AdminOrdersProps>().props;
+
+    const applyStatusFilter = (status: string): void => {
+        router.get(
+            adminOrdersIndex().url,
+            {
+                status: status !== '' ? status : undefined,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
+        );
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -54,11 +70,41 @@ export default function AdminOrdersIndex() {
                             Verify payments, track disputes, and coordinate shipping responsibility.
                         </p>
                     </div>
+
+                    <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                        <div className="space-y-2">
+                            <label
+                                htmlFor="status"
+                                className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                            >
+                                Filter by status
+                            </label>
+                            <select
+                                id="status"
+                                value={selectedStatus ?? ''}
+                                onChange={(event) => applyStatusFilter(event.target.value)}
+                                className="w-full min-w-[220px] rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-strong) md:w-auto"
+                            >
+                                <option value="">All statuses</option>
+                                {statusOptions.map((status) => (
+                                    <option key={status} value={status}>
+                                        {status}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                            Showing {orders.length} {selectedStatus ? `${selectedStatus} ` : ''}orders
+                        </p>
+                    </div>
                 </div>
 
                 {orders.length === 0 ? (
                     <div className="rounded-[24px] border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-6 text-sm text-(--welcome-muted-text)">
-                        No orders placed yet.
+                        {selectedStatus
+                            ? `No ${selectedStatus} orders found.`
+                            : 'No orders placed yet.'}
                     </div>
                 ) : (
                     <div className="grid gap-4">

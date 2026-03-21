@@ -37,6 +37,36 @@ it('allows admins to update order statuses including shipped', function () {
     ]);
 });
 
+it('lists all orders for admins and supports filtering by status', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $pendingOrder = createManagedOrder();
+    $deliveredOrder = createManagedOrder();
+
+    $pendingOrder->update(['status' => 'pending']);
+    $deliveredOrder->update(['status' => 'delivered']);
+
+    $this->actingAs($admin)
+        ->get(route('admin.orders.index'))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/orders/index')
+            ->has('orders', 2)
+            ->where('selected_status', null)
+            ->where('status_options', ['pending', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'])
+        );
+
+    $this->actingAs($admin)
+        ->get(route('admin.orders.index', ['status' => 'delivered']))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/orders/index')
+            ->has('orders', 1)
+            ->where('orders.0.id', $deliveredOrder->id)
+            ->where('orders.0.status', 'delivered')
+            ->where('selected_status', 'delivered')
+        );
+});
+
 it('soft deletes orders for admins', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $customer = User::factory()->create(['role' => 'customer']);

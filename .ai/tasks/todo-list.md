@@ -15,5 +15,6 @@
 - [x] `order-history-and-operations.md` completed on 2026-03-20
 - [x] `dashboard-navigation-and-mobile-overflow.md` completed on 2026-03-20
 - [x] `ui-defaults-and-checkout-selection.md` completed on 2026-03-20
+- [x] `admin-orders-and-status-management.md` completed on 2026-03-21
 
 ## Task to do

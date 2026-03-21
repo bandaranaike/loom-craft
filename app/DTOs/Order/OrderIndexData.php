@@ -7,7 +7,15 @@ use Illuminate\Http\Request;
 
 class OrderIndexData
 {
-    public function __construct(public User $user) {}
+    public function __construct(
+        public User $user,
+        public ?string $status = null,
+    ) {}
+
+    /**
+     * @var list<string>
+     */
+    public const ORDER_STATUSES = ['pending', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'];
 
     public static function fromRequest(Request $request): self
     {
@@ -17,6 +25,11 @@ class OrderIndexData
             throw new \RuntimeException('User is required for order listings.');
         }
 
-        return new self($user);
+        $status = $request->string('status')->toString();
+
+        return new self(
+            $user,
+            in_array($status, self::ORDER_STATUSES, true) ? $status : null,
+        );
     }
 }

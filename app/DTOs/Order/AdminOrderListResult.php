@@ -6,9 +6,12 @@ class AdminOrderListResult
 {
     /**
      * @param  list<AdminOrderListItem>  $orders
+     * @param  list<string>  $statusOptions
      */
     public function __construct(
         public array $orders,
+        public ?string $selectedStatus,
+        public array $statusOptions,
     ) {}
 
     /**
@@ -21,6 +24,8 @@ class AdminOrderListResult
                 static fn (AdminOrderListItem $order): array => $order->toArray(),
                 $this->orders,
             ),
+            'selected_status' => $this->selectedStatus,
+            'status_options' => $this->statusOptions,
         ];
     }
 }
