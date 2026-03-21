@@ -1,6 +1,9 @@
 import type { FormEvent } from 'react';
 import InputError from '@/components/input-error';
 
+const fileInputClassName =
+    'w-full rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] file:mr-4 file:rounded-full file:border-0 file:bg-(--welcome-strong) file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.3em] file:text-(--welcome-on-strong) hover:file:bg-(--welcome-strong-hover) focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
+
 type PaymentProof = {
     url: string;
     original_name: string;
@@ -79,7 +82,7 @@ export default function OrderBankTransferSlipPanel({
                         onChange={(event) =>
                             onFileChange(event.target.files?.[0] ?? null)
                         }
-                        className="block w-full text-sm text-(--welcome-body-text)"
+                        className={fileInputClassName}
                     />
                     <InputError message={slipError} />
                     <button

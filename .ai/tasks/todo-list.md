@@ -18,3 +18,6 @@
 - [x] `admin-orders-and-status-management.md` completed on 2026-03-21
 
 ## Task to do
+
+1. On the checkout page, if the user has selected billing details the same as shipping details, we can show a message
+    something like "Your billing details are the same as your shipping details" and hide the billing details form. 

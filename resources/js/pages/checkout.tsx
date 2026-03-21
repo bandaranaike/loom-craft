@@ -581,230 +581,234 @@ export default function CheckoutPage({
                                                 : 'Mirror shipping'}
                                         </button>
                                     </div>
-                                    <div className="mt-4 grid gap-4 md:grid-cols-2">
-                                        <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Billing name
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="billing_full_name"
-                                                value={
-                                                    form.data.billing_full_name
-                                                }
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'billing_full_name',
-                                                        event.target.value,
-                                                    )
-                                                }
-                                                disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
-                                            />
-                                            <InputError
-                                                message={
-                                                    form.errors
-                                                        .billing_full_name
-                                                }
-                                            />
+                                    {mirrorBilling ? (
+                                        <div className="mt-4 rounded-[24px] border border-dashed border-(--welcome-border) bg-(--welcome-surface-1) p-5">
+                                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                Billing confirmed
+                                            </p>
+                                            <p className="mt-3 text-sm text-(--welcome-body-text)">
+                                                Your billing details are the same as your shipping details.
+                                            </p>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Billing phone
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="billing_phone"
-                                                value={form.data.billing_phone}
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'billing_phone',
-                                                        event.target.value,
-                                                    )
-                                                }
-                                                disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="mt-4 space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                            Address line 1
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="billing_line1"
-                                            value={form.data.billing_line1}
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'billing_line1',
-                                                    event.target.value,
-                                                )
-                                            }
-                                            disabled={mirrorBilling}
-                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
-                                        />
-                                        <InputError
-                                            message={form.errors.billing_line1}
-                                        />
-                                    </div>
-                                    <div className="mt-4 space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                            Address line 2 (optional)
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="billing_line2"
-                                            value={form.data.billing_line2}
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'billing_line2',
-                                                    event.target.value,
-                                                )
-                                            }
-                                            disabled={mirrorBilling}
-                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
-                                        />
-                                    </div>
-                                    <div className="mt-4 grid gap-4 md:grid-cols-3">
-                                        <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                City
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="billing_city"
-                                                value={form.data.billing_city}
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'billing_city',
-                                                        event.target.value,
-                                                    )
-                                                }
-                                                disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
-                                            />
-                                            <InputError
-                                                message={
-                                                    form.errors.billing_city
-                                                }
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Region
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="billing_region"
-                                                value={form.data.billing_region}
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'billing_region',
-                                                        event.target.value,
-                                                    )
-                                                }
-                                                disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Postal code
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="billing_postal_code"
-                                                value={
-                                                    form.data
-                                                        .billing_postal_code
-                                                }
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'billing_postal_code',
-                                                        event.target.value,
-                                                    )
-                                                }
-                                                disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="mt-4 grid gap-4 md:grid-cols-2">
-                                        <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Country code
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="billing_country_code"
-                                                value={
-                                                    form.data
-                                                        .billing_country_code
-                                                }
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'billing_country_code',
-                                                        event.target.value.toUpperCase(),
-                                                    )
-                                                }
-                                                disabled={mirrorBilling}
-                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none disabled:opacity-70"
-                                            />
-                                            <InputError
-                                                message={
-                                                    form.errors
-                                                        .billing_country_code
-                                                }
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Payment method
-                                            </label>
-                                            <select
-                                                name="payment_method"
-                                                value={form.data.payment_method}
-                                                onChange={(event) =>
-                                                    {
-                                                        form.setData(
-                                                            'payment_method',
-                                                            event.target.value,
-                                                        );
-
-                                                        if (
-                                                            event.target
-                                                                .value !==
-                                                            'paypal' &&
-                                                            event.target
-                                                                .value !==
-                                                                'paypal_card'
-                                                        ) {
+                                    ) : (
+                                        <>
+                                            <div className="mt-4 grid gap-4 md:grid-cols-2">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                        Billing name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="billing_full_name"
+                                                        value={form.data.billing_full_name}
+                                                        onChange={(event) =>
                                                             form.setData(
-                                                                'paypal_conversion_confirmed',
-                                                                false,
-                                                            );
+                                                                'billing_full_name',
+                                                                event.target.value,
+                                                            )
                                                         }
+                                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                    />
+                                                    <InputError
+                                                        message={form.errors.billing_full_name}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                        Billing phone
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="billing_phone"
+                                                        value={form.data.billing_phone}
+                                                        onChange={(event) =>
+                                                            form.setData(
+                                                                'billing_phone',
+                                                                event.target.value,
+                                                            )
+                                                        }
+                                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="mt-4 space-y-2">
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                    Address line 1
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="billing_line1"
+                                                    value={form.data.billing_line1}
+                                                    onChange={(event) =>
+                                                        form.setData(
+                                                            'billing_line1',
+                                                            event.target.value,
+                                                        )
                                                     }
-                                                }
-                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
-                                            >
-                                                {payment_methods.map(
-                                                    (method) => (
-                                                        <option
-                                                            key={method}
-                                                            value={method}
-                                                        >
-                                                            {defaultPaymentLabel(
-                                                                method,
-                                                            )}
-                                                        </option>
-                                                    ),
-                                                )}
-                                            </select>
-                                        </div>
-                                    </div>
+                                                    className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                />
+                                                <InputError message={form.errors.billing_line1} />
+                                            </div>
+                                            <div className="mt-4 space-y-2">
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                    Address line 2 (optional)
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="billing_line2"
+                                                    value={form.data.billing_line2}
+                                                    onChange={(event) =>
+                                                        form.setData(
+                                                            'billing_line2',
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                />
+                                            </div>
+                                            <div className="mt-4 grid gap-4 md:grid-cols-3">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                        City
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="billing_city"
+                                                        value={form.data.billing_city}
+                                                        onChange={(event) =>
+                                                            form.setData(
+                                                                'billing_city',
+                                                                event.target.value,
+                                                            )
+                                                        }
+                                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                    />
+                                                    <InputError message={form.errors.billing_city} />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                        Region
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="billing_region"
+                                                        value={form.data.billing_region}
+                                                        onChange={(event) =>
+                                                            form.setData(
+                                                                'billing_region',
+                                                                event.target.value,
+                                                            )
+                                                        }
+                                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                        Postal code
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="billing_postal_code"
+                                                        value={form.data.billing_postal_code}
+                                                        onChange={(event) =>
+                                                            form.setData(
+                                                                'billing_postal_code',
+                                                                event.target.value,
+                                                            )
+                                                        }
+                                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="mt-4 grid gap-4 md:grid-cols-2">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                        Country code
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="billing_country_code"
+                                                        value={form.data.billing_country_code}
+                                                        onChange={(event) =>
+                                                            form.setData(
+                                                                'billing_country_code',
+                                                                event.target.value.toUpperCase(),
+                                                            )
+                                                        }
+                                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                    />
+                                                    <InputError
+                                                        message={form.errors.billing_country_code}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                        Payment method
+                                                    </label>
+                                                    <select
+                                                        name="payment_method"
+                                                        value={form.data.payment_method}
+                                                        onChange={(event) => {
+                                                            form.setData(
+                                                                'payment_method',
+                                                                event.target.value,
+                                                            );
+
+                                                            if (
+                                                                event.target.value !== 'paypal' &&
+                                                                event.target.value !== 'paypal_card'
+                                                            ) {
+                                                                form.setData(
+                                                                    'paypal_conversion_confirmed',
+                                                                    false,
+                                                                );
+                                                            }
+                                                        }}
+                                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                    >
+                                                        {payment_methods.map((method) => (
+                                                            <option key={method} value={method}>
+                                                                {defaultPaymentLabel(method)}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
+
+                                {mirrorBilling ? (
+                                    <div className="space-y-2">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                            Payment method
+                                        </label>
+                                        <select
+                                            name="payment_method"
+                                            value={form.data.payment_method}
+                                            onChange={(event) => {
+                                                form.setData('payment_method', event.target.value);
+
+                                                if (
+                                                    event.target.value !== 'paypal' &&
+                                                    event.target.value !== 'paypal_card'
+                                                ) {
+                                                    form.setData(
+                                                        'paypal_conversion_confirmed',
+                                                        false,
+                                                    );
+                                                }
+                                            }}
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                        >
+                                            {payment_methods.map((method) => (
+                                                <option key={method} value={method}>
+                                                    {defaultPaymentLabel(method)}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                ) : null}
 
                                 <input
                                     type="hidden"
