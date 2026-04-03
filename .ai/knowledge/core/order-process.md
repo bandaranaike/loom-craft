@@ -6,10 +6,10 @@ This document defines the end-to-end ordering workflow for LoomCraft, aligned wi
 
 ## Alignment (Keep In Sync)
 
-- `.ai/guardrails.md` (hard non-negotiables)
-- `.ai/best-practices.md` (implementation rules)
-- `.ai/dbschema.md` (authoritative domain fields)
-- `.ai/implementation.md` (implementation guidance)
+- `.ai/knowledge/core/guardrails.md` (hard non-negotiables)
+- `.ai/knowledge/core/best-practices.md` (implementation rules)
+- `.ai/knowledge/core/db-schema.md` (authoritative domain fields)
+- `.ai/knowledge/core/implementation-guide.md` (implementation guidance)
 
 ---
 
@@ -33,7 +33,7 @@ This document defines the end-to-end ordering workflow for LoomCraft, aligned wi
 - **Vendor**: `vendors`
 - **User**: `users`
 
-No additional fields are introduced beyond `.ai/dbschema.md`.
+No additional fields are introduced beyond `.ai/knowledge/core/db-schema.md`.
 
 ---
 

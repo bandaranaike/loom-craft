@@ -1,18 +1,18 @@
 # Task: Product Catalog JSON Generation from Uploaded Images
 
 ## Goal
-Generate a structured JSON catalog from product images uploaded into `.ai/resources/<category-folder>/`, using filename-based product codes and inferred metadata.
+Generate a structured JSON catalog from product images uploaded into `.ai/knowledge/assets/source-products/<category-folder>/`, using filename-based product codes and inferred metadata.
 
 ## Confirmed Inputs from User
 1. Images will be uploaded in category folders like:
-- `.ai/resources/wall-hangers/`
-- `.ai/resources/cushion-cover/`
+- `.ai/knowledge/assets/source-products/wall-hangers/`
+- `.ai/knowledge/assets/source-products/cushion-cover/`
 
 2. Image file names represent product code.
 
 ## Required Output
-Generate: `.ai/resources/products.generated.json`
-Validation schema: `.ai/resources/products.generated.schema.json`
+Generate: `.ai/knowledge/assets/generated/products.generated.json`
+Validation schema: `.ai/knowledge/assets/generated/products.generated.schema.json`
 
 Each item must include:
 - `name`
@@ -43,7 +43,7 @@ Example:
 ## Processing Rules
 1. Category resolution
 - `categories` must be an array.
-- Default category comes from folder name under `.ai/resources/`.
+- Default category comes from folder name under `.ai/knowledge/assets/source-products/`.
 - Additional categories may be added based on product classification rules.
 
 2. Code resolution
@@ -54,8 +54,8 @@ Example:
 - Classify inferred colors into primary, secondary, and tertiary roles.
 - Map to the shared project color registry in `resources/data/product-colors.json`.
 - Use product image folders below as reference sources for color inference quality:
-  - `.ai/resources/cushion-cover/`
-  - `.ai/resources/wall-hangers/`
+  - `.ai/knowledge/assets/source-products/cushion-cover/`
+  - `.ai/knowledge/assets/source-products/wall-hangers/`
 - Add new standardized colors only when genuinely necessary.
 - When a genuinely new standardized color is required, update `resources/data/product-colors.json` in the same task run.
 - Each new color added to `resources/data/product-colors.json` must include:
@@ -79,7 +79,7 @@ Example:
 3. Ensure `colors` is role-ordered (primary → secondary → tertiary).
 4. Ensure `categories` is a non-empty array and each value matches known/created categories.
 5. Reject duplicate `code` values.
-6. Validate generated JSON against `.ai/resources/products.generated.schema.json` before import.
+6. Validate generated JSON against `.ai/knowledge/assets/generated/products.generated.schema.json` before import.
 
 ## Follow-up Integration
 1. Use generated JSON to seed/import products and attach:

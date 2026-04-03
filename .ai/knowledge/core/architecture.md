@@ -19,12 +19,12 @@ All outputs must align with this domain and tone.
 
 This architecture brief defines the high-level product and page scope. It must stay consistent with:
 
-- `.ai/guardrails.md` (hard non-negotiables)
-- `.ai/best-practices.md` (implementation rules)
-- `.ai/implementation.md` (concrete implementation guidance)
-- `.ai/dbschema.md` (authoritative domain fields)
-- `.ai/order-process.md` (checkout/order flow)
-- `.ai/implementation-status.md` (code-verified progress)
+- `.ai/knowledge/core/guardrails.md` (hard non-negotiables)
+- `.ai/knowledge/core/best-practices.md` (implementation rules)
+- `.ai/knowledge/core/implementation-guide.md` (concrete implementation guidance)
+- `.ai/knowledge/core/db-schema.md` (authoritative domain fields)
+- `.ai/knowledge/core/order-process.md` (checkout/order flow)
+- `.ai/knowledge/core/implementation-status.md` (code-verified progress)
 
 ---
 

@@ -1,0 +1,80 @@
+You will receive a reference image of a textile design.
+Your task is to generate FOUR SEPARATE PHOTOREALISTIC PRODUCT IMAGES using the same textile design from the reference image applied to a decorative pillow cover.
+⚠️ Very Important Instructions
+Generate 4 separate images (four individual outputs).
+Do NOT combine them into one collage or grid.
+Each image must be a standalone professional product photograph.
+Reference Lock Instructions (Critical)
+The reference image is the master design.
+You must strictly preserve:
+
+the exact textile pattern
+the exact color palette
+the exact woven textile texture
+the exact pattern proportions and layout
+Do NOT modify, reinterpret, redraw, stylize, enhance, or recreate the pattern.
+The textile design must appear identical to the reference image.
+Only the product form (pillow cover) and scene environment change.
+Product Details
+Product: Decorative pillow cover on a real pillow
+Size:
+
+Height: 16 inches
+
+Width: 14 inches
+The pillow must look realistic and filled, with natural fabric tension, stitching, and slight corner puffing.
+Edges should show clean stitched seams typical of decorative cushion covers.
+Photographic Quality Requirements
+Ultra-realistic woven textile texture
+Visible fabric fibers and stitching
+Natural fabric tension and soft creases
+Soft studio daylight lighting
+Soft realistic shadows
+Professional interior product photography
+No oversaturation
+No artificial smoothing
+No stylization
+No new patterns
+No logos or watermarks
+The pillow should occupy 70–90% of the frame.
+Interior Style (Modern Home Setting)
+All scenes should look like a modern, tasteful home interior.
+Use plain light-colored sofas or settees that complement the pillow design.
+Possible elements in the scene:
+
+light neutral fabric sofas or settees
+modern minimal interior
+ornamental plants
+ceramic vases
+subtle decor pieces
+soft natural daylight from windows
+Wall colors may vary but should harmonize with the pillow textile colors, such as:
+
+warm white
+soft beige
+muted clay
+pale sage
+light terracotta
+soft neutral tones
+Avoid clutter and keep the setting elegant and minimal.
+Generate These 4 Images (All Separate)
+Image 1 — Modern Sofa Display
+A realistic decorative pillow with the textile cover placed on a plain light-colored sofa in a modern living room.
+Background includes a simple wall, small ornamental plant, and a ceramic vase.
+Background color should be match with the pillow cover color with very light colors
+Image 2 — Settee Interior Scene
+The pillow is placed on a minimal settee or lounge chair with matching neutral upholstery.
+Behind it is a wall color that complements the textile design, with a decorative indoor plant nearby.
+Image 3 — Multiple Pillow Arrangement
+The textile pillow is placed among one or two plain neutral pillows on a sofa, making the textile pillow the focal point.
+The surrounding pillows should be solid colors that complement the textile pattern.
+Image 4 — Table / Styled Interior Scene
+The pillow is placed on a modern wooden bench or sofa corner with gentle natural folds in the fabric.
+Nearby there is a decorative vase or plant and a soft neutral wall background.
+Output Requirements
+4 independent images
+No collage
+No grid layout
+No split frame
+Each image generated separately
+Images must look like high-end interior catalog photography from a premium home decor brand.

@@ -1,5 +1,12 @@
 # Vendor Public Page Unified Requirements
 
+## Status
+
+- Implementation completed earlier and code-verified on 2026-04-03
+- Focused verification on 2026-04-03 confirmed the public vendor storefront, inquiry flow, visibility flags, locations, and vendor profile edit surface are implemented
+- `tests/Feature/VendorPublicPageTest.php` passed on 2026-04-03
+- `tests/Feature/VendorProfileManagementTest.php` confirms the profile feature surface, but one test currently fails in this environment because the GD extension is not installed for fake image generation
+
 ## Objective
 Build and enhance the public vendor page as a mini storefront that improves trust, supports vendor storytelling, and drives conversion.
 
@@ -246,3 +253,10 @@ Build and enhance the public vendor page as a mini storefront that improves trus
 
 4. Moderation:
 - Do contact submissions require admin moderation in v1?
+
+## Completion Notes
+
+- Public vendor pages are available at `/vendors/{slug}` and render through `vendors/show`
+- Visibility flags hide website and contact information correctly when disabled
+- Vendor locations, category summaries, product filtering, and inquiry submission are implemented
+- Vendor registration remains minimal while vendor profile edit exposes the broader public storefront dataset

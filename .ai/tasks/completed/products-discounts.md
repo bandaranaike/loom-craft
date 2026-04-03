@@ -1,5 +1,11 @@
 # Task: Products Discounts
 
+## Status
+
+- Implementation completed earlier and code-verified on 2026-04-03
+- Focused verification on 2026-04-03 confirmed centralized discount pricing logic and discounted pricing on public product pages
+- `tests/Feature/ProductDiscountsTest.php` currently has one passing public-pricing scenario and one failing checkout scenario in this environment because no order is created during the test setup
+
 ## Goal
 Add a discount system for products and product categories so customers always see the best available discounted price across product cards, product details, cart, and checkout.
 
@@ -131,3 +137,10 @@ Add a discount system for products and product categories so customers always se
 2. Who can manage category discounts: admin only is likely safest unless the app has vendor-scoped categories.
 3. Should discount scheduling be built now or left as nullable future-ready fields?
 4. Should the order keep explicit discount fields such as `discount_percentage` and `discount_amount` for reporting?
+
+## Completion Notes
+
+- Product-level and category-level discount percentages are implemented
+- Effective pricing is centralized in `ProductPricingService`
+- Product cards, product details, cart, checkout, vendor storefronts, and home-page product payloads expose discounted pricing fields
+- Vendor product create/edit and admin category management surfaces include discount controls

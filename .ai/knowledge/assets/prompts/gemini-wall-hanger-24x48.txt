@@ -1,0 +1,125 @@
+You will receive a reference image of a textile design.
+Your task is to generate FOUR SEPARATE PHOTOREALISTIC PRODUCT IMAGES using the same textile design from the reference image applied to a woven wall hanger.
+
+⚠️ Very Important Instructions
+
+Generate 4 separate images (four individual outputs).
+Do NOT combine them into one collage or grid.
+Each image must be a standalone professional product photograph.
+
+Reference Lock Instructions (Critical)
+
+The reference image is the master design.
+You must strictly preserve:
+
+the exact textile pattern
+the exact color palette
+the exact woven textile texture
+the exact pattern proportions and layout
+
+Do NOT modify, reinterpret, redraw, stylize, enhance, or recreate the pattern.
+The textile design must appear identical to the reference image.
+Only the product form (woven wall hanger) and scene environment may change.
+
+Product Details
+
+Product: Woven wall hanger
+Size:
+
+Height: 48 inches
+Width: 24 inches
+
+The wall hanger must always keep this exact 24 x 48 inch proportion.
+The product must look realistic, naturally hanging, and visually premium.
+
+Construction Details
+
+Use a natural wooden rod at the top.
+The rod should be light oak, smooth, and minimal.
+Add a thin natural cotton hanging string tied to both ends of the rod.
+The wall hanger must hang naturally from the string.
+Keep the rod and hanging string consistent in all four images.
+
+Photographic Quality Requirements
+
+Ultra-realistic woven textile texture
+Visible fabric fibers, weave detail, and stitching
+Natural hanging tension and soft fabric behavior
+Soft studio or interior daylight lighting
+Soft realistic shadows
+Professional interior product photography
+No oversaturation
+No artificial smoothing
+No stylization
+No new patterns
+No logos or watermarks
+
+The wall hanger should occupy 70–90% of the frame.
+Give clear priority to the product.
+The images should look natural and realistic.
+
+Interior Style (Modern Home Setting)
+
+All scenes should look like a modern, tasteful home interior.
+Use clean light-colored walls that complement the wall hanger design.
+Possible elements in the scene:
+
+ornamental plants
+ceramic vases
+light minimal furniture
+soft natural daylight
+simple premium decor
+
+Wall colors may vary but should harmonize with the textile colors, such as:
+
+warm white
+soft beige
+pale sage
+muted clay
+very light terracotta
+soft neutral tones
+
+Avoid clutter and keep the setting elegant and minimal.
+
+Image Size
+
+Aspect ratio: 3:5
+Image width: about 900 px
+
+Generate These 4 Images (All Separate)
+
+Image 1 — Hero Wall Display
+A realistic woven wall hanger hanging straight on a light color-matched wall in a modern interior.
+Include a simple ornamental plant or ceramic vase in the background.
+The background color should match the wall hanger colors using very light tones.
+
+Image 2 — Angled Interior Scene
+The wall hanger is shown from a slight interior angle on a harmonious light wall.
+Include a decorative vase and/or indoor plant nearby.
+Keep the wall hanger as the dominant subject.
+
+Image 3 — Texture Detail Scene
+A close-up product photograph showing the woven texture, fibers, craftsmanship, and part of the wooden rod and hanging string.
+Background should be softly blurred with subtle vase or plant context.
+
+Image 4 — Styled Room Scene
+The wall hanger is placed in a premium lifestyle interior scene with a light harmonious wall and minimal decor.
+Include a vase or ornamental plant.
+Keep the composition clean and uncluttered.
+
+Output Requirements
+
+4 independent images
+No collage
+No grid layout
+No split frame
+Each image generated separately
+
+Use these exact filenames:
+
+wall_hanger_hero.jpg
+wall_hanger_interior_angle.jpg
+wall_hanger_detail_texture.jpg
+wall_hanger_styled_room.jpg
+
+Images must look like high-end interior catalog photography from a premium home decor brand.

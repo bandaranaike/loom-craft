@@ -1,0 +1,426 @@
+[
+  {
+    "name": "Cushion Cover - Violet Sunset Diamond Weave",
+    "code": "DR-CC-01001",
+    "description": "Handwoven pillow cover with bold violet side panels, sunset orange accents, and a centered geometric diamond motif.",
+    "colors": [
+      "Purple",
+      "Orange",
+      "Black"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Lime Black Graphic Frame",
+    "code": "DR-CC-01002",
+    "description": "Graphic handwoven pillow cover in lime green and black with layered geometric framing and a central diamond detail.",
+    "colors": [
+      "Green",
+      "Black"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Monochrome Striped Band",
+    "code": "DR-CC-01003",
+    "description": "Monochrome handwoven design featuring black and ivory stripes with three horizontal patterned bands for a modern look.",
+    "colors": [
+      "Black",
+      "White"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - High Contrast Diamond Grid",
+    "code": "DR-CC-01004",
+    "description": "High-contrast black and white pillow cover with repeating diamond and vertical geometric motifs in a clean structured layout.",
+    "colors": [
+      "Black",
+      "White"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Classic Diamond Stripe",
+    "code": "DR-CC-01005",
+    "description": "Classic black and white woven pillow cover with striped borders and vertical rows of small diamond motifs in the center panel.",
+    "colors": [
+      "Black",
+      "White"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Coral Pink Diamond Lines",
+    "code": "DR-CC-01006",
+    "description": "Vibrant handwoven pillow cover in magenta, pink, and coral tones with repeating diamond accents over fine horizontal lines.",
+    "colors": [
+      "Pink",
+      "Orange"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Neon Geo Square",
+    "code": "DR-CC-01007",
+    "description": "Contemporary geometric pillow cover in neon lime, yellow, and deep teal with a bold centered square motif.",
+    "colors": [
+      "Green",
+      "Yellow",
+      "Blue"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Mustard Amber Frame",
+    "code": "DR-CC-01008",
+    "description": "Warm mustard and amber woven pillow cover with a framed central diamond and balanced border detailing.",
+    "colors": [
+      "Yellow",
+      "Orange"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Deep Green Diamond Stripe",
+    "code": "DR-CC-01009",
+    "description": "Deep green and black striped pillow cover with yellow highlights and repeating small diamond motifs in a linear composition.",
+    "colors": [
+      "Green",
+      "Black",
+      "Yellow"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Cobalt Multi Diamond",
+    "code": "DR-CC-01010",
+    "description": "Handwoven pillow cover in cobalt blue, green, and yellow with side panels and a centered multi-diamond motif.",
+    "colors": [
+      "Blue",
+      "Green",
+      "Yellow"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Beige Black Diamond Lines",
+    "code": "DR-CC-01011",
+    "description": "Elegant black and beige woven pillow cover with fine stripes and evenly spaced geometric diamond motifs.",
+    "colors": [
+      "Black",
+      "Beige"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Amber Vertical Diamonds",
+    "code": "DR-CC-01012",
+    "description": "Rich orange and amber handwoven pillow cover with a dark center field and vertically arranged diamond accents.",
+    "colors": [
+      "Orange",
+      "Brown"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Teal Lime Triangle",
+    "code": "DR-CC-01013",
+    "description": "Teal and lime geometric pillow cover with a striking triangular center composition and subtle border patterning.",
+    "colors": [
+      "Green",
+      "Blue"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Bold Blue Diamond Cluster",
+    "code": "DR-CC-01014",
+    "description": "Bold blue, green, and yellow woven pillow cover featuring structured side panels and a centered diamond cluster motif.",
+    "colors": [
+      "Blue",
+      "Green",
+      "Yellow"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Minimal Cream Geo Panel",
+    "code": "DR-CC-01015",
+    "description": "Minimalist cream and black handwoven pillow cover with a centered geometric panel and understated woven texture.",
+    "colors": [
+      "Beige",
+      "Black"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Cushion Cover - Earth Tone Triangle Weave",
+    "code": "DR-CC-01016",
+    "description": "Earth-tone woven pillow cover in brown, cream, and black with mirrored triangular motifs and balanced border framing.",
+    "colors": [
+      "Brown",
+      "Beige",
+      "Black"
+    ],
+    "categories": [
+      "cushion-cover",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Midnight Diamond Horizon",
+    "code": "DR-WH-01001",
+    "description": "Handwoven wall hanger with layered blue and yellow-green bands, a centered diamond medallion, and stepped geometric side panels over a dark field.",
+    "colors": [
+      "Blue",
+      "Yellow-Green",
+      "Black"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Prism Diamond Frame",
+    "code": "DR-WH-01002",
+    "description": "Bold multicolor wall hanger with a radiant diamond center, framed side pillars, and saturated yellow-green, magenta, and amber striping.",
+    "colors": [
+      "Yellow-Green",
+      "Red-Purple",
+      "Yellow-Orange"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Ivory Heritage Panel",
+    "code": "DR-WH-01003",
+    "description": "Classic black and ivory wall hanger with framed motif blocks, fine horizontal striping, and balanced ornamental panels across the center.",
+    "colors": [
+      "Black",
+      "Beige"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Sunset Labyrinth Grid",
+    "code": "DR-WH-01004",
+
+
+    "description": "Handwoven wall hanger in warm magenta, amber, and green tones with nested rectangular framing and a glowing labyrinth-style center.",
+    "colors": [
+      "Red-Purple",
+      "Yellow-Orange",
+      "Green"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Festival Stripe Diamond",
+    "code": "DR-WH-01005",
+    "description": "Vibrant striped wall hanger with repeating side motifs, a central diamond band, and a lively mix of green, blue, and yellow accents.",
+    "colors": [
+      "Green",
+      "Blue",
+      "Yellow"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Orchard Medallion Bands",
+    "code": "DR-WH-01006",
+    "description": "Graphic wall hanger with bright yellow-green panels, red framed motifs, and a central medallion band set against a deep black weave.",
+    "colors": [
+      "Yellow-Green",
+      "Red",
+      "Black"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Ocean Pulse Geometry",
+    "code": "DR-WH-01007",
+    "description": "Cool-toned wall hanger with blue and teal gradients, framed geometric blocks, and a mirrored central motif with subtle purple accents.",
+    "colors": [
+      "Blue",
+      "Teal",
+      "Blue-Purple"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Mosaic Crossroads",
+    "code": "DR-WH-01008",
+    "description": "Handwoven wall hanger with layered square motifs, side medallions, and a bright interplay of green, purple, and orange across the weave.",
+    "colors": [
+      "Green",
+      "Purple",
+      "Orange"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Ember Step Mosaic",
+    "code": "DR-WH-01009",
+    "description": "Richly patterned wall hanger with stepped geometric blocks, orange and plum bands, and small gold accents arranged in a rhythmic grid.",
+    "colors": [
+      "Orange",
+      "Purple",
+      "Yellow"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Earth line Arrow Tapestry",
+    "code": "DR-WH-01010",
+    "description": "Earth-tone wall hanger featuring boxed motifs, vertical stripe dividers, and a bold arrow composition in brown, beige, and black.",
+    "colors": [
+      "Brown",
+      "Beige",
+      "Black"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Solar Loom Diamond",
+    "code": "DR-WH-01011",
+    "description": "Radiant wall hanger with blue side blocks, a warm orange center field, and a diamond chain motif framed by yellow-green highlights.",
+    "colors": [
+      "Blue",
+      "Yellow-Green",
+      "Red-Orange"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Electric Frame Tapestry",
+    "code": "DR-WH-01012",
+    "description": "Handwoven wall hanger with vivid blue borders, a concentric square center, and layered yellow-green and purple striping across the panel.",
+    "colors": [
+      "Blue",
+      "Purple",
+      "Yellow-Green"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Aurora Pathway Weave",
+    "code": "DR-WH-01013",
+    "description": "Color-rich wall hanger with mirrored square motifs, sunset orange bands, and purple framing that creates a bold pathway-like composition.",
+    "colors": [
+      "Red-Purple",
+      "Orange",
+      "Blue"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Monochrome Heritage Frame",
+    "code": "DR-WH-01015",
+    "description": "Traditional black and white wall hanger with a framed center panel, small diamond motifs, and ornamental side columns in crisp contrast.",
+    "colors": [
+      "Black",
+      "White"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  },
+  {
+    "name": "Wall Hanger - Blue Current Diamond",
+    "code": "DR-WH-01016",
+    "description": "Contemporary wall hanger with flowing blue bands, yellow-green highlights, and a centered diamond motif framed by tall linear side panels.",
+    "colors": [
+      "Blue",
+      "Yellow-Green",
+      "Green"
+    ],
+    "categories": [
+      "wall-hangers",
+      "home-decor"
+    ]
+  }
+]

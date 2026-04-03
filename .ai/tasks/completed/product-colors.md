@@ -47,18 +47,18 @@ Introduce standardized product colors so customers can discover products visuall
 - Prevent deleting colors used by products (or soft-disable via `is_active`).
 
 5. Image-assisted workflow (confirmed)
-- User uploads product images into category folders under `.ai/resources/` (e.g., `.ai/resources/wall-hangers`, `.ai/resources/cushion-cover`).
+- User uploads product images into category folders under `.ai/knowledge/assets/source-products/` (e.g., `.ai/knowledge/assets/source-products/wall-hangers`, `.ai/knowledge/assets/source-products/cushion-cover`).
 - Product code is derived from image file name.
 - Generate JSON catalog entries with: `name`, `code`, `description`, `colors`, `categories`.
 - If a detected color is new, add it to `product_colors` dictionary before linking.
 
 ## JSON Generation Spec
 1. Input
-- Folder structure under `.ai/resources/<category-slug>/`.
+- Folder structure under `.ai/knowledge/assets/source-products/<category-slug>/`.
 - Image filename base is product code (example: `DR-WH-01001.jpg` -> `code: DR-WH-01001`).
 
 2. Output
-- Generated file path: `.ai/resources/products.generated.json`.
+- Generated file path: `.ai/knowledge/assets/generated/products.generated.json`.
 - Shape:
 ```json
 [

@@ -8,11 +8,11 @@ These guidelines optimize for LoomCraft’s business logic, architecture, and co
 
 This file operationalizes the architecture and must stay aligned with:
 
-- `.ai/guardrails.md` (hard non-negotiables)
-- `.ai/implementation.md` (concrete implementation guidance)
-- `.ai/dbschema.md` (authoritative domain fields)
-- `.ai/order-process.md` (checkout/order flow)
-- `.ai/implementation-status.md` (code-verified progress)
+- `.ai/knowledge/core/guardrails.md` (hard non-negotiables)
+- `.ai/knowledge/core/implementation-guide.md` (concrete implementation guidance)
+- `.ai/knowledge/core/db-schema.md` (authoritative domain fields)
+- `.ai/knowledge/core/order-process.md` (checkout/order flow)
+- `.ai/knowledge/core/implementation-status.md` (code-verified progress)
 
 ---
 
@@ -119,5 +119,5 @@ Always enforce permissions on the backend (policies/gates/middleware).
 
 ## Prohibited / Guardrails
 - No automated refunds
-- Do not invent database fields beyond `.ai/dbschema.md`
+- Do not invent database fields beyond `.ai/knowledge/core/db-schema.md`
 - Do not use `env()` outside config files

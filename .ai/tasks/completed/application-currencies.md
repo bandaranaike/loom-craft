@@ -1,5 +1,11 @@
 # Task: Application Currencies
 
+## Status
+
+- Implementation completed earlier and code-verified on 2026-04-03
+- Focused verification on 2026-04-03 confirmed the exchange-rate command, canonical LKR checkout rules, and PayPal USD conversion flow are implemented
+- `tests/Feature/SyncExchangeRatesCommandTest.php` currently fails in this environment because it expects a string value for `rate` while the model returns a numeric decimal value
+
 ## Goal
 Keep product pricing canonical in LKR, while allowing PayPal checkout by converting the payable amount into a PayPal-supported currency and preserving the exact exchange-rate snapshot used for the transaction.
 
@@ -207,3 +213,10 @@ Keep product pricing canonical in LKR, while allowing PayPal checkout by convert
 7. Cart and checkout are simplified to the LKR-first flow for customers, with USD used only when settling PayPal.
 8. Both PayPal wallet and PayPal card checkouts use the same conversion snapshot rules.
 9. The flow is covered by automated tests.
+
+## Completion Notes
+
+- Exchange-rate persistence is implemented through `exchange_rates` plus scheduled sync support
+- Checkout and cart are normalized to LKR-only customer currency handling
+- PayPal checkout stores LKR to USD quote snapshots and blocks stale exchange rates
+- Order and payment persistence includes original currency and exchange-rate snapshot fields

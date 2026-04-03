@@ -401,6 +401,6 @@ ls -l /var/www/loom-craft/current/public/storage
 
 For any deployment-related task in this repository:
 
-1. Read this file first (`.ai/deployment.md`).
+1. Read this file first (`.ai/knowledge/core/deployment.md`).
 2. Treat this file as the source of truth unless the user explicitly overrides a value.
 3. If a value is missing here, ask the user before changing deployment scripts or infrastructure docs.

@@ -9,8 +9,9 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.4.17
+- php - 8.4.18
 - inertiajs/inertia-laravel (INERTIA_LARAVEL) - v2
+- laravel/ai (AI) - v0
 - laravel/cashier (CASHIER) - v16
 - laravel/fortify (FORTIFY) - v1
 - laravel/framework (LARAVEL) - v12
@@ -63,6 +64,15 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Documentation Files
 
 - You must only create documentation files if explicitly requested by the user.
+
+## AI Knowledge Center
+
+- `.ai/README.md` is the entry point for the project knowledge center.
+- At the start of every task, read `.ai/README.md`, then the relevant files under `.ai/knowledge/core/`.
+- Before implementation, review `.ai/tasks/task-board.md` for current task state.
+- If the task starts as a freeform note, normalize it into a proper task file using `.ai/inbox/task-request.md` and `.ai/tasks/_templates/task-template.md`.
+- After completing a task, update the relevant `.ai/knowledge/core/*.md` documents and `.ai/tasks/task-board.md`.
+- For deployment work, `.ai/knowledge/core/deployment.md` is the deployment source of truth unless the user explicitly overrides it.
 
 ## Replies
 
@@ -303,7 +313,7 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 ## Project Update Notes
 
 - New public Inertia page "Build your own woven" is available at `/loom-weave-demo` (route name: `loom-weave-demo`).
-- The page implementation source is `resources/js/pages/loom-weave-demo.tsx`, based on `.ai/LoomWeaveDemoPage.tsx`.
+- The page implementation source is `resources/js/pages/loom-weave-demo.tsx`.
 - Vendor product create/edit flows and backend commission calculations use `COMMERCE_COMMISSION_RATE` from `.env` via `config/commerce.php`. Current default is `100.00`.
 - Products use a required `product_code` field. It must be unique across all products, is vendor-managed in create/edit flows, and should be validated with Laravel Form Requests.
 - Products also use an auto-generated unique `slug` derived from the product name. Public product URLs must use `/product/{slug}` and slug conflicts should be resolved by appending an incrementing number.

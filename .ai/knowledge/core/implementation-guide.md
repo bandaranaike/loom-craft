@@ -6,11 +6,11 @@ This document translates the approved architecture into concrete implementation 
 
 ## Alignment (Keep In Sync)
 
-- `.ai/guardrails.md` (hard non-negotiables)
-- `.ai/best-practices.md` (implementation rules)
-- `.ai/dbschema.md` (authoritative domain fields)
-- `.ai/order-process.md` (checkout/order flow)
-- `.ai/implementation-status.md` (code-verified progress)
+- `.ai/knowledge/core/guardrails.md` (hard non-negotiables)
+- `.ai/knowledge/core/best-practices.md` (implementation rules)
+- `.ai/knowledge/core/db-schema.md` (authoritative domain fields)
+- `.ai/knowledge/core/order-process.md` (checkout/order flow)
+- `.ai/knowledge/core/implementation-status.md` (code-verified progress)
 
 ---
 

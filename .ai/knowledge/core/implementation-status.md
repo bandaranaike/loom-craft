@@ -3,7 +3,7 @@
 Last reviewed: 2026-03-07
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
-Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices.md`, `.ai/guardrails.md`, `.ai/dbschema.md`, and `.ai/order-process.md`.
+Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implementation-guide.md`, `.ai/knowledge/core/best-practices.md`, `.ai/knowledge/core/guardrails.md`, `.ai/knowledge/core/db-schema.md`, and `.ai/knowledge/core/order-process.md`.
 
 ## Current Delivery Snapshot
 
@@ -22,12 +22,11 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 ### Public Storefront
 - Home page (`/`) with:
   - random approved active products,
-  - approved community feedback highlights,
-  - basic storefront metrics (`atelier_ledger`).
-- Home page now includes authenticated feedback composer for vendor/customer users with edit-in-place behavior.
+  - a full-width hero panel without the previous `Atelier Ledger`, `Atelier Voices`, or `Craftsmanship Flow` sections.
 - Build Your Own Woven page (`/loom-weave-demo`) with interactive grid painting, compile preview, undo/redo history, constraint visibility, and PNG export.
 - Product index (`/products`) with search and pagination inputs.
 - Product show (`/products/{product}`) restricted to active products from approved vendors.
+- Public vendor storefront page (`/vendors/{slug}`) implemented with vendor details, filtered products, category summaries, location blocks, and inquiry form handling.
 
 ### Cart and Checkout
 - Guest and authenticated cart support with `loomcraft_guest_token` cookie for guest ownership.
@@ -38,6 +37,8 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Checkout now shows PayPal LKR to USD conversion details before payment starts.
 - PayPal checkout supports both wallet redirect approval and on-page direct card entry via PayPal Card Fields.
 - Exchange-rate snapshots are stored historically and used to block stale PayPal conversions.
+- Exchange-rate syncing is implemented through a dedicated command and exchange-rate storage.
+- Cart, checkout, and order placement use centralized discounted pricing derived from product and category discounts.
 
 ### Orders
 - Order placement persists to:
@@ -62,6 +63,7 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Vendor feedback submission page and create action (`/vendor/feedback`) implemented.
 - Feedback writes are upserted by `user_id` (single feedback record per authenticated user).
 - Public product pages resolve by slug at `/product/{slug}` with automatically generated unique product slugs.
+- Vendor public storefront profile edit flow is implemented and exposes the broader public-facing vendor dataset, including visibility flags and locations.
 
 ### Admin Features
 - Pending vendor queue with search, pagination, per-page persistence, approve, and reject.
@@ -86,7 +88,9 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Product catalog filters include swatch-based color selection using the shared product color palette.
 - GitHub Actions workflows now install frontend dependencies and build assets with pnpm to match the repository package manager configuration.
 - Product index/show visibility rules.
+- Product discounts pricing behavior.
 - Vendor registration and vendor product workflows.
+- Vendor public storefront visibility and payload behavior.
 - Cart flow and checkout order creation.
 - Customer order history.
 - Admin vendor approvals, admin feedback approvals, and YouTube authorization callback.
@@ -100,7 +104,6 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Admin vendor CRUD beyond pending/approve/reject is not implemented.
 - Product moderation workflow UI beyond vendor submission status is not implemented.
 - Public informational pages are partially implemented: About, Contact, and Cookie pages remain pending.
-- Public vendor profile page is not implemented.
 
 ## Structural Notes
 
@@ -117,13 +120,15 @@ Aligned with `.ai/architecture.md`, `.ai/implementation.md`, `.ai/best-practices
 - Production deploy workflow now recreates each release `public/storage` symlink from shared storage directly (instead of `artisan storage:link`) to prevent broken image links in release-based deploys.
 - Home page product merchandising was reprioritized for faster first-glance shopping: `welcome` now shows the New Arrivals product grid immediately after the hero section, and the backend feed limit was increased from 4 to 8 approved active products selected for display.
 - Home page hero-side Atelier Ledger panel is now hidden on mobile viewports and remains visible on `md+` screens for cleaner first-screen product focus on phones.
+- Home page simplification removed the `Atelier Ledger`, `Atelier Voices`, and `Craftsmanship Flow` sections entirely, and the main heritage-marketplace hero now renders as a full-width featured panel.
+- The home-page hero was further compacted into a border-free, box-free layout with tighter vertical spacing to bring the `New Arrivals` section higher in the initial scroll.
 - GitHub Actions production deploy workflow now creates the release tarball in `/tmp` before moving it to workspace, preventing `tar: .: file changed as we read it` failures during artifact packaging.
 - Production deploy script now guards `php artisan view:cache` behind a `resources/views` directory existence check to prevent first-deploy failures when the view path is unavailable at runtime.
 - GitHub Actions `lint.yml` and `tests.yml` are temporarily manual-only (`workflow_dispatch`) and no longer auto-run on push/pull_request.
 - Production deploy no longer runs `php artisan view:cache`; deployment keeps `config:cache` only to avoid `View path not found` runtime failures during release activation.
 - Deploy script now reloads `php8.4-fpm`/`nginx` only when `sudo -n` is available; otherwise it logs and skips reloads to prevent CI failure on password-protected sudo.
-- Deployment runbook added at `.ai/deployment.md` for Hostinger Ubuntu 24.04 production setup (`31.97.51.24`) with Nginx, HTTPS (Let's Encrypt), local-only MariaDB, systemd queue worker, scheduler cron, and GitHub Actions `main` branch CI-build/server-deploy flow.
-- `AGENTS.md` now explicitly requires reading `.ai/deployment.md` before any deployment-related work and treats it as the deployment source of truth unless user overrides.
+- Deployment runbook added at `.ai/knowledge/core/deployment.md` for Hostinger Ubuntu 24.04 production setup (`31.97.51.24`) with Nginx, HTTPS (Let's Encrypt), local-only MariaDB, systemd queue worker, scheduler cron, and GitHub Actions `main` branch CI-build/server-deploy flow.
+- `AGENTS.md` now explicitly requires reading `.ai/knowledge/core/deployment.md` before any deployment-related work and treats it as the deployment source of truth unless user overrides.
 - Production deployment workflow created at `.github/workflows/deploy-production.yml` to auto-deploy `main` to the VPS using build artifact + SSH release deployment.
 - Price display now uses formatted currency labels in major storefront and order views.
 - LKR prices render as `Rs. 5,000.00` style formatting instead of raw amount + currency code.
