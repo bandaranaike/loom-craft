@@ -56,6 +56,10 @@ test('guests can view active products', function () {
             ->where('product.images.0.id', $firstImage->id)
             ->where('product.images.0.alt_text', 'Front view')
             ->where('product.images.1.id', $secondImage->id)
+            ->where('review_summary.average_rating', null)
+            ->where('review_summary.total_reviews', 0)
+            ->where('reviews', [])
+            ->where('review_form.requires_authentication', true)
         );
 });
 

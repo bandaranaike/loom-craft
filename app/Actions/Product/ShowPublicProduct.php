@@ -11,6 +11,7 @@ use App\DTOs\Product\ProductVendorSummary;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductColor;
+use App\Models\ProductReview;
 use App\Services\ProductPricingService;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
@@ -36,7 +37,12 @@ class ShowPublicProduct
                     ->where('is_active', true)
                     ->orderBy('sort_order')
                     ->orderBy('name'),
+                'reviews' => fn ($query) => $query
+                    ->with('user:id,name')
+                    ->latest(),
             ])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->where('status', 'active')
             ->whereHas('vendor', fn ($query) => $query->where('status', 'approved'))
             ->findOrFail($data->product->id);
@@ -62,6 +68,45 @@ class ShowPublicProduct
         }
 
         $pricing = $this->productPricingService->forProduct($product);
+        $reviewSummary = [
+            'average_rating' => $product->reviews_avg_rating !== null
+                ? number_format((float) $product->reviews_avg_rating, 1, '.', '')
+                : null,
+            'total_reviews' => $product->reviews_count,
+        ];
+        $reviews = $product->reviews
+            ->map(static fn (ProductReview $review): array => [
+                'id' => $review->id,
+                'rating' => $review->rating,
+                'review' => $review->review,
+                'reviewer_name' => $review->user?->name ?? 'Verified customer',
+                'created_at' => $review->created_at?->toDateString(),
+                'created_at_human' => $review->created_at?->format('M j, Y'),
+            ])
+            ->values()
+            ->all();
+        $hasDeliveredPurchase = $data->user?->exists
+            ? $product->hasDeliveredPurchaseBy($data->user)
+            : false;
+        $hasReview = $data->user?->exists
+            ? $product->hasReviewBy($data->user)
+            : false;
+        $canSubmitReview = $data->user?->exists
+            ? $hasDeliveredPurchase && ! $hasReview
+            : false;
+        $reviewForm = [
+            'can_submit' => $canSubmitReview,
+            'has_delivered_purchase' => $hasDeliveredPurchase,
+            'has_reviewed' => $hasReview,
+            'requires_authentication' => $data->user === null,
+            'message' => $data->user === null
+                ? 'Sign in after delivery to leave a review.'
+                : ($hasReview
+                    ? 'You already shared feedback for this product.'
+                    : ($hasDeliveredPurchase
+                        ? null
+                        : 'Reviews open once your order is marked delivered.')),
+        ];
 
         return new ProductShowResult(
             new ProductShowItem(
@@ -112,7 +157,10 @@ class ShowPublicProduct
                     ->values()
                     ->all(),
                 $video?->path,
-            )
+            ),
+            $reviewSummary,
+            $reviews,
+            $reviewForm,
         );
     }
 }

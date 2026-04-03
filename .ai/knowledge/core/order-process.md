@@ -204,6 +204,21 @@ Typical status progression (may vary by payment method):
 
 ---
 
+## 8.5 Post-Delivery Reviews
+
+- Authenticated customers can submit a product review only after at least one of their orders containing that product reaches `delivered`.
+- Reviews are limited to one record per `user_id` + `product_id`.
+- Each review stores:
+  - `rating` from 1 to 5
+  - written feedback in `review`
+- Public product pages surface:
+  - average rating
+  - review count
+  - published review list
+  - current-user submission eligibility state
+
+---
+
 ## 9) Disputes, Complaints, and Reports
 
 - Disputes can be raised on orders or items (no automated refunds).

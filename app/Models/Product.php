@@ -106,6 +106,11 @@ class Product extends Model
         return $this->hasMany(ProductReport::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -124,5 +129,28 @@ class Product extends Model
             'product_id',
             'product_color_id',
         );
+    }
+
+    public function hasDeliveredPurchaseBy(User $user): bool
+    {
+        return $this->orderItems()
+            ->whereHas('order', function ($query) use ($user): void {
+                $query
+                    ->where('user_id', $user->id)
+                    ->where('status', 'delivered');
+            })
+            ->exists();
+    }
+
+    public function hasReviewBy(User $user): bool
+    {
+        return $this->reviews()
+            ->where('user_id', $user->id)
+            ->exists();
+    }
+
+    public function canBeReviewedBy(User $user): bool
+    {
+        return $this->hasDeliveredPurchaseBy($user) && ! $this->hasReviewBy($user);
     }
 }

@@ -4,7 +4,7 @@ Last updated: 2026-04-03
 
 ## Planned
 
-- [product-reviews-and-ratings](/var/www/loom-craft/.ai/tasks/planned/product-reviews-and-ratings.md)
+- None
 
 ## In Progress
 
@@ -25,6 +25,7 @@ Last updated: 2026-04-03
 - [product-colors](/var/www/loom-craft/.ai/tasks/completed/product-colors.md)
 - [product-detail-image-slider](/var/www/loom-craft/.ai/tasks/completed/product-detail-image-slider.md)
 - [products-discounts](/var/www/loom-craft/.ai/tasks/completed/products-discounts.md)
+- [product-reviews-and-ratings](/var/www/loom-craft/.ai/tasks/completed/product-reviews-and-ratings.md)
 - [product-quantity](/var/www/loom-craft/.ai/tasks/completed/product-quantity.md)
 - [product-search-upgrade](/var/www/loom-craft/.ai/tasks/completed/product-search-upgrade.md)
 - [stripe-checkout](/var/www/loom-craft/.ai/tasks/completed/stripe-checkout.md)

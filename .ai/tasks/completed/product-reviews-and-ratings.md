@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Status: planned
+- Status: completed
 - Created: 2026-04-03
 - Updated: 2026-04-03
 - Source: user request
@@ -62,4 +62,7 @@ Add a post-delivery review system so customers can leave 1 to 5 star ratings and
 
 ## Completion Notes
 
-Not started yet.
+- Implemented `product_reviews` with one review per user per product and 1 to 5 star ratings plus written feedback.
+- Review submission is restricted to authenticated customers with a delivered order containing the product.
+- Product pages now show average rating, total review count, a themed review section, and the gated review form state.
+- Focused verification passed with `php artisan test --compact tests/Feature/ProductShowTest.php tests/Feature/ProductReviewTest.php`, `pnpm run types`, and `vendor/bin/pint --dirty --format agent`.

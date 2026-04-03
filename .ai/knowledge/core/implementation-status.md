@@ -1,16 +1,16 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-03-07
+Last reviewed: 2026-04-03
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implementation-guide.md`, `.ai/knowledge/core/best-practices.md`, `.ai/knowledge/core/guardrails.md`, `.ai/knowledge/core/db-schema.md`, and `.ai/knowledge/core/order-process.md`.
 
 ## Current Delivery Snapshot
 
-- Route surface: 38 web routes (`php artisan route:list --except-vendor`).
-- Test inventory: 29 tests files total (28 feature, 1 unit).
-- Service layer: one concrete external integration service at `app/Services/Video/YouTubeVideoUploader.php`.
-- Frontend page surface: Inertia React pages are present for public, auth/settings, vendor, and admin areas under `resources/js/pages`.
+- Public, auth/settings, vendor, and admin route groups are implemented through `routes/web.php` and `routes/settings.php`.
+- Feature and unit test coverage is present across storefront, checkout, order, vendor, and admin flows.
+- Service layer includes external integrations such as `app/Services/Video/YouTubeVideoUploader.php`.
+- Inertia React pages are present for public, auth/settings, vendor, and admin areas under `resources/js/pages`.
 
 ## Implemented Features
 
@@ -25,7 +25,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
   - a full-width hero panel without the previous `Atelier Ledger`, `Atelier Voices`, or `Craftsmanship Flow` sections.
 - Build Your Own Woven page (`/loom-weave-demo`) with interactive grid painting, compile preview, undo/redo history, constraint visibility, and PNG export.
 - Product index (`/products`) with search and pagination inputs.
-- Product show (`/products/{product}`) restricted to active products from approved vendors.
+- Product show (`/product/{slug}`) restricted to active products from approved vendors, now with delivered-purchase review summaries and customer feedback.
 - Public vendor storefront page (`/vendors/{slug}`) implemented with vendor details, filtered products, category summaries, location blocks, and inquiry form handling.
 
 ### Cart and Checkout
@@ -52,6 +52,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Order confirmation route supports guest access through session-backed `guest_order_id` check.
 - Customer order history (`/orders`) and order detail (`/orders/{order}`) implemented for authenticated users.
 - Admin order list (`/admin/orders`) and vendor order items list (`/vendor/orders`) implemented.
+- Post-delivery product reviews are implemented with 1 to 5 star ratings, written feedback, one-review-per-customer-per-product enforcement, and public product-page display.
 
 ### Vendor Features
 - Vendor registration form and submission (`/vendor/register`).
@@ -88,6 +89,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Public pages and dashboard access.
 - Public loom weave demo route/component availability.
 - Product detail gallery navigation, swipe support, and image-anchored floating thumbnail behavior when the gallery reaches the viewport edge.
+- Product review eligibility, review submission, and public review summary rendering on product pages.
 - Product catalog filters include swatch-based color selection using the shared product color palette.
 - GitHub Actions workflows now install frontend dependencies and build assets with pnpm to match the repository package manager configuration.
 - Product index/show visibility rules.
@@ -142,3 +144,4 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Public legal pages are now available at `/privacy-policy` and `/terms-of-service` with Inertia React implementations.
 - Shared bottom legal navigation now links Terms of Service and Privacy Policy across public, auth, and app layouts.
 - Product show gallery (`/products/{product}`) now supports clickable thumbnail switching, rounded main-image corners, and conditional floating thumbnails that dock only while the selected image bottom remains below the viewport; once the image bottom is visible, thumbnails fall back to inline below the image.
+- Product pages now include a modern review experience with delivered-order gating, star-based rating input, published customer feedback, and aggregate rating summary data from the new `product_reviews` table.

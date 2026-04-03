@@ -20,6 +20,7 @@ use App\Http\Controllers\OrderBankTransferSlipController;
 use App\Http\Controllers\OrderConfirmationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductIndexController;
+use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\ProductShowController;
 use App\Http\Controllers\Vendor\FeedbackController as VendorFeedbackController;
 use App\Http\Controllers\Vendor\InquiryController as VendorInquiryController;
@@ -90,6 +91,9 @@ Route::get('dashboard', DashboardController::class)
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
+    Route::post('product/{product:slug}/reviews', [ProductReviewController::class, 'store'])
+        ->name('products.reviews.store');
+
     Route::get('vendor/register', [VendorRegistrationController::class, 'register'])
         ->name('vendor.register');
     Route::post('vendor/register', [VendorRegistrationController::class, 'store'])

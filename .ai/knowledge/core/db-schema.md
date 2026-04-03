@@ -117,6 +117,24 @@ Indexes:
 
 ---
 
+### product_reviews
+
+Delivered-purchase customer reviews shown on public product pages.
+
+- `id` (bigint, PK)
+- `product_id` (bigint, FK → products.id)
+- `user_id` (bigint, FK → users.id)
+- `rating` (unsigned tinyint) — `1` through `5`
+- `review` (text)
+- `created_at` (timestamp, nullable)
+- `updated_at` (timestamp, nullable)
+
+Indexes:
+- `product_reviews_product_id_user_id_unique` on (`product_id`, `user_id`) — one review per customer per product
+- implicit foreign-key indexes on `product_id` and `user_id`
+
+---
+
 ### carts
 
 Guest carts allowed via `guest_token`.

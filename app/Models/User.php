@@ -84,6 +84,11 @@ class User extends Authenticatable
         return $this->hasMany(ProductReport::class);
     }
 
+    public function productReviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
     public function handledProductReports(): HasMany
     {
         return $this->hasMany(ProductReport::class, 'handled_by');

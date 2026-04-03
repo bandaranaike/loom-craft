@@ -25,6 +25,7 @@ class ProductShowController extends Controller
             'cartCurrency' => Currency::default()->code,
             'canRegister' => Features::enabled(Features::registration()),
             'status' => session('status'),
+            'reviewStatus' => session('review_status'),
         ]);
     }
 }

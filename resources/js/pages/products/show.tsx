@@ -17,6 +17,7 @@ import { DEFAULT_CURRENCY, formatMoney } from '@/lib/currency';
 import { resolveProductStockAvailability } from '@/lib/product-stock-availability';
 import { show as cartShow } from '@/routes/cart';
 import { store as cartItemStore } from '@/routes/cart/items';
+import { store as productReviewStore } from '@/routes/products/reviews';
 import { show as vendorShow } from '@/routes/vendors';
 
 type ProductImage = {
@@ -74,6 +75,26 @@ type ProductShowProps = {
     cartCurrency: string;
     canRegister?: boolean;
     status?: string | null;
+    review_summary: {
+        average_rating: string | null;
+        total_reviews: number;
+    };
+    reviews: Array<{
+        id: number;
+        rating: number;
+        review: string;
+        reviewer_name: string;
+        created_at: string | null;
+        created_at_human: string | null;
+    }>;
+    review_form: {
+        can_submit: boolean;
+        has_delivered_purchase: boolean;
+        has_reviewed: boolean;
+        requires_authentication: boolean;
+        message: string | null;
+    };
+    reviewStatus?: string | null;
 };
 
 const formatDimensions = (dimensions: ProductDetails['dimensions']) => {
@@ -92,11 +113,36 @@ const formatDimensions = (dimensions: ProductDetails['dimensions']) => {
     return `${parts.join(' × ')}${unit}`;
 };
 
+const renderRatingStars = (
+    rating: number,
+    filledClassName = 'text-amber-500',
+    emptyClassName = 'text-(--welcome-border)',
+) => {
+    return Array.from({ length: 5 }, (_, index) => {
+        const starNumber = index + 1;
+        const isFilled = starNumber <= rating;
+
+        return (
+            <span
+                key={starNumber}
+                aria-hidden="true"
+                className={isFilled ? filledClassName : emptyClassName}
+            >
+                ★
+            </span>
+        );
+    });
+};
+
 export default function ProductShow({
     product,
     cartCurrency,
     canRegister = true,
     status = null,
+    review_summary,
+    reviews,
+    review_form,
+    reviewStatus = null,
 }: ProductShowProps) {
     const { errors } = usePage<{ errors: Record<string, string> }>().props;
     const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -113,6 +159,10 @@ export default function ProductShow({
         product_id: product.id,
         quantity: 1,
         currency: cartCurrency,
+    });
+    const reviewFormState = useForm({
+        rating: 5,
+        review: '',
     });
     const hasInquiryErrors = [
         'name',
@@ -214,6 +264,17 @@ export default function ProductShow({
         event.preventDefault();
         form.post(cartItemStore().url, {
             preserveScroll: true,
+        });
+    };
+
+    const submitReview = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        reviewFormState.post(productReviewStore(product.slug).url, {
+            preserveScroll: true,
+            onSuccess: () => {
+                reviewFormState.reset('review');
+                reviewFormState.setData('rating', 5);
+            },
         });
     };
 
@@ -432,6 +493,29 @@ export default function ProductShow({
                                     ? ` • ${product.vendor.location}`
                                     : ''}
                             </p>
+                            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-(--welcome-body-text)">
+                                <div className="flex items-center gap-1 text-base">
+                                    {renderRatingStars(
+                                        Math.round(
+                                            Number(
+                                                review_summary.average_rating ??
+                                                    0,
+                                            ),
+                                        ),
+                                    )}
+                                </div>
+                                <span className="font-medium text-(--welcome-strong)">
+                                    {review_summary.total_reviews > 0 &&
+                                    review_summary.average_rating
+                                        ? `${review_summary.average_rating} / 5`
+                                        : 'Not yet rated'}
+                                </span>
+                                <span className="text-(--welcome-muted-text)">
+                                    {review_summary.total_reviews === 1
+                                        ? '1 collector review'
+                                        : `${review_summary.total_reviews} collector reviews`}
+                                </span>
+                            </div>
                             {product.categories.length > 0 && (
                                 <div className="mt-3 flex flex-wrap gap-2">
                                     {product.categories.map((category) => (
@@ -588,6 +672,222 @@ export default function ProductShow({
                                 >
                                     Watch Studio Video
                                 </a>
+                            )}
+                        </div>
+                    </div>
+                </section>
+
+                <section className="mx-auto grid w-full max-w-6xl gap-8 px-6 pb-16 lg:grid-cols-[0.78fr_1.22fr]">
+                    <div className="space-y-6">
+                        <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-8">
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                Collector sentiment
+                            </p>
+                            <div className="mt-4 flex items-end gap-4">
+                                <span className="font-['Playfair_Display',serif] text-5xl text-(--welcome-strong)">
+                                    {review_summary.average_rating ?? '—'}
+                                </span>
+                                <div className="pb-2">
+                                    <div className="flex items-center gap-1 text-lg">
+                                        {renderRatingStars(
+                                            Math.round(
+                                                Number(
+                                                    review_summary.average_rating ??
+                                                        0,
+                                                ),
+                                            ),
+                                        )}
+                                    </div>
+                                    <p className="mt-2 text-sm text-(--welcome-body-text)">
+                                        {review_summary.total_reviews === 0
+                                            ? 'Be the first verified buyer to review this piece.'
+                                            : review_summary.total_reviews === 1
+                                              ? 'Based on 1 verified review'
+                                              : `Based on ${review_summary.total_reviews} verified reviews`}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-8">
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                Review eligibility
+                            </p>
+                            <h2 className="mt-3 font-['Playfair_Display',serif] text-2xl">
+                                Verified after delivery
+                            </h2>
+                            <p className="mt-3 text-sm leading-6 text-(--welcome-body-text)">
+                                Ratings are reserved for customers whose order
+                                has been marked delivered, keeping product
+                                feedback grounded in completed purchases.
+                            </p>
+                            {review_form.message && (
+                                <p className="mt-4 rounded-3xl bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-body-text)">
+                                    {review_form.message}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-8">
+                            <div className="flex flex-wrap items-start justify-between gap-4">
+                                <div>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                        Customer reviews
+                                    </p>
+                                    <h2 className="mt-3 font-['Playfair_Display',serif] text-3xl">
+                                        What buyers are saying
+                                    </h2>
+                                </div>
+                                <div className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
+                                    Verified purchasers only
+                                </div>
+                            </div>
+
+                            {reviewStatus && (
+                                <div className="mt-6 rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-body-text)">
+                                    {reviewStatus}
+                                </div>
+                            )}
+
+                            {review_form.can_submit ? (
+                                <form onSubmit={submitReview} className="mt-6 grid gap-5">
+                                    <div>
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                            Your rating
+                                        </p>
+                                        <div className="mt-3 flex flex-wrap gap-2">
+                                            {Array.from({ length: 5 }, (_, index) => {
+                                                const rating = index + 1;
+                                                const isSelected =
+                                                    reviewFormState.data.rating >= rating;
+
+                                                return (
+                                                    <button
+                                                        key={rating}
+                                                        type="button"
+                                                        onClick={() =>
+                                                            reviewFormState.setData(
+                                                                'rating',
+                                                                rating,
+                                                            )
+                                                        }
+                                                        className={`inline-flex h-11 w-11 items-center justify-center rounded-full border text-lg transition ${
+                                                            isSelected
+                                                                ? 'border-amber-500 bg-amber-500/12 text-amber-500'
+                                                                : 'border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-muted-text) hover:border-amber-500 hover:text-amber-500'
+                                                        }`}
+                                                        aria-label={`Rate ${rating} star${rating === 1 ? '' : 's'}`}
+                                                        aria-pressed={reviewFormState.data.rating === rating}
+                                                    >
+                                                        ★
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        <InputError
+                                            message={reviewFormState.errors.rating}
+                                            className="mt-2"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label
+                                            htmlFor="review"
+                                            className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase"
+                                        >
+                                            Your review
+                                        </label>
+                                        <textarea
+                                            id="review"
+                                            name="review"
+                                            rows={5}
+                                            value={reviewFormState.data.review}
+                                            onChange={(event) =>
+                                                reviewFormState.setData(
+                                                    'review',
+                                                    event.target.value,
+                                                )
+                                            }
+                                            className="mt-3 w-full rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-3) px-5 py-4 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                            placeholder="Describe the workmanship, finish, delivery experience, or how the piece feels in your space."
+                                        />
+                                        <InputError
+                                            message={reviewFormState.errors.review}
+                                            className="mt-2"
+                                        />
+                                    </div>
+                                    <div className="flex flex-wrap items-center justify-between gap-4">
+                                        <p className="text-sm text-(--welcome-body-text)">
+                                            Your review appears publicly on this
+                                            product page once submitted.
+                                        </p>
+                                        <button
+                                            type="submit"
+                                            disabled={reviewFormState.processing}
+                                            className="inline-flex items-center justify-center rounded-full bg-(--welcome-strong) px-6 py-3 text-xs font-semibold tracking-[0.28em] text-(--welcome-on-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
+                                        >
+                                            {reviewFormState.processing
+                                                ? 'Publishing...'
+                                                : 'Publish review'}
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : (
+                                <div className="mt-6 rounded-[32px] border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-6 text-sm leading-6 text-(--welcome-body-text)">
+                                    {review_form.message ??
+                                        'Reviews become available after a completed delivery.'}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-8">
+                            <div className="flex items-center justify-between gap-4">
+                                <div>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                        Recent feedback
+                                    </p>
+                                    <h2 className="mt-3 font-['Playfair_Display',serif] text-3xl">
+                                        Review notes from delivered orders
+                                    </h2>
+                                </div>
+                            </div>
+
+                            {reviews.length === 0 ? (
+                                <div className="mt-6 rounded-[32px] bg-(--welcome-surface-1) p-6 text-sm leading-6 text-(--welcome-body-text)">
+                                    No reviews have been published yet. The
+                                    first delivered buyer will set the tone for
+                                    this listing.
+                                </div>
+                            ) : (
+                                <div className="mt-6 grid gap-4">
+                                    {reviews.map((review) => (
+                                        <article
+                                            key={review.id}
+                                            className="rounded-[32px] bg-(--welcome-surface-1) p-6"
+                                        >
+                                            <div className="flex flex-wrap items-center justify-between gap-4">
+                                                <div>
+                                                    <p className="text-sm font-semibold text-(--welcome-strong)">
+                                                        {review.reviewer_name}
+                                                    </p>
+                                                    <p className="mt-1 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
+                                                        {review.created_at_human ??
+                                                            'Verified purchase'}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-base">
+                                                    {renderRatingStars(
+                                                        review.rating,
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <p className="mt-4 text-sm leading-7 text-(--welcome-body-text)">
+                                                {review.review}
+                                            </p>
+                                        </article>
+                                    ))}
+                                </div>
                             )}
                         </div>
                     </div>
