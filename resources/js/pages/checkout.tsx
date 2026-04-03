@@ -4,6 +4,7 @@ import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-ale
 import InputError from '@/components/input-error';
 import PayPalCardFields from '@/components/paypal-card-fields';
 import PublicSiteLayout from '@/layouts/public-site-layout';
+import { countryOptions } from '@/lib/countries';
 import { formatMoney } from '@/lib/currency';
 import { show as cartShow } from '@/routes/cart';
 import { store as checkoutStore } from '@/routes/checkout';
@@ -49,6 +50,7 @@ type CheckoutPageProps = {
     default_payment_method?: string | null;
     guest_name?: string | null;
     guest_email?: string | null;
+    default_country_code: string;
     canRegister?: boolean;
     paypal_configured?: boolean;
     stripe_configured?: boolean;
@@ -89,6 +91,7 @@ export default function CheckoutPage({
     default_payment_method = null,
     guest_name,
     guest_email,
+    default_country_code,
     canRegister = true,
     paypal_configured = false,
     stripe_configured = false,
@@ -113,7 +116,7 @@ export default function CheckoutPage({
         shipping_city: '',
         shipping_region: '',
         shipping_postal_code: '',
-        shipping_country_code: 'US',
+        shipping_country_code: default_country_code,
         shipping_phone: '',
         billing_full_name: auth.user?.name ?? '',
         billing_line1: '',
@@ -121,7 +124,7 @@ export default function CheckoutPage({
         billing_city: '',
         billing_region: '',
         billing_postal_code: '',
-        billing_country_code: 'US',
+        billing_country_code: default_country_code,
         billing_phone: '',
         paypal_conversion_confirmed: false,
     });
@@ -527,10 +530,9 @@ export default function CheckoutPage({
                                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
                                             <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Country code
+                                                Country
                                             </label>
-                                            <input
-                                                type="text"
+                                            <select
                                                 name="shipping_country_code"
                                                 value={
                                                     form.data
@@ -539,11 +541,17 @@ export default function CheckoutPage({
                                                 onChange={(event) =>
                                                     form.setData(
                                                         'shipping_country_code',
-                                                        event.target.value.toUpperCase(),
+                                                        event.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
-                                            />
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                            >
+                                                {countryOptions.map((country) => (
+                                                    <option key={country.code} value={country.code}>
+                                                        {country.name}
+                                                    </option>
+                                                ))}
+                                            </select>
                                             <InputError
                                                 message={
                                                     form.errors
@@ -723,20 +731,25 @@ export default function CheckoutPage({
                                             <div className="mt-4 grid gap-4 md:grid-cols-2">
                                                 <div className="space-y-2">
                                                     <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                        Country code
+                                                        Country
                                                     </label>
-                                                    <input
-                                                        type="text"
+                                                    <select
                                                         name="billing_country_code"
                                                         value={form.data.billing_country_code}
                                                         onChange={(event) =>
                                                             form.setData(
                                                                 'billing_country_code',
-                                                                event.target.value.toUpperCase(),
+                                                                event.target.value,
                                                             )
                                                         }
-                                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
-                                                    />
+                                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                    >
+                                                        {countryOptions.map((country) => (
+                                                            <option key={country.code} value={country.code}>
+                                                                {country.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
                                                     <InputError
                                                         message={form.errors.billing_country_code}
                                                     />

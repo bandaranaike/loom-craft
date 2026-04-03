@@ -4,7 +4,6 @@ Last updated: 2026-04-03
 
 ## Planned
 
-- [cart-and-checkout-ux-refinements](/var/www/loom-craft/.ai/tasks/planned/cart-and-checkout-ux-refinements.md)
 - [product-reviews-and-ratings](/var/www/loom-craft/.ai/tasks/planned/product-reviews-and-ratings.md)
 
 ## In Progress
@@ -15,6 +14,7 @@ Last updated: 2026-04-03
 
 - [admin-orders-and-status-management](/var/www/loom-craft/.ai/tasks/completed/admin-orders-and-status-management.md)
 - [application-currencies](/var/www/loom-craft/.ai/tasks/completed/application-currencies.md)
+- [cart-and-checkout-ux-refinements](/var/www/loom-craft/.ai/tasks/completed/cart-and-checkout-ux-refinements.md)
 - [checkout-offline-payment-operations](/var/www/loom-craft/.ai/tasks/completed/checkout-offline-payment-operations.md)
 - [dashboard-navigation-and-mobile-overflow](/var/www/loom-craft/.ai/tasks/completed/dashboard-navigation-and-mobile-overflow.md)
 - [home-page-content-simplification](/var/www/loom-craft/.ai/tasks/completed/home-page-content-simplification.md)

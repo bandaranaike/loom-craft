@@ -84,6 +84,22 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                 </div>
                             ) : (
                                 <div className="space-y-5">
+                                    <div className="flex flex-wrap items-center justify-between gap-4 rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) px-5 py-4">
+                                        <div>
+                                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                                Keep Curating
+                                            </p>
+                                            <p className="mt-1 text-sm text-(--welcome-body-text)">
+                                                Add more woven pieces before you head to checkout.
+                                            </p>
+                                        </div>
+                                        <Link
+                                            href={productsIndex()}
+                                            className="inline-flex items-center justify-center rounded-full border border-(--welcome-strong) px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                                        >
+                                            Continue Curating
+                                        </Link>
+                                    </div>
                                     {cart.items.map((item) => (
                                         <div
                                             key={item.id}

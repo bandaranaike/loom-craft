@@ -32,8 +32,11 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Guest and authenticated cart support with `loomcraft_guest_token` cookie for guest ownership.
 - Default cart/session currency is now `LKR` when not explicitly provided.
 - Cart item create/update/delete endpoints implemented.
+- Cart page now includes a continue-shopping CTA for customers who want to add more products before checkout.
 - Checkout page enforces non-empty cart before rendering.
 - Checkout store flow creates order aggregate and clears cart items.
+- Checkout country selection now uses explicit country selectors instead of a hardcoded US default, with authenticated users defaulting from their latest prior order country when available and otherwise falling back to the configured application default.
+- Checkout keeps billing-details mirroring available and hides the billing form when billing matches shipping.
 - Checkout now shows PayPal LKR to USD conversion details before payment starts.
 - PayPal checkout supports both wallet redirect approval and on-page direct card entry via PayPal Card Fields.
 - Exchange-rate snapshots are stored historically and used to block stale PayPal conversions.

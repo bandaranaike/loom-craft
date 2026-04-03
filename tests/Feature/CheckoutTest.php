@@ -47,6 +47,61 @@ it('shows checkout for guests and preserves the guest token cookie', function ()
             ->component('checkout')
             ->where('default_payment_method', 'stripe')
             ->where('payment_methods.0', 'stripe')
+            ->where('default_country_code', 'LK')
+        );
+});
+
+it('uses the authenticated users latest order address country as the checkout default country', function () {
+    $user = User::factory()->create();
+    $vendor = Vendor::factory()->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'selling_price' => '180.00',
+    ]);
+
+    $cart = Cart::query()->create([
+        'user_id' => $user->id,
+        'currency' => 'LKR',
+    ]);
+
+    $cart->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 1,
+        'unit_price' => '180.00',
+    ]);
+
+    $order = Order::query()->create([
+        'user_id' => $user->id,
+        'status' => 'delivered',
+        'currency' => 'LKR',
+        'subtotal' => '180.00',
+        'commission_total' => '180.00',
+        'total' => '180.00',
+        'shipping_responsibility' => 'platform',
+        'placed_at' => now(),
+    ]);
+
+    $order->addresses()->create([
+        'type' => 'shipping',
+        'full_name' => 'Heritage Patron',
+        'line1' => '1 Loom Street',
+        'line2' => null,
+        'city' => 'Colombo',
+        'region' => 'Western',
+        'postal_code' => '00100',
+        'country_code' => 'GB',
+        'phone' => '0770000000',
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('checkout.show'))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('checkout')
+            ->where('default_country_code', 'GB')
         );
 });
 

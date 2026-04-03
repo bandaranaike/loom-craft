@@ -83,6 +83,8 @@ No additional fields are introduced beyond `.ai/knowledge/core/db-schema.md`.
 ### 4.2 Address Collection
 
 - Collect **shipping** and **billing** address details.
+- Checkout now defaults the country code from the authenticated user's latest prior order address when available; otherwise it falls back to the configured application default country code.
+- When the customer keeps billing the same as shipping, the billing form is hidden in the UI and the billing payload is mirrored from the shipping fields on submission.
 - Persist into `order_addresses` with `type = shipping|billing`.
 
 ### 4.3 Pricing & Commission

@@ -3,6 +3,8 @@
 return [
     'base_currency' => env('COMMERCE_BASE_CURRENCY', 'LKR'),
 
+    'default_country_code' => env('COMMERCE_DEFAULT_COUNTRY_CODE', 'LK'),
+
     'commission_rate' => env('COMMERCE_COMMISSION_RATE', '100.00'),
 
     'paypal_currency' => env('COMMERCE_PAYPAL_CURRENCY', 'USD'),

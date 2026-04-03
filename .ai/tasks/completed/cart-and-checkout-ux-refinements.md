@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Status: planned
+- Status: completed
 - Created: 2026-04-03
 - Updated: 2026-04-03
 - Source: user request + merged legacy note
@@ -64,4 +64,9 @@ Improve the pre-purchase flow by making the cart easier to continue shopping fro
 
 ## Completion Notes
 
-Not started yet.
+- Implementation completed on 2026-04-03
+- Added a non-empty cart continuation CTA using the existing storefront visual language
+- Replaced hardcoded checkout country defaults with a configurable fallback and per-user default country from the latest prior order address when available
+- Updated shipping and billing country inputs to themed country selectors while keeping the existing checkout UI direction intact
+- Preserved and kept the same-as-shipping billing hide/show behavior with the existing explanatory message
+- Verified with `php artisan test --compact tests/Feature/CartFlowTest.php`, `php artisan test --compact --filter="shows checkout for guests and preserves the guest token cookie|uses the authenticated users latest order address country as the checkout default country" tests/Feature/CheckoutTest.php`, `vendor/bin/pint --dirty --format agent`, and `pnpm run types`
