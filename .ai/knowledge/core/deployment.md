@@ -107,6 +107,11 @@ Set production `.env` at `/var/www/loom-craft/shared/.env` with at least:
 - `APP_ENV=production`
 - `APP_DEBUG=false`
 - `APP_URL=https://loomcraft.work`
+- `MAIL_MAILER=resend`
+- `MAIL_FROM_ADDRESS=...` (use a verified Resend sender/domain)
+- `MAIL_FROM_NAME="Woven Wonder For Every Home"`
+- `RESEND_API_KEY=...`
+- `RESEND_WEBHOOK_SECRET=...` (only if enabling Resend webhooks)
 - `DB_CONNECTION=mysql`
 - `DB_HOST=127.0.0.1`
 - `DB_PORT=3306`
@@ -116,6 +121,8 @@ Set production `.env` at `/var/www/loom-craft/shared/.env` with at least:
 - `PAYPAL_CLIENT_ID=...`
 - `PAYPAL_CLIENT_SECRET=...`
 - `PAYPAL_BASE_URL=https://api-m.paypal.com` (or sandbox if needed)
+
+Password reset emails now explicitly use the `resend` mailer through the application's custom reset notification, so production must have a valid Resend API key and verified sender before password reset requests are enabled for end users.
 
 Generate app key once per environment:
 

@@ -1,6 +1,6 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-04-03
+Last reviewed: 2026-04-04
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implementation-guide.md`, `.ai/knowledge/core/best-practices.md`, `.ai/knowledge/core/guardrails.md`, `.ai/knowledge/core/db-schema.md`, and `.ai/knowledge/core/order-process.md`.
@@ -16,6 +16,8 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 
 ### Authentication and Account Settings
 - Fortify auth flow in place: login, register, password reset, email verification, password confirmation, and two-factor challenge.
+- Password reset emails are now routed through Resend via a custom app notification that preserves Laravel's default reset link generation and Fortify flow.
+- Published Laravel mail Markdown components now apply LoomCraft-branded email chrome globally, including the logo plus visible `LoomCraft` wordmark fallback for image-blocking mail clients.
 - Settings implemented: profile edit/delete, password update, appearance page, and two-factor status page.
 - Access control applied through route middleware and policy/gate checks.
 
