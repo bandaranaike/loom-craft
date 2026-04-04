@@ -1,10 +1,13 @@
 # Task Board
 
-Last updated: 2026-04-03
+Last updated: 2026-04-04
 
 ## Planned
 
-- None
+- [delivery-operations-workflow-planning](/var/www/loom-craft/.ai/tasks/planned/delivery-operations-workflow-planning.md)
+- [order-stickers-and-label-printing-requirements](/var/www/loom-craft/.ai/tasks/planned/order-stickers-and-label-printing-requirements.md)
+- [fulfillment-mobile-api-support](/var/www/loom-craft/.ai/tasks/planned/fulfillment-mobile-api-support.md)
+- [fulfillment-mobile-app-implementation-brief](/var/www/loom-craft/.ai/tasks/planned/fulfillment-mobile-app-implementation-brief.md)
 
 ## In Progress
 
@@ -20,6 +23,7 @@ Last updated: 2026-04-03
 - [home-page-content-simplification](/var/www/loom-craft/.ai/tasks/completed/home-page-content-simplification.md)
 - [order-details-and-tracking](/var/www/loom-craft/.ai/tasks/completed/order-details-and-tracking.md)
 - [order-history-and-operations](/var/www/loom-craft/.ai/tasks/completed/order-history-and-operations.md)
+- [password-reset-email-configuration-via-resend](/var/www/loom-craft/.ai/tasks/completed/password-reset-email-configuration-via-resend.md)
 - [product-catalog-json-generation](/var/www/loom-craft/.ai/tasks/completed/product-catalog-json-generation.md)
 - [product-categories](/var/www/loom-craft/.ai/tasks/completed/product-categories.md)
 - [product-colors](/var/www/loom-craft/.ai/tasks/completed/product-colors.md)

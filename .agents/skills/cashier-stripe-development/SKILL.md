@@ -8,16 +8,6 @@ metadata:
 
 # Cashier Stripe Development
 
-## When to Apply
-
-Activate this skill when:
-
-- Installing or configuring Laravel Cashier Stripe
-- Setting up subscriptions, trials, quantities, or plan swapping
-- Handling webhooks or SCA/3DS payment failures
-- Working with Stripe Checkout, invoices, or charges
-- Testing billing scenarios with Stripe test cards or tokens
-
 ## Documentation
 
 Use `search-docs` for detailed Cashier patterns and documentation covering subscriptions, webhooks, Stripe Checkout, invoices, payment methods, and testing.
@@ -33,9 +23,9 @@ For deeper guidance on specific topics, read the relevant reference file before 
 ### Installation
 
 ```bash
-php artisan vendor:publish --tag=&quot;cashier-migrations&quot;
+php artisan vendor:publish --tag="cashier-migrations"
 php artisan migrate
-php artisan vendor:publish --tag=&quot;cashier-config&quot;
+php artisan vendor:publish --tag="cashier-config"
 ```
 
 ### Environment Variables
