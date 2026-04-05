@@ -13,6 +13,7 @@ use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CheckoutPayPalController;
 use App\Http\Controllers\CheckoutStripeController;
+use App\Http\Controllers\ConnectedDeviceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoomWeaveDemoController;
@@ -89,6 +90,13 @@ Route::post('orders/{order:public_id}/bank-transfer-slip', [OrderBankTransferSli
 Route::get('dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('connected-devices', [ConnectedDeviceController::class, 'index'])
+        ->name('connected-devices.index');
+    Route::delete('connected-devices/{token}', [ConnectedDeviceController::class, 'destroy'])
+        ->name('connected-devices.destroy');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::post('product/{product:slug}/reviews', [ProductReviewController::class, 'store'])

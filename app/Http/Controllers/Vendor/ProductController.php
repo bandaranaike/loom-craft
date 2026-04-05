@@ -49,6 +49,7 @@ class ProductController extends Controller
 
         return Inertia::render('vendor/products/create', [
             ...$result->toArray(),
+            'base_currency' => (string) config('commerce.base_currency', 'LKR'),
             'commission_rate' => (string) config('commerce.commission_rate'),
             'status' => session('status'),
         ]);
@@ -74,6 +75,7 @@ class ProductController extends Controller
 
         return Inertia::render('vendor/products/edit', [
             ...$result->toArray(),
+            'base_currency' => (string) config('commerce.base_currency', 'LKR'),
             'status' => session('status'),
         ]);
     }

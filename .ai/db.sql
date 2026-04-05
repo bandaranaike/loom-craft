@@ -1,30 +1,28 @@
-create table cache
+create table loom_craft.cache
 (
     `key`      varchar(255) not null
         primary key,
     value      mediumtext   not null,
     expiration int          not null
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index cache_expiration_index
-    on cache (expiration);
+    on loom_craft.cache (expiration);
 
-create table cache_locks
+create table loom_craft.cache_locks
 (
     `key`      varchar(255) not null
         primary key,
     owner      varchar(255) not null,
     expiration int          not null
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index cache_locks_expiration_index
-    on cache_locks (expiration);
+    on loom_craft.cache_locks (expiration);
 
-create table exchange_rates
+create table loom_craft.exchange_rates
 (
     id            bigint unsigned auto_increment
         primary key,
@@ -36,13 +34,12 @@ create table exchange_rates
     created_at    timestamp      null,
     updated_at    timestamp      null
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index exchange_rates_pair_fetched_at_index
-    on exchange_rates (from_currency, to_currency, fetched_at);
+    on loom_craft.exchange_rates (from_currency, to_currency, fetched_at);
 
-create table failed_jobs
+create table loom_craft.failed_jobs
 (
     id         bigint unsigned auto_increment
         primary key,
@@ -55,10 +52,9 @@ create table failed_jobs
     constraint failed_jobs_uuid_unique
         unique (uuid)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table job_batches
+create table loom_craft.job_batches
 (
     id             varchar(255) not null
         primary key,
@@ -72,10 +68,9 @@ create table job_batches
     created_at     int          not null,
     finished_at    int          null
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table jobs
+create table loom_craft.jobs
 (
     id           bigint unsigned auto_increment
         primary key,
@@ -86,33 +81,54 @@ create table jobs
     available_at int unsigned     not null,
     created_at   int unsigned     not null
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index jobs_queue_index
-    on jobs (queue);
+    on loom_craft.jobs (queue);
 
-create table migrations
+create table loom_craft.migrations
 (
     id        int unsigned auto_increment
         primary key,
     migration varchar(255) not null,
     batch     int          not null
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table password_reset_tokens
+create table loom_craft.password_reset_tokens
 (
     email      varchar(255) not null
         primary key,
     token      varchar(255) not null,
     created_at timestamp    null
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table product_categories
+create table loom_craft.personal_access_tokens
+(
+    id             bigint unsigned auto_increment
+        primary key,
+    tokenable_type varchar(255)    not null,
+    tokenable_id   bigint unsigned not null,
+    name           text            not null,
+    token          varchar(64)     not null,
+    abilities      text            null,
+    last_used_at   timestamp       null,
+    expires_at     timestamp       null,
+    created_at     timestamp       null,
+    updated_at     timestamp       null,
+    constraint personal_access_tokens_token_unique
+        unique (token)
+)
+    collate = utf8mb4_unicode_ci;
+
+create index personal_access_tokens_expires_at_index
+    on loom_craft.personal_access_tokens (expires_at);
+
+create index personal_access_tokens_tokenable_type_tokenable_id_index
+    on loom_craft.personal_access_tokens (tokenable_type, tokenable_id);
+
+create table loom_craft.product_categories
 (
     id                  bigint unsigned auto_increment
         primary key,
@@ -129,10 +145,9 @@ create table product_categories
     constraint product_categories_slug_unique
         unique (slug)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table product_colors
+create table loom_craft.product_colors
 (
     id         bigint unsigned auto_increment
         primary key,
@@ -147,10 +162,9 @@ create table product_colors
     constraint product_colors_slug_unique
         unique (slug)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table sessions
+create table loom_craft.sessions
 (
     id            varchar(255)    not null
         primary key,
@@ -160,16 +174,15 @@ create table sessions
     payload       longtext        not null,
     last_activity int             not null
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index sessions_last_activity_index
-    on sessions (last_activity);
+    on loom_craft.sessions (last_activity);
 
 create index sessions_user_id_index
-    on sessions (user_id);
+    on loom_craft.sessions (user_id);
 
-create table subscription_items
+create table loom_craft.subscription_items
 (
     id               bigint unsigned auto_increment
         primary key,
@@ -185,13 +198,12 @@ create table subscription_items
     constraint subscription_items_stripe_id_unique
         unique (stripe_id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index subscription_items_subscription_id_stripe_price_index
-    on subscription_items (subscription_id, stripe_price);
+    on loom_craft.subscription_items (subscription_id, stripe_price);
 
-create table subscriptions
+create table loom_craft.subscriptions
 (
     id            bigint unsigned auto_increment
         primary key,
@@ -208,13 +220,12 @@ create table subscriptions
     constraint subscriptions_stripe_id_unique
         unique (stripe_id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index subscriptions_user_id_stripe_status_index
-    on subscriptions (user_id, stripe_status);
+    on loom_craft.subscriptions (user_id, stripe_status);
 
-create table users
+create table loom_craft.users
 (
     id                        bigint unsigned auto_increment
         primary key,
@@ -236,10 +247,9 @@ create table users
     constraint users_email_unique
         unique (email)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table carts
+create table loom_craft.carts
 (
     id          bigint unsigned auto_increment
         primary key,
@@ -251,12 +261,11 @@ create table carts
     constraint carts_guest_token_unique
         unique (guest_token),
     constraint carts_user_id_foreign
-        foreign key (user_id) references users (id)
+        foreign key (user_id) references loom_craft.users (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table complaints
+create table loom_craft.complaints
 (
     id          bigint unsigned auto_increment
         primary key,
@@ -269,20 +278,38 @@ create table complaints
     created_at  timestamp       null,
     updated_at  timestamp       null,
     constraint complaints_handled_by_foreign
-        foreign key (handled_by) references users (id),
+        foreign key (handled_by) references loom_craft.users (id),
     constraint complaints_user_id_foreign
-        foreign key (user_id) references users (id)
+        foreign key (user_id) references loom_craft.users (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index complaints_status_index
-    on complaints (status);
+    on loom_craft.complaints (status);
 
-create table orders
+create table loom_craft.mobile_notification_tokens
+(
+    id           bigint unsigned auto_increment
+        primary key,
+    user_id      bigint unsigned               not null,
+    fcm_token    varchar(512)                  not null,
+    platform     varchar(32) default 'android' not null,
+    last_used_at timestamp                     null,
+    created_at   timestamp                     null,
+    updated_at   timestamp                     null,
+    constraint mobile_notification_tokens_fcm_token_unique
+        unique (fcm_token),
+    constraint mobile_notification_tokens_user_id_foreign
+        foreign key (user_id) references loom_craft.users (id)
+            on delete cascade
+)
+    collate = utf8mb4_unicode_ci;
+
+create table loom_craft.orders
 (
     id                      bigint unsigned auto_increment
         primary key,
+    public_id               varchar(40)     null,
     user_id                 bigint unsigned null,
     guest_name              varchar(255)    null,
     guest_email             varchar(255)    null,
@@ -295,13 +322,15 @@ create table orders
     placed_at               timestamp       null,
     created_at              timestamp       null,
     updated_at              timestamp       null,
+    deleted_at              timestamp       null,
+    constraint orders_public_id_unique
+        unique (public_id),
     constraint orders_user_id_foreign
-        foreign key (user_id) references users (id)
+        foreign key (user_id) references loom_craft.users (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table order_addresses
+create table loom_craft.order_addresses
 (
     id           bigint unsigned auto_increment
         primary key,
@@ -318,48 +347,50 @@ create table order_addresses
     created_at   timestamp       null,
     updated_at   timestamp       null,
     constraint order_addresses_order_id_foreign
-        foreign key (order_id) references orders (id)
+        foreign key (order_id) references loom_craft.orders (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index order_addresses_type_index
-    on order_addresses (type);
+    on loom_craft.order_addresses (type);
 
 create index orders_status_index
-    on orders (status);
+    on loom_craft.orders (status);
 
-create table payments
+create table loom_craft.payments
 (
-    id                       bigint unsigned auto_increment
+    id                               bigint unsigned auto_increment
         primary key,
-    order_id                 bigint unsigned not null,
-    method                   varchar(255)    not null,
-    status                   varchar(255)    not null,
-    amount                   decimal(10, 2)  not null,
-    currency                 varchar(255)    not null,
-    original_amount          decimal(10, 2)  null,
-    original_currency        varchar(3)      null,
-    exchange_rate            decimal(18, 8)  null,
-    exchange_rate_source     varchar(255)    null,
-    exchange_rate_fetched_at timestamp       null,
-    provider_reference       varchar(255)    null,
-    verified_by              bigint unsigned null,
-    verified_at              timestamp       null,
-    created_at               timestamp       null,
-    updated_at               timestamp       null,
+    order_id                         bigint unsigned not null,
+    method                           varchar(255)    not null,
+    status                           varchar(255)    not null,
+    amount                           decimal(10, 2)  not null,
+    currency                         varchar(255)    not null,
+    original_amount                  decimal(10, 2)  null,
+    original_currency                varchar(3)      null,
+    exchange_rate                    decimal(18, 8)  null,
+    exchange_rate_source             varchar(255)    null,
+    exchange_rate_fetched_at         timestamp       null,
+    provider_reference               varchar(255)    null,
+    bank_transfer_slip_path          varchar(255)    null,
+    bank_transfer_slip_original_name varchar(255)    null,
+    bank_transfer_slip_mime_type     varchar(255)    null,
+    bank_transfer_slip_uploaded_at   timestamp       null,
+    verified_by                      bigint unsigned null,
+    verified_at                      timestamp       null,
+    created_at                       timestamp       null,
+    updated_at                       timestamp       null,
     constraint payments_order_id_foreign
-        foreign key (order_id) references orders (id),
+        foreign key (order_id) references loom_craft.orders (id),
     constraint payments_verified_by_foreign
-        foreign key (verified_by) references users (id)
+        foreign key (verified_by) references loom_craft.users (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index payments_status_index
-    on payments (status);
+    on loom_craft.payments (status);
 
-create table suggestions
+create table loom_craft.suggestions
 (
     id          bigint unsigned auto_increment
         primary key,
@@ -372,23 +403,22 @@ create table suggestions
     created_at  timestamp       null,
     updated_at  timestamp       null,
     constraint suggestions_handled_by_foreign
-        foreign key (handled_by) references users (id),
+        foreign key (handled_by) references loom_craft.users (id),
     constraint suggestions_user_id_foreign
-        foreign key (user_id) references users (id)
+        foreign key (user_id) references loom_craft.users (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index suggestions_status_index
-    on suggestions (status);
+    on loom_craft.suggestions (status);
 
 create index users_role_index
-    on users (role);
+    on loom_craft.users (role);
 
 create index users_stripe_id_index
-    on users (stripe_id);
+    on loom_craft.users (stripe_id);
 
-create table vendors
+create table loom_craft.vendors
 (
     id                bigint unsigned auto_increment
         primary key,
@@ -418,14 +448,13 @@ create table vendors
     constraint vendors_slug_unique
         unique (slug),
     constraint vendors_approved_by_foreign
-        foreign key (approved_by) references users (id),
+        foreign key (approved_by) references loom_craft.users (id),
     constraint vendors_user_id_foreign
-        foreign key (user_id) references users (id)
+        foreign key (user_id) references loom_craft.users (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table products
+create table loom_craft.products
 (
     id                   bigint unsigned auto_increment
         primary key,
@@ -453,12 +482,11 @@ create table products
     constraint products_slug_unique
         unique (slug),
     constraint products_vendor_id_foreign
-        foreign key (vendor_id) references vendors (id)
+        foreign key (vendor_id) references loom_craft.vendors (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table cart_items
+create table loom_craft.cart_items
 (
     id         bigint unsigned auto_increment
         primary key,
@@ -469,14 +497,13 @@ create table cart_items
     created_at timestamp       null,
     updated_at timestamp       null,
     constraint cart_items_cart_id_foreign
-        foreign key (cart_id) references carts (id),
+        foreign key (cart_id) references loom_craft.carts (id),
     constraint cart_items_product_id_foreign
-        foreign key (product_id) references products (id)
+        foreign key (product_id) references loom_craft.products (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table category_product
+create table loom_craft.category_product
 (
     id                  bigint unsigned auto_increment
         primary key,
@@ -487,16 +514,15 @@ create table category_product
     constraint category_product_product_id_product_category_id_unique
         unique (product_id, product_category_id),
     constraint category_product_product_category_id_foreign
-        foreign key (product_category_id) references product_categories (id)
+        foreign key (product_category_id) references loom_craft.product_categories (id)
             on delete cascade,
     constraint category_product_product_id_foreign
-        foreign key (product_id) references products (id)
+        foreign key (product_id) references loom_craft.products (id)
             on delete cascade
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table order_items
+create table loom_craft.order_items
 (
     id                bigint unsigned auto_increment
         primary key,
@@ -511,16 +537,15 @@ create table order_items
     created_at        timestamp       null,
     updated_at        timestamp       null,
     constraint order_items_order_id_foreign
-        foreign key (order_id) references orders (id),
+        foreign key (order_id) references loom_craft.orders (id),
     constraint order_items_product_id_foreign
-        foreign key (product_id) references products (id),
+        foreign key (product_id) references loom_craft.products (id),
     constraint order_items_vendor_id_foreign
-        foreign key (vendor_id) references vendors (id)
+        foreign key (vendor_id) references loom_craft.vendors (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table disputes
+create table loom_craft.disputes
 (
     id                bigint unsigned auto_increment
         primary key,
@@ -535,24 +560,23 @@ create table disputes
     created_at        timestamp       null,
     updated_at        timestamp       null,
     constraint disputes_handled_by_foreign
-        foreign key (handled_by) references users (id),
+        foreign key (handled_by) references loom_craft.users (id),
     constraint disputes_opened_by_user_id_foreign
-        foreign key (opened_by_user_id) references users (id),
+        foreign key (opened_by_user_id) references loom_craft.users (id),
     constraint disputes_order_id_foreign
-        foreign key (order_id) references orders (id),
+        foreign key (order_id) references loom_craft.orders (id),
     constraint disputes_order_item_id_foreign
-        foreign key (order_item_id) references order_items (id)
+        foreign key (order_item_id) references loom_craft.order_items (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index disputes_status_index
-    on disputes (status);
+    on loom_craft.disputes (status);
 
 create index order_items_vendor_id_index
-    on order_items (vendor_id);
+    on loom_craft.order_items (vendor_id);
 
-create table product_color_product
+create table loom_craft.product_color_product
 (
     id               bigint unsigned auto_increment
         primary key,
@@ -563,16 +587,15 @@ create table product_color_product
     constraint product_color_product_product_id_product_color_id_unique
         unique (product_id, product_color_id),
     constraint product_color_product_product_color_id_foreign
-        foreign key (product_color_id) references product_colors (id)
+        foreign key (product_color_id) references loom_craft.product_colors (id)
             on delete cascade,
     constraint product_color_product_product_id_foreign
-        foreign key (product_id) references products (id)
+        foreign key (product_id) references loom_craft.products (id)
             on delete cascade
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table product_media
+create table loom_craft.product_media
 (
     id         bigint unsigned auto_increment
         primary key,
@@ -584,15 +607,14 @@ create table product_media
     created_at timestamp              null,
     updated_at timestamp              null,
     constraint product_media_product_id_foreign
-        foreign key (product_id) references products (id)
+        foreign key (product_id) references loom_craft.products (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index product_media_type_index
-    on product_media (type);
+    on loom_craft.product_media (type);
 
-create table product_reports
+create table loom_craft.product_reports
 (
     id          bigint unsigned auto_increment
         primary key,
@@ -605,28 +627,48 @@ create table product_reports
     created_at  timestamp       null,
     updated_at  timestamp       null,
     constraint product_reports_handled_by_foreign
-        foreign key (handled_by) references users (id),
+        foreign key (handled_by) references loom_craft.users (id),
     constraint product_reports_product_id_foreign
-        foreign key (product_id) references products (id),
+        foreign key (product_id) references loom_craft.products (id),
     constraint product_reports_user_id_foreign
-        foreign key (user_id) references users (id)
+        foreign key (user_id) references loom_craft.users (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index product_reports_status_index
-    on product_reports (status);
+    on loom_craft.product_reports (status);
+
+create table loom_craft.product_reviews
+(
+    id         bigint unsigned auto_increment
+        primary key,
+    product_id bigint unsigned  not null,
+    user_id    bigint unsigned  not null,
+    rating     tinyint unsigned not null,
+    review     text             not null,
+    created_at timestamp        null,
+    updated_at timestamp        null,
+    constraint product_reviews_product_id_user_id_unique
+        unique (product_id, user_id),
+    constraint product_reviews_product_id_foreign
+        foreign key (product_id) references loom_craft.products (id)
+            on delete cascade,
+    constraint product_reviews_user_id_foreign
+        foreign key (user_id) references loom_craft.users (id)
+            on delete cascade
+)
+    collate = utf8mb4_unicode_ci;
 
 create index products_status_created_at_index
-    on products (status, created_at);
+    on loom_craft.products (status, created_at);
 
 create index products_status_index
-    on products (status);
+    on loom_craft.products (status);
 
 create index products_status_selling_price_index
-    on products (status, selling_price);
+    on loom_craft.products (status, selling_price);
 
-create table shipments
+create table loom_craft.shipments
 (
     id              bigint unsigned auto_increment
         primary key,
@@ -641,14 +683,13 @@ create table shipments
     created_at      timestamp       null,
     updated_at      timestamp       null,
     constraint shipments_order_id_foreign
-        foreign key (order_id) references orders (id),
+        foreign key (order_id) references loom_craft.orders (id),
     constraint shipments_vendor_id_foreign
-        foreign key (vendor_id) references vendors (id)
+        foreign key (vendor_id) references loom_craft.vendors (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
-create table vendor_contact_submissions
+create table loom_craft.vendor_contact_submissions
 (
     id           bigint unsigned auto_increment
         primary key,
@@ -665,18 +706,17 @@ create table vendor_contact_submissions
     created_at   timestamp                                null,
     updated_at   timestamp                                null,
     constraint vendor_contact_submissions_handled_by_foreign
-        foreign key (handled_by) references users (id),
+        foreign key (handled_by) references loom_craft.users (id),
     constraint vendor_contact_submissions_vendor_id_foreign
-        foreign key (vendor_id) references vendors (id)
+        foreign key (vendor_id) references loom_craft.vendors (id)
             on delete cascade
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index vendor_contact_submissions_vendor_id_status_index
-    on vendor_contact_submissions (vendor_id, status);
+    on loom_craft.vendor_contact_submissions (vendor_id, status);
 
-create table vendor_locations
+create table loom_craft.vendor_locations
 (
     id             bigint unsigned auto_increment
         primary key,
@@ -695,16 +735,15 @@ create table vendor_locations
     created_at     timestamp            null,
     updated_at     timestamp            null,
     constraint vendor_locations_vendor_id_foreign
-        foreign key (vendor_id) references vendors (id)
+        foreign key (vendor_id) references loom_craft.vendors (id)
             on delete cascade
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index vendor_locations_vendor_id_index
-    on vendor_locations (vendor_id);
+    on loom_craft.vendor_locations (vendor_id);
 
-create table vendor_payouts
+create table loom_craft.vendor_payouts
 (
     id         bigint unsigned auto_increment
         primary key,
@@ -717,16 +756,15 @@ create table vendor_payouts
     created_at timestamp       null,
     updated_at timestamp       null,
     constraint vendor_payouts_order_id_foreign
-        foreign key (order_id) references orders (id),
+        foreign key (order_id) references loom_craft.orders (id),
     constraint vendor_payouts_vendor_id_foreign
-        foreign key (vendor_id) references vendors (id)
+        foreign key (vendor_id) references loom_craft.vendors (id)
 )
-    engine = InnoDB
     collate = utf8mb4_unicode_ci;
 
 create index vendors_status_display_name_index
-    on vendors (status, display_name);
+    on loom_craft.vendors (status, display_name);
 
 create index vendors_status_index
-    on vendors (status);
+    on loom_craft.vendors (status);
 

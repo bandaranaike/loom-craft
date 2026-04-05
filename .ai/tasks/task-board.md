@@ -1,6 +1,6 @@
 # Task Board
 
-Last updated: 2026-04-05
+Last updated: 2026-04-06
 
 ## Planned
 
@@ -8,6 +8,8 @@ Last updated: 2026-04-05
 - [order-stickers-and-label-printing-requirements](/var/www/loom-craft/.ai/tasks/planned/order-stickers-and-label-printing-requirements.md)
 - [fulfillment-mobile-api-support](/var/www/loom-craft/.ai/tasks/planned/fulfillment-mobile-api-support.md)
 - [fulfillment-mobile-app-implementation-brief](/var/www/loom-craft/.ai/tasks/planned/fulfillment-mobile-app-implementation-brief.md)
+- [vendor-product-pricing-currency-label-lkr](/var/www/loom-craft/.ai/tasks/planned/vendor-product-pricing-currency-label-lkr.md)
+- [mobile-device-session-management-dashboard](/var/www/loom-craft/.ai/tasks/planned/mobile-device-session-management-dashboard.md)
 
 ## In Progress
 

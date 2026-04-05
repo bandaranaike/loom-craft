@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
+    Smartphone,
     Folder,
     Inbox,
     LayoutGrid,
@@ -32,6 +33,7 @@ import { pending as adminVendorInquiriesPending } from '@/routes/admin/vendor-in
 import { connect as adminYouTubeConnect } from '@/routes/admin/youtube';
 import { index as adminOrdersIndex } from '@/routes/admin/orders';
 import { pending as adminVendorsPending } from '@/routes/admin/vendors';
+import { index as connectedDevicesIndex } from '@/routes/connected-devices';
 import { create as vendorFeedbackCreate } from '@/routes/vendor/feedback';
 import { index as vendorInquiriesIndex } from '@/routes/vendor/inquiries';
 import { index as vendorProductsIndex } from '@/routes/vendor/products';
@@ -68,6 +70,15 @@ export function AppSidebar() {
             href: isAdmin ? adminOrdersIndex() : ordersIndex(),
             icon: Package,
         },
+        ...((isAdmin || isVendor)
+            ? [
+                  {
+                      title: 'Connected Devices',
+                      href: connectedDevicesIndex(),
+                      icon: Smartphone,
+                  },
+              ]
+            : []),
         ...(isAdmin
             ? [
                   {

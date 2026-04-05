@@ -14,6 +14,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 uses(RefreshDatabase::class);
 
 it('allows approved vendors to view the product creation page', function () {
+    $baseCurrency = (string) config('commerce.base_currency', 'LKR');
     $commissionRate = (string) config('commerce.commission_rate');
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $admin = User::factory()->create(['role' => 'admin']);
@@ -29,6 +30,7 @@ it('allows approved vendors to view the product creation page', function () {
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('vendor/products/create')
+            ->where('base_currency', $baseCurrency)
             ->where('commission_rate', $commissionRate)
         );
 });

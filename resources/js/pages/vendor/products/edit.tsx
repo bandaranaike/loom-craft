@@ -4,6 +4,7 @@ import InputError from '@/components/input-error';
 import ProductColorSelector from '@/components/product-color-selector';
 import { Spinner } from '@/components/ui/spinner';
 import PublicSiteLayout from '@/layouts/public-site-layout';
+import { formatMoney } from '@/lib/currency';
 import { dashboard } from '@/routes';
 import { index as vendorProductsIndex, update } from '@/routes/vendor/products';
 import { destroy, store } from '@/routes/vendor/products/images';
@@ -32,6 +33,7 @@ type ProductForm = {
 };
 
 type Props = {
+    base_currency: string;
     commission_rate: string;
     vendor_name: string | null;
     vendor_slug: string | null;
@@ -59,7 +61,7 @@ const fileInputClassName =
     'w-full rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] file:mr-4 file:rounded-full file:border-0 file:bg-(--welcome-strong) file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.3em] file:text-(--welcome-on-strong) hover:file:bg-(--welcome-strong-hover) focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
 
 export default function ProductEdit() {
-    const { commission_rate, vendor_name, vendor_slug, product, categories, colors, status } = usePage<Props>().props;
+    const { base_currency, commission_rate, vendor_name, vendor_slug, product, categories, colors, status } = usePage<Props>().props;
     const [vendorPrice, setVendorPrice] = useState(product.vendor_price);
     const [discountPercentage, setDiscountPercentage] = useState(product.discount_percentage ?? '');
 
@@ -158,15 +160,15 @@ export default function ProductEdit() {
                             </p>
                             <div className="flex items-center justify-between text-sm text-(--welcome-body-text)">
                                 <span>Vendor price</span>
-                                <span>{vendorPrice ? `Rs. ${vendorPrice}` : '—'}</span>
+                                <span>{vendorPrice ? formatMoney(vendorPrice, base_currency) : '—'}</span>
                             </div>
                             <div className="flex items-center justify-between text-sm text-(--welcome-body-text)">
                                 <span>Catalog price</span>
-                                <span>{baseSellingPrice === '—' ? '—' : `Rs. ${baseSellingPrice}`}</span>
+                                <span>{baseSellingPrice === '—' ? '—' : formatMoney(baseSellingPrice, base_currency)}</span>
                             </div>
                             <div className="flex items-center justify-between text-sm text-(--welcome-body-text)">
                                 <span>Customer price</span>
-                                <span>{discountedSellingPrice === '—' ? '—' : `Rs. ${discountedSellingPrice}`}</span>
+                                <span>{discountedSellingPrice === '—' ? '—' : formatMoney(discountedSellingPrice, base_currency)}</span>
                             </div>
                         </div>
                     </div>
