@@ -1,6 +1,6 @@
 # Task Board
 
-Last updated: 2026-04-04
+Last updated: 2026-04-05
 
 ## Planned
 
@@ -11,7 +11,7 @@ Last updated: 2026-04-04
 
 ## In Progress
 
-- None
+- [mobile-public-api-v1](/var/www/loom-craft/.ai/tasks/in-progress/mobile-public-api-v1.md)
 
 ## Completed
 

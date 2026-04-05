@@ -15,4 +15,4 @@ Useful things to include when available:
 
 Latest note:
 
-- Application email should be configured to send emails when the password reset. https://resend.com/
+- We have to create public API. the details are in the file `.ai/inbox/api-spec.md`

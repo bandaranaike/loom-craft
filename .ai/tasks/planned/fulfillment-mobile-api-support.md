@@ -13,13 +13,14 @@
 - A mobile app should use the API of the LoomCraft website.
 - All processing orders should be visible in the app.
 - Users should be able to open an order and:
-  - print stickers
-  - change order status to shipped or delivered
+    - print stickers
+    - change order status to shipped or delivered
 - Additional useful fulfillment features may be added if necessary.
 
 ## Objective
 
-Define and later implement the backend API surface required to support a fulfillment-focused mobile app. The API should expose processing orders, detailed order payloads for packing and shipping, printable sticker data, and safe status-update actions that match the real delivery workflow.
+Define and later implement the backend API surface required to support a fulfillment-focused mobile app. The API should expose processing orders, detailed order payloads for
+packing and shipping, printable sticker data, and safe status-update actions that match the real delivery workflow.
 
 ## Acceptance Criteria
 

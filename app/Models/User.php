@@ -12,11 +12,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use Billable, HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use Billable, HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -129,5 +130,10 @@ class User extends Authenticatable
     public function vendorApprovals(): HasMany
     {
         return $this->hasMany(Vendor::class, 'approved_by');
+    }
+
+    public function mobileNotificationTokens(): HasMany
+    {
+        return $this->hasMany(MobileNotificationToken::class);
     }
 }
