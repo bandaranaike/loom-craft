@@ -1,10 +1,10 @@
 import { Head, usePage } from '@inertiajs/react';
-import { show as vendorOrderShow } from '@/routes/vendor/orders';
+import { Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
-import type { BreadcrumbItem } from '@/types';
+import { show as vendorOrderShow } from '@/routes/vendor/orders';
 import { index as vendorOrdersIndex } from '@/routes/vendor/orders';
-import { Link } from '@inertiajs/react';
+import type { BreadcrumbItem } from '@/types';
 
 type VendorOrder = {
     id: number;

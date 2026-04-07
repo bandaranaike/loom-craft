@@ -1,4 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -10,14 +11,13 @@ import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import { dashboard } from '@/routes';
 import { index as adminOrdersIndex } from '@/routes/admin/orders';
-import { index as ordersIndex, show as ordersShow } from '@/routes/orders';
 import { pending as adminVendorPending } from '@/routes/admin/vendors';
-import { edit as vendorProfileEdit } from '@/routes/vendor/profile';
+import { index as ordersIndex, show as ordersShow } from '@/routes/orders';
 import { register as vendorRegister } from '@/routes/vendor';
+import { edit as vendorProfileEdit } from '@/routes/vendor/profile';
 import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
 import type { BreadcrumbItem } from '@/types';
-import { useMemo, useState } from 'react';
 
 type Props = {
     status?: string;

@@ -26,18 +26,18 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { pending as adminFeedbackPending } from '@/routes/admin/feedback';
+import { index as adminOrdersIndex } from '@/routes/admin/orders';
 import { index as adminProductCategoriesIndex } from '@/routes/admin/product-categories';
 import { index as adminProductColorsIndex } from '@/routes/admin/product-colors';
 import { pending as adminProductsPending } from '@/routes/admin/products';
 import { pending as adminVendorInquiriesPending } from '@/routes/admin/vendor-inquiries';
-import { connect as adminYouTubeConnect } from '@/routes/admin/youtube';
-import { index as adminOrdersIndex } from '@/routes/admin/orders';
 import { pending as adminVendorsPending } from '@/routes/admin/vendors';
+import { connect as adminYouTubeConnect } from '@/routes/admin/youtube';
 import { index as connectedDevicesIndex } from '@/routes/connected-devices';
+import { index as ordersIndex } from '@/routes/orders';
 import { create as vendorFeedbackCreate } from '@/routes/vendor/feedback';
 import { index as vendorInquiriesIndex } from '@/routes/vendor/inquiries';
 import { index as vendorProductsIndex } from '@/routes/vendor/products';
-import { index as ordersIndex } from '@/routes/orders';
 import type { NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
 

@@ -1,0 +1,300 @@
+{
+  "info": {
+    "name": "Loom Craft Public API",
+    "_postman_id": "5c15866f-7411-40df-aa42-1c611f083467",
+    "description": "Postman collection for the public mobile API exposed in routes/api.php. Set `base_url`, `email`, and `password` for the production server, then run `Auth / Login` first. The login test script stores the Sanctum token in the collection variable `access_token` and also stores `user_role`. Order detail responses are role-based: `admin` users receive customer, address, shipment, payment, and contact details; `vendor` users receive only vendor-safe order item data without customer details.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://your-production-domain.com"
+    },
+    {
+      "key": "email",
+      "value": "admin@example.com"
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "device_name",
+      "value": "postman"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "user_id",
+      "value": ""
+    },
+    {
+      "key": "user_role",
+      "value": ""
+    },
+    {
+      "key": "vendor_id",
+      "value": ""
+    },
+    {
+      "key": "order_id",
+      "value": ""
+    },
+    {
+      "key": "order_public_id",
+      "value": ""
+    },
+    {
+      "key": "order_status",
+      "value": "shipped"
+    },
+    {
+      "key": "fcm_token",
+      "value": "demo-fcm-token"
+    },
+    {
+      "key": "platform",
+      "value": "android"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('login succeeded', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.collectionVariables.set('access_token', response.token || '');",
+                  "pm.collectionVariables.set('user_id', response.user?.id ? String(response.user.id) : '');",
+                  "pm.collectionVariables.set('user_role', response.user?.role || '');",
+                  "pm.collectionVariables.set('vendor_id', response.user?.vendor_id ? String(response.user.vendor_id) : '');",
+                  "",
+                  "pm.test('access token saved', function () {",
+                  "    pm.expect(pm.collectionVariables.get('access_token')).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"device_name\": \"{{device_name}}\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/login",
+            "description": "Returns a Sanctum plain text token. Only `admin` and approved `vendor` users can authenticate."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "List Orders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('orders listed', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test('response is an array', function () {",
+                  "    pm.expect(response).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (Array.isArray(response) && response.length > 0) {",
+                  "    const firstOrder = response[0];",
+                  "    pm.collectionVariables.set('order_id', firstOrder.id ? String(firstOrder.id) : '');",
+                  "    pm.collectionVariables.set('order_public_id', firstOrder.public_id || '');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/orders",
+            "description": "Lists orders available to the authenticated user. Admins receive all orders. Vendors receive their own vendor-scoped orders."
+          }
+        },
+        {
+          "name": "Show Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('order detail returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "const userRole = pm.collectionVariables.get('user_role');",
+                  "",
+                  "pm.test('common order fields exist', function () {",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('public_id');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('items');",
+                  "});",
+                  "",
+                  "if (userRole === 'admin') {",
+                  "    pm.test('admin sees customer and address details', function () {",
+                  "        pm.expect(response).to.have.property('customer');",
+                  "        pm.expect(response.customer).to.have.property('name');",
+                  "        pm.expect(response.customer).to.have.property('email');",
+                  "        pm.expect(response).to.have.property('addresses');",
+                  "        pm.expect(response.addresses).to.be.an('array');",
+                  "    });",
+                  "",
+                  "    pm.test('admin sees payment and shipment details', function () {",
+                  "        pm.expect(response).to.have.property('payment');",
+                  "        pm.expect(response).to.have.property('shipments');",
+                  "        pm.expect(response.shipments).to.be.an('array');",
+                  "    });",
+                  "} else if (userRole === 'vendor') {",
+                  "    pm.test('vendor does not receive customer or address details', function () {",
+                  "        pm.expect(response).to.not.have.property('customer');",
+                  "        pm.expect(response).to.not.have.property('addresses');",
+                  "        pm.expect(response).to.not.have.property('payment');",
+                  "        pm.expect(response).to.not.have.property('shipments');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/orders/{{order_id}}",
+            "description": "Fetches a single order by numeric internal `id`. Run `List Orders` first to populate `order_id` automatically. Response shape depends on `user_role` captured at login: admins receive customer, address, payment, shipment, and contact details; vendors do not receive customer details and only receive vendor-safe order item data."
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"{{order_status}}\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/orders/{{order_id}}/status",
+            "description": "Updates order status. Admin allowed values: `pending`, `paid`, `confirmed`, `shipped`, `delivered`, `cancelled`. Vendor allowed value: `shipped` only, and only when the current order status is `paid` or `confirmed`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Register Notification Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fcm_token\": \"{{fcm_token}}\",\n  \"platform\": \"{{platform}}\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/notifications/register",
+            "description": "Registers or updates the authenticated user's mobile push notification token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Only",
+      "item": [
+        {
+          "name": "Get Order Sticker Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/admin/orders/{{order_id}}/sticker-data",
+            "description": "Admin token required. Returns sticker-printing data for the selected order."
+          }
+        }
+      ]
+    }
+  ]
+}

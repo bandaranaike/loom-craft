@@ -1,4 +1,6 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import { Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
 import PublicSiteLayout from '@/layouts/public-site-layout';
@@ -15,182 +17,146 @@ type Props = {
 const inputClassName =
     'w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) placeholder:text-(--welcome-muted-70) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
 
-export default function Login({
-    status,
-    canResetPassword,
-    canRegister,
-}: Props) {
+export default function Login({ status, canResetPassword, canRegister }: Props) {
+    const [passwordVisible, setPasswordVisible] = useState(false);
+
     return (
         <>
             <Head title="Log in">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link
-                    href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
-                    rel="stylesheet"
-                />
+                <link href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600" rel="stylesheet" />
             </Head>
             <PublicSiteLayout canRegister={canRegister}>
-                    <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-4 lg:grid-cols-[1.05fr_0.95fr]">
-                        <div className="space-y-6">
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Welcome Back
-                            </p>
-                            <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
-                                Return to the LoomCraft atelier.
-                            </h1>
-                            <p className="max-w-xl text-sm text-(--welcome-body-text) md:text-base">
-                                Sign in to manage your collections, review artisan releases, and
-                                follow the provenance of every textile in your care.
-                            </p>
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Atelier Notes
-                                    </p>
-                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                        Guest checkout remains available, with curated guidance
-                                        when you return.
-                                    </p>
-                                </div>
-                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Secure Access
-                                    </p>
-                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                        Two-factor challenges protect the artisan network you
-                                        support.
-                                    </p>
-                                </div>
+                <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-4 pb-16 lg:grid-cols-[1.05fr_0.95fr]">
+                    <div className="space-y-6">
+                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Welcome Back</p>
+                        <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">Return to the LoomCraft atelier.</h1>
+                        <p className="max-w-xl text-sm text-(--welcome-body-text) md:text-base">
+                            Sign in to manage your collections, review artisan releases, and follow the provenance of every textile in your care.
+                        </p>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Atelier Notes</p>
+                                <p className="mt-3 text-sm text-(--welcome-body-text)">Guest checkout remains available, with curated guidance when you return.</p>
+                            </div>
+                            <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Secure Access</p>
+                                <p className="mt-3 text-sm text-(--welcome-body-text)">Two-factor challenges protect the artisan network you support.</p>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="relative">
-                            <div className="relative rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
-                                <div className="space-y-2">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Patron Access
-                                    </p>
-                                    <h2 className="font-['Playfair_Display',serif] text-2xl">
-                                        Log in to your account
-                                    </h2>
-                                    <p className="text-sm text-(--welcome-body-text)">
-                                        Enter your credentials to continue.
-                                    </p>
+                    <div className="relative">
+                        <div className="relative rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-8 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
+                            <div className="space-y-2">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Patron Access</p>
+                                <h2 className="font-['Playfair_Display',serif] text-2xl">Log in to your account</h2>
+                                <p className="text-sm text-(--welcome-body-text)">Enter your credentials to continue.</p>
+                            </div>
+
+                            {status && (
+                                <div className="mt-4 rounded-[24px] border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-muted-text)">
+                                    {status}
                                 </div>
+                            )}
 
-                                {status && (
-                                    <div className="mt-4 rounded-[24px] border border-(--welcome-accent-40) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-muted-text)">
-                                        {status}
-                                    </div>
-                                )}
+                            <Form {...store.form()} resetOnSuccess={['password']} className="mt-6 grid gap-5">
+                                {({ processing, errors }) => (
+                                    <>
+                                        <div className="grid gap-2">
+                                            <label htmlFor="email" className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                Email address
+                                            </label>
+                                            <input
+                                                id="email"
+                                                type="email"
+                                                name="email"
+                                                required
+                                                autoFocus
+                                                tabIndex={1}
+                                                autoComplete="email"
+                                                placeholder="email@example.com"
+                                                className={inputClassName}
+                                            />
+                                            <InputError message={errors.email} className="text-xs" />
+                                        </div>
 
-                                <Form
-                                    {...store.form()}
-                                    resetOnSuccess={['password']}
-                                    className="mt-6 grid gap-5"
-                                >
-                                    {({ processing, errors }) => (
-                                        <>
-                                            <div className="grid gap-2">
-                                                <label
-                                                    htmlFor="email"
-                                                    className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
-                                                >
-                                                    Email address
+                                        <div className="grid gap-2">
+                                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                                <label htmlFor="password" className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                    Password
                                                 </label>
-                                                <input
-                                                    id="email"
-                                                    type="email"
-                                                    name="email"
-                                                    required
-                                                    autoFocus
-                                                    tabIndex={1}
-                                                    autoComplete="email"
-                                                    placeholder="email@example.com"
-                                                    className={inputClassName}
-                                                />
-                                                <InputError
-                                                    message={errors.email}
-                                                    className="text-xs"
-                                                />
-                                            </div>
-
-                                            <div className="grid gap-2">
-                                                <div className="flex flex-wrap items-center justify-between gap-2">
-                                                    <label
-                                                        htmlFor="password"
-                                                        className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
+                                                {canResetPassword && (
+                                                    <Link
+                                                        href={request()}
+                                                        className="text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase transition hover:text-(--welcome-strong)"
+                                                        tabIndex={5}
                                                     >
-                                                        Password
-                                                    </label>
-                                                    {canResetPassword && (
-                                                        <Link
-                                                            href={request()}
-                                                            className="text-xs uppercase tracking-[0.25em] text-(--welcome-muted-text) transition hover:text-(--welcome-strong)"
-                                                            tabIndex={5}
-                                                        >
-                                                            Forgot password?
-                                                        </Link>
-                                                    )}
-                                                </div>
+                                                        Forgot password?
+                                                    </Link>
+                                                )}
+                                            </div>
+                                            <div className="relative">
                                                 <input
                                                     id="password"
-                                                    type="password"
+                                                    type={passwordVisible ? 'text' : 'password'}
                                                     name="password"
                                                     required
                                                     tabIndex={2}
                                                     autoComplete="current-password"
                                                     placeholder="Password"
-                                                    className={inputClassName}
+                                                    className={`${inputClassName} pr-12`}
                                                 />
-                                                <InputError
-                                                    message={errors.password}
-                                                    className="text-xs"
-                                                />
-                                            </div>
-
-                                            <label className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                                <input
-                                                    id="remember"
-                                                    name="remember"
-                                                    type="checkbox"
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPasswordVisible((value) => !value)}
+                                                    className="absolute top-1/2 right-4 inline-flex -translate-y-1/2 items-center justify-center rounded-full p-1 text-(--welcome-muted-text) transition hover:text-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                    aria-label={passwordVisible ? 'Hide password' : 'Show password'}
+                                                    aria-pressed={passwordVisible}
                                                     tabIndex={3}
-                                                    className="h-4 w-4 rounded border border-(--welcome-border-alt) bg-(--welcome-surface-2) text-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20)"
-                                                />
-                                                Remember me
-                                            </label>
+                                                >
+                                                    {passwordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </button>
+                                            </div>
+                                            <InputError message={errors.password} className="text-xs" />
+                                        </div>
 
-                                            <button
-                                                type="submit"
-                                                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-(--welcome-strong) px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-on-strong) transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
+                                        <label className="flex items-center gap-3 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                            <input
+                                                id="remember"
+                                                name="remember"
+                                                type="checkbox"
                                                 tabIndex={4}
-                                                disabled={processing}
-                                                data-test="login-button"
-                                            >
-                                                {processing && (
-                                                    <Spinner className="text-(--welcome-on-strong)" />
-                                                )}
-                                                Log in
-                                            </button>
-                                        </>
-                                    )}
-                                </Form>
+                                                className="h-4 w-4 rounded border border-(--welcome-border-alt) bg-(--welcome-surface-2) text-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20)"
+                                            />
+                                            Remember me
+                                        </label>
 
-                                {canRegister && (
-                                    <div className="mt-6 text-center text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Don&apos;t have an account?{' '}
-                                        <Link
-                                            href={register()}
-                                            className="font-semibold text-(--welcome-strong)"
-                                            tabIndex={6}
+                                        <button
+                                            type="submit"
+                                            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-(--welcome-strong) px-6 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-on-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
+                                            tabIndex={5}
+                                            disabled={processing}
+                                            data-test="login-button"
                                         >
-                                            Sign up
-                                        </Link>
-                                    </div>
+                                            {processing && <Spinner className="text-(--welcome-on-strong)" />}
+                                            Log in
+                                        </button>
+                                    </>
                                 )}
-                            </div>
+                            </Form>
+
+                            {canRegister && (
+                                <div className="mt-6 text-center text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                    Don&apos;t have an account?{' '}
+                                    <Link href={register()} className="font-semibold text-(--welcome-strong)" tabIndex={7}>
+                                        Sign up
+                                    </Link>
+                                </div>
+                            )}
                         </div>
-                    </section>
+                    </div>
+                </section>
             </PublicSiteLayout>
         </>
     );

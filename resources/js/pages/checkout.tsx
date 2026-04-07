@@ -9,11 +9,11 @@ import { formatMoney } from '@/lib/currency';
 import { show as cartShow } from '@/routes/cart';
 import { store as checkoutStore } from '@/routes/checkout';
 import { create as checkoutPayPalCreate } from '@/routes/checkout/paypal';
-import { create as checkoutStripeCreate } from '@/routes/checkout/stripe';
 import {
     capture as checkoutPayPalCardCapture,
     create as checkoutPayPalCardCreate,
 } from '@/routes/checkout/paypal/card';
+import { create as checkoutStripeCreate } from '@/routes/checkout/stripe';
 import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
 

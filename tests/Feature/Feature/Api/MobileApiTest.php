@@ -89,6 +89,29 @@ it('hides addresses customer details and payment details from vendor order detai
         ->assertJsonMissingPath('total');
 });
 
+it('shows customer shipping and payment details in admin order detail responses', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $customer = User::factory()->create([
+        'role' => 'customer',
+        'name' => 'Jane Smith',
+        'email' => 'jane@example.com',
+    ]);
+    [$vendorUser, $vendor] = createApprovedVendorApiUser();
+    $order = createMobileManagedOrder(customer: $customer, vendor: $vendor);
+
+    Sanctum::actingAs($admin, ['orders:read']);
+
+    $this->getJson("/api/v1/orders/{$order->id}")
+        ->assertOk()
+        ->assertJsonPath('id', $order->id)
+        ->assertJsonPath('customer.name', 'Jane Smith')
+        ->assertJsonPath('customer.email', 'jane@example.com')
+        ->assertJsonPath('addresses.0.city', 'Kandy')
+        ->assertJsonPath('addresses.0.phone', '0770000000')
+        ->assertJsonPath('payment.method', 'bank_transfer')
+        ->assertJsonPath('items.0.vendor_name', $vendorUser->vendor->display_name);
+});
+
 it('allows admins to update order statuses through the mobile api', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $order = createMobileManagedOrder(status: 'paid');

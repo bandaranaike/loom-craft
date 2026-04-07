@@ -2,8 +2,8 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import { show as adminOrderShow } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
-import type { BreadcrumbItem } from '@/types';
 import { index as adminOrdersIndex } from '@/routes/admin/orders';
+import type { BreadcrumbItem } from '@/types';
 
 type AdminOrderItem = {
     id: number;

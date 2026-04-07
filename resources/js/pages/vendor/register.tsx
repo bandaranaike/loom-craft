@@ -1,7 +1,7 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
-import PublicSiteLayout from '@/layouts/public-site-layout';
 import { Spinner } from '@/components/ui/spinner';
+import PublicSiteLayout from '@/layouts/public-site-layout';
 import { dashboard } from '@/routes';
 import { store } from '@/routes/vendor/register';
 

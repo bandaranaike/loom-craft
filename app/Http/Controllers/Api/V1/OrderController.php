@@ -10,30 +10,53 @@ use App\Http\Resources\Api\V1\VendorOrderListResource;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class OrderController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        /** @var User $user */
-        $user = request()->user();
+        $user = $this->authenticatedUser($request);
 
         if ($user->role === 'admin') {
-            Gate::authorize('viewAny', Order::class);
-
-            $orders = Order::query()
-                ->with('user')
-                ->withCount('items')
-                ->latest('placed_at')
-                ->get();
-
-            return response()->json(
-                AdminOrderListResource::collection($orders)->resolve()
-            );
+            return $this->adminIndexResponse($user);
         }
 
+        return $this->vendorIndexResponse($user);
+    }
+
+    public function show(Request $request, Order $order): JsonResponse
+    {
+        $user = $this->authenticatedUser($request);
+
+        if ($user->role === 'admin') {
+            return $this->adminShowResponse($user, $order);
+        }
+
+        return $this->vendorShowResponse($user, $order);
+    }
+
+    private function adminIndexResponse(User $user): JsonResponse
+    {
+        Gate::authorize('viewAny', Order::class);
+        abort_unless($user->tokenCan('orders:read'), 403);
+
+        $orders = Order::query()
+            ->with('user')
+            ->withCount('items')
+            ->latest('placed_at')
+            ->get();
+
+        return response()->json(
+            AdminOrderListResource::collection($orders)->resolve()
+        );
+    }
+
+    private function vendorIndexResponse(User $user): JsonResponse
+    {
         Gate::authorize('viewVendorIndex', Order::class);
+        abort_unless($user->tokenCan('orders:read'), 403);
 
         $vendor = $user->vendor;
 
@@ -57,20 +80,20 @@ class OrderController extends Controller
         );
     }
 
-    public function show(Order $order): JsonResponse
+    private function adminShowResponse(User $user, Order $order): JsonResponse
     {
-        /** @var User $user */
-        $user = request()->user();
+        Gate::authorize('viewAny', Order::class);
+        abort_unless($user->tokenCan('orders:read'), 403);
 
-        if ($user->role === 'admin') {
-            Gate::authorize('viewAny', Order::class);
+        $order->load(['user', 'payment', 'addresses', 'shipments', 'items.product', 'items.vendor']);
 
-            $order->load(['user', 'payment', 'addresses', 'shipments', 'items.product', 'items.vendor']);
+        return response()->json(new AdminOrderDetailResource($order));
+    }
 
-            return response()->json(new AdminOrderDetailResource($order));
-        }
-
+    private function vendorShowResponse(User $user, Order $order): JsonResponse
+    {
         Gate::authorize('viewVendor', $order);
+        abort_unless($user->tokenCan('orders:read'), 403);
 
         $vendor = $user->vendor;
 
@@ -83,5 +106,13 @@ class OrderController extends Controller
         ]);
 
         return response()->json(new VendorOrderDetailResource($order));
+    }
+
+    private function authenticatedUser(Request $request): User
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        return $user;
     }
 }

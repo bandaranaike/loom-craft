@@ -3,8 +3,8 @@ import {
     updateOffline as vendorOrderUpdateOffline,
     updateStatus as vendorOrderUpdateStatus,
 } from '@/actions/App/Http/Controllers/Vendor/OrderController';
-import AppLayout from '@/layouts/app-layout';
 import InputError from '@/components/input-error';
+import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import { show as vendorOrdersShow, index as vendorOrdersIndex } from '@/routes/vendor/orders';
 import { show as vendorShow } from '@/routes/vendors';

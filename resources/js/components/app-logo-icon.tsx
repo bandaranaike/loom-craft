@@ -1,7 +1,7 @@
 import type { ImgHTMLAttributes } from 'react';
-import { cn } from '@/lib/utils';
 import darkLogo from '@/images/logo-dark.png';
 import lightLogo from '@/images/logo.png';
+import { cn } from '@/lib/utils';
 
 export default function AppLogoIcon({
     alt = 'LoomCraft',
