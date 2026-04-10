@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class AdminOrderDetailResource extends JsonResource
 {
@@ -21,22 +22,9 @@ class AdminOrderDetailResource extends JsonResource
             'public_id' => $this->public_id,
             'status' => $this->status,
             'currency' => $this->currency,
-            'subtotal' => (float) $this->subtotal,
-            'commission_total' => (float) $this->commission_total,
             'total' => (float) $this->total,
-            'shipping_responsibility' => $this->shipping_responsibility,
-            'placed_at' => $this->placed_at?->toISOString(),
-            'customer' => [
-                'name' => $this->user?->name ?? $this->guest_name,
-                'email' => $this->user?->email ?? $this->guest_email,
-            ],
-            'payment' => [
-                'method' => $this->payment?->method,
-                'status' => $this->payment?->status,
-                'amount' => $this->payment ? (float) $this->payment->amount : null,
-                'currency' => $this->payment?->currency,
-                'provider_reference' => $this->payment?->provider_reference,
-            ],
+            'created_at' => $this->formatMobileDate($this->created_at),
+            'customer_name' => $this->user?->name ?? $this->guest_name,
             'addresses' => $this->addresses
                 ->map(fn ($address): array => [
                     'type' => $address->type,
@@ -51,19 +39,6 @@ class AdminOrderDetailResource extends JsonResource
                 ])
                 ->values()
                 ->all(),
-            'shipments' => $this->shipments
-                ->map(fn ($shipment): array => [
-                    'id' => $shipment->id,
-                    'vendor_id' => $shipment->vendor_id,
-                    'responsibility' => $shipment->responsibility,
-                    'status' => $shipment->status,
-                    'carrier' => $shipment->carrier,
-                    'tracking_number' => $shipment->tracking_number,
-                    'shipped_at' => $shipment->shipped_at?->toISOString(),
-                    'delivered_at' => $shipment->delivered_at?->toISOString(),
-                ])
-                ->values()
-                ->all(),
             'items' => $this->items
                 ->map(fn ($item): array => [
                     'id' => $item->id,
@@ -75,9 +50,50 @@ class AdminOrderDetailResource extends JsonResource
                     'quantity' => $item->quantity,
                     'unit_price' => (float) $item->unit_price,
                     'line_total' => (float) $item->line_total,
+                    'status' => $this->status,
+                    'currency' => $this->currency,
+                    'image_url' => $this->resolvePrimaryImageUrl($item->product?->media),
+                    'product_media' => $this->transformProductMedia($item->product?->media),
                 ])
                 ->values()
                 ->all(),
         ];
+    }
+
+    private function formatMobileDate(mixed $date): ?string
+    {
+        return $date?->format('M d, Y g:i A');
+    }
+
+    private function resolvePrimaryImageUrl(mixed $media): ?string
+    {
+        $primaryImage = $media?->firstWhere('type', 'image');
+
+        if (! is_string($primaryImage?->path) || $primaryImage->path === '') {
+            return null;
+        }
+
+        return url(Storage::disk('public')->url($primaryImage->path));
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function transformProductMedia(mixed $media): array
+    {
+        return $media
+            ?->map(fn ($item): array => [
+                'id' => $item->id,
+                'type' => $item->type,
+                'path' => $item->path,
+                'media_url' => is_string($item->path) && $item->path !== ''
+                    ? url(Storage::disk('public')->url($item->path))
+                    : null,
+                'thumbnail_url' => null,
+                'alt_text' => $item->alt_text,
+                'sort_order' => $item->sort_order,
+            ])
+            ->values()
+            ->all() ?? [];
     }
 }

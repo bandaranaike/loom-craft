@@ -47,6 +47,7 @@ it('lists all orders for admin mobile api users', function () {
         ->assertOk()
         ->assertJsonCount(2)
         ->assertJsonFragment(['id' => $firstOrder->id, 'customer_name' => 'Jane Smith'])
+        ->assertJsonPath('0.created_at', 'Apr 05, 2026 10:00 AM')
         ->assertJsonFragment(['id' => $secondOrder->id]);
 });
 
@@ -64,11 +65,12 @@ it('lists only vendor-visible order summaries without customer or global totals'
         ->assertJsonPath('0.id', $matchingOrder->id)
         ->assertJsonPath('0.vendor_items_total', 180)
         ->assertJsonPath('0.items_count', 1)
+        ->assertJsonPath('0.created_at', 'Apr 05, 2026 10:00 AM')
         ->assertJsonMissingPath('0.customer_name')
         ->assertJsonMissingPath('0.total');
 });
 
-it('hides addresses customer details and payment details from vendor order detail responses', function () {
+it('returns the mobile vendor order detail shape', function () {
     [$vendorUser, $vendor] = createApprovedVendorApiUser();
     $customer = User::factory()->create([
         'role' => 'customer',
@@ -82,14 +84,25 @@ it('hides addresses customer details and payment details from vendor order detai
     $this->getJson("/api/v1/orders/{$order->id}")
         ->assertOk()
         ->assertJsonPath('id', $order->id)
+        ->assertJsonPath('public_id', $order->public_id)
+        ->assertJsonPath('currency', 'LKR')
+        ->assertJsonPath('total', 180)
+        ->assertJsonPath('created_at', 'Apr 05, 2026 10:00 AM')
         ->assertJsonPath('items.0.product_name', $order->items()->first()->product->name)
+        ->assertJsonPath('items.0.status', $order->status)
+        ->assertJsonPath('items.0.currency', 'LKR')
+        ->assertJsonPath('items.0.image_url', url('/storage/products/mobile-api-scarf.jpg'))
+        ->assertJsonPath('items.0.product_media.0.path', 'products/mobile-api-scarf.jpg')
         ->assertJsonMissingPath('customer')
         ->assertJsonMissingPath('addresses')
         ->assertJsonMissingPath('payment')
-        ->assertJsonMissingPath('total');
+        ->assertJsonMissingPath('subtotal')
+        ->assertJsonMissingPath('commission_total')
+        ->assertJsonMissingPath('shipping_responsibility')
+        ->assertJsonMissingPath('shipments');
 });
 
-it('shows customer shipping and payment details in admin order detail responses', function () {
+it('returns the mobile admin order detail shape', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $customer = User::factory()->create([
         'role' => 'customer',
@@ -104,12 +117,21 @@ it('shows customer shipping and payment details in admin order detail responses'
     $this->getJson("/api/v1/orders/{$order->id}")
         ->assertOk()
         ->assertJsonPath('id', $order->id)
-        ->assertJsonPath('customer.name', 'Jane Smith')
-        ->assertJsonPath('customer.email', 'jane@example.com')
+        ->assertJsonPath('public_id', $order->public_id)
+        ->assertJsonPath('created_at', 'Apr 05, 2026 10:00 AM')
+        ->assertJsonPath('customer_name', 'Jane Smith')
         ->assertJsonPath('addresses.0.city', 'Kandy')
         ->assertJsonPath('addresses.0.phone', '0770000000')
-        ->assertJsonPath('payment.method', 'bank_transfer')
-        ->assertJsonPath('items.0.vendor_name', $vendorUser->vendor->display_name);
+        ->assertJsonPath('items.0.vendor_name', $vendorUser->vendor->display_name)
+        ->assertJsonPath('items.0.status', $order->status)
+        ->assertJsonPath('items.0.currency', 'LKR')
+        ->assertJsonPath('items.0.image_url', url('/storage/products/mobile-api-scarf.jpg'))
+        ->assertJsonMissingPath('customer')
+        ->assertJsonMissingPath('payment')
+        ->assertJsonMissingPath('shipments')
+        ->assertJsonMissingPath('subtotal')
+        ->assertJsonMissingPath('commission_total')
+        ->assertJsonMissingPath('shipping_responsibility');
 });
 
 it('allows admins to update order statuses through the mobile api', function () {
@@ -167,7 +189,8 @@ it('registers mobile notification tokens for authenticated users', function () {
         'fcm_token' => 'test-fcm-token',
         'platform' => 'android',
     ])->assertOk()
-        ->assertJsonPath('data.platform', 'android');
+        ->assertJsonPath('data.platform', 'android')
+        ->assertJsonPath('data.last_used_at', now()->format('M d, Y g:i A'));
 
     $this->assertDatabaseHas('mobile_notification_tokens', [
         'user_id' => $admin->id,
@@ -217,6 +240,15 @@ function createMobileManagedOrder(
     $product = Product::factory()->for($vendor)->create([
         'status' => 'active',
         'selling_price' => '180.00',
+        'name' => 'Mobile API Scarf',
+        'product_code' => fake()->unique()->bothify('MOBILE-###'),
+    ]);
+
+    $product->media()->create([
+        'type' => 'image',
+        'path' => 'products/mobile-api-scarf.jpg',
+        'alt_text' => 'Mobile API Scarf',
+        'sort_order' => 0,
     ]);
 
     $order = Order::query()->create([
@@ -231,6 +263,11 @@ function createMobileManagedOrder(
         'shipping_responsibility' => 'platform',
         'placed_at' => Carbon::parse('2026-04-05 10:00:00'),
     ]);
+
+    $order->forceFill([
+        'created_at' => Carbon::parse('2026-04-05 10:00:00'),
+        'updated_at' => Carbon::parse('2026-04-05 10:00:00'),
+    ])->saveQuietly();
 
     $order->items()->create([
         'product_id' => $product->id,
@@ -286,5 +323,5 @@ function createMobileManagedOrder(
         'original_currency' => 'LKR',
     ]);
 
-    return $order->fresh(['items.product', 'addresses', 'shipments', 'payment']);
+    return $order->fresh(['items.product.media', 'addresses', 'shipments', 'payment']);
 }

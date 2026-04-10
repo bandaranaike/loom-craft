@@ -45,7 +45,7 @@ class OrderController extends Controller
         $orders = Order::query()
             ->with('user')
             ->withCount('items')
-            ->latest('placed_at')
+            ->latest('created_at')
             ->get();
 
         return response()->json(
@@ -72,7 +72,7 @@ class OrderController extends Controller
             ->withSum([
                 'items as vendor_items_total' => fn ($query) => $query->where('vendor_id', $vendor->id),
             ], 'line_total')
-            ->latest('placed_at')
+            ->latest('created_at')
             ->get();
 
         return response()->json(
@@ -85,7 +85,12 @@ class OrderController extends Controller
         Gate::authorize('viewAny', Order::class);
         abort_unless($user->tokenCan('orders:read'), 403);
 
-        $order->load(['user', 'payment', 'addresses', 'shipments', 'items.product', 'items.vendor']);
+        $order->load([
+            'user',
+            'addresses',
+            'items.product.media' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
+            'items.vendor',
+        ]);
 
         return response()->json(new AdminOrderDetailResource($order));
     }
@@ -102,7 +107,11 @@ class OrderController extends Controller
         }
 
         $order->load([
-            'items' => fn ($query) => $query->where('vendor_id', $vendor->id)->with(['product']),
+            'items' => fn ($query) => $query
+                ->where('vendor_id', $vendor->id)
+                ->with([
+                    'product.media' => fn ($mediaQuery) => $mediaQuery->orderBy('sort_order')->orderBy('id'),
+                ]),
         ]);
 
         return response()->json(new VendorOrderDetailResource($order));

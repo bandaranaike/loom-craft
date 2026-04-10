@@ -22,7 +22,12 @@ class VendorOrderListResource extends JsonResource
             'status' => $this->status,
             'vendor_items_total' => (float) $this->vendor_items_total,
             'items_count' => (int) $this->vendor_items_count,
-            'created_at' => ($this->placed_at ?? $this->created_at)?->format('M d, Y g:i A'),
+            'created_at' => $this->formatMobileDate($this->created_at),
         ];
+    }
+
+    private function formatMobileDate(mixed $date): ?string
+    {
+        return $date?->format('M d, Y g:i A');
     }
 }

@@ -25,7 +25,7 @@ class NotificationRegistrationController extends Controller
             'data' => [
                 'id' => $token->id,
                 'platform' => $token->platform,
-                'last_used_at' => $token->last_used_at?->toISOString(),
+                'last_used_at' => $token->last_used_at?->format('M d, Y g:i A'),
             ],
         ]);
     }
