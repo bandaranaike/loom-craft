@@ -18,7 +18,8 @@ This document provides instructions for the Backend AI Agent to implement the AP
   ```json
   {
     "email": "user@example.com",
-    "password": "password"
+    "password": "password",
+    "device_name": "android"
   }
   ```
 - **Response (200 OK)**:
@@ -49,7 +50,8 @@ This document provides instructions for the Backend AI Agent to implement the AP
   [
     {
       "id": 101,
-      "status": "pending",
+      "public_id": "ORD-EXAMPLE123",
+      "status": "paid",
       "total": 1500.00,
       "customer_name": "Jane Smith",
       "items_count": 3,
@@ -62,7 +64,7 @@ This document provides instructions for the Backend AI Agent to implement the AP
   [
     {
       "id": 101,
-      "status": "processing",
+      "status": "confirmed",
       "vendor_items_total": 450.00,
       "items_count": 1, 
       "created_at": "2026-04-05T..."
@@ -77,22 +79,55 @@ This document provides instructions for the Backend AI Agent to implement the AP
 - **Endpoint**: `GET /orders/{id}`
 - **Logic**:
     - **Admin**: Full access to `order_addresses`, `payments`, `shipments`, and all `order_items`.
-    - **Vendor**: 
+    - **Vendor**:
         - Show **only** `order_items` belonging to them.
         - **HIDE** `order_addresses`, customer phone/email, and total order payment details.
-        - Show `status`, `id`, and specific item details (name, quantity, price).
+        - Show `status`, `id`, and specific item details (name, quantity, price, product image).
+- **Order item media requirement**:
+    - Each returned order item should include enough product media data for the mobile app to render an image without making a separate product-media request.
+    - The backend should source this from the `product_media` table using `order_items.product_id`.
+    - Preferred fields per item:
+      ```json
+      {
+        "id": 50,
+        "product_id": 77,
+        "product_name": "Handwoven Silk Scarf",
+        "quantity": 1,
+        "unit_price": 450.00,
+        "currency": "LKR",
+        "image_url": "https://loomcraft.work/storage/products/scarf-main.jpg",
+        "product_media": [
+          {
+            "id": 301,
+            "type": "image",
+            "path": "products/scarf-main.jpg",
+            "media_url": "https://loomcraft.work/storage/products/scarf-main.jpg",
+            "thumbnail_url": "https://loomcraft.work/storage/products/scarf-main-thumb.jpg",
+            "alt_text": "Handwoven Silk Scarf main image",
+            "sort_order": 0
+          }
+        ]
+      }
+      ```
+    - `image_url` should be the primary display image for the ordered product.
+    - `product_media` should be sorted by `sort_order ASC`.
+    - All URLs returned to mobile should be fully qualified absolute URLs.
+    - If only one media field is feasible immediately, return `image_url`.
 - **Vendor Response Example**:
   ```json
   {
     "id": 101,
-    "status": "processing",
+    "status": "confirmed",
+    "currency": "LKR",
     "items": [
       {
         "id": 50,
+        "product_id": 77,
         "product_name": "Handwoven Silk Scarf",
         "quantity": 1,
         "unit_price": 450.00,
-        "status": "processing"
+        "status": "confirmed",
+        "image_url": "https://loomcraft.work/storage/products/scarf-main.jpg"
       }
     ]
   }
@@ -105,14 +140,14 @@ This document provides instructions for the Backend AI Agent to implement the AP
 - **Request Body**:
   ```json
   {
-    "status": "accepted"
+    "status": "confirmed"
   }
   ```
 - **Allowed Statuses (Vendor)**:
-    - `accepted`, `rejected`, `processing`, `hand_over_to_admin`.
+    - `shipped` only, and only when the current order status is `paid` or `confirmed`.
 - **Allowed Statuses (Admin)**:
-    - All database enums (e.g., `shipped`, `delivered`, `disputed`, `cancelled`).
-- **Logic**: 
+    - `pending`, `paid`, `confirmed`, `shipped`, `delivered`, `cancelled`.
+- **Logic**:
     - Validate that the user has permission to move the order to the requested state.
     - Trigger an internal event to notify relevant parties (Admin/Customer).
 
@@ -141,4 +176,5 @@ This document provides instructions for the Backend AI Agent to implement the AP
 2. Use **Form Requests** for validation.
 3. Implement **Policies** to handle Vendor vs Admin authorization logic.
 4. Use **Sanctum** for token-based auth.
-5. Ensure the database matches `.ai/resources/db-schema.md`.
+5. Ensure the database matches `.ai/knowledge/core/db-schema.md`, and that `orders.status` only accepts `pending`, `paid`, `confirmed`, `shipped`, `delivered`, or `cancelled`.
+6. Treat `.ai/resources/loom-craft-public-api.postman_collection.json` as the most up-to-date mobile API contract when there is a conflict with older notes.

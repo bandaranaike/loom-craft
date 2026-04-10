@@ -4,7 +4,7 @@
 
 - Status: in-progress
 - Created: 2026-04-05
-- Updated: 2026-04-05
+- Updated: 2026-04-10
 - Source: user request
 - Priority: high
 
@@ -23,9 +23,10 @@ Implement a JSON API surface under `/api/v1` for the LoomCraft admin/vendor mobi
 3. Admin and vendor order list endpoints return only the data each role is allowed to see.
 4. Admin and vendor order detail endpoints enforce role-based visibility of customer, payment, and address information.
 5. Order status update rules match the current application workflow and reject invalid transitions.
-6. Notification token registration persists the token against the authenticated user.
-7. Admin sticker-data endpoint returns dense shipping payload data for an order.
-8. Focused feature tests cover authentication, authorization, scoped order visibility, and status updates.
+6. The `orders.status` database column only accepts `pending`, `paid`, `confirmed`, `shipped`, `delivered`, or `cancelled`.
+7. Notification token registration persists the token against the authenticated user.
+8. Admin sticker-data endpoint returns dense shipping payload data for an order.
+9. Focused feature tests cover authentication, authorization, scoped order visibility, status updates, and the order-status database constraint.
 
 ## Relevant Knowledge To Read
 
@@ -49,13 +50,13 @@ Implement a JSON API surface under `/api/v1` for the LoomCraft admin/vendor mobi
 ## Risks Or Open Questions
 
 - The current app does not yet include Laravel Sanctum or an API route surface.
-- The API spec's vendor status transitions do not match the current application behavior.
+- The API spec previously used placeholder order states such as `processing` and `accepted`; implementation must use the real LoomCraft order states `pending`, `paid`, `confirmed`, `shipped`, `delivered`, and `cancelled`.
 - The API spec references notification token registration, but no existing FCM token persistence exists.
 - The API spec points to `.ai/resources/db-schema.md`, but the maintained schema file is `.ai/knowledge/core/db-schema.md`.
 
 ## Test Plan
 
-- Add focused Pest feature tests for API login, order list/detail access, status updates, and notification token registration
+- Add focused Pest feature tests for API login, order list/detail access, status updates, notification token registration, and order-status database enforcement
 - Run only the affected API-related tests with `php artisan test --compact`
 
 ## Documentation Updates Required

@@ -209,7 +209,7 @@ Primary product catalog record.
 - `dimension_width` (decimal(10,2), nullable)
 - `dimension_height` (decimal(10,2), nullable)
 - `dimension_unit` (varchar(255), nullable)
-- `status` (varchar(255))
+- `status` (enum: `pending`, `paid`, `confirmed`, `shipped`, `delivered`, `cancelled`; default `pending`)
 - `created_at` (timestamp, nullable)
 - `updated_at` (timestamp, nullable)
 
@@ -324,7 +324,7 @@ Supports guest checkout via nullable `user_id` and guest fields.
 - `user_id` (bigint unsigned, FK -> users.id, nullable)
 - `guest_name` (varchar(255), nullable)
 - `guest_email` (varchar(255), nullable)
-- `status` (varchar(255))
+- `status` (enum: `pending`, `paid`, `confirmed`, `shipped`, `delivered`, `cancelled`; default `pending`)
 - `currency` (varchar(255))
 - `subtotal` (decimal(10,2))
 - `commission_total` (decimal(10,2))

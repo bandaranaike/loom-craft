@@ -22,7 +22,7 @@ class VendorOrderListResource extends JsonResource
             'status' => $this->status,
             'vendor_items_total' => (float) $this->vendor_items_total,
             'items_count' => (int) $this->vendor_items_count,
-            'created_at' => ($this->placed_at ?? $this->created_at)?->toISOString(),
+            'created_at' => ($this->placed_at ?? $this->created_at)?->format('M d, Y g:i A'),
         ];
     }
 }
