@@ -23,7 +23,7 @@ class AdminOrderListResource extends JsonResource
             'total' => (float) $this->total,
             'customer_name' => $this->user?->name ?? $this->guest_name,
             'items_count' => (int) $this->items_count,
-            'created_at' => ($this->placed_at ?? $this->created_at)?->toISOString(),
+            'created_at' => ($this->placed_at ?? $this->created_at)?->format('M d, Y g:i A'),
         ];
     }
 }
