@@ -122,7 +122,8 @@ jobs:
 
           cd "${RELEASE_DIR}"
           php artisan migrate --force
-          php artisan config:cache
+          php artisan optimize:clear
+          php artisan optimize
 
           ln -sfn "${RELEASE_DIR}" "${CURRENT_LINK}"
           php "${CURRENT_LINK}/artisan" queue:restart
