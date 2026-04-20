@@ -70,9 +70,14 @@ export default function ContactUs({ status, formDefaults }: Props) {
                                 </p>
                             </div>
                             <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
-                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">Contact Details</p>
+                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">Direct Contact</p>
+                                <p className="mt-3 text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">Call or WhatsApp</p>
+                                <p className="mt-2 font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">
+                                    +94 712 512 512
+                                </p>
                                 <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                    Name and message are required. At least one of email or phone must be provided.
+                                    Name and message are required in the form, and at least one of email or phone must
+                                    be provided.
                                 </p>
                             </div>
                         </div>
