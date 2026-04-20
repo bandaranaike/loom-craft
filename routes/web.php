@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ContactSubmissionController as AdminContactSubmissionController;
 use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductApprovalController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CheckoutPayPalController;
 use App\Http\Controllers\CheckoutStripeController;
 use App\Http\Controllers\ConnectedDeviceController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoomWeaveDemoController;
@@ -35,6 +37,10 @@ use Inertia\Inertia;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('loom-weave-demo', LoomWeaveDemoController::class)->name('loom-weave-demo');
+Route::get('contact-us', [ContactController::class, 'show'])->name('contact.show');
+Route::post('contact-us', [ContactController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('contact.store');
 Route::get('privacy-policy', fn () => Inertia::render('privacy-policy'))
     ->name('privacy-policy');
 Route::get('terms-of-service', fn () => Inertia::render('terms-of-service'))
@@ -143,6 +149,13 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('admin')->group(function () {
+        Route::get('contact-submissions', [AdminContactSubmissionController::class, 'index'])
+            ->name('admin.contact-submissions.index');
+        Route::patch('contact-submissions/{contactSubmission}/status', [AdminContactSubmissionController::class, 'updateStatus'])
+            ->name('admin.contact-submissions.status.update');
+        Route::post('contact-submissions/{contactSubmission}/reply', [AdminContactSubmissionController::class, 'reply'])
+            ->name('admin.contact-submissions.reply');
+
         Route::get('vendors/pending', [VendorApprovalController::class, 'pending'])
             ->name('admin.vendors.pending');
         Route::post('vendors/{vendor}/approve', [VendorApprovalController::class, 'approve'])

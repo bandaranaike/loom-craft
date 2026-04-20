@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { useState } from 'react';
 import type { CSSProperties, MouseEventHandler, PropsWithChildren, ReactNode } from 'react';
+import ContactController from '@/actions/App/Http/Controllers/ContactController';
 import AppLogoIcon from '@/components/app-logo-icon';
 import LegalLinks from '@/components/legal-links';
 import { useAppearance } from '@/hooks/use-appearance';
@@ -72,6 +73,13 @@ export default function PublicSiteLayout({
                         Browse Products
                     </Link>
                 )}
+                <Link
+                    href={ContactController.show()}
+                    className={isMobile ? mobileMenuItemClass : menuItemClass}
+                    onClick={isMobile ? handleMenuItemClick : undefined}
+                >
+                    Contact Us
+                </Link>
                 {auth.user ? (
                     <Link
                         href={dashboard()}
@@ -209,6 +217,12 @@ export default function PublicSiteLayout({
                                     className="hover:text-(--welcome-strong)"
                                 >
                                     Design Studio
+                                </Link>
+                                <Link
+                                    href={ContactController.show()}
+                                    className="hover:text-(--welcome-strong)"
+                                >
+                                    Contact
                                 </Link>
                             </div>
                         </div>

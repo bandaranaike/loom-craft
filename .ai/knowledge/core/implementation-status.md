@@ -1,6 +1,6 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-04-04
+Last reviewed: 2026-04-20
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implementation-guide.md`, `.ai/knowledge/core/best-practices.md`, `.ai/knowledge/core/guardrails.md`, `.ai/knowledge/core/db-schema.md`, and `.ai/knowledge/core/order-process.md`.
@@ -19,6 +19,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Password reset emails are now routed through Resend via a custom app notification that preserves Laravel's default reset link generation and Fortify flow.
 - Published Laravel mail Markdown components now apply LoomCraft-branded email chrome globally, including the logo plus visible `LoomCraft` wordmark fallback for image-blocking mail clients.
 - Settings implemented: profile edit/delete, password update, appearance page, and two-factor status page.
+- Profile settings now include an optional `phone` field that is reused for contact-us autofill.
 - Access control applied through route middleware and policy/gate checks.
 
 ### Public Storefront
@@ -26,6 +27,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
   - random approved active products,
   - a full-width hero panel without the previous `Atelier Ledger`, `Atelier Voices`, or `Craftsmanship Flow` sections.
 - Build Your Own Woven page (`/loom-weave-demo`) with interactive grid painting, compile preview, undo/redo history, constraint visibility, and PNG export.
+- Contact us page (`/contact-us`) implemented with login-page-aligned styling, validation requiring `name` plus `message` and at least one of `email` or `phone`, and persistence to `contact_submissions`.
 - Product index (`/products`) with search and pagination inputs.
 - Product show (`/product/{slug}`) restricted to active products from approved vendors, now with delivered-purchase review summaries and customer feedback.
 - Public vendor storefront page (`/vendors/{slug}`) implemented with vendor details, filtered products, category summaries, location blocks, and inquiry form handling.
@@ -75,6 +77,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Pending vendor queue with search, pagination, per-page persistence, approve, and reject.
 - YouTube OAuth connect/callback screens and callback handling for refresh token retrieval.
 - Pending community feedback moderation list with approve action (vendor + buyer submissions).
+- Contact message management page (`/admin/contact-submissions`) implemented with status updates and reply-by-email actions.
 
 ## Implemented Pages (Inertia)
 
@@ -110,7 +113,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Vendor shipping management and vendor payments/earnings pages are not implemented.
 - Admin vendor CRUD beyond pending/approve/reject is not implemented.
 - Product moderation workflow UI beyond vendor submission status is not implemented.
-- Public informational pages are partially implemented: About, Contact, and Cookie pages remain pending.
+- Public informational pages are partially implemented: About and Cookie pages remain pending.
 
 ## Structural Notes
 
@@ -145,5 +148,6 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Dashboard now loads authenticated users' recent order histories via `DashboardController` + `ListDashboardOrderHistories` and displays them in a `/vendor/products`-style card layout with click-to-open detailed order popup.
 - Public legal pages are now available at `/privacy-policy` and `/terms-of-service` with Inertia React implementations.
 - Shared bottom legal navigation now links Terms of Service and Privacy Policy across public, auth, and app layouts.
+- Public navigation now includes a dedicated Contact Us link, and the admin sidebar includes a Contact Messages entry.
 - Product show gallery (`/products/{product}`) now supports clickable thumbnail switching, rounded main-image corners, and conditional floating thumbnails that dock only while the selected image bottom remains below the viewport; once the image bottom is visible, thumbnails fall back to inline below the image.
 - Product pages now include a modern review experience with delivered-order gating, star-based rating input, published customer feedback, and aggregate rating summary data from the new `product_reviews` table.

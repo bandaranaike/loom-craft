@@ -1,9 +1,10 @@
 # Task Board
 
-Last updated: 2026-04-06
+Last updated: 2026-04-20
 
 ## Planned
 
+- [contact-us-page-and-admin-message-management](/var/www/loom-craft/.ai/tasks/planned/contact-us-page-and-admin-message-management.md)
 - [delivery-operations-workflow-planning](/var/www/loom-craft/.ai/tasks/planned/delivery-operations-workflow-planning.md)
 - [order-stickers-and-label-printing-requirements](/var/www/loom-craft/.ai/tasks/planned/order-stickers-and-label-printing-requirements.md)
 - [fulfillment-mobile-api-support](/var/www/loom-craft/.ai/tasks/planned/fulfillment-mobile-api-support.md)

@@ -5,6 +5,7 @@ import {
     Folder,
     Inbox,
     LayoutGrid,
+    Mailbox,
     MessageSquareQuote,
     Package,
     Palette,
@@ -25,6 +26,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as adminContactSubmissionsIndex } from '@/routes/admin/contact-submissions';
 import { pending as adminFeedbackPending } from '@/routes/admin/feedback';
 import { index as adminOrdersIndex } from '@/routes/admin/orders';
 import { index as adminProductCategoriesIndex } from '@/routes/admin/product-categories';
@@ -81,6 +83,11 @@ export function AppSidebar() {
             : []),
         ...(isAdmin
             ? [
+                  {
+                      title: 'Contact Messages',
+                      href: adminContactSubmissionsIndex(),
+                      icon: Mailbox,
+                  },
                   {
                       title: 'Vendor Approvals',
                       href: adminVendorsPending(),

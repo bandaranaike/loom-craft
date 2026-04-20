@@ -58,7 +58,7 @@ export default function Welcome({
             </Head>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-4 pb-10 md:pt-6 md:pb-16">
-                    <div className="space-y-5 lg:max-w-5xl">
+                    <div className="space-y-5 lg:max-w-3xl">
                         <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                             Handloomed • Curated • Collectible
                         </div>

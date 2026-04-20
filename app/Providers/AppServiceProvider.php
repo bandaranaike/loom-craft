@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Contracts\VideoUploader;
 use App\Models\Cart;
+use App\Models\ContactSubmission;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Suggestion;
@@ -12,6 +13,7 @@ use App\Models\Vendor;
 use App\Models\VendorContactSubmission;
 use App\Policies\AdminPolicy;
 use App\Policies\CartPolicy;
+use App\Policies\ContactSubmissionPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\SuggestionPolicy;
@@ -86,6 +88,7 @@ class AppServiceProvider extends ServiceProvider
     protected function registerPolicies(): void
     {
         Gate::policy(User::class, AdminPolicy::class);
+        Gate::policy(ContactSubmission::class, ContactSubmissionPolicy::class);
         Gate::policy(Cart::class, CartPolicy::class);
         Gate::policy(Order::class, OrderPolicy::class);
         Gate::policy(Product::class, ProductPolicy::class);

@@ -46,6 +46,7 @@ Authentication, roles, and Cashier billing metadata.
 - `id` (bigint unsigned, PK)
 - `name` (varchar(255))
 - `email` (varchar(255), unique)
+- `phone` (varchar(50), nullable)
 - `email_verified_at` (timestamp, nullable)
 - `password` (varchar(255))
 - `role` (varchar(255), default `customer`)
@@ -147,6 +148,29 @@ Inbound public contact submissions for vendors.
 
 Indexes:
 - `vendor_contact_submissions_vendor_id_status_index` on (`vendor_id`, `status`)
+
+---
+
+### contact_submissions
+
+Inbound public contact-us messages handled by admins.
+
+- `id` (bigint unsigned, PK)
+- `user_id` (bigint unsigned, FK -> users.id, nullable)
+- `name` (varchar(255))
+- `email` (varchar(255), nullable)
+- `phone` (varchar(50), nullable)
+- `message` (text)
+- `status` (varchar(255), default `new`; application enum values: `new`, `in_progress`, `replied`, `closed`)
+- `latest_reply_message` (text, nullable)
+- `replied_at` (timestamp, nullable)
+- `replied_by` (bigint unsigned, FK -> users.id, nullable)
+- `submitted_at` (timestamp, default current timestamp)
+- `created_at` (timestamp, nullable)
+- `updated_at` (timestamp, nullable)
+
+Indexes:
+- `contact_submissions_status_submitted_at_index` on (`status`, `submitted_at`)
 
 ---
 

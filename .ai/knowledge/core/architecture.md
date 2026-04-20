@@ -113,6 +113,7 @@ If something is not defined, state the limitation instead of inventing details.
 * Commission enforcement
 * Order and dispute resolution
 * Complaint and report management
+* Public contact message review, status management, and reply handling
 
 ---
 
@@ -180,6 +181,7 @@ If something is not defined, state the limitation instead of inventing details.
 ### Admin Pages (Inertia-protected)
 
 * Admin dashboard
+* Contact message management
 * Vendor management (CRUD + approval)
 * Product moderation
 * Order and dispute management
