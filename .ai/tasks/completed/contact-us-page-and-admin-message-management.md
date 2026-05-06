@@ -2,9 +2,9 @@
 
 ## Metadata
 
-- Status: planned
+- Status: completed
 - Created: 2026-04-20
-- Updated: 2026-04-20
+- Updated: 2026-05-06
 - Source: user request
 - Priority: high
 
@@ -70,4 +70,5 @@ Add a public contact-us page using the same general presentation style as the cu
 
 ## Completion Notes
 
-Fill this section only when the task is done.
+- Moved to completed on 2026-05-06 after verifying the contact-us page, admin contact submission management, and reply workflow are implemented.
+- Admin reply behavior is limited to submissions with an email address; phone-only submissions remain manageable for status updates without a reply composer.

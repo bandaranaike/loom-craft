@@ -34,6 +34,7 @@ class ContactSubmissionController extends Controller
                     'name' => $submission->name,
                     'email' => $submission->email,
                     'phone' => $submission->phone,
+                    'can_reply' => filled($submission->email),
                     'message' => $submission->message,
                     'status' => $status,
                     'submitted_at' => $submission->submitted_at?->toDateTimeString(),

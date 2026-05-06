@@ -1,14 +1,15 @@
 # Task Board
 
-Last updated: 2026-04-20
+Last updated: 2026-05-06
 
 ## Planned
 
-- [contact-us-page-and-admin-message-management](/var/www/loom-craft/.ai/tasks/planned/contact-us-page-and-admin-message-management.md)
-- [delivery-operations-workflow-planning](/var/www/loom-craft/.ai/tasks/planned/delivery-operations-workflow-planning.md)
+- [end-to-end-order-fulfillment-platform](/var/www/loom-craft/.ai/tasks/planned/end-to-end-order-fulfillment-platform.md)
 - [order-stickers-and-label-printing-requirements](/var/www/loom-craft/.ai/tasks/planned/order-stickers-and-label-printing-requirements.md)
 - [fulfillment-mobile-api-support](/var/www/loom-craft/.ai/tasks/planned/fulfillment-mobile-api-support.md)
 - [fulfillment-mobile-app-implementation-brief](/var/www/loom-craft/.ai/tasks/planned/fulfillment-mobile-app-implementation-brief.md)
+- [mobile-fulfillment-and-courier-operations](/var/www/loom-craft/.ai/tasks/planned/mobile-fulfillment-and-courier-operations.md)
+- [shipping-label-pdf-generation-and-print-pipeline](/var/www/loom-craft/.ai/tasks/planned/shipping-label-pdf-generation-and-print-pipeline.md)
 - [vendor-product-pricing-currency-label-lkr](/var/www/loom-craft/.ai/tasks/planned/vendor-product-pricing-currency-label-lkr.md)
 - [mobile-device-session-management-dashboard](/var/www/loom-craft/.ai/tasks/planned/mobile-device-session-management-dashboard.md)
 
@@ -21,6 +22,7 @@ Last updated: 2026-04-20
 - [admin-orders-and-status-management](/var/www/loom-craft/.ai/tasks/completed/admin-orders-and-status-management.md)
 - [application-currencies](/var/www/loom-craft/.ai/tasks/completed/application-currencies.md)
 - [cart-and-checkout-ux-refinements](/var/www/loom-craft/.ai/tasks/completed/cart-and-checkout-ux-refinements.md)
+- [contact-us-page-and-admin-message-management](/var/www/loom-craft/.ai/tasks/completed/contact-us-page-and-admin-message-management.md)
 - [checkout-offline-payment-operations](/var/www/loom-craft/.ai/tasks/completed/checkout-offline-payment-operations.md)
 - [dashboard-navigation-and-mobile-overflow](/var/www/loom-craft/.ai/tasks/completed/dashboard-navigation-and-mobile-overflow.md)
 - [home-page-content-simplification](/var/www/loom-craft/.ai/tasks/completed/home-page-content-simplification.md)
@@ -44,3 +46,4 @@ Last updated: 2026-04-20
 - `application-currencies.md`, `products-discounts.md`, and `vendor-public-page-unified-requirements.md` were reclassified from `planned` to `completed` on 2026-04-03 after code verification against the current implementation.
 - The old flat tracker was preserved at `.ai/tasks/archive/todo-list-legacy.md`.
 - `checkout-hide-billing-form-when-same-as-shipping.md` was merged into `cart-and-checkout-ux-refinements.md` and preserved in `archive`.
+- `delivery-operations-workflow-planning.md` and `order-shipment-domain-model-and-status-workflow.md` were merged into `end-to-end-order-fulfillment-platform.md` on 2026-05-06, using the latest 2026-04-23 umbrella planning task as the base.

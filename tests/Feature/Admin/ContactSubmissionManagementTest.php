@@ -9,7 +9,18 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 test('admins can view all contact submissions', function () {
     $admin = User::factory()->create(['role' => 'admin']);
-    ContactSubmission::factory()->count(2)->create();
+    ContactSubmission::factory()->create([
+        'name' => 'Email Contact',
+        'email' => 'reply@example.com',
+        'phone' => '0771234567',
+        'submitted_at' => now()->subMinute(),
+    ]);
+    ContactSubmission::factory()->create([
+        'name' => 'Phone Contact',
+        'email' => null,
+        'phone' => '0777654321',
+        'submitted_at' => now(),
+    ]);
 
     $response = $this->actingAs($admin)->get(route('admin.contact-submissions.index'));
 
@@ -18,6 +29,8 @@ test('admins can view all contact submissions', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/contact-submissions/index')
             ->has('submissions', 2)
+            ->where('submissions.0.can_reply', false)
+            ->where('submissions.1.can_reply', true)
             ->has('statusOptions', 4)
         );
 });
@@ -68,6 +81,35 @@ test('admins can reply to contact submissions by email', function () {
         'replied_by' => $admin->id,
         'latest_reply_message' => 'We have reviewed your message and will follow up today.',
     ]);
+});
+
+test('admins cannot send replies for phone-only contact submissions', function () {
+    Mail::fake();
+
+    $admin = User::factory()->create(['role' => 'admin']);
+    $submission = ContactSubmission::factory()->create([
+        'email' => null,
+        'phone' => '0771234567',
+        'status' => ContactSubmissionStatus::InProgress,
+    ]);
+
+    $response = $this->actingAs($admin)->post(
+        route('admin.contact-submissions.reply', $submission),
+        ['reply_message' => 'We tried to reply.'],
+    );
+
+    $response
+        ->assertRedirect(route('admin.contact-submissions.index'))
+        ->assertSessionHas('status', 'This contact message does not have an email address for replies.');
+
+    Mail::assertNothingSent();
+
+    $submission->refresh();
+
+    expect($submission->status)->toBe(ContactSubmissionStatus::InProgress)
+        ->and($submission->latest_reply_message)->toBeNull()
+        ->and($submission->replied_at)->toBeNull()
+        ->and($submission->replied_by)->toBeNull();
 });
 
 test('non admins cannot manage contact submissions', function () {

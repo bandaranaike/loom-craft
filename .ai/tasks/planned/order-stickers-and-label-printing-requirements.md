@@ -12,15 +12,16 @@
 
 - One package should support sticker printing.
 - The current requested sticker content is:
-  - customer delivery details and address
-  - product details with product name and price
-  - order details with order number
+    - customer delivery details and address
+    - product details with product name and price
+    - order details with order number
 - Sticker contents may be adjusted if a better structure is identified.
 - The printer should be handled by a mobile app.
 
 ## Objective
 
-Define the sticker and label system needed for LoomCraft package fulfillment, including what labels are required per order, the exact data each label needs, how labels should be grouped for printing, and what output format the future mobile app and website API must support.
+Define the sticker and label system needed for LoomCraft package fulfillment, including what labels are required per order, the exact data each label needs, how labels should be
+grouped for printing, and what output format the future mobile app and website API must support.
 
 ## Acceptance Criteria
 

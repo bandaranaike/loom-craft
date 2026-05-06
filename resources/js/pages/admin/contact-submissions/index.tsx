@@ -9,6 +9,7 @@ type ContactSubmissionItem = {
     name: string;
     email: string | null;
     phone: string | null;
+    can_reply: boolean;
     message: string;
     status: string;
     submitted_at: string | null;
@@ -53,7 +54,8 @@ export default function ContactSubmissionsIndex() {
                     <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">Admin Inbox</p>
                     <h2 className="mt-2 font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">Contact messages</h2>
                     <p className="mt-2 text-sm text-(--welcome-body-text)">
-                        Review inbound contact-us submissions, update their status, and send replies by email.
+                        Review inbound contact-us submissions, update their status, and send email replies when an
+                        address is available.
                     </p>
                 </div>
 
@@ -148,47 +150,47 @@ export default function ContactSubmissionsIndex() {
                                         )}
                                     </Form>
 
-                                    <Form
-                                        action={ContactSubmissionController.reply.url(submission.id)}
-                                        method="post"
-                                        disableWhileProcessing
-                                        resetOnSuccess={['reply_message']}
-                                    >
-                                        {({ processing, errors }) => (
-                                            <div className="space-y-3">
-                                                <div className="flex flex-wrap items-center justify-between gap-3">
+                                    {submission.can_reply ? (
+                                        <Form
+                                            action={ContactSubmissionController.reply.url(submission.id)}
+                                            method="post"
+                                            disableWhileProcessing
+                                            resetOnSuccess={['reply_message']}
+                                        >
+                                            {({ processing, errors }) => (
+                                                <div className="space-y-3">
                                                     <label
                                                         htmlFor={`reply-${submission.id}`}
                                                         className="text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-muted-text)"
                                                     >
                                                         Reply by email
                                                     </label>
-                                                    {!submission.email && (
-                                                        <span className="text-xs uppercase tracking-[0.2em] text-(--welcome-muted-text)">
-                                                            No email available
-                                                        </span>
+                                                    <textarea
+                                                        id={`reply-${submission.id}`}
+                                                        name="reply_message"
+                                                        className="min-h-36 w-full rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-4 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
+                                                        placeholder="Write the email response to this message."
+                                                    />
+                                                    {errors.reply_message && (
+                                                        <p className="text-xs text-red-600">{errors.reply_message}</p>
                                                     )}
+                                                    <button
+                                                        type="submit"
+                                                        disabled={processing}
+                                                        className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-(--welcome-muted-text) disabled:cursor-not-allowed disabled:opacity-70"
+                                                    >
+                                                        {processing && <Spinner />}
+                                                        Send reply
+                                                    </button>
                                                 </div>
-                                                <textarea
-                                                    id={`reply-${submission.id}`}
-                                                    name="reply_message"
-                                                    className="min-h-36 w-full rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-4 text-sm text-(--welcome-strong) focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)"
-                                                    placeholder="Write the email response to this message."
-                                                />
-                                                {errors.reply_message && (
-                                                    <p className="text-xs text-red-600">{errors.reply_message}</p>
-                                                )}
-                                                <button
-                                                    type="submit"
-                                                    disabled={processing || !submission.email}
-                                                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-(--welcome-muted-text) disabled:cursor-not-allowed disabled:opacity-70"
-                                                >
-                                                    {processing && <Spinner />}
-                                                    Send reply
-                                                </button>
-                                            </div>
-                                        )}
-                                    </Form>
+                                            )}
+                                        </Form>
+                                    ) : (
+                                        <div className="rounded-[20px] border border-dashed border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-5 text-sm text-(--welcome-muted-text)">
+                                            This submission only includes a phone number, so no reply message is needed
+                                            here.
+                                        </div>
+                                    )}
                                 </div>
                             </article>
                         ))}
