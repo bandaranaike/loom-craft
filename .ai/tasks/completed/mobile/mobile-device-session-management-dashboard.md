@@ -2,9 +2,9 @@
 
 ## Metadata
 
-- Status: planned
+- Status: completed
 - Created: 2026-04-06
-- Updated: 2026-04-06
+- Updated: 2026-05-08
 - Source: user request
 - Priority: high
 
@@ -32,7 +32,7 @@ Add a dashboard-accessible management view for API-connected mobile devices or s
 - `.ai/knowledge/core/guardrails.md`
 - `.ai/knowledge/core/best-practices.md`
 - `.ai/knowledge/core/implementation-status.md`
-- `.ai/tasks/in-progress/mobile-public-api-v1.md`
+- `.ai/tasks/completed/mobile/mobile-public-api-v1.md`
 - `.ai/inbox/api-spec.md`
 
 ## Likely Implementation Areas
@@ -65,4 +65,10 @@ Add a dashboard-accessible management view for API-connected mobile devices or s
 
 ## Completion Notes
 
-Fill this section only when the task is done.
+- Reclassified from `planned` to `completed` on 2026-05-08 after code verification.
+- Implemented artifacts include:
+  - `app/Http/Controllers/ConnectedDeviceController.php`
+  - `resources/js/pages/connected-devices/index.tsx`
+  - `resources/js/components/app-sidebar.tsx`
+  - generated route helpers under `resources/js/routes/connected-devices`
+- Verified by `tests/Feature/ConnectedDevicesTest.php`.

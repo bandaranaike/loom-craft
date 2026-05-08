@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Status: planned
+- Status: in_progress
 - Created: 2026-04-23
 - Updated: 2026-05-08
 - Source: user request
@@ -26,6 +26,12 @@ together.
 
 This merged task now absorbs the earlier workflow-planning and shipment-domain planning items so there is one canonical planning brief for order handling, shipment status design,
 delivery operations, returns, complaints, labels, courier tracking, and admin/mobile operational responsibilities.
+
+## Execution Status
+
+- Current state: active umbrella task with foundational fulfillment schema and payload work already implemented.
+- Recommended handling: keep this task as the master tracker while delivering the remaining work in focused slices.
+- Implementation style: complete one operational slice at a time, with tests and knowledge-doc updates after each slice.
 
 ## Acceptance Criteria
 
@@ -51,12 +57,12 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - 
 - `.ai/knowledge/core/order-process.md`
 - `.ai/knowledge/core/implementation-status.md`
-- `.ai/tasks/planned/order-stickers-and-label-printing-requirements.md`
-- `.ai/tasks/planned/fulfillment-mobile-api-support.md`
-- `.ai/tasks/planned/fulfillment-mobile-app-implementation-brief.md`
-- `.ai/tasks/completed/order-details-and-tracking.md`
-- `.ai/tasks/completed/admin-orders-and-status-management.md`
-- `.ai/tasks/completed/checkout-offline-payment-operations.md`
+- `.ai/tasks/planned/fulfillment/order-stickers-and-label-printing-requirements.md`
+- `.ai/tasks/planned/mobile/fulfillment-mobile-api-support.md`
+- `.ai/tasks/planned/mobile/fulfillment-mobile-app-implementation-brief.md`
+- `.ai/tasks/completed/fulfillment/order-details-and-tracking.md`
+- `.ai/tasks/completed/fulfillment/admin-orders-and-status-management.md`
+- `.ai/tasks/completed/commerce/checkout-offline-payment-operations.md`
 
 ## Likely Implementation Areas
 
@@ -89,6 +95,112 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Implemented automatic initial shipment creation during order placement.
 - Extended the sticker payload contract so label/PDF work can consume the new identifiers and parcel fields.
 - Added focused Pest coverage for schema presence, identifier generation, invoice creation, shipment numbering, and sticker payload exposure.
+
+## Completed So Far
+
+### Data And Identifier Foundation
+
+- `orders.public_id` remains the customer-facing opaque identifier.
+- `orders.order_number` now exists for operational use.
+- `invoices` now exists as a one-to-one order document table.
+- `invoices.invoice_number` now exists and is generated automatically.
+- `shipments.shipment_number` now exists and is generated automatically.
+- Shipment parcel fields now exist for package count, weight, and packed dimensions.
+
+### Order Placement Baseline
+
+- Order placement now creates:
+  - the `orders` record
+  - the linked `invoice`
+  - the initial `shipment`
+  - the `payment`
+  - the `order_items`
+  - the `order_addresses`
+- The initial shipment is created with `pending` status and no tracking number.
+
+### Label Data Baseline
+
+- Admin/mobile sticker payloads now include:
+  - `order_number`
+  - `invoice_number`
+  - `shipment_number`
+  - courier tracking/carrier/service fields
+  - parcel metrics
+  - product dimensions from the catalog
+
+### Documentation And Tests
+
+- Core fulfillment docs were updated to reflect the new numbering and shipment/invoice baseline.
+- Focused Pest coverage was added for schema, identifier generation, and sticker payload data.
+
+## Remaining Work By Track
+
+### Track 1: Fulfillment Workflow And Status Model
+
+- Define the canonical workflow from placed order to delivered/returned/closed.
+- Separate order status from shipment status more explicitly.
+- Define allowed transitions for:
+  - `order`
+  - `payment`
+  - `shipment`
+  - `return`
+  - `complaint`
+- Define which actor can perform each transition:
+  - admin web
+  - vendor mobile
+  - admin mobile
+
+### Track 2: Shipment Operations
+
+- Decide whether the current one-shipment-at-placement baseline stays single-package only for phase 1.
+- Add shipment event/history tracking.
+- Add courier handoff timestamps and operator attribution.
+- Add tracking-number assignment workflow.
+- Add proof-of-delivery fields and evidence handling.
+- Add failed-delivery and delivery-exception reasons.
+
+### Track 3: Label And PDF Generation
+
+- Replace the static `bill.html` concept with a server-side label generator.
+- Define the final print payload contract for:
+  - package label
+  - product sticker / packing detail
+  - invoice or packing slip if needed
+- Add downloadable/printable PDF or HTML endpoints for admin/mobile use.
+- Confirm barcode/QR strategy and final print dimensions.
+
+### Track 4: Mobile And Admin Fulfillment Actions
+
+- Expand the mobile API beyond read-only sticker payloads.
+- Add safe shipment update actions.
+- Add shipment detail payloads for packing/dispatch.
+- Add admin web fulfillment screens for:
+  - shipment preparation
+  - tracking assignment
+  - dispatch confirmation
+  - delivery confirmation
+
+### Track 5: COD, Returns, And Complaints
+
+- Add COD settlement/remittance tracking.
+- Add return request and reverse-logistics records.
+- Add complaint workflow with links to order/shipment/return/refund/replacement.
+- Add resolution and SLA fields.
+
+### Track 6: Auditability And Multi-Vendor Rules
+
+- Add immutable history for fulfillment state changes.
+- Define multi-vendor order handling vs vendor-scoped shipment handling.
+- Define multi-package behavior and whether it is phase 1 or later.
+- Add operator/action attribution for sensitive fulfillment steps.
+
+## Suggested Next Slices
+
+1. Shipment status workflow and shipment-event history.
+2. Admin/mobile tracking-number assignment and dispatch confirmation.
+3. Label/PDF generation service using the new identifier and parcel schema.
+4. COD settlement model and admin handling flow.
+5. Returns and complaint domain implementation.
 
 ## Recommended Identifier Standards
 
@@ -192,6 +304,13 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Define exception flows: damaged parcel, lost parcel, customer unreachable, address issue, customer refusal, and partial fulfillment.
 - Define operational SLAs for vendor handoff, admin packing, dispatch lead time, complaint response, and return processing.
 - Define immutable history requirements for status transitions and operator attribution.
+
+## Progress Notes
+
+- 2026-05-08:
+  Implemented the fulfillment foundation layer:
+  order number, invoice table/number, shipment number, shipment parcel fields, automatic shipment creation on order placement, and richer sticker payload support.
+  This task remains open because the operational workflow, courier actions, returns, complaints, and label/PDF pipeline are still pending.
 
 ## Test Plan
 

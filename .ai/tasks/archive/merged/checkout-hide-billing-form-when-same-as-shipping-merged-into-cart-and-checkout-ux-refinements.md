@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Status: planned
+- Status: archived
 - Created: 2026-04-03
 - Updated: 2026-04-03
 - Source: migrated legacy note
@@ -55,4 +55,4 @@ Improve checkout clarity by hiding unnecessary billing-address inputs when the c
 
 ## Completion Notes
 
-Not started yet.
+Archived after merging this scope into `.ai/tasks/completed/commerce/cart-and-checkout-ux-refinements.md`.

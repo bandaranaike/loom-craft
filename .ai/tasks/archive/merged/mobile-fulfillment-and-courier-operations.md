@@ -2,9 +2,9 @@
 
 ## Metadata
 
-- Status: planned
+- Status: archived
 - Created: 2026-04-23
-- Updated: 2026-04-23
+- Updated: 2026-05-08
 - Source: user request
 - Priority: high
 
@@ -34,11 +34,11 @@ update on mobile for shipment creation, status progression, courier handoff, COD
 - `.ai/knowledge/core/guardrails.md`
 - `.ai/knowledge/core/best-practices.md`
 - `.ai/knowledge/core/implementation-status.md`
-- `.ai/tasks/planned/fulfillment-mobile-api-support.md`
-- `.ai/tasks/planned/fulfillment-mobile-app-implementation-brief.md`
+- `.ai/tasks/planned/mobile/fulfillment-mobile-api-support.md`
+- `.ai/tasks/planned/mobile/fulfillment-mobile-app-implementation-brief.md`
 - `.ai/tasks/planned/delivery-operations-workflow-planning.md`
-- `.ai/tasks/completed/order-details-and-tracking.md`
-- `.ai/tasks/in-progress/mobile-public-api-v1.md`
+- `.ai/tasks/completed/fulfillment/order-details-and-tracking.md`
+- `.ai/tasks/completed/mobile/mobile-public-api-v1.md`
 
 ## Likely Implementation Areas
 
@@ -76,4 +76,8 @@ update on mobile for shipment creation, status progression, courier handoff, COD
 
 ## Completion Notes
 
-Fill this section only when the task is done.
+- Archived on 2026-05-08 after backlog reorganization.
+- Its scope is now covered by:
+  - `.ai/tasks/in-progress/fulfillment/end-to-end-order-fulfillment-platform.md`
+  - `.ai/tasks/planned/mobile/fulfillment-mobile-api-support.md`
+  - `.ai/tasks/planned/mobile/fulfillment-mobile-app-implementation-brief.md`

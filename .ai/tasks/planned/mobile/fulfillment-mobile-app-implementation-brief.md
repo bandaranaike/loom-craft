@@ -4,7 +4,7 @@
 
 - Status: planned
 - Created: 2026-04-03
-- Updated: 2026-04-03
+- Updated: 2026-05-08
 - Source: user request
 - Priority: high
 
@@ -37,9 +37,9 @@ Prepare a build-ready implementation brief for a separate AI agent to develop th
 - `.ai/knowledge/core/best-practices.md`
 - `.ai/knowledge/core/order-process.md`
 - `.ai/knowledge/core/implementation-status.md`
-- `.ai/tasks/planned/delivery-operations-workflow-planning.md`
-- `.ai/tasks/planned/order-stickers-and-label-printing-requirements.md`
-- `.ai/tasks/planned/fulfillment-mobile-api-support.md`
+- `.ai/tasks/in-progress/fulfillment/end-to-end-order-fulfillment-platform.md`
+- `.ai/tasks/planned/fulfillment/order-stickers-and-label-printing-requirements.md`
+- `.ai/tasks/planned/mobile/fulfillment-mobile-api-support.md`
 
 ## Likely Implementation Areas
 
@@ -50,7 +50,7 @@ Prepare a build-ready implementation brief for a separate AI agent to develop th
 
 ## Risks Or Open Questions
 
-- The mobile app cannot be built cleanly until the fulfillment workflow and API contract are clarified.
+- API v1 exists, but the mobile app still cannot be built cleanly until the remaining fulfillment workflow and shipment-action API contract are clarified.
 - Printer SDK and connection details are still unknown.
 - The app may need tablet-oriented layouts if used during packing workstations.
 - It is not yet confirmed whether the app is for admin-only use or broader staff use.

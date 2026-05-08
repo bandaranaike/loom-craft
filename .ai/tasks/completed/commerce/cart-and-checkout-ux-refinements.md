@@ -36,7 +36,7 @@ Improve the pre-purchase flow by making the cart easier to continue shopping fro
 - `.ai/knowledge/core/implementation-guide.md`
 - `.ai/knowledge/core/order-process.md`
 - `.ai/knowledge/core/implementation-status.md`
-- `.ai/tasks/archive/checkout-hide-billing-form-when-same-as-shipping-merged-into-cart-and-checkout-ux-refinements.md`
+- `.ai/tasks/archive/merged/checkout-hide-billing-form-when-same-as-shipping-merged-into-cart-and-checkout-ux-refinements.md`
 
 ## Likely Implementation Areas
 

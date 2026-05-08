@@ -4,7 +4,7 @@
 
 - Status: planned
 - Created: 2026-04-23
-- Updated: 2026-04-23
+- Updated: 2026-05-08
 - Source: user request
 - Priority: high
 
@@ -33,8 +33,8 @@ Define and then implement a proper server-side shipping-document pipeline for Lo
 - `.ai/knowledge/core/guardrails.md`
 - `.ai/knowledge/core/best-practices.md`
 - `.ai/knowledge/core/db-schema.md`
-- `.ai/tasks/planned/order-stickers-and-label-printing-requirements.md`
-- `.ai/tasks/planned/delivery-operations-workflow-planning.md`
+- `.ai/tasks/planned/fulfillment/order-stickers-and-label-printing-requirements.md`
+- `.ai/tasks/in-progress/fulfillment/end-to-end-order-fulfillment-platform.md`
 - `.ai/knowledge/assets/guidelines/bill.html`
 - `.ai/knowledge/assets/guidelines/loom_craft_label_desing_docs.md`
 - `.ai/knowledge/assets/guidelines/loom_craft_label_system_docs.md`
@@ -52,6 +52,7 @@ Define and then implement a proper server-side shipping-document pipeline for Lo
 ## Risks Or Open Questions
 
 - Recommended baseline approach: move `bill.html` into a Laravel view or dedicated document template and render with structured shipment data before converting to PDF.
+- Identifier and parcel-data foundations are now in place, so the remaining uncertainty is about rendering approach, caching/versioning, and document-type separation rather than missing core order/shipment keys.
 - It is unclear whether PDFs should be generated on demand every time or cached per shipment version.
 - It is unclear whether documents must be immutable once a shipment is handed to the courier.
 - It is unclear which paper sizes and printers are target devices: A4, 4x6 thermal, or both.

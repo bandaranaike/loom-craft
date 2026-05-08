@@ -35,9 +35,9 @@ Design the canonical backend workflow and schema for orders after checkout. This
 - `.ai/knowledge/core/order-process.md`
 - `.ai/knowledge/core/implementation-status.md`
 - `.ai/tasks/planned/delivery-operations-workflow-planning.md`
-- `.ai/tasks/completed/admin-orders-and-status-management.md`
-- `.ai/tasks/completed/order-details-and-tracking.md`
-- `.ai/tasks/completed/checkout-offline-payment-operations.md`
+- `.ai/tasks/completed/fulfillment/admin-orders-and-status-management.md`
+- `.ai/tasks/completed/fulfillment/order-details-and-tracking.md`
+- `.ai/tasks/completed/commerce/checkout-offline-payment-operations.md`
 
 ## Likely Implementation Areas
 
@@ -75,4 +75,4 @@ Design the canonical backend workflow and schema for orders after checkout. This
 
 ## Completion Notes
 
-Archived on 2026-05-06 after merging its schema and status-workflow requirements into `.ai/tasks/planned/end-to-end-order-fulfillment-platform.md`.
+Archived on 2026-05-06 after merging its schema and status-workflow requirements into `.ai/tasks/in-progress/fulfillment/end-to-end-order-fulfillment-platform.md`.

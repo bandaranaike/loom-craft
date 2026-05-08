@@ -2,9 +2,9 @@
 
 ## Metadata
 
-- Status: planned
+- Status: completed
 - Created: 2026-04-06
-- Updated: 2026-04-06
+- Updated: 2026-05-08
 - Source: user request
 - Priority: medium
 
@@ -53,4 +53,8 @@ Ensure the vendor product create and edit experiences display pricing consistent
 
 ## Completion Notes
 
-Fill this section only when the task is done.
+- Reclassified from `planned` to `completed` on 2026-05-08 after code verification.
+- Vendor product create/edit pricing previews already use the shared `formatMoney(..., base_currency)` path in:
+  - `resources/js/pages/vendor/products/create.tsx`
+  - `resources/js/pages/vendor/products/edit.tsx`
+- Vendor product controllers already pass `base_currency` from `config('commerce.base_currency', 'LKR')`.

@@ -67,4 +67,4 @@ app need to support the process.
 
 ## Completion Notes
 
-Archived on 2026-05-06 after merging its workflow requirements into `.ai/tasks/planned/end-to-end-order-fulfillment-platform.md`.
+Archived on 2026-05-06 after merging its workflow requirements into `.ai/tasks/in-progress/fulfillment/end-to-end-order-fulfillment-platform.md`.

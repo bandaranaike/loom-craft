@@ -1,10 +1,17 @@
 # Task System
 
-This directory tracks work in three states:
+This directory tracks work in four states:
 
 - `planned`
 - `in-progress`
 - `completed`
+- `archive`
+
+The backlog is now organized by folder and topic:
+
+- `planned/fulfillment`
+- `planned/mobile`
+- `in-progress/fulfillment`
 
 Use `.ai/tasks/task-board.md` as the human-readable board.
 

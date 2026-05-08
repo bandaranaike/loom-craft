@@ -2,9 +2,9 @@
 
 ## Metadata
 
-- Status: in-progress
+- Status: completed
 - Created: 2026-04-05
-- Updated: 2026-04-10
+- Updated: 2026-05-08
 - Source: user request
 - Priority: high
 
@@ -49,7 +49,6 @@ Implement a JSON API surface under `/api/v1` for the LoomCraft admin/vendor mobi
 
 ## Risks Or Open Questions
 
-- The current app does not yet include Laravel Sanctum or an API route surface.
 - The API spec previously used placeholder order states such as `processing` and `accepted`; implementation must use the real LoomCraft order states `pending`, `paid`, `confirmed`, `shipped`, `delivered`, and `cancelled`.
 - The API spec references notification token registration, but no existing FCM token persistence exists.
 - The API spec points to `.ai/resources/db-schema.md`, but the maintained schema file is `.ai/knowledge/core/db-schema.md`.
@@ -67,4 +66,11 @@ Implement a JSON API surface under `/api/v1` for the LoomCraft admin/vendor mobi
 
 ## Completion Notes
 
-Fill this section only when the task is done.
+- Completed and reclassified from `in-progress` to `completed` on 2026-05-08 after backlog audit.
+- Implemented scope includes:
+  - `/api/v1/login`
+  - admin/vendor order list and detail endpoints
+  - order status update endpoints
+  - notification token registration
+  - admin sticker-data endpoint
+- Verified primarily by `tests/Feature/Feature/Api/MobileApiTest.php`.

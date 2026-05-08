@@ -4,7 +4,7 @@
 
 - Status: planned
 - Created: 2026-04-03
-- Updated: 2026-04-03
+- Updated: 2026-05-08
 - Source: user request
 - Priority: high
 
@@ -22,6 +22,11 @@
 
 Define the sticker and label system needed for LoomCraft package fulfillment, including what labels are required per order, the exact data each label needs, how labels should be
 grouped for printing, and what output format the future mobile app and website API must support.
+
+Current baseline:
+- order number, invoice number, shipment number, and parcel metrics now exist
+- admin/mobile sticker payloads already expose the foundational fulfillment identifiers and parcel fields
+- this task now focuses on final document requirements and print-contract decisions, not basic data availability
 
 ## Acceptance Criteria
 
