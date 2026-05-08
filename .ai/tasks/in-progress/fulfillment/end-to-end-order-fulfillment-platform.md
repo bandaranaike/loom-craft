@@ -54,6 +54,7 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - `.ai/knowledge/core/guardrails.md`
 - `.ai/knowledge/core/best-practices.md`
 - `.ai/knowledge/core/db-schema.md`
+- `.ai/knowledge/skills.md`
 - 
 - `.ai/knowledge/core/order-process.md`
 - `.ai/knowledge/core/implementation-status.md`

@@ -13,6 +13,7 @@ This file operationalizes the architecture and must stay aligned with:
 - `.ai/knowledge/core/db-schema.md` (authoritative domain fields)
 - `.ai/knowledge/core/order-process.md` (checkout/order flow)
 - `.ai/knowledge/core/implementation-status.md` (code-verified progress)
+- `.ai/knowledge/skills.md` (advisory e-commerce/fulfillment skill baseline, not authoritative over code)
 
 ---
 
@@ -20,6 +21,25 @@ This file operationalizes the architecture and must stay aligned with:
 - Laravel 12 (PHP 8.4+), MariaDB
 - React + TypeScript via Inertia.js (server‑driven pages)
 - PNPM for frontend package management
+
+---
+
+## Operational Skill Baseline
+
+When working in this repository, assume the agent should already reason like:
+
+- a Laravel + React e-commerce engineer
+- an order-management and fulfillment workflow designer
+- a logistics and shipping operations modeler
+- a customer-experience and back-office operations implementer
+
+Use that skill baseline to improve implementation quality, but do not let it override the codebase reality. The actual source of truth remains:
+
+- current schema and models
+- implemented routes, controllers, actions, and tests
+- the business rules documented in the core knowledge files
+
+If a generic e-commerce best practice conflicts with LoomCraft’s implemented constraints, prefer LoomCraft’s constraints.
 
 ---
 
@@ -36,6 +56,13 @@ This file operationalizes the architecture and must stay aligned with:
 - Product media handling:
   - Images are uploaded to **application storage** and stored as local paths.
   - Videos are uploaded to **YouTube** using the **Google API Client for PHP** and stored as YouTube URLs.
+
+Additional operational mindset:
+
+- Treat orders, payments, shipments, returns, and complaints as related state machines.
+- Prefer shipment-level operational data for fulfillment artifacts such as labels, parcel metrics, tracking, and courier handoff.
+- Keep customer-facing identifiers and back-office operational identifiers distinct when both are needed.
+- Design for auditability: state changes, operator attribution, and history should be easy to add and reason about.
 
 ---
 
@@ -85,6 +112,12 @@ Always enforce permissions on the backend (policies/gates/middleware).
 - Every Action/Service must begin with an explicit **policy check**
 - All Action/Service inputs must be **validated** (Form Request or DTO only)
 - Use immutable **Value Objects** for money, currency, and dimensions
+
+For larger domains such as fulfillment, shipping, returns, and complaints:
+
+- prefer explicit workflow-oriented services/actions over controller-heavy logic
+- keep document/label payload assembly separate from rendering/generation
+- model operational identifiers and timestamps explicitly rather than burying them in ad hoc strings
 
 ---
 
