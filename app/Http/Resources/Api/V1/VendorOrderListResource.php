@@ -19,6 +19,7 @@ class VendorOrderListResource extends JsonResource
         return [
             'id' => $this->id,
             'public_id' => $this->public_id,
+            'order_number' => $this->order_number,
             'status' => $this->status,
             'vendor_items_total' => (float) $this->vendor_items_total,
             'items_count' => (int) $this->vendor_items_count,

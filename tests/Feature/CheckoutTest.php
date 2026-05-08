@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Services\Payments\StripeCheckoutService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
 use Stripe\Checkout\Session;
@@ -127,7 +128,7 @@ it('falls back to the first available checkout payment method when stripe is not
         'unit_price' => '180.00',
     ]);
 
-    $stripeCheckoutService = \Mockery::mock(StripeCheckoutService::class);
+    $stripeCheckoutService = Mockery::mock(StripeCheckoutService::class);
     $stripeCheckoutService->shouldReceive('isConfigured')->once()->andReturn(false);
     app()->instance(StripeCheckoutService::class, $stripeCheckoutService);
 
@@ -337,6 +338,21 @@ it('creates a pending order from checkout and clears the cart', function () {
         'original_currency' => 'LKR',
     ]);
 
+    $this->assertDatabaseHas('invoices', [
+        'order_id' => $order->id,
+        'currency' => 'LKR',
+        'subtotal' => '180.00',
+        'total' => '180.00',
+    ]);
+
+    $this->assertDatabaseHas('shipments', [
+        'order_id' => $order->id,
+        'vendor_id' => $vendor->id,
+        'responsibility' => 'platform',
+        'status' => 'pending',
+        'package_count' => 1,
+    ]);
+
     $this->assertDatabaseMissing('cart_items', [
         'cart_id' => $cart->id,
     ]);
@@ -465,7 +481,7 @@ it('does not place a stripe order through the generic checkout endpoint', functi
 });
 
 it('returns a stripe checkout url and stores pending checkout data in session', function () {
-    $service = \Mockery::mock(StripeCheckoutService::class);
+    $service = Mockery::mock(StripeCheckoutService::class);
     $service->shouldReceive('isConfigured')->once()->andReturnTrue();
     $service->shouldReceive('createCheckoutSession')->once()->andReturn(
         Session::constructFrom([
@@ -582,7 +598,7 @@ it('fails gracefully when stripe is not configured', function () {
 });
 
 it('completes a stripe checkout and creates the final order', function () {
-    $service = \Mockery::mock(StripeCheckoutService::class);
+    $service = Mockery::mock(StripeCheckoutService::class);
     $service->shouldReceive('retrieveCheckoutSession')->once()->andReturn(
         Session::constructFrom([
             'id' => 'cs_test_123',
@@ -773,7 +789,7 @@ it('creates a PayPal order and stores pending checkout data in session', functio
     $response->assertSessionHas('checkout.paypal.pending.PAYPAL-ORDER-1.quote.converted_amount', '0.60');
     $response->assertSessionHas('checkout.paypal.pending.PAYPAL-ORDER-1.quote.converted_currency', 'USD');
 
-    Http::assertSent(function (\Illuminate\Http\Client\Request $request): bool {
+    Http::assertSent(function (Request $request): bool {
         return $request->url() === 'https://api-m.sandbox.paypal.com/v2/checkout/orders'
             && $request['purchase_units'][0]['amount']['currency_code'] === 'USD'
             && $request['purchase_units'][0]['amount']['value'] === '0.60';
@@ -856,7 +872,7 @@ it('creates a PayPal card order and stores pending checkout data in session', fu
     $response->assertSessionHas('checkout.paypal.pending.PAYPAL-CARD-ORDER-1.quote.converted_amount', '0.60');
     $response->assertSessionHas('checkout.paypal.pending.PAYPAL-CARD-ORDER-1.quote.converted_currency', 'USD');
 
-    Http::assertSent(function (\Illuminate\Http\Client\Request $request): bool {
+    Http::assertSent(function (Request $request): bool {
         return $request->url() === 'https://api-m.sandbox.paypal.com/v2/checkout/orders'
             && $request['purchase_units'][0]['amount']['currency_code'] === 'USD'
             && $request['purchase_units'][0]['amount']['value'] === '0.60';

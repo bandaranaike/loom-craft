@@ -4,7 +4,7 @@
 
 - Status: planned
 - Created: 2026-04-23
-- Updated: 2026-05-06
+- Updated: 2026-05-08
 - Source: user request
 - Priority: high
 
@@ -41,6 +41,7 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 10. The plan defines minimum audit-history requirements so every major operational state change is traceable.
 11. The plan identifies how multi-vendor, multi-package, and partial-shipment scenarios should be represented, even if some are deferred to a later phase.
 12. The plan clearly separates what belongs in the current web admin, what belongs in mobile operations, and what can remain manual at first.
+13. The plan distinguishes identifiers and parcel attributes that already exist in the codebase from those that still need to be added.
 
 ## Relevant Knowledge To Read
 
@@ -69,6 +70,69 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Identifier and numbering conventions for order, invoice, shipment, return, and complaint records
 - Status transition rules, audit trail support, and future mobile payload contracts
 
+## Current System Baseline
+
+- `orders.public_id` already exists and is the current customer-facing order reference. It is generated as an opaque `ORD-...` token and is already used in routes, order pages, and mobile/API payloads.
+- `shipments.tracking_number` already exists as a nullable shipment field and is the correct place to store the courier AWB or courier tracking code.
+- `shipments.carrier`, `shipments.status`, `shipments.shipped_at`, and `shipments.delivered_at` already exist.
+- A dedicated `invoices` table now exists with immutable `invoice_number` generation and one invoice record per order in the current implementation.
+- Product catalog records already store `dimension_length`, `dimension_width`, `dimension_height`, and `dimension_unit`.
+- Shipment records now store `shipment_number`, `service_level`, `package_count`, `parcel_weight`, `weight_unit`, `parcel_length`, `parcel_width`, `parcel_height`, and `parcel_dimension_unit`.
+- The current system still does not store product dead weight.
+- The admin/mobile sticker payload now exposes order number, invoice number, shipment number, tracking number, carrier/service, shipment parcel metrics, and product dimensions.
+
+## Started Implementation Slice
+
+- Implemented operational `orders.order_number` generation alongside the existing customer-facing `orders.public_id`.
+- Implemented automatic one-to-one invoice creation with immutable `invoices.invoice_number`.
+- Implemented `shipments.shipment_number` and shipment-level parcel metric fields needed for labels.
+- Implemented automatic initial shipment creation during order placement.
+- Extended the sticker payload contract so label/PDF work can consume the new identifiers and parcel fields.
+- Added focused Pest coverage for schema presence, identifier generation, invoice creation, shipment numbering, and sticker payload exposure.
+
+## Recommended Identifier Standards
+
+- Order number:
+  Keep the existing `orders.public_id` for customer lookup and sharing because it is already live and integrated.
+  Add a separate human-friendly operational `orders.order_number` for admin/vendor documents and printed labels in a sequential format such as `ORD-202605-000125`.
+- Invoice number:
+  Introduce a dedicated immutable invoice number such as `INV-202605-000125`.
+  Invoice numbering should be sequential, finance-friendly, and independent from the opaque order public ID.
+- Tracking number:
+  Use the real courier-provided AWB/tracking code in `shipments.tracking_number`.
+  Do not synthesize values like `TRK-9482-5517` in production unless a courier integration explicitly requires an internal pre-allocation placeholder before handoff.
+- Shipment number:
+  Add a platform shipment identifier such as `SHP-202605-000125` for internal operations, because one order may later map to more than one shipment.
+
+## Recommended Label Example Conventions
+
+- `Order No` on the shipping label should use the operational order number once added, for example `ORD-202605-000125`.
+- `Tracking No` should use the real courier AWB/tracking code, for example `7734567890` or another courier-issued format. It should not include a fake `TRK-` prefix unless that prefix is actually part of the courier code.
+- `Invoice No` should use the finance document number, for example `INV-202605-000125`.
+- If the operational order number is not implemented yet, the temporary fallback for labels should be the existing `orders.public_id`.
+
+## Parcel Data Assessment
+
+- Already available now:
+  customer shipping address
+  customer phone
+  ordered products
+  product code
+  quantity
+  product dimensions from the catalog (`dimension_length`, `dimension_width`, `dimension_height`, `dimension_unit`)
+- Not available yet and should be planned explicitly:
+  product dead weight
+  guaranteed tracking number assignment workflow
+  courier booking / handoff timestamps beyond the current shipment status timestamps
+  proof-of-delivery evidence payload
+  return-shipment identifiers and parcel metrics
+
+## Label Planning Notes
+
+- Product dimensions should not be assumed to equal the final courier parcel dimensions. The task should plan shipment-level measured dimensions captured during packing.
+- Weight on the label should come from a shipment/package measurement field, not from a hardcoded example and not from product data unless there is an explicit fallback rule.
+- For multi-item or multi-vendor orders, parcel details must belong to the shipment/package record, not only to the order header.
+
 ## Risks Or Open Questions
 
 - It is not yet confirmed whether LoomCraft will support one courier only or multiple couriers with different tracking formats.
@@ -88,14 +152,22 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - The current order lifecycle may not cleanly distinguish vendor-to-admin inbound movement from admin-to-customer outbound shipment.
 - Packaging and quality-control checkpoints are still operational concepts and must be mapped into concrete statuses, timestamps, and user actions.
 - Suggested identifier baseline:
-    - `orders.public_id`: keep the existing customer-facing `ORD-...` convention unless production constraints require a forward-only replacement.
-    - `invoices.invoice_number`: use a stable platform format such as `INV-YYYYMM-#####`.
+    - `orders.public_id`: keep the existing customer-facing opaque `ORD-...` convention for lookup and sharing.
+    - `orders.order_number`: add a human-friendly operational format such as `ORD-YYYYMM-#####`.
+    - `invoices.invoice_number`: use a stable finance format such as `INV-YYYYMM-#####`.
     - `shipments.shipment_number`: use a platform-generated format such as `SHP-YYYYMM-#####`.
     - `shipments.tracking_number`: store the courier AWB or courier tracking code and do not synthesize it when a real courier code exists.
-- It is still unclear whether one order can generate multiple invoices, or whether invoicing remains strictly one invoice per order.
-- It is still unclear whether courier tracking numbers are created only at handoff time or can exist earlier as pre-booked shipments.
+- One order should have exactly one invoice.
+- The system should auto-create the initial shipment record during order placement.
+- Courier tracking numbers are still expected to be assigned later in the fulfillment flow unless courier pre-booking is introduced.
 - Returns may need separate header and item tables plus a return-shipment tracking number, not just a status on `orders`.
 - Complaints may need severity, SLA target, resolution type, and links to refunds, returns, replacements, and courier incidents.
+- Shipment label parcel metrics currently have a data gap:
+    - product dimensions exist today
+    - shipment/package dimensions now exist at shipment level
+    - shipment/package weight now exists at shipment level
+    - product dead weight still does not exist
+    - invoice number now exists
 
 ## Proposed Scope Structure
 

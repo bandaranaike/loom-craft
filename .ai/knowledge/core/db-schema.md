@@ -1,8 +1,9 @@
 # LoomCraft Database Schema
 
-Schema snapshot derived from `.ai/db.sql`, the latest SQL dump of the database.
+Schema snapshot derived from `.ai/db.sql`, the latest SQL dump of the database, plus code-verified schema changes that landed after the last dump.
 
 Last synchronized with `.ai/db.sql`: 2026-04-05.
+Code-verified updates through: 2026-05-08.
 
 ---
 
@@ -345,6 +346,8 @@ No explicit standalone indexes beyond foreign-key support.
 Supports guest checkout via nullable `user_id` and guest fields.
 
 - `id` (bigint unsigned, PK)
+- `public_id` (varchar(40), nullable, unique)
+- `order_number` (varchar(255), nullable, unique)
 - `user_id` (bigint unsigned, FK -> users.id, nullable)
 - `guest_name` (varchar(255), nullable)
 - `guest_email` (varchar(255), nullable)
@@ -360,6 +363,8 @@ Supports guest checkout via nullable `user_id` and guest fields.
 
 Indexes:
 - `orders_status_index` on `status`
+- `orders_public_id_unique` on `public_id`
+- `orders_order_number_unique` on `order_number`
 
 ---
 
@@ -405,23 +410,56 @@ Indexes:
 
 ---
 
+### invoices
+
+One-to-one operational invoice records for orders.
+
+- `id` (bigint unsigned, PK)
+- `order_id` (bigint unsigned, FK -> orders.id, unique)
+- `invoice_number` (varchar(255), nullable, unique)
+- `status` (varchar(255), default `issued`)
+- `currency` (varchar(3))
+- `subtotal` (decimal(10,2))
+- `commission_total` (decimal(10,2))
+- `total` (decimal(10,2))
+- `issued_at` (timestamp, nullable)
+- `created_at` (timestamp, nullable)
+- `updated_at` (timestamp, nullable)
+
+Indexes:
+- `invoices_order_id_unique` on `order_id`
+- `invoices_invoice_number_unique` on `invoice_number`
+- `invoices_status_index` on `status`
+
+---
+
 ### shipments
 
 Tracks shipping responsibility and fulfillment.
 
 - `id` (bigint unsigned, PK)
+- `shipment_number` (varchar(255), nullable, unique)
 - `order_id` (bigint unsigned, FK -> orders.id)
 - `vendor_id` (bigint unsigned, FK -> vendors.id, nullable)
 - `responsibility` (varchar(255))
 - `status` (varchar(255))
 - `carrier` (varchar(255), nullable)
+- `service_level` (varchar(255), nullable)
 - `tracking_number` (varchar(255), nullable)
+- `package_count` (int unsigned, default `1`)
+- `parcel_weight` (decimal(10,2), nullable)
+- `weight_unit` (varchar(10), nullable)
+- `parcel_length` (decimal(10,2), nullable)
+- `parcel_width` (decimal(10,2), nullable)
+- `parcel_height` (decimal(10,2), nullable)
+- `parcel_dimension_unit` (varchar(10), nullable)
 - `shipped_at` (timestamp, nullable)
 - `delivered_at` (timestamp, nullable)
 - `created_at` (timestamp, nullable)
 - `updated_at` (timestamp, nullable)
 
-No explicit standalone indexes defined in the dump.
+Indexes:
+- `shipments_shipment_number_unique` on `shipment_number`
 
 ---
 
@@ -622,6 +660,7 @@ Indexes:
 - `products` 1-* `product_media`
 - `products` 1-* `product_reports`
 - `carts` 1-* `cart_items`
+- `orders` 1-1 `invoices`
 - `orders` 1-* `order_items`
 - `orders` 1-* `order_addresses`
 - `orders` 1-* `shipments`
@@ -638,3 +677,4 @@ Indexes:
 - `product_reviews` is not present in the SQL dump even though existing knowledge/tasks indicate reviews were implemented.
 - Several tables rely only on foreign-key support indexes and do not have separately named explicit indexes in the dump.
 - The database currently includes exchange-rate fields on `payments` plus a dedicated `exchange_rates` table, which means currency conversion is now part of persisted checkout/payment data.
+- Shipment parcel metrics now exist at shipment level, but product dead weight is still not modeled.

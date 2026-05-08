@@ -47,6 +47,7 @@ it('lists all orders for admin mobile api users', function () {
         ->assertOk()
         ->assertJsonCount(2)
         ->assertJsonFragment(['id' => $firstOrder->id, 'customer_name' => 'Jane Smith'])
+        ->assertJsonPath('0.order_number', $firstOrder->order_number)
         ->assertJsonPath('0.created_at', 'Apr 05, 2026 10:00 AM')
         ->assertJsonFragment(['id' => $secondOrder->id]);
 });
@@ -63,6 +64,7 @@ it('lists only vendor-visible order summaries without customer or global totals'
         ->assertOk()
         ->assertJsonCount(1)
         ->assertJsonPath('0.id', $matchingOrder->id)
+        ->assertJsonPath('0.order_number', $matchingOrder->order_number)
         ->assertJsonPath('0.vendor_items_total', 180)
         ->assertJsonPath('0.items_count', 1)
         ->assertJsonPath('0.created_at', 'Apr 05, 2026 10:00 AM')
@@ -85,6 +87,7 @@ it('returns the mobile vendor order detail shape', function () {
         ->assertOk()
         ->assertJsonPath('id', $order->id)
         ->assertJsonPath('public_id', $order->public_id)
+        ->assertJsonPath('order_number', $order->order_number)
         ->assertJsonPath('currency', 'LKR')
         ->assertJsonPath('total', 180)
         ->assertJsonPath('created_at', 'Apr 05, 2026 10:00 AM')
@@ -118,6 +121,7 @@ it('returns the mobile admin order detail shape', function () {
         ->assertOk()
         ->assertJsonPath('id', $order->id)
         ->assertJsonPath('public_id', $order->public_id)
+        ->assertJsonPath('order_number', $order->order_number)
         ->assertJsonPath('created_at', 'Apr 05, 2026 10:00 AM')
         ->assertJsonPath('customer_name', 'Jane Smith')
         ->assertJsonPath('addresses.0.city', 'Kandy')
@@ -209,9 +213,18 @@ it('returns dense sticker payload data for admins', function () {
     $this->getJson("/api/v1/admin/orders/{$order->id}/sticker-data")
         ->assertOk()
         ->assertJsonPath('id', $order->id)
+        ->assertJsonPath('order_number', $order->order_number)
+        ->assertJsonPath('invoice_number', $order->invoice->invoice_number)
+        ->assertJsonPath('shipment_number', $order->shipments->first()->shipment_number)
+        ->assertJsonPath('tracking_number', '7734567890')
+        ->assertJsonPath('carrier', 'DHL eCommerce')
+        ->assertJsonPath('service_level', 'Standard')
+        ->assertJsonPath('parcel.weight', 3.2)
+        ->assertJsonPath('parcel.dimension_unit', 'cm')
         ->assertJsonPath('customer_name', $vendorUser->name)
         ->assertJsonPath('shipping_address.city', 'Kandy')
-        ->assertJsonPath('products.0.quantity', 1);
+        ->assertJsonPath('products.0.quantity', 1)
+        ->assertJsonPath('products.0.dimension_unit', 'cm');
 });
 
 /**
@@ -308,8 +321,16 @@ function createMobileManagedOrder(
         'vendor_id' => $vendor->id,
         'responsibility' => 'platform',
         'status' => 'pending',
-        'carrier' => null,
-        'tracking_number' => null,
+        'carrier' => 'DHL eCommerce',
+        'service_level' => 'Standard',
+        'tracking_number' => '7734567890',
+        'package_count' => 1,
+        'parcel_weight' => '3.20',
+        'weight_unit' => 'kg',
+        'parcel_length' => '40.00',
+        'parcel_width' => '28.00',
+        'parcel_height' => '18.00',
+        'parcel_dimension_unit' => 'cm',
         'shipped_at' => null,
         'delivered_at' => null,
     ]);
@@ -323,5 +344,5 @@ function createMobileManagedOrder(
         'original_currency' => 'LKR',
     ]);
 
-    return $order->fresh(['items.product.media', 'addresses', 'shipments', 'payment']);
+    return $order->fresh(['invoice', 'items.product.media', 'addresses', 'shipments', 'payment']);
 }

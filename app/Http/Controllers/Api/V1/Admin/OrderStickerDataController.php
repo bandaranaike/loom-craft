@@ -14,7 +14,7 @@ class OrderStickerDataController extends Controller
     {
         Gate::authorize('viewAny', Order::class);
 
-        $order->load(['user', 'addresses', 'items.product', 'items.vendor']);
+        $order->load(['user', 'addresses', 'invoice', 'shipments', 'items.product', 'items.vendor']);
 
         return response()->json(new OrderStickerDataResource($order));
     }

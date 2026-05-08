@@ -1,6 +1,6 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-04-20
+Last reviewed: 2026-05-08
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implementation-guide.md`, `.ai/knowledge/core/best-practices.md`, `.ai/knowledge/core/guardrails.md`, `.ai/knowledge/core/db-schema.md`, and `.ai/knowledge/core/order-process.md`.
@@ -50,6 +50,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 ### Orders
 - Order placement persists to:
   - `orders`
+  - `invoices`
   - `order_items`
   - `order_addresses`
   - `payments`
@@ -57,6 +58,17 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Customer order history (`/orders`) and order detail (`/orders/{order}`) implemented for authenticated users.
 - Admin order list (`/admin/orders`) and vendor order items list (`/vendor/orders`) implemented.
 - Post-delivery product reviews are implemented with 1 to 5 star ratings, written feedback, one-review-per-customer-per-product enforcement, and public product-page display.
+- Orders now keep two distinct references:
+  - `public_id` for customer-facing lookup and URLs
+  - `order_number` for operational/admin/vendor document usage
+- Orders now auto-create a one-to-one invoice record with `invoice_number`.
+- Orders now auto-create the initial shipment record at placement time.
+- Shipment records now support:
+  - `shipment_number`
+  - `service_level`
+  - `package_count`
+  - parcel weight and packed dimensions
+- Admin mobile sticker payloads now include order/invoice/shipment identifiers plus parcel metrics and product dimensions.
 
 ### Vendor Features
 - Vendor registration form and submission (`/vendor/register`).
@@ -110,6 +122,8 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 
 - PayPal wallet approval/capture flow and PayPal direct card checkout are implemented; Stripe remains record/status-only and bank transfer admin verification workflow UI is still missing.
 - Shipment, disputes, complaints, and product reports are modeled at DB level but not surfaced as completed user/admin workflows.
+- Shipment numbering and parcel metrics are now modeled, but courier booking workflows, shipment events, proof-of-delivery capture, and return logistics are still pending.
+- Product dead weight is still not stored in the catalog or fulfillment domain.
 - Vendor shipping management and vendor payments/earnings pages are not implemented.
 - Admin vendor CRUD beyond pending/approve/reject is not implemented.
 - Product moderation workflow UI beyond vendor submission status is not implemented.

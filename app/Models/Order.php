@@ -21,6 +21,7 @@ class Order extends Model
      */
     protected $fillable = [
         'user_id',
+        'order_number',
         'guest_name',
         'guest_email',
         'status',
@@ -37,6 +38,29 @@ class Order extends Model
         static::creating(function (Order $order): void {
             if (! is_string($order->public_id) || $order->public_id === '') {
                 $order->public_id = self::newPublicId();
+            }
+        });
+
+        static::created(function (Order $order): void {
+            $updates = [];
+
+            if (! is_string($order->order_number) || $order->order_number === '') {
+                $updates['order_number'] = self::newOrderNumber($order);
+            }
+
+            if ($updates !== []) {
+                $order->forceFill($updates)->saveQuietly();
+            }
+
+            if (! $order->relationLoaded('invoice') && ! $order->invoice()->exists()) {
+                $order->invoice()->create([
+                    'status' => 'issued',
+                    'currency' => $order->currency,
+                    'subtotal' => $order->subtotal,
+                    'commission_total' => $order->commission_total,
+                    'total' => $order->total,
+                    'issued_at' => $order->placed_at ?? now(),
+                ]);
             }
         });
     }
@@ -81,6 +105,11 @@ class Order extends Model
         return $this->hasMany(Shipment::class);
     }
 
+    public function invoice(): HasOne
+    {
+        return $this->hasOne(Invoice::class);
+    }
+
     public function payment(): HasOne
     {
         return $this->hasOne(Payment::class);
@@ -89,5 +118,12 @@ class Order extends Model
     public function disputes(): HasMany
     {
         return $this->hasMany(Dispute::class);
+    }
+
+    private static function newOrderNumber(self $order): string
+    {
+        $date = $order->placed_at ?? $order->created_at ?? now();
+
+        return sprintf('ORD-%s-%06d', $date->format('Ym'), $order->id);
     }
 }

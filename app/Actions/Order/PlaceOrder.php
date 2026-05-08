@@ -132,6 +132,24 @@ class PlaceOrder
                 $data->billingAddress->toArray('billing'),
             ]);
 
+            $order->shipments()->create([
+                'vendor_id' => $this->resolveInitialShipmentVendorId($lineItems),
+                'responsibility' => $data->shippingResponsibility,
+                'status' => 'pending',
+                'carrier' => null,
+                'service_level' => null,
+                'tracking_number' => null,
+                'package_count' => 1,
+                'parcel_weight' => null,
+                'weight_unit' => null,
+                'parcel_length' => null,
+                'parcel_width' => null,
+                'parcel_height' => null,
+                'parcel_dimension_unit' => null,
+                'shipped_at' => null,
+                'delivered_at' => null,
+            ]);
+
             $order->payment()->create([
                 'method' => $data->paymentMethod,
                 'status' => $paymentStatus,
@@ -195,5 +213,24 @@ class PlaceOrder
         }
 
         return $cart->refresh();
+    }
+
+    /**
+     * @param  list<array{vendor_id: int, product_id: int, quantity: int, unit_price: string, commission_rate: string, commission_amount: string, line_total: string}>  $lineItems
+     */
+    private function resolveInitialShipmentVendorId(array $lineItems): ?int
+    {
+        $vendorIds = collect($lineItems)
+            ->pluck('vendor_id')
+            ->unique()
+            ->values();
+
+        if ($vendorIds->count() !== 1) {
+            return null;
+        }
+
+        $vendorId = $vendorIds->first();
+
+        return is_int($vendorId) ? $vendorId : null;
     }
 }

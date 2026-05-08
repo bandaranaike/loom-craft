@@ -19,6 +19,7 @@ class AdminOrderListResource extends JsonResource
         return [
             'id' => $this->id,
             'public_id' => $this->public_id,
+            'order_number' => $this->order_number,
             'status' => $this->status,
             'total' => (float) $this->total,
             'customer_name' => $this->user?->name ?? $this->guest_name,

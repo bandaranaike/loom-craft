@@ -2,13 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\Invoice;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Order>
+ * @extends Factory<Invoice>
  */
-class OrderFactory extends Factory
+class InvoiceFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,16 +19,15 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => null,
-            'guest_name' => fake()->name(),
-            'guest_email' => fake()->safeEmail(),
-            'status' => 'pending',
+            'order_id' => Order::factory()->afterCreating(function (Order $order): void {
+                $order->invoice()->delete();
+            }),
+            'status' => 'issued',
             'currency' => 'LKR',
             'subtotal' => '180.00',
             'commission_total' => '180.00',
             'total' => '180.00',
-            'shipping_responsibility' => 'platform',
-            'placed_at' => now(),
+            'issued_at' => now(),
         ];
     }
 }

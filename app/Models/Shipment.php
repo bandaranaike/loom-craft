@@ -6,6 +6,7 @@ use Database\Factories\ShipmentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class Shipment extends Model
 {
@@ -16,15 +17,35 @@ class Shipment extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'shipment_number',
         'order_id',
         'vendor_id',
         'responsibility',
         'status',
         'carrier',
+        'service_level',
         'tracking_number',
+        'package_count',
+        'parcel_weight',
+        'weight_unit',
+        'parcel_length',
+        'parcel_width',
+        'parcel_height',
+        'parcel_dimension_unit',
         'shipped_at',
         'delivered_at',
     ];
+
+    protected static function booted(): void
+    {
+        static::created(function (self $shipment): void {
+            if (! is_string($shipment->shipment_number) || $shipment->shipment_number === '') {
+                $shipment->forceFill([
+                    'shipment_number' => self::newShipmentNumber($shipment),
+                ])->saveQuietly();
+            }
+        });
+    }
 
     /**
      * @return array<string, string>
@@ -32,6 +53,10 @@ class Shipment extends Model
     protected function casts(): array
     {
         return [
+            'parcel_weight' => 'decimal:2',
+            'parcel_length' => 'decimal:2',
+            'parcel_width' => 'decimal:2',
+            'parcel_height' => 'decimal:2',
             'shipped_at' => 'datetime',
             'delivered_at' => 'datetime',
         ];
@@ -45,5 +70,14 @@ class Shipment extends Model
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    private static function newShipmentNumber(self $shipment): string
+    {
+        $date = $shipment->created_at instanceof Carbon
+            ? $shipment->created_at
+            : Carbon::parse($shipment->created_at ?? now());
+
+        return sprintf('SHP-%s-%06d', $date->format('Ym'), $shipment->id);
     }
 }

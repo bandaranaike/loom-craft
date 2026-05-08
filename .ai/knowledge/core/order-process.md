@@ -125,12 +125,15 @@ No additional fields are introduced beyond `.ai/knowledge/core/db-schema.md`.
 ### 5.1 Create Order Record
 
 - Create `orders` with:
+  - `public_id` as the opaque customer-facing lookup key
+  - `order_number` as the human-friendly operational document number
   - `user_id` or `guest_name` / `guest_email`
   - `status` (initial: `pending` or `paid` depending on method)
   - `currency` = `LKR`
   - `subtotal`, `commission_total`, `total`
   - `shipping_responsibility`
   - `placed_at`
+- The current implementation keeps `public_id` for customer URLs and also assigns a separate operational `order_number` in the format `ORD-YYYYMM-######`.
 
 ### 5.2 Create Order Items
 
@@ -153,6 +156,31 @@ For each cart item:
 
 - Clear cart items after successful order creation.
 - Preserve cart record for future reuse if needed.
+
+### 5.5 Invoice Creation
+
+- Each order currently creates exactly one linked invoice record automatically.
+- Invoice records store:
+  - `invoice_number`
+  - `status`
+  - `currency`
+  - `subtotal`
+  - `commission_total`
+  - `total`
+  - `issued_at`
+- The current invoice number format is `INV-YYYYMM-######`.
+
+### 5.6 Initial Shipment Creation
+
+- Order placement now auto-creates the initial shipment record inside the same transaction.
+- The current baseline creates one shipment per order at placement time.
+- The initial shipment starts with:
+  - `status = pending`
+  - `tracking_number = null`
+  - `package_count = 1`
+  - parcel measurements unset until packing
+- Shipment numbering uses the format `SHP-YYYYMM-######`.
+- Tracking numbers are expected to be attached later in fulfillment when the courier AWB is known.
 
 ---
 
@@ -201,6 +229,18 @@ Typical status progression (may vary by payment method):
 ### 8.4 Admin Order View
 
 - Admin can view all orders, statuses, and disputes.
+
+### 8.4 Fulfillment Identifiers And Labels
+
+- Admin/mobile fulfillment payloads now expose:
+  - `order_number`
+  - `invoice_number`
+  - `shipment_number`
+  - courier `tracking_number`
+  - `carrier`
+  - `service_level`
+  - shipment-level parcel metrics
+- Product catalog dimensions remain available, but they should be treated as catalog data, not guaranteed final packed-parcel measurements.
 
 ---
 
