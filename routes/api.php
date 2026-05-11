@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\OrderShipmentLabelController;
 use App\Http\Controllers\Api\V1\Admin\OrderStickerDataController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\NotificationRegistrationController;
@@ -18,5 +19,6 @@ Route::prefix('v1')->group(function (): void {
         Route::patch('orders/{order}/shipments/{shipment}/status', ShipmentStatusController::class);
         Route::post('notifications/register', NotificationRegistrationController::class);
         Route::get('admin/orders/{order}/sticker-data', OrderStickerDataController::class);
+        Route::get('admin/orders/{order}/shipments/{shipment}/label', OrderShipmentLabelController::class);
     });
 });

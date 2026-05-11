@@ -8,6 +8,7 @@ import {
     updateShipmentTracking as adminOrderUpdateShipmentTracking,
     updateStatus as adminOrderUpdateStatus,
 } from '@/actions/App/Http/Controllers/Admin/OrderController';
+import adminOrderShipmentLabel from '@/actions/App/Http/Controllers/Admin/OrderShipmentLabelController';
 import InputError from '@/components/input-error';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
@@ -463,6 +464,28 @@ export default function AdminOrderShow() {
                                     </button>
                                 </div>
                             </form>
+                        )}
+
+                        {order.shipment && (
+                            <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Print label</p>
+                                <p className="mt-3 text-sm text-(--welcome-body-text)">
+                                    Open the server-rendered shipping label in a print-ready page.
+                                </p>
+                                <a
+                                    href={
+                                        adminOrderShipmentLabel({
+                                            order: order.id,
+                                            shipment: order.shipment.id,
+                                        }).url
+                                    }
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                                >
+                                    Open printable label
+                                </a>
+                            </div>
                         )}
 
                         {order.can_manage_offline && (

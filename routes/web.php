@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ContactSubmissionController as AdminContactSubmissionController;
 use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\OrderShipmentLabelController as AdminOrderShipmentLabelController;
 use App\Http\Controllers\Admin\ProductApprovalController;
 use App\Http\Controllers\Admin\ProductCategoryController as AdminProductCategoryController;
 use App\Http\Controllers\Admin\ProductColorController as AdminProductColorController;
@@ -176,6 +177,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.orders.shipments.status.update');
         Route::patch('orders/{order}/shipments/{shipment}/tracking', [AdminOrderController::class, 'updateShipmentTracking'])
             ->name('admin.orders.shipments.tracking.update');
+        Route::get('orders/{order}/shipments/{shipment}/label', AdminOrderShipmentLabelController::class)
+            ->name('admin.orders.shipments.label.show');
         Route::patch('orders/{order}/offline', [AdminOrderController::class, 'updateOffline'])
             ->name('admin.orders.offline.update');
         Route::delete('orders/{order}', [AdminOrderController::class, 'destroy'])

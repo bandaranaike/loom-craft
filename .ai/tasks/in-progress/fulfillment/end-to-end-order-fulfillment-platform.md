@@ -97,6 +97,7 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Extended the sticker payload contract so label/PDF work can consume the new identifiers and parcel fields.
 - Added focused Pest coverage for schema presence, identifier generation, invoice creation, shipment numbering, and sticker payload exposure.
 - Added admin courier tracking assignment with immutable fulfillment history and dispatch guarded until carrier/tracking data exists.
+- Added server-rendered shipment label generation for admin web and authenticated mobile/API print flows.
 
 ## Completed So Far
 
@@ -136,6 +137,13 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Tracking assignment records an immutable `fulfillment_status_histories` entry with `reason=tracking_updated`.
 - Shipments cannot transition from `ready_for_dispatch` to `dispatched` until carrier and tracking number are assigned.
 
+### Label And Print Rendering
+
+- The static `bill.html` concept now has a server-side Blade rendering path backed by live order, invoice, shipment, address, parcel, and product data.
+- Admin web users can open a printable shipment label from the admin order page.
+- Authenticated mobile/API users with `stickers:read` can render the same print-ready shipment label over the API.
+- Native binary PDF generation remains deferred until a PDF renderer dependency is approved; current output is browser-printable HTML that can be saved as PDF by the client.
+
 ### Documentation And Tests
 
 - Core fulfillment docs were updated to reflect the new numbering and shipment/invoice baseline.
@@ -169,12 +177,12 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ### Track 3: Label And PDF Generation
 
-- Replace the static `bill.html` concept with a server-side label generator.
+- Replace the static `bill.html` concept with a server-side label generator. Print-ready HTML label rendering is implemented.
 - Define the final print payload contract for:
   - package label
   - product sticker / packing detail
   - invoice or packing slip if needed
-- Add downloadable/printable PDF or HTML endpoints for admin/mobile use.
+- Add downloadable/printable PDF or HTML endpoints for admin/mobile use. Admin web and authenticated mobile/API HTML label endpoints are implemented.
 - Confirm barcode/QR strategy and final print dimensions.
 
 ### Track 4: Mobile And Admin Fulfillment Actions
@@ -205,7 +213,7 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 ## Suggested Next Slices
 
 1. Mobile/API tracking-number assignment if mobile operators need to set AWB values directly.
-2. Label/PDF generation service using the new identifier and parcel schema.
+2. Confirm barcode/QR strategy and decide whether to approve a server-side PDF dependency.
 3. COD settlement model and admin handling flow.
 4. Returns and complaint domain implementation.
 
