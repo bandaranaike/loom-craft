@@ -2,6 +2,7 @@
 
 namespace App\DTOs\Order;
 
+use App\Enums\OrderStatus;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,14 @@ class OrderIndexData
     /**
      * @var list<string>
      */
-    public const ORDER_STATUSES = ['pending', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'];
+    public const ORDER_STATUSES = [
+        OrderStatus::Pending->value,
+        OrderStatus::Paid->value,
+        OrderStatus::Confirmed->value,
+        OrderStatus::Fulfilled->value,
+        OrderStatus::Closed->value,
+        OrderStatus::Cancelled->value,
+    ];
 
     public static function fromRequest(Request $request): self
     {

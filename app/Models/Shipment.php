@@ -6,6 +6,7 @@ use Database\Factories\ShipmentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 class Shipment extends Model
@@ -70,6 +71,11 @@ class Shipment extends Model
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    public function fulfillmentStatusHistories(): HasMany
+    {
+        return $this->hasMany(FulfillmentStatusHistory::class);
     }
 
     private static function newShipmentNumber(self $shipment): string

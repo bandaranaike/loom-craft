@@ -9,18 +9,23 @@ use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Services\Fulfillment\FulfillmentStatusService;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class ShowAdminOrder
 {
+    public function __construct(
+        private readonly FulfillmentStatusService $fulfillmentStatusService,
+    ) {}
+
     public function handle(int $orderId): AdminOrderSummaryResult
     {
         Gate::authorize('viewAny', Order::class);
 
         $order = Order::query()
-            ->with(['items.product.vendor', 'addresses', 'payment', 'user'])
+            ->with(['items.product.vendor', 'addresses', 'payment', 'user', 'shipments'])
             ->findOrFail($orderId);
 
         $payment = $order->payment;
@@ -60,6 +65,8 @@ class ShowAdminOrder
             $address->phone,
         ))->all();
 
+        $shipment = $order->shipments->first();
+
         return new AdminOrderSummaryResult(
             $order->id,
             $order->public_id,
@@ -76,9 +83,18 @@ class ShowAdminOrder
             $order->user?->email ?? $order->guest_email,
             $items,
             $addresses,
+            $shipment === null ? null : [
+                'id' => $shipment->id,
+                'shipment_number' => $shipment->shipment_number,
+                'status' => $shipment->status,
+                'tracking_number' => $shipment->tracking_number,
+                'carrier' => $shipment->carrier,
+                'service_level' => $shipment->service_level,
+            ],
             $this->paymentProof($payment),
-            ['paid', 'failed'],
-            ['pending', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+            $this->fulfillmentStatusService->paymentStatusOptionsFor($payment),
+            $this->fulfillmentStatusService->allowedNextOrderStatuses($order, auth()->user()),
+            $shipment === null ? [] : $this->fulfillmentStatusService->allowedNextShipmentStatuses($order, $shipment, auth()->user()),
             Gate::allows('manageOffline', $order),
             Gate::allows('delete', $order),
         );

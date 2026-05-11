@@ -2,27 +2,14 @@
 
 namespace App\Http\Requests\Vendor;
 
-use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class UpdateOfflineOrderRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $order = $this->route('order');
-
-        if (! $order instanceof Order) {
-            return false;
-        }
-
-        $payment = $order->payment;
-
-        return $payment !== null
-            && in_array($payment->method, ['bank_transfer', 'cod'], true)
-            && Gate::allows('viewVendor', $order)
-            && Gate::allows('manageOffline', $order);
+        return false;
     }
 
     public function rules(): array

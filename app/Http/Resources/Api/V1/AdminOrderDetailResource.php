@@ -17,6 +17,8 @@ class AdminOrderDetailResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $shipment = $this->shipments->first();
+
         return [
             'id' => $this->id,
             'public_id' => $this->public_id,
@@ -58,6 +60,14 @@ class AdminOrderDetailResource extends JsonResource
                 ])
                 ->values()
                 ->all(),
+            'shipment' => $shipment === null ? null : [
+                'id' => $shipment->id,
+                'shipment_number' => $shipment->shipment_number,
+                'status' => $shipment->status,
+                'tracking_number' => $shipment->tracking_number,
+                'carrier' => $shipment->carrier,
+                'service_level' => $shipment->service_level,
+            ],
         ];
     }
 

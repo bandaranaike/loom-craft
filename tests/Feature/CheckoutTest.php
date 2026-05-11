@@ -76,7 +76,7 @@ it('uses the authenticated users latest order address country as the checkout de
 
     $order = Order::query()->create([
         'user_id' => $user->id,
-        'status' => 'delivered',
+        'status' => 'fulfilled',
         'currency' => 'LKR',
         'subtotal' => '180.00',
         'commission_total' => '180.00',
@@ -331,7 +331,7 @@ it('creates a pending order from checkout and clears the cart', function () {
     $this->assertDatabaseHas('payments', [
         'order_id' => $order->id,
         'method' => 'cod',
-        'status' => 'pending',
+        'status' => 'collection_pending',
         'amount' => '180.00',
         'currency' => 'LKR',
         'original_amount' => '180.00',

@@ -115,6 +115,11 @@ class Order extends Model
         return $this->hasOne(Payment::class);
     }
 
+    public function fulfillmentStatusHistories(): HasMany
+    {
+        return $this->hasMany(FulfillmentStatusHistory::class);
+    }
+
     public function disputes(): HasMany
     {
         return $this->hasMany(Dispute::class);

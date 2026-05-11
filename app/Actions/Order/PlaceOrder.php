@@ -5,6 +5,7 @@ namespace App\Actions\Order;
 use App\DTOs\Order\CheckoutStoreData;
 use App\DTOs\Order\OrderPlacementResult;
 use App\DTOs\Payment\PayPalPaymentQuote;
+use App\Enums\PaymentStatus;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
@@ -79,7 +80,11 @@ class PlaceOrder
             }
 
             $isInstantPaid = in_array($data->paymentMethod, ['stripe', 'paypal', 'paypal_card'], true);
-            $paymentStatus = $isInstantPaid ? 'paid' : 'pending';
+            $paymentStatus = $isInstantPaid
+                ? PaymentStatus::Paid->value
+                : ($data->paymentMethod === 'cod'
+                    ? PaymentStatus::CollectionPending->value
+                    : PaymentStatus::Pending->value);
             $orderStatus = $isInstantPaid ? 'paid' : 'pending';
             $orderSubtotal = Money::fromString((string) $subtotal)->amount;
             $orderCurrency = $data->currency->code;

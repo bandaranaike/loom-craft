@@ -137,7 +137,7 @@ class Product extends Model
             ->whereHas('order', function ($query) use ($user): void {
                 $query
                     ->where('user_id', $user->id)
-                    ->where('status', 'delivered');
+                    ->whereIn('status', ['fulfilled', 'closed']);
             })
             ->exists();
     }

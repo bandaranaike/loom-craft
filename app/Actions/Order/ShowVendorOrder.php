@@ -10,12 +10,17 @@ use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\User;
+use App\Services\Fulfillment\FulfillmentStatusService;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class ShowVendorOrder
 {
+    public function __construct(
+        private readonly FulfillmentStatusService $fulfillmentStatusService,
+    ) {}
+
     public function handle(User $user, Order $order): VendorOrderSummaryResult
     {
         Gate::authorize('viewVendor', $order);
@@ -26,7 +31,7 @@ class ShowVendorOrder
             throw new \RuntimeException('Vendor profile is required to view orders.');
         }
 
-        $order->load(['items.product.vendor', 'addresses', 'payment', 'user']);
+        $order->load(['items.product.vendor', 'addresses', 'payment', 'user', 'shipments']);
 
         $payment = $order->payment;
 
@@ -66,6 +71,9 @@ class ShowVendorOrder
             $address->phone,
         ))->all();
 
+        $shipment = $order->shipments
+            ->firstWhere('vendor_id', $vendor->id) ?? $order->shipments->first();
+
         return new VendorOrderSummaryResult(
             $order->id,
             $order->public_id,
@@ -82,10 +90,18 @@ class ShowVendorOrder
             $order->user?->email ?? $order->guest_email,
             $items,
             $addresses,
+            $shipment === null ? null : [
+                'id' => $shipment->id,
+                'shipment_number' => $shipment->shipment_number,
+                'status' => $shipment->status,
+                'tracking_number' => $shipment->tracking_number,
+                'carrier' => $shipment->carrier,
+                'service_level' => $shipment->service_level,
+            ],
             $this->paymentProof($payment),
-            ['paid', 'failed'],
-            Gate::allows('manageOffline', $order),
-            in_array($order->status, ['paid', 'confirmed'], true),
+            [],
+            $shipment === null ? [] : $this->fulfillmentStatusService->allowedNextShipmentStatuses($order, $shipment, $user),
+            false,
         );
     }
 

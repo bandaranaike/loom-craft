@@ -105,7 +105,7 @@ class ShowPublicProduct
                     ? 'You already shared feedback for this product.'
                     : ($hasDeliveredPurchase
                         ? null
-                        : 'Reviews open once your order is marked delivered.')),
+                        : 'Reviews open once your order is fulfilled.')),
         ];
 
         return new ProductShowResult(

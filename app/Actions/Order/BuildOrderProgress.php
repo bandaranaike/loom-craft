@@ -28,23 +28,22 @@ class BuildOrderProgress
 
         $paymentState = match (true) {
             $paymentStatus === 'paid' => 'complete',
-            in_array($paymentStatus, ['pending', 'failed'], true) => 'current',
+            in_array($paymentStatus, ['pending', 'collection_pending', 'failed'], true) => 'current',
             default => 'upcoming',
         };
 
         $confirmedState = match ($orderStatus) {
             'confirmed' => 'current',
-            'shipped', 'delivered' => 'complete',
+            'fulfilled', 'closed' => 'complete',
             default => 'upcoming',
         };
 
         $shippedState = match ($orderStatus) {
-            'shipped' => 'current',
-            'delivered' => 'complete',
+            'fulfilled', 'closed' => 'complete',
             default => 'upcoming',
         };
 
-        $deliveredState = $orderStatus === 'delivered' ? 'current' : 'upcoming';
+        $deliveredState = in_array($orderStatus, ['fulfilled', 'closed'], true) ? 'current' : 'upcoming';
 
         return [
             'is_cancelled' => false,

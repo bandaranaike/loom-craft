@@ -67,7 +67,7 @@ it('shares order and payment currencies separately on the order page', function 
 
 it('exposes delivered progress states on the order page', function () {
     $order = createTrackedOrder([
-        'status' => 'delivered',
+        'status' => 'fulfilled',
     ], [
         'status' => 'paid',
     ]);

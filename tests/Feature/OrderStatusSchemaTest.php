@@ -21,7 +21,7 @@ it('rejects unsupported order statuses at the database layer', function () {
  */
 function supportedOrderStatuses(): array
 {
-    return ['pending', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'];
+    return ['pending', 'paid', 'confirmed', 'fulfilled', 'closed', 'cancelled'];
 }
 
 /**

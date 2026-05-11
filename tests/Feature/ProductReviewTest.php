@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Vendor;
 use Inertia\Testing\AssertableInertia as Assert;
 
-it('shows published product reviews and allows delivered customers to post once', function () {
+it('shows published product reviews and allows fulfilled customers to post once', function () {
     $product = createReviewableProduct();
 
     $firstReviewer = User::factory()->create(['name' => 'Ayesha Fernando']);
@@ -52,7 +52,7 @@ it('shows published product reviews and allows delivered customers to post once'
         );
 });
 
-it('allows a delivered customer to submit a single product review', function () {
+it('allows a fulfilled customer to submit a single product review', function () {
     $customer = User::factory()->create();
     $product = createReviewableProduct();
 
@@ -77,7 +77,7 @@ it('forbids review submissions before delivery is completed', function () {
     $customer = User::factory()->create();
     $product = createReviewableProduct();
 
-    createProductOrder($customer, $product, status: 'shipped');
+    createProductOrder($customer, $product, status: 'confirmed');
 
     $this->actingAs($customer)
         ->post(route('products.reviews.store', ['product' => $product->slug]), [
@@ -102,7 +102,7 @@ function createReviewableProduct(): Product
     ]);
 }
 
-function createProductOrder(User $customer, Product $product, string $status = 'delivered'): Order
+function createProductOrder(User $customer, Product $product, string $status = 'fulfilled'): Order
 {
     $order = Order::query()->create([
         'user_id' => $customer->id,

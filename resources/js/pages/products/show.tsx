@@ -714,11 +714,11 @@ export default function ProductShow({
                                 Review eligibility
                             </p>
                             <h2 className="mt-3 font-['Playfair_Display',serif] text-2xl">
-                                Verified after delivery
+                                Verified after fulfillment
                             </h2>
                             <p className="mt-3 text-sm leading-6 text-(--welcome-body-text)">
                                 Ratings are reserved for customers whose order
-                                has been marked delivered, keeping product
+                                has been fulfilled, keeping product
                                 feedback grounded in completed purchases.
                             </p>
                             {review_form.message && (
@@ -836,7 +836,7 @@ export default function ProductShow({
                             ) : (
                                 <div className="mt-6 rounded-[32px] border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-6 text-sm leading-6 text-(--welcome-body-text)">
                                     {review_form.message ??
-                                        'Reviews become available after a completed delivery.'}
+                                        'Reviews become available after fulfillment is complete.'}
                                 </div>
                             )}
                         </div>
@@ -848,7 +848,7 @@ export default function ProductShow({
                                         Recent feedback
                                     </p>
                                     <h2 className="mt-3 font-['Playfair_Display',serif] text-3xl">
-                                        Review notes from delivered orders
+                                        Review notes from fulfilled orders
                                     </h2>
                                 </div>
                             </div>
@@ -856,7 +856,7 @@ export default function ProductShow({
                             {reviews.length === 0 ? (
                                 <div className="mt-6 rounded-[32px] bg-(--welcome-surface-1) p-6 text-sm leading-6 text-(--welcome-body-text)">
                                     No reviews have been published yet. The
-                                    first delivered buyer will set the tone for
+                                    first fulfilled buyer will set the tone for
                                     this listing.
                                 </div>
                             ) : (

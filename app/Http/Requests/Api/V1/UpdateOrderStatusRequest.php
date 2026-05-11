@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
+use App\Services\Fulfillment\FulfillmentStatusService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -14,7 +16,10 @@ class UpdateOrderStatusRequest extends FormRequest
     {
         $order = $this->route('order');
 
-        return $order instanceof Order && $this->user()?->can('updateStatus', $order) === true;
+        return $order instanceof Order
+            && $this->user()?->role === 'admin'
+            && $this->user()?->can('updateStatus', $order) === true
+            && $this->user()?->currentAccessToken()?->can('orders:update') === true;
     }
 
     /**
@@ -25,7 +30,7 @@ class UpdateOrderStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', 'string', Rule::in($this->allowedStatuses())],
+            'status' => ['required', 'string', Rule::in(OrderStatus::values())],
         ];
     }
 
@@ -39,24 +44,14 @@ class UpdateOrderStatusRequest extends FormRequest
                     return;
                 }
 
-                if ($this->user()?->role === 'vendor'
-                    && ! in_array($order->status, ['paid', 'confirmed'], true)
-                    && $this->input('status') === 'shipped') {
-                    $validator->errors()->add('status', 'Only paid or confirmed orders can be marked as shipped.');
+                if (! app(FulfillmentStatusService::class)->canTransitionOrder(
+                    $order,
+                    $this->input('status'),
+                    $this->user(),
+                )) {
+                    $validator->errors()->add('status', 'Select a valid next order status.');
                 }
             },
         ];
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function allowedStatuses(): array
-    {
-        if ($this->user()?->role === 'admin') {
-            return ['pending', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'];
-        }
-
-        return ['shipped'];
     }
 }

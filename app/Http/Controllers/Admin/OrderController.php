@@ -8,7 +8,10 @@ use App\DTOs\Order\OrderIndexData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateOfflineOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
+use App\Http\Requests\Admin\UpdateShipmentStatusRequest;
 use App\Models\Order;
+use App\Models\Shipment;
+use App\Services\Fulfillment\FulfillmentStatusService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -17,6 +20,10 @@ use Inertia\Response;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        private readonly FulfillmentStatusService $fulfillmentStatusService,
+    ) {}
+
     public function index(Request $request, ListAdminOrders $action): Response
     {
         $result = $action->handle(OrderIndexData::fromRequest($request));
@@ -39,9 +46,11 @@ class OrderController extends Controller
         UpdateOrderStatusRequest $request,
         Order $order,
     ): RedirectResponse {
-        $order->update([
-            'status' => $request->validated('order_status'),
-        ]);
+        $this->fulfillmentStatusService->updateOrderStatus(
+            $order,
+            $request->validated('order_status'),
+            $request->user(),
+        );
 
         return back()->with('status', 'Order status updated.');
     }
@@ -56,13 +65,29 @@ class OrderController extends Controller
             abort(404);
         }
 
-        $payment->update([
-            'status' => $request->validated('payment_status'),
-            'verified_by' => $request->user()?->id,
-            'verified_at' => now(),
-        ]);
+        $this->fulfillmentStatusService->updatePaymentStatus(
+            $order,
+            $payment,
+            $request->validated('payment_status'),
+            $request->user(),
+        );
 
         return back()->with('status', 'Offline payment status updated.');
+    }
+
+    public function updateShipmentStatus(
+        UpdateShipmentStatusRequest $request,
+        Order $order,
+        Shipment $shipment,
+    ): RedirectResponse {
+        $this->fulfillmentStatusService->updateShipmentStatus(
+            $order,
+            $shipment,
+            $request->validated('shipment_status'),
+            $request->user(),
+        );
+
+        return back()->with('status', 'Shipment status updated.');
     }
 
     public function destroy(Order $order): RedirectResponse

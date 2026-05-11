@@ -88,6 +88,7 @@ class OrderController extends Controller
         $order->load([
             'user',
             'addresses',
+            'shipments',
             'items.product.media' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
             'items.vendor',
         ]);
@@ -107,6 +108,13 @@ class OrderController extends Controller
         }
 
         $order->load([
+            'shipments' => fn ($query) => $query
+                ->where(function ($shipmentQuery) use ($vendor): void {
+                    $shipmentQuery
+                        ->where('vendor_id', $vendor->id)
+                        ->orWhereNull('vendor_id');
+                })
+                ->orderBy('id'),
             'items' => fn ($query) => $query
                 ->where('vendor_id', $vendor->id)
                 ->with([

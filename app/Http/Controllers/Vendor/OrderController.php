@@ -7,8 +7,10 @@ use App\Actions\Order\ShowVendorOrder;
 use App\DTOs\Order\OrderIndexData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Vendor\UpdateOfflineOrderRequest;
-use App\Http\Requests\Vendor\UpdateOrderStatusRequest;
+use App\Http\Requests\Vendor\UpdateShipmentStatusRequest;
 use App\Models\Order;
+use App\Models\Shipment;
+use App\Services\Fulfillment\FulfillmentStatusService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,6 +18,10 @@ use Inertia\Response;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        private readonly FulfillmentStatusService $fulfillmentStatusService,
+    ) {}
+
     public function index(Request $request, ListVendorOrders $action): Response
     {
         $result = $action->handle(OrderIndexData::fromRequest($request));
@@ -40,15 +46,19 @@ class OrderController extends Controller
         ]);
     }
 
-    public function updateStatus(
-        UpdateOrderStatusRequest $request,
+    public function updateShipmentStatus(
+        UpdateShipmentStatusRequest $request,
         Order $order,
+        Shipment $shipment,
     ): RedirectResponse {
-        $order->update([
-            'status' => $request->validated('order_status'),
-        ]);
+        $this->fulfillmentStatusService->updateShipmentStatus(
+            $order,
+            $shipment,
+            $request->validated('shipment_status'),
+            $request->user(),
+        );
 
-        return back()->with('status', 'Order marked as shipped.');
+        return back()->with('status', 'Shipment status updated.');
     }
 
     public function updateOffline(

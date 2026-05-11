@@ -132,14 +132,14 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 ### Documentation And Tests
 
 - Core fulfillment docs were updated to reflect the new numbering and shipment/invoice baseline.
-- Focused Pest coverage was added for schema, identifier generation, and sticker payload data.
+- Focused Pest coverage was added for s.chema, identifier generation, and sticker payload data.
 
 ## Remaining Work By Track
 
 ### Track 1: Fulfillment Workflow And Status Model
 
 - Define the canonical workflow from placed order to delivered/returned/closed.
-- Separate order status from shipment status more explicitly.
+- Separate order status from shipment status more explicitly. 
 - Define allowed transitions for:
   - `order`
   - `payment`

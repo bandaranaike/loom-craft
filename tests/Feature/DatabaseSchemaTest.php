@@ -53,5 +53,6 @@ it('adds fulfillment identifier and parcel columns', function () {
             'commission_total',
             'total',
             'issued_at',
-        ]))->toBeTrue();
+        ]))->toBeTrue()
+        ->and(Schema::hasTable('fulfillment_status_histories'))->toBeTrue();
 });

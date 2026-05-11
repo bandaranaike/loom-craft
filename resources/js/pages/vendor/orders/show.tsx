@@ -1,7 +1,6 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import {
-    updateOffline as vendorOrderUpdateOffline,
-    updateStatus as vendorOrderUpdateStatus,
+    updateShipmentStatus as vendorOrderUpdateShipmentStatus,
 } from '@/actions/App/Http/Controllers/Vendor/OrderController';
 import InputError from '@/components/input-error';
 import AppLayout from '@/layouts/app-layout';
@@ -40,6 +39,15 @@ type OrderProof = {
     uploaded_at: string | null;
 };
 
+type ShipmentSummary = {
+    id: number;
+    shipment_number: string | null;
+    status: string;
+    tracking_number: string | null;
+    carrier: string | null;
+    service_level: string | null;
+};
+
 type VendorOrderSummary = {
     id: number;
     public_id: string | null;
@@ -56,18 +64,22 @@ type VendorOrderSummary = {
     customer_email: string | null;
     items: OrderItem[];
     addresses: OrderAddress[];
+    shipment: ShipmentSummary | null;
     payment_proof: OrderProof | null;
     payment_status_options: string[];
+    shipment_status_options: string[];
     can_manage_offline: boolean;
-    can_mark_shipped: boolean;
 };
 
 type VendorOrderShowProps = {
     order: VendorOrderSummary;
 };
 
-const paymentStatusLabel = (status: string) =>
-    status === 'paid' ? 'Payment success' : 'Payment failed';
+const shipmentStatusLabel = (status: string) =>
+    status
+        .split('_')
+        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+        .join(' ');
 
 export default function VendorOrderShow() {
     const { order } = usePage<VendorOrderShowProps>().props;
@@ -77,11 +89,8 @@ export default function VendorOrderShow() {
         { title: order.public_id ?? `Order #${order.id}`, href: vendorOrdersShow(order.id).url },
     ];
 
-    const paymentForm = useForm({
-        payment_status: order.payment_status === 'failed' ? 'failed' : 'paid',
-    });
     const shipForm = useForm({
-        order_status: 'shipped',
+        shipment_status: order.shipment_status_options[0] ?? order.shipment?.status ?? 'pending',
     });
 
     const shipping = order.addresses.find((address) => address.type === 'shipping');
@@ -223,72 +232,51 @@ export default function VendorOrderShow() {
                             </div>
                         </div>
 
-                        {order.can_mark_shipped && (
+                        {order.shipment && order.shipment_status_options.length > 0 && (
                             <form
                                 onSubmit={(event) => {
                                     event.preventDefault();
-                                    shipForm.patch(vendorOrderUpdateStatus(order.id).url, {
+                                    shipForm.patch(vendorOrderUpdateShipmentStatus(order.id, order.shipment!.id).url, {
                                         preserveScroll: true,
                                     });
                                 }}
                                 className="rounded-[28px] border border-amber-200 bg-amber-50 p-6"
                             >
                                 <p className="text-xs uppercase tracking-[0.3em] text-amber-800">
-                                    Shipping update
+                                    Shipment workflow
                                 </p>
                                 <p className="mt-3 text-sm text-amber-900">
-                                    Mark this order as shipped once your studio&apos;s fulfillment is ready to leave.
+                                    Move your shipment forward as packing work is completed.
                                 </p>
-                                <InputError message={shipForm.errors.order_status} />
+                                <div className="mt-4 space-y-2">
+                                    <p className="text-sm text-amber-950">
+                                        Shipment {order.shipment.shipment_number ?? `#${order.shipment.id}`}
+                                    </p>
+                                    <p className="text-sm text-amber-900">
+                                        Current status: <span className="font-semibold">{shipmentStatusLabel(order.shipment.status)}</span>
+                                    </p>
+                                </div>
+                                <div className="mt-4 space-y-2">
+                                    <select
+                                        value={shipForm.data.shipment_status}
+                                        onChange={(event) => shipForm.setData('shipment_status', event.target.value)}
+                                        className="w-full rounded-full border border-amber-300 bg-amber-100 px-4 py-3 text-sm text-amber-950"
+                                    >
+                                        {order.shipment_status_options.map((status) => (
+                                            <option key={status} value={status}>
+                                                {shipmentStatusLabel(status)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <InputError message={shipForm.errors.shipment_status} />
+                                </div>
                                 <button
                                     type="submit"
                                     disabled={shipForm.processing}
                                     className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-amber-900 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-amber-900 transition hover:bg-amber-900 hover:text-amber-50 disabled:opacity-70"
                                 >
-                                    {shipForm.processing ? 'Saving...' : 'Mark as shipped'}
+                                    {shipForm.processing ? 'Saving...' : 'Save shipment status'}
                                 </button>
-                            </form>
-                        )}
-
-                        {order.can_manage_offline && (
-                            <form
-                                onSubmit={(event) => {
-                                    event.preventDefault();
-                                    paymentForm.patch(vendorOrderUpdateOffline(order.id).url, {
-                                        preserveScroll: true,
-                                    });
-                                }}
-                                className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
-                            >
-                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                    Offline payment review
-                                </p>
-                                <div className="mt-4 space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                            Payment status
-                                        </label>
-                                        <select
-                                            value={paymentForm.data.payment_status}
-                                            onChange={(event) => paymentForm.setData('payment_status', event.target.value)}
-                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
-                                        >
-                                            {order.payment_status_options.map((status) => (
-                                                <option key={status} value={status}>
-                                                    {paymentStatusLabel(status)}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <InputError message={paymentForm.errors.payment_status} />
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        disabled={paymentForm.processing}
-                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
-                                    >
-                                        {paymentForm.processing ? 'Saving...' : 'Save payment review'}
-                                    </button>
-                                </div>
                             </form>
                         )}
 

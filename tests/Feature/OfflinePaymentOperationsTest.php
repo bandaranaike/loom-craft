@@ -51,7 +51,7 @@ it('prevents non-admins from updating offline payment and order statuses', funct
 
     $this->assertDatabaseHas('payments', [
         'order_id' => $order->id,
-        'status' => 'pending',
+        'status' => 'collection_pending',
         'verified_by' => null,
     ]);
 });
@@ -153,8 +153,8 @@ it('shows offline review options and payment proof on the admin order page', fun
             ->where('order.id', $order->id)
             ->where('order.can_manage_offline', true)
             ->where('order.can_delete', true)
-            ->where('order.payment_status_options', ['paid', 'failed'])
-            ->where('order.order_status_options', ['pending', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'])
+            ->where('order.payment_status_options', ['pending', 'paid', 'failed'])
+            ->where('order.order_status_options', ['paid', 'cancelled'])
             ->where('order.payment_proof.original_name', 'review-slip.png')
         );
 });
@@ -247,7 +247,7 @@ function createOfflineOrder(?User $user = null, string $paymentMethod = 'bank_tr
 
     $order->payment()->create([
         'method' => $paymentMethod,
-        'status' => 'pending',
+        'status' => $paymentMethod === 'cod' ? 'collection_pending' : 'pending',
         'amount' => '180.00',
         'currency' => 'LKR',
         'original_amount' => '180.00',

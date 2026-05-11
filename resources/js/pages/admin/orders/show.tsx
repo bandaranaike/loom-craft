@@ -3,6 +3,7 @@ import { index as adminOrdersIndex } from '@/actions/App/Http/Controllers/Admin/
 import {
     destroy as adminOrderDestroy,
     updateOffline as adminOrderUpdateOffline,
+    updateShipmentStatus as adminOrderUpdateShipmentStatus,
     updateStatus as adminOrderUpdateStatus,
 } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import InputError from '@/components/input-error';
@@ -40,6 +41,15 @@ type OrderProof = {
     uploaded_at: string | null;
 };
 
+type ShipmentSummary = {
+    id: number;
+    shipment_number: string | null;
+    status: string;
+    tracking_number: string | null;
+    carrier: string | null;
+    service_level: string | null;
+};
+
 type AdminOrderSummary = {
     id: number;
     public_id: string | null;
@@ -56,9 +66,11 @@ type AdminOrderSummary = {
     customer_email: string | null;
     items: OrderItem[];
     addresses: OrderAddress[];
+    shipment: ShipmentSummary | null;
     payment_proof: OrderProof | null;
     payment_status_options: string[];
     order_status_options: string[];
+    shipment_status_options: string[];
     can_manage_offline: boolean;
     can_delete: boolean;
 };
@@ -67,17 +79,27 @@ type AdminOrderShowProps = {
     order: AdminOrderSummary;
 };
 
-const paymentStatusLabel = (status: string) =>
-    status === 'paid' ? 'Payment success' : 'Payment failed';
+const paymentStatusLabel = (status: string) => {
+    switch (status) {
+        case 'paid':
+            return 'Paid';
+        case 'failed':
+            return 'Failed';
+        case 'collection_pending':
+            return 'Collection pending';
+        default:
+            return 'Pending';
+    }
+};
 
 const orderStatusLabel = (status: string) => {
     switch (status) {
         case 'confirmed':
             return 'Confirmed';
-        case 'delivered':
-            return 'Delivered';
-        case 'shipped':
-            return 'Shipped';
+        case 'fulfilled':
+            return 'Fulfilled';
+        case 'closed':
+            return 'Closed';
         case 'cancelled':
             return 'Cancelled';
         case 'paid':
@@ -86,6 +108,12 @@ const orderStatusLabel = (status: string) => {
             return 'Pending';
     }
 };
+
+const shipmentStatusLabel = (status: string) =>
+    status
+        .split('_')
+        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+        .join(' ');
 
 const paymentProofHeading = (paymentMethod: string): string => {
     if (paymentMethod === 'bank_transfer') {
@@ -120,10 +148,13 @@ export default function AdminOrderShow() {
     ];
 
     const form = useForm({
-        payment_status: order.payment_status === 'failed' ? 'failed' : 'paid',
+        payment_status: order.payment_status,
     });
     const statusForm = useForm({
-        order_status: order.status,
+        order_status: order.order_status_options[0] ?? order.status,
+    });
+    const shipmentForm = useForm({
+        shipment_status: order.shipment_status_options[0] ?? order.shipment?.status ?? 'pending',
     });
     const deleteForm = useForm({});
 
@@ -240,6 +271,18 @@ export default function AdminOrderShow() {
                                 Order summary
                             </p>
                             <div className="mt-4 space-y-3 text-sm">
+                                {order.shipment && (
+                                    <>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-(--welcome-body-text)">Shipment</span>
+                                            <span>{order.shipment.shipment_number ?? `#${order.shipment.id}`}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-(--welcome-body-text)">Shipment status</span>
+                                            <span>{shipmentStatusLabel(order.shipment.status)}</span>
+                                        </div>
+                                    </>
+                                )}
                                 <div className="flex items-center justify-between">
                                     <span className="text-(--welcome-body-text)">Subtotal</span>
                                     <span>{formatMoney(order.subtotal, order.currency)}</span>
@@ -259,45 +302,96 @@ export default function AdminOrderShow() {
                             </div>
                         </div>
 
-                        <form
-                            onSubmit={(event) => {
-                                event.preventDefault();
-                                statusForm.patch(adminOrderUpdateStatus(order.id).url, {
-                                    preserveScroll: true,
-                                });
-                            }}
-                            className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
-                        >
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Order status
-                            </p>
-                            <div className="mt-4 space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Order status
-                                    </label>
-                                    <select
-                                        value={statusForm.data.order_status}
-                                        onChange={(event) => statusForm.setData('order_status', event.target.value)}
-                                        className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                        {order.order_status_options.length > 0 && (
+                            <form
+                                onSubmit={(event) => {
+                                    event.preventDefault();
+                                    statusForm.patch(adminOrderUpdateStatus(order.id).url, {
+                                        preserveScroll: true,
+                                    });
+                                }}
+                                className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
+                            >
+                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                    Order status
+                                </p>
+                                <div className="mt-4 space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                            Next order status
+                                        </label>
+                                        <select
+                                            value={statusForm.data.order_status}
+                                            onChange={(event) => statusForm.setData('order_status', event.target.value)}
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                        >
+                                            {order.order_status_options.map((status) => (
+                                                <option key={status} value={status}>
+                                                    {orderStatusLabel(status)}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <InputError message={statusForm.errors.order_status} />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={statusForm.processing}
+                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
                                     >
-                                        {order.order_status_options.map((status) => (
-                                            <option key={status} value={status}>
-                                                {orderStatusLabel(status)}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <InputError message={statusForm.errors.order_status} />
+                                        {statusForm.processing ? 'Saving...' : 'Save order status'}
+                                    </button>
                                 </div>
-                                <button
-                                    type="submit"
-                                    disabled={statusForm.processing}
-                                    className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
-                                >
-                                    {statusForm.processing ? 'Saving...' : 'Save order status'}
-                                </button>
-                            </div>
-                        </form>
+                            </form>
+                        )}
+
+                        {order.shipment && order.shipment_status_options.length > 0 && (
+                            <form
+                                onSubmit={(event) => {
+                                    event.preventDefault();
+                                    shipmentForm.patch(
+                                        adminOrderUpdateShipmentStatus(order.id, order.shipment!.id).url,
+                                        { preserveScroll: true },
+                                    );
+                                }}
+                                className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
+                            >
+                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                    Shipment workflow
+                                </p>
+                                <div className="mt-4 space-y-2 text-sm text-(--welcome-body-text)">
+                                    <p>Shipment {order.shipment.shipment_number ?? `#${order.shipment.id}`}</p>
+                                    <p>
+                                        Current status: <span className="font-semibold text-(--welcome-strong)">{shipmentStatusLabel(order.shipment.status)}</span>
+                                    </p>
+                                </div>
+                                <div className="mt-4 space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                            Next shipment status
+                                        </label>
+                                        <select
+                                            value={shipmentForm.data.shipment_status}
+                                            onChange={(event) => shipmentForm.setData('shipment_status', event.target.value)}
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                        >
+                                            {order.shipment_status_options.map((status) => (
+                                                <option key={status} value={status}>
+                                                    {shipmentStatusLabel(status)}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <InputError message={shipmentForm.errors.shipment_status} />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={shipmentForm.processing}
+                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
+                                    >
+                                        {shipmentForm.processing ? 'Saving...' : 'Save shipment status'}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
 
                         {order.can_manage_offline && (
                             <form

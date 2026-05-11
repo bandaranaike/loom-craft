@@ -19,21 +19,21 @@ it('prevents customers from viewing another customers order page', function () {
         ->assertForbidden();
 });
 
-it('allows admins to update order statuses including shipped', function () {
+it('allows admins to update order statuses through the business-state workflow', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $order = createManagedOrder();
 
     $this->actingAs($admin)
         ->from(route('admin.orders.show', ['order' => $order->id]))
         ->patch(route('admin.orders.status.update', ['order' => $order->id]), [
-            'order_status' => 'shipped',
+            'order_status' => 'confirmed',
         ])
         ->assertRedirect(route('admin.orders.show', ['order' => $order->id]))
         ->assertSessionHas('status', 'Order status updated.');
 
     $this->assertDatabaseHas('orders', [
         'id' => $order->id,
-        'status' => 'shipped',
+        'status' => 'confirmed',
     ]);
 });
 
@@ -48,10 +48,10 @@ it('redirects admins from the customer orders route to the admin orders route', 
 it('lists all orders for admins and supports filtering by status', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $pendingOrder = createManagedOrder();
-    $deliveredOrder = createManagedOrder();
+    $fulfilledOrder = createManagedOrder();
 
     $pendingOrder->update(['status' => 'pending']);
-    $deliveredOrder->update(['status' => 'delivered']);
+    $fulfilledOrder->update(['status' => 'fulfilled']);
 
     $this->actingAs($admin)
         ->get(route('admin.orders.index'))
@@ -60,18 +60,18 @@ it('lists all orders for admins and supports filtering by status', function () {
             ->component('admin/orders/index')
             ->has('orders', 2)
             ->where('selected_status', null)
-            ->where('status_options', ['pending', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'])
+            ->where('status_options', ['pending', 'paid', 'confirmed', 'fulfilled', 'closed', 'cancelled'])
         );
 
     $this->actingAs($admin)
-        ->get(route('admin.orders.index', ['status' => 'delivered']))
+        ->get(route('admin.orders.index', ['status' => 'fulfilled']))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/orders/index')
             ->has('orders', 1)
-            ->where('orders.0.id', $deliveredOrder->id)
-            ->where('orders.0.status', 'delivered')
-            ->where('selected_status', 'delivered')
+            ->where('orders.0.id', $fulfilledOrder->id)
+            ->where('orders.0.status', 'fulfilled')
+            ->where('selected_status', 'fulfilled')
         );
 });
 
@@ -127,7 +127,8 @@ it('shows mixed vendor orders with the vendors own items highlighted', function 
             ->where('order.id', $order->id)
             ->where('order.items.0.is_vendor_owned', true)
             ->where('order.items.1.is_vendor_owned', false)
-            ->where('order.can_mark_shipped', true)
+            ->where('order.shipment.status', 'pending')
+            ->where('order.shipment_status_options', ['ready_for_packing'])
         );
 });
 
@@ -141,41 +142,36 @@ it('prevents vendors from viewing unrelated orders', function () {
         ->assertForbidden();
 });
 
-it('allows vendors to mark their orders as shipped', function () {
+it('allows vendors to advance their shipment status', function () {
     [$vendorUser, $vendor] = createApprovedVendor();
     $order = createManagedOrder(vendor: $vendor);
+    $shipment = $order->shipments()->firstOrFail();
 
     $this->actingAs($vendorUser)
         ->from(route('vendor.orders.show', ['order' => $order->id]))
-        ->patch(route('vendor.orders.status.update', ['order' => $order->id]), [
-            'order_status' => 'shipped',
+        ->patch(route('vendor.orders.shipments.status.update', ['order' => $order->id, 'shipment' => $shipment->id]), [
+            'shipment_status' => 'ready_for_packing',
         ])
         ->assertRedirect(route('vendor.orders.show', ['order' => $order->id]))
-        ->assertSessionHas('status', 'Order marked as shipped.');
+        ->assertSessionHas('status', 'Shipment status updated.');
 
-    $this->assertDatabaseHas('orders', [
-        'id' => $order->id,
-        'status' => 'shipped',
+    $this->assertDatabaseHas('shipments', [
+        'id' => $shipment->id,
+        'status' => 'ready_for_packing',
     ]);
 });
 
-it('allows vendors to review offline payments for their orders', function () {
+it('does not expose offline payment controls to vendors', function () {
     [$vendorUser, $vendor] = createApprovedVendor();
     $order = createManagedOrder(vendor: $vendor, paymentMethod: 'bank_transfer');
 
     $this->actingAs($vendorUser)
-        ->from(route('vendor.orders.show', ['order' => $order->id]))
-        ->patch(route('vendor.orders.offline.update', ['order' => $order->id]), [
-            'payment_status' => 'paid',
-        ])
-        ->assertRedirect(route('vendor.orders.show', ['order' => $order->id]))
-        ->assertSessionHas('status', 'Offline payment status updated.');
-
-    $this->assertDatabaseHas('payments', [
-        'order_id' => $order->id,
-        'status' => 'paid',
-        'verified_by' => $vendorUser->id,
-    ]);
+        ->get(route('vendor.orders.show', ['order' => $order->id]))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('vendor/orders/show')
+            ->where('order.can_manage_offline', false)
+        );
 });
 
 /**
@@ -271,9 +267,25 @@ function createManagedOrder(
         ],
     ]);
 
+    $order->shipments()->create([
+        'vendor_id' => $vendor->id,
+        'responsibility' => 'platform',
+        'status' => 'pending',
+        'carrier' => 'DHL eCommerce',
+        'service_level' => 'Standard',
+        'tracking_number' => null,
+        'package_count' => 1,
+        'parcel_weight' => null,
+        'weight_unit' => null,
+        'parcel_length' => null,
+        'parcel_width' => null,
+        'parcel_height' => null,
+        'parcel_dimension_unit' => null,
+    ]);
+
     $order->payment()->create([
         'method' => $paymentMethod,
-        'status' => 'pending',
+        'status' => $paymentMethod === 'cod' ? 'collection_pending' : 'pending',
         'amount' => $extraVendor ? '360.00' : '180.00',
         'currency' => 'LKR',
         'original_amount' => $extraVendor ? '360.00' : '180.00',

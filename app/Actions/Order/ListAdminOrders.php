@@ -6,11 +6,16 @@ use App\DTOs\Order\AdminOrderListItem;
 use App\DTOs\Order\AdminOrderListResult;
 use App\DTOs\Order\OrderIndexData;
 use App\Models\Order;
+use App\Services\Fulfillment\FulfillmentStatusService;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
 
 class ListAdminOrders
 {
+    public function __construct(
+        private readonly FulfillmentStatusService $fulfillmentStatusService,
+    ) {}
+
     public function handle(OrderIndexData $data): AdminOrderListResult
     {
         Gate::authorize('viewAny', Order::class);
@@ -51,7 +56,7 @@ class ListAdminOrders
         return new AdminOrderListResult(
             $orders,
             $data->status,
-            OrderIndexData::ORDER_STATUSES,
+            $this->fulfillmentStatusService->orderFilterOptions(),
         );
     }
 }

@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\PaymentStatus;
 use App\Models\Order;
+use App\Services\Fulfillment\FulfillmentStatusService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateOfflineOrderRequest extends FormRequest
 {
@@ -27,8 +30,42 @@ class UpdateOfflineOrderRequest extends FormRequest
 
     public function rules(): array
     {
+        $payment = $this->route('order')?->payment;
+
         return [
-            'payment_status' => ['required', Rule::in(['paid', 'failed'])],
+            'payment_status' => ['required', Rule::in(
+                $payment === null
+                    ? PaymentStatus::values()
+                    : app(FulfillmentStatusService::class)->paymentStatusOptionsFor($payment)
+            )],
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                $order = $this->route('order');
+
+                if (! $order instanceof Order || $validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
+                $payment = $order->payment;
+
+                if ($payment === null) {
+                    return;
+                }
+
+                if (! app(FulfillmentStatusService::class)->canTransitionPayment(
+                    $order,
+                    $payment,
+                    $this->validated('payment_status'),
+                    $this->user(),
+                )) {
+                    $validator->errors()->add('payment_status', 'Select a valid next payment status.');
+                }
+            },
         ];
     }
 

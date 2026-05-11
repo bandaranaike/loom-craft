@@ -96,13 +96,13 @@ it('returns the mobile vendor order detail shape', function () {
         ->assertJsonPath('items.0.currency', 'LKR')
         ->assertJsonPath('items.0.image_url', url('/storage/products/mobile-api-scarf.jpg'))
         ->assertJsonPath('items.0.product_media.0.path', 'products/mobile-api-scarf.jpg')
+        ->assertJsonPath('shipment.status', 'pending')
         ->assertJsonMissingPath('customer')
         ->assertJsonMissingPath('addresses')
         ->assertJsonMissingPath('payment')
         ->assertJsonMissingPath('subtotal')
         ->assertJsonMissingPath('commission_total')
-        ->assertJsonMissingPath('shipping_responsibility')
-        ->assertJsonMissingPath('shipments');
+        ->assertJsonMissingPath('shipping_responsibility');
 });
 
 it('returns the mobile admin order detail shape', function () {
@@ -130,9 +130,9 @@ it('returns the mobile admin order detail shape', function () {
         ->assertJsonPath('items.0.status', $order->status)
         ->assertJsonPath('items.0.currency', 'LKR')
         ->assertJsonPath('items.0.image_url', url('/storage/products/mobile-api-scarf.jpg'))
+        ->assertJsonPath('shipment.status', 'pending')
         ->assertJsonMissingPath('customer')
         ->assertJsonMissingPath('payment')
-        ->assertJsonMissingPath('shipments')
         ->assertJsonMissingPath('subtotal')
         ->assertJsonMissingPath('commission_total')
         ->assertJsonMissingPath('shipping_responsibility');
@@ -145,41 +145,43 @@ it('allows admins to update order statuses through the mobile api', function () 
     Sanctum::actingAs($admin, ['orders:update']);
 
     $this->patchJson("/api/v1/orders/{$order->id}/status", [
-        'status' => 'delivered',
+        'status' => 'confirmed',
     ])->assertOk()
-        ->assertJsonPath('order.status', 'delivered');
+        ->assertJsonPath('order.status', 'confirmed');
 
     $this->assertDatabaseHas('orders', [
         'id' => $order->id,
-        'status' => 'delivered',
+        'status' => 'confirmed',
     ]);
 });
 
-it('allows vendors to mark confirmed orders as shipped only', function () {
+it('allows vendors to advance shipment statuses through the mobile api', function () {
     [$vendorUser, $vendor] = createApprovedVendorApiUser();
     $order = createMobileManagedOrder(vendor: $vendor, status: 'confirmed');
+    $shipment = $order->shipments()->firstOrFail();
 
     Sanctum::actingAs($vendorUser, ['orders:update']);
 
-    $this->patchJson("/api/v1/orders/{$order->id}/status", [
-        'status' => 'shipped',
+    $this->patchJson("/api/v1/orders/{$order->id}/shipments/{$shipment->id}/status", [
+        'status' => 'ready_for_packing',
     ])->assertOk()
-        ->assertJsonPath('order.status', 'shipped');
+        ->assertJsonPath('shipment.status', 'ready_for_packing');
 
-    $this->assertDatabaseHas('orders', [
-        'id' => $order->id,
-        'status' => 'shipped',
+    $this->assertDatabaseHas('shipments', [
+        'id' => $shipment->id,
+        'status' => 'ready_for_packing',
     ]);
 });
 
-it('rejects vendor status updates from unsupported starting states', function () {
+it('rejects vendor shipment updates from unsupported starting states', function () {
     [$vendorUser, $vendor] = createApprovedVendorApiUser();
     $order = createMobileManagedOrder(vendor: $vendor, status: 'pending');
+    $shipment = $order->shipments()->firstOrFail();
 
     Sanctum::actingAs($vendorUser, ['orders:update']);
 
-    $this->patchJson("/api/v1/orders/{$order->id}/status", [
-        'status' => 'shipped',
+    $this->patchJson("/api/v1/orders/{$order->id}/shipments/{$shipment->id}/status", [
+        'status' => 'ready_for_packing',
     ])->assertUnprocessable()
         ->assertJsonValidationErrors('status');
 });

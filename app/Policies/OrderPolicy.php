@@ -57,12 +57,7 @@ class OrderPolicy
 
     public function updateStatus(User $user, Order $order): bool
     {
-        if ($user->role === 'admin') {
-            return true;
-        }
-
-        return $this->hasApprovedVendorProfile($user)
-            && $this->vendorOwnsOrder($user, $order);
+        return $user->role === 'admin';
     }
 
     public function delete(User $user, Order $order): bool
@@ -76,12 +71,7 @@ class OrderPolicy
             return false;
         }
 
-        if ($user->role === 'admin') {
-            return true;
-        }
-
-        return $this->hasApprovedVendorProfile($user)
-            && $this->vendorOwnsOrder($user, $order);
+        return $user->role === 'admin';
     }
 
     private function hasApprovedVendorProfile(User $user): bool
