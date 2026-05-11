@@ -1,7 +1,6 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import {
-    updateShipmentStatus as vendorOrderUpdateShipmentStatus,
-} from '@/actions/App/Http/Controllers/Vendor/OrderController';
+import { useEffect, useEffectEvent } from 'react';
+import { updateShipmentStatus as vendorOrderUpdateShipmentStatus } from '@/actions/App/Http/Controllers/Vendor/OrderController';
 import InputError from '@/components/input-error';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
@@ -97,6 +96,15 @@ export default function VendorOrderShow() {
     const billing = order.addresses.find((address) => address.type === 'billing');
     const proofIsImage = order.payment_proof?.mime_type.startsWith('image/') ?? false;
 
+    const resetShipmentFormFromOrder = useEffectEvent(() => {
+        shipForm.setData('shipment_status', order.shipment_status_options[0] ?? order.shipment?.status ?? 'pending');
+        shipForm.clearErrors();
+    });
+
+    useEffect(() => {
+        resetShipmentFormFromOrder();
+    }, [order.shipment?.status, order.shipment_status_options]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Vendor Order ${order.public_id ?? `#${order.id}`}`} />
@@ -104,20 +112,14 @@ export default function VendorOrderShow() {
                 <div className="rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-1) p-7 shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]">
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="min-w-0 space-y-2">
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Vendor fulfillment view
-                            </p>
-                            <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">
-                                {order.public_id ?? `Order #${order.id}`}
-                            </h2>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Vendor fulfillment view</p>
+                            <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">{order.public_id ?? `Order #${order.id}`}</h2>
                             <p className="text-sm text-(--welcome-body-text)">
                                 {order.customer_name ?? 'Guest customer'} • {order.customer_email ?? 'No email'}
                             </p>
                         </div>
                         <div className="min-w-0 md:text-right">
-                            <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">
-                                {formatMoney(order.total, order.currency)}
-                            </p>
+                            <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">{formatMoney(order.total, order.currency)}</p>
                             <p className="text-sm text-(--welcome-body-text)">
                                 {order.payment_method} • {order.payment_status} • {order.status}
                             </p>
@@ -128,9 +130,7 @@ export default function VendorOrderShow() {
                 <div className="grid min-w-0 gap-6 xl:grid-cols-[1.15fr_0.85fr]">
                     <div className="min-w-0 space-y-6">
                         <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Order items
-                            </p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Order items</p>
                             <p className="mt-2 text-sm text-(--welcome-body-text)">
                                 Your products stay vivid. Other vendors&apos; products remain visible with muted styling for context.
                             </p>
@@ -147,22 +147,14 @@ export default function VendorOrderShow() {
                                         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                                             <div className="min-w-0">
                                                 <p className="font-semibold">{item.product_name}</p>
-                                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                                    {item.vendor_slug ? (
-                                                        <Link href={vendorShow(item.vendor_slug)}>
-                                                            {item.vendor_name}
-                                                        </Link>
-                                                    ) : (
-                                                        item.vendor_name
-                                                    )}
+                                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                    {item.vendor_slug ? <Link href={vendorShow(item.vendor_slug)}>{item.vendor_name}</Link> : item.vendor_name}
                                                 </p>
                                             </div>
                                             <div className="text-sm text-(--welcome-body-text)">
                                                 {item.quantity} × {formatMoney(item.unit_price, order.currency)}
                                             </div>
-                                            <div className="font-semibold">
-                                                {formatMoney(item.line_total, order.currency)}
-                                            </div>
+                                            <div className="font-semibold">{formatMoney(item.line_total, order.currency)}</div>
                                         </div>
                                     </div>
                                 ))}
@@ -172,9 +164,7 @@ export default function VendorOrderShow() {
                         <div className="grid gap-4 md:grid-cols-2">
                             {shipping && (
                                 <div className="rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Shipping address
-                                    </p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Shipping address</p>
                                     <p className="mt-3 text-sm font-semibold">{shipping.full_name}</p>
                                     <p className="text-sm text-(--welcome-body-text)">
                                         {shipping.line1}
@@ -189,9 +179,7 @@ export default function VendorOrderShow() {
                             )}
                             {billing && (
                                 <div className="rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Billing address
-                                    </p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Billing address</p>
                                     <p className="mt-3 text-sm font-semibold">{billing.full_name}</p>
                                     <p className="text-sm text-(--welcome-body-text)">
                                         {billing.line1}
@@ -209,9 +197,7 @@ export default function VendorOrderShow() {
 
                     <div className="min-w-0 space-y-6">
                         <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Order summary
-                            </p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Order summary</p>
                             <div className="mt-4 space-y-3 text-sm">
                                 <div className="flex items-center justify-between">
                                     <span className="text-(--welcome-body-text)">Subtotal</span>
@@ -236,22 +222,22 @@ export default function VendorOrderShow() {
                             <form
                                 onSubmit={(event) => {
                                     event.preventDefault();
-                                    shipForm.patch(vendorOrderUpdateShipmentStatus(order.id, order.shipment!.id).url, {
-                                        preserveScroll: true,
-                                    });
+                                    shipForm.patch(
+                                        vendorOrderUpdateShipmentStatus({
+                                            order: order.id,
+                                            shipment: order.shipment!.id,
+                                        }).url,
+                                        {
+                                            preserveScroll: true,
+                                        },
+                                    );
                                 }}
                                 className="rounded-[28px] border border-amber-200 bg-amber-50 p-6"
                             >
-                                <p className="text-xs uppercase tracking-[0.3em] text-amber-800">
-                                    Shipment workflow
-                                </p>
-                                <p className="mt-3 text-sm text-amber-900">
-                                    Move your shipment forward as packing work is completed.
-                                </p>
+                                <p className="text-xs tracking-[0.3em] text-amber-800 uppercase">Shipment workflow</p>
+                                <p className="mt-3 text-sm text-amber-900">Move your shipment forward as packing work is completed.</p>
                                 <div className="mt-4 space-y-2">
-                                    <p className="text-sm text-amber-950">
-                                        Shipment {order.shipment.shipment_number ?? `#${order.shipment.id}`}
-                                    </p>
+                                    <p className="text-sm text-amber-950">Shipment {order.shipment.shipment_number ?? `#${order.shipment.id}`}</p>
                                     <p className="text-sm text-amber-900">
                                         Current status: <span className="font-semibold">{shipmentStatusLabel(order.shipment.status)}</span>
                                     </p>
@@ -273,7 +259,7 @@ export default function VendorOrderShow() {
                                 <button
                                     type="submit"
                                     disabled={shipForm.processing}
-                                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-amber-900 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-amber-900 transition hover:bg-amber-900 hover:text-amber-50 disabled:opacity-70"
+                                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-amber-900 px-4 py-3 text-xs font-semibold tracking-[0.3em] text-amber-900 uppercase transition hover:bg-amber-900 hover:text-amber-50 disabled:opacity-70"
                                 >
                                     {shipForm.processing ? 'Saving...' : 'Save shipment status'}
                                 </button>
@@ -282,22 +268,13 @@ export default function VendorOrderShow() {
 
                         {order.payment_method === 'bank_transfer' && (
                             <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                    Final bank transfer slip
-                                </p>
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Final bank transfer slip</p>
                                 {order.payment_proof ? (
                                     <div className="mt-4 space-y-3">
-                                        <a
-                                            href={order.payment_proof.url}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="inline-flex text-sm text-(--welcome-strong) underline"
-                                        >
+                                        <a href={order.payment_proof.url} target="_blank" rel="noreferrer" className="inline-flex text-sm text-(--welcome-strong) underline">
                                             {order.payment_proof.original_name}
                                         </a>
-                                        <p className="text-xs text-(--welcome-body-text)">
-                                            Uploaded {order.payment_proof.uploaded_at ?? 'recently'}
-                                        </p>
+                                        <p className="text-xs text-(--welcome-body-text)">Uploaded {order.payment_proof.uploaded_at ?? 'recently'}</p>
                                         {proofIsImage && (
                                             <img
                                                 src={order.payment_proof.url}
@@ -307,9 +284,7 @@ export default function VendorOrderShow() {
                                         )}
                                     </div>
                                 ) : (
-                                    <p className="mt-4 text-sm text-(--welcome-body-text)">
-                                        No bank transfer slip uploaded yet.
-                                    </p>
+                                    <p className="mt-4 text-sm text-(--welcome-body-text)">No bank transfer slip uploaded yet.</p>
                                 )}
                             </div>
                         )}

@@ -1,9 +1,11 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { useEffect, useEffectEvent } from 'react';
 import { index as adminOrdersIndex } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import {
     destroy as adminOrderDestroy,
     updateOffline as adminOrderUpdateOffline,
     updateShipmentStatus as adminOrderUpdateShipmentStatus,
+    updateShipmentTracking as adminOrderUpdateShipmentTracking,
     updateStatus as adminOrderUpdateStatus,
 } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import InputError from '@/components/input-error';
@@ -156,11 +158,44 @@ export default function AdminOrderShow() {
     const shipmentForm = useForm({
         shipment_status: order.shipment_status_options[0] ?? order.shipment?.status ?? 'pending',
     });
+    const trackingForm = useForm({
+        carrier: order.shipment?.carrier ?? '',
+        service_level: order.shipment?.service_level ?? '',
+        tracking_number: order.shipment?.tracking_number ?? '',
+    });
     const deleteForm = useForm({});
 
     const shipping = order.addresses.find((address) => address.type === 'shipping');
     const billing = order.addresses.find((address) => address.type === 'billing');
     const proofIsImage = order.payment_proof?.mime_type.startsWith('image/') ?? false;
+
+    const resetFormsFromOrder = useEffectEvent(() => {
+        statusForm.setData('order_status', order.order_status_options[0] ?? order.status);
+        shipmentForm.setData('shipment_status', order.shipment_status_options[0] ?? order.shipment?.status ?? 'pending');
+        form.setData('payment_status', order.payment_status);
+        trackingForm.setData({
+            carrier: order.shipment?.carrier ?? '',
+            service_level: order.shipment?.service_level ?? '',
+            tracking_number: order.shipment?.tracking_number ?? '',
+        });
+        statusForm.clearErrors();
+        shipmentForm.clearErrors();
+        form.clearErrors();
+        trackingForm.clearErrors();
+    });
+
+    useEffect(() => {
+        resetFormsFromOrder();
+    }, [
+        order.order_status_options,
+        order.payment_status,
+        order.shipment?.carrier,
+        order.shipment?.service_level,
+        order.shipment?.status,
+        order.shipment?.tracking_number,
+        order.shipment_status_options,
+        order.status,
+    ]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -169,23 +204,15 @@ export default function AdminOrderShow() {
                 <div className="rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-1) p-7 shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]">
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="min-w-0 space-y-2">
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Admin review
-                            </p>
-                            <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">
-                                Order #{order.id}
-                            </h2>
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Public reference {order.public_id ?? 'Pending'}
-                            </p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Admin review</p>
+                            <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">Order #{order.id}</h2>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Public reference {order.public_id ?? 'Pending'}</p>
                             <p className="text-sm text-(--welcome-body-text)">
                                 {order.customer_name ?? 'Guest customer'} • {order.customer_email ?? 'No email'}
                             </p>
                         </div>
                         <div className="min-w-0 md:text-right">
-                            <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">
-                                {formatMoney(order.total, order.currency)}
-                            </p>
+                            <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">{formatMoney(order.total, order.currency)}</p>
                             <p className="text-sm text-(--welcome-body-text)">
                                 {order.payment_method} • {order.payment_status}
                             </p>
@@ -196,31 +223,21 @@ export default function AdminOrderShow() {
                 <div className="grid min-w-0 gap-6 xl:grid-cols-[1.15fr_0.85fr]">
                     <div className="min-w-0 space-y-6">
                         <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Items
-                            </p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Items</p>
                             <div className="mt-4 space-y-4">
                                 {order.items.map((item) => (
                                     <div key={item.id} className="rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-1) p-4">
                                         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                                             <div className="min-w-0">
                                                 <p className="font-semibold">{item.product_name}</p>
-                                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                                    {item.vendor_slug ? (
-                                                        <Link href={vendorShow(item.vendor_slug)}>
-                                                            {item.vendor_name}
-                                                        </Link>
-                                                    ) : (
-                                                        item.vendor_name
-                                                    )}
+                                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                    {item.vendor_slug ? <Link href={vendorShow(item.vendor_slug)}>{item.vendor_name}</Link> : item.vendor_name}
                                                 </p>
                                             </div>
                                             <div className="text-sm text-(--welcome-body-text)">
                                                 {item.quantity} × {formatMoney(item.unit_price, order.currency)}
                                             </div>
-                                            <div className="font-semibold">
-                                                {formatMoney(item.line_total, order.currency)}
-                                            </div>
+                                            <div className="font-semibold">{formatMoney(item.line_total, order.currency)}</div>
                                         </div>
                                     </div>
                                 ))}
@@ -230,9 +247,7 @@ export default function AdminOrderShow() {
                         <div className="grid gap-4 md:grid-cols-2">
                             {shipping && (
                                 <div className="rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Shipping address
-                                    </p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Shipping address</p>
                                     <p className="mt-3 text-sm font-semibold">{shipping.full_name}</p>
                                     <p className="text-sm text-(--welcome-body-text)">
                                         {shipping.line1}
@@ -247,9 +262,7 @@ export default function AdminOrderShow() {
                             )}
                             {billing && (
                                 <div className="rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Billing address
-                                    </p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Billing address</p>
                                     <p className="mt-3 text-sm font-semibold">{billing.full_name}</p>
                                     <p className="text-sm text-(--welcome-body-text)">
                                         {billing.line1}
@@ -267,9 +280,7 @@ export default function AdminOrderShow() {
 
                     <div className="min-w-0 space-y-6">
                         <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                Order summary
-                            </p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Order summary</p>
                             <div className="mt-4 space-y-3 text-sm">
                                 {order.shipment && (
                                     <>
@@ -280,6 +291,14 @@ export default function AdminOrderShow() {
                                         <div className="flex items-center justify-between">
                                             <span className="text-(--welcome-body-text)">Shipment status</span>
                                             <span>{shipmentStatusLabel(order.shipment.status)}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="text-(--welcome-body-text)">Carrier</span>
+                                            <span className="text-right">{order.shipment.carrier ?? 'Not assigned'}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="text-(--welcome-body-text)">Tracking</span>
+                                            <span className="text-right">{order.shipment.tracking_number ?? 'Not assigned'}</span>
                                         </div>
                                     </>
                                 )}
@@ -312,14 +331,10 @@ export default function AdminOrderShow() {
                                 }}
                                 className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
                             >
-                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                    Order status
-                                </p>
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Order status</p>
                                 <div className="mt-4 space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                            Next order status
-                                        </label>
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Next order status</label>
                                         <select
                                             value={statusForm.data.order_status}
                                             onChange={(event) => statusForm.setData('order_status', event.target.value)}
@@ -336,7 +351,7 @@ export default function AdminOrderShow() {
                                     <button
                                         type="submit"
                                         disabled={statusForm.processing}
-                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
+                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
                                     >
                                         {statusForm.processing ? 'Saving...' : 'Save order status'}
                                     </button>
@@ -349,15 +364,16 @@ export default function AdminOrderShow() {
                                 onSubmit={(event) => {
                                     event.preventDefault();
                                     shipmentForm.patch(
-                                        adminOrderUpdateShipmentStatus(order.id, order.shipment!.id).url,
+                                        adminOrderUpdateShipmentStatus({
+                                            order: order.id,
+                                            shipment: order.shipment!.id,
+                                        }).url,
                                         { preserveScroll: true },
                                     );
                                 }}
                                 className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
                             >
-                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                    Shipment workflow
-                                </p>
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Shipment workflow</p>
                                 <div className="mt-4 space-y-2 text-sm text-(--welcome-body-text)">
                                     <p>Shipment {order.shipment.shipment_number ?? `#${order.shipment.id}`}</p>
                                     <p>
@@ -366,9 +382,7 @@ export default function AdminOrderShow() {
                                 </div>
                                 <div className="mt-4 space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                            Next shipment status
-                                        </label>
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Next shipment status</label>
                                         <select
                                             value={shipmentForm.data.shipment_status}
                                             onChange={(event) => shipmentForm.setData('shipment_status', event.target.value)}
@@ -385,9 +399,67 @@ export default function AdminOrderShow() {
                                     <button
                                         type="submit"
                                         disabled={shipmentForm.processing}
-                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
+                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
                                     >
                                         {shipmentForm.processing ? 'Saving...' : 'Save shipment status'}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+
+                        {order.shipment && (
+                            <form
+                                onSubmit={(event) => {
+                                    event.preventDefault();
+                                    trackingForm.patch(
+                                        adminOrderUpdateShipmentTracking({
+                                            order: order.id,
+                                            shipment: order.shipment!.id,
+                                        }).url,
+                                        { preserveScroll: true },
+                                    );
+                                }}
+                                className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
+                            >
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Courier tracking</p>
+                                <p className="mt-3 text-sm text-(--welcome-body-text)">Assign the real courier reference before dispatching the parcel.</p>
+                                <div className="mt-4 space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Carrier</label>
+                                        <input
+                                            value={trackingForm.data.carrier}
+                                            onChange={(event) => trackingForm.setData('carrier', event.target.value)}
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                            placeholder="DHL eCommerce"
+                                        />
+                                        <InputError message={trackingForm.errors.carrier} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Service level</label>
+                                        <input
+                                            value={trackingForm.data.service_level}
+                                            onChange={(event) => trackingForm.setData('service_level', event.target.value)}
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                            placeholder="Standard"
+                                        />
+                                        <InputError message={trackingForm.errors.service_level} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Tracking number / AWB</label>
+                                        <input
+                                            value={trackingForm.data.tracking_number}
+                                            onChange={(event) => trackingForm.setData('tracking_number', event.target.value)}
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                            placeholder="7734567890"
+                                        />
+                                        <InputError message={trackingForm.errors.tracking_number} />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={trackingForm.processing}
+                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
+                                    >
+                                        {trackingForm.processing ? 'Saving...' : 'Save tracking'}
                                     </button>
                                 </div>
                             </form>
@@ -403,14 +475,10 @@ export default function AdminOrderShow() {
                                 }}
                                 className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
                             >
-                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                    Offline review
-                                </p>
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Offline review</p>
                                 <div className="mt-4 space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                            Payment status
-                                        </label>
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Payment status</label>
                                         <select
                                             value={form.data.payment_status}
                                             onChange={(event) => form.setData('payment_status', event.target.value)}
@@ -427,7 +495,7 @@ export default function AdminOrderShow() {
                                     <button
                                         type="submit"
                                         disabled={form.processing}
-                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
+                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
                                     >
                                         {form.processing ? 'Saving...' : 'Save payment review'}
                                     </button>
@@ -437,16 +505,14 @@ export default function AdminOrderShow() {
 
                         {order.can_delete && (
                             <div className="rounded-[28px] border border-rose-200 bg-rose-50 p-6">
-                                <p className="text-xs uppercase tracking-[0.3em] text-rose-700">
-                                    Soft delete
-                                </p>
+                                <p className="text-xs tracking-[0.3em] text-rose-700 uppercase">Soft delete</p>
                                 <p className="mt-3 text-sm text-rose-900">
                                     This removes the order from standard admin, vendor, and customer views without permanently erasing the row.
                                 </p>
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        if (! window.confirm('Soft delete this order?')) {
+                                        if (!window.confirm('Soft delete this order?')) {
                                             return;
                                         }
 
@@ -455,7 +521,7 @@ export default function AdminOrderShow() {
                                         });
                                     }}
                                     disabled={deleteForm.processing}
-                                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-rose-700 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-rose-700 transition hover:bg-rose-700 hover:text-rose-50 disabled:opacity-70"
+                                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-rose-700 px-4 py-3 text-xs font-semibold tracking-[0.3em] text-rose-700 uppercase transition hover:bg-rose-700 hover:text-rose-50 disabled:opacity-70"
                                 >
                                     {deleteForm.processing ? 'Deleting...' : 'Soft delete order'}
                                 </button>
@@ -464,22 +530,13 @@ export default function AdminOrderShow() {
 
                         {order.can_manage_offline && (
                             <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                                <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                    {paymentProofHeading(order.payment_method)}
-                                </p>
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{paymentProofHeading(order.payment_method)}</p>
                                 {order.payment_proof ? (
                                     <div className="mt-4 space-y-3">
-                                        <a
-                                            href={order.payment_proof.url}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="inline-flex text-sm text-(--welcome-strong) underline"
-                                        >
+                                        <a href={order.payment_proof.url} target="_blank" rel="noreferrer" className="inline-flex text-sm text-(--welcome-strong) underline">
                                             {order.payment_proof.original_name}
                                         </a>
-                                        <p className="text-xs text-(--welcome-body-text)">
-                                            Uploaded {order.payment_proof.uploaded_at ?? 'recently'}
-                                        </p>
+                                        <p className="text-xs text-(--welcome-body-text)">Uploaded {order.payment_proof.uploaded_at ?? 'recently'}</p>
                                         {proofIsImage && (
                                             <img
                                                 src={order.payment_proof.url}
@@ -489,9 +546,7 @@ export default function AdminOrderShow() {
                                         )}
                                     </div>
                                 ) : (
-                                    <p className="mt-4 text-sm text-(--welcome-body-text)">
-                                        {paymentProofEmptyState(order.payment_method)}
-                                    </p>
+                                    <p className="mt-4 text-sm text-(--welcome-body-text)">{paymentProofEmptyState(order.payment_method)}</p>
                                 )}
                             </div>
                         )}

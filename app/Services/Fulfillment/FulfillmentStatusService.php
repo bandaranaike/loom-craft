@@ -130,7 +130,11 @@ class FulfillmentStatusService
 
     public function canTransitionShipment(Order $order, Shipment $shipment, string $nextStatus, User $actor): bool
     {
-        return in_array($nextStatus, $this->allowedNextShipmentStatuses($order, $shipment, $actor), true);
+        if (! in_array($nextStatus, $this->allowedNextShipmentStatuses($order, $shipment, $actor), true)) {
+            return false;
+        }
+
+        return ! ($nextStatus === ShipmentStatus::Dispatched->value && ! $this->shipmentHasTracking($shipment));
     }
 
     public function canTransitionPayment(Order $order, Payment $payment, string $nextStatus, User $actor): bool
@@ -273,6 +277,36 @@ class FulfillmentStatusService
         }
     }
 
+    public function updateShipmentTracking(
+        Order $order,
+        Shipment $shipment,
+        User $actor,
+        string $carrier,
+        string $trackingNumber,
+        ?string $serviceLevel = null,
+    ): void {
+        if ($actor->role !== 'admin' || $shipment->order_id !== $order->id) {
+            throw new InvalidArgumentException('The requested shipment tracking update is not allowed.');
+        }
+
+        $shipment->update([
+            'carrier' => $carrier,
+            'service_level' => $serviceLevel,
+            'tracking_number' => $trackingNumber,
+        ]);
+
+        $this->recordHistory(
+            order: $order,
+            shipment: $shipment,
+            domain: FulfillmentStatusDomain::Shipment,
+            actor: $actor,
+            fromStatus: $shipment->status,
+            toStatus: $shipment->status,
+            reason: 'tracking_updated',
+            note: sprintf('Tracking number %s assigned to %s.', $trackingNumber, $carrier),
+        );
+    }
+
     private function shipmentHasReachedDispatch(Order $order): bool
     {
         return $order->shipments()
@@ -284,6 +318,14 @@ class FulfillmentStatusService
                 ShipmentStatus::ReturnToSender->value,
                 ShipmentStatus::Returned->value,
             ])->exists();
+    }
+
+    private function shipmentHasTracking(Shipment $shipment): bool
+    {
+        return is_string($shipment->carrier)
+            && $shipment->carrier !== ''
+            && is_string($shipment->tracking_number)
+            && $shipment->tracking_number !== '';
     }
 
     private function resolveOrderStatus(string $status): OrderStatus

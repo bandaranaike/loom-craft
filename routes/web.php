@@ -174,6 +174,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.orders.status.update');
         Route::patch('orders/{order}/shipments/{shipment}/status', [AdminOrderController::class, 'updateShipmentStatus'])
             ->name('admin.orders.shipments.status.update');
+        Route::patch('orders/{order}/shipments/{shipment}/tracking', [AdminOrderController::class, 'updateShipmentTracking'])
+            ->name('admin.orders.shipments.tracking.update');
         Route::patch('orders/{order}/offline', [AdminOrderController::class, 'updateOffline'])
             ->name('admin.orders.offline.update');
         Route::delete('orders/{order}', [AdminOrderController::class, 'destroy'])

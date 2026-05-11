@@ -96,6 +96,7 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Implemented automatic initial shipment creation during order placement.
 - Extended the sticker payload contract so label/PDF work can consume the new identifiers and parcel fields.
 - Added focused Pest coverage for schema presence, identifier generation, invoice creation, shipment numbering, and sticker payload exposure.
+- Added admin courier tracking assignment with immutable fulfillment history and dispatch guarded until carrier/tracking data exists.
 
 ## Completed So Far
 
@@ -129,10 +130,16 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
   - parcel metrics
   - product dimensions from the catalog
 
+### Shipment Tracking Assignment
+
+- Admin web users can assign carrier, service level, and courier tracking/AWB to a shipment.
+- Tracking assignment records an immutable `fulfillment_status_histories` entry with `reason=tracking_updated`.
+- Shipments cannot transition from `ready_for_dispatch` to `dispatched` until carrier and tracking number are assigned.
+
 ### Documentation And Tests
 
 - Core fulfillment docs were updated to reflect the new numbering and shipment/invoice baseline.
-- Focused Pest coverage was added for s.chema, identifier generation, and sticker payload data.
+- Focused Pest coverage was added for schema, identifier generation, sticker payload data, and tracking-assignment dispatch guards.
 
 ## Remaining Work By Track
 
@@ -154,9 +161,9 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 ### Track 2: Shipment Operations
 
 - Decide whether the current one-shipment-at-placement baseline stays single-package only for phase 1.
-- Add shipment event/history tracking.
+- Add shipment event/history tracking. `fulfillment_status_histories` now captures order, payment, shipment, and tracking-assignment history.
 - Add courier handoff timestamps and operator attribution.
-- Add tracking-number assignment workflow.
+- Add tracking-number assignment workflow. Admin web assignment is implemented; mobile/API tracking assignment remains to be added if required.
 - Add proof-of-delivery fields and evidence handling.
 - Add failed-delivery and delivery-exception reasons.
 
@@ -197,11 +204,10 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ## Suggested Next Slices
 
-1. Shipment status workflow and shipment-event history.
-2. Admin/mobile tracking-number assignment and dispatch confirmation.
-3. Label/PDF generation service using the new identifier and parcel schema.
-4. COD settlement model and admin handling flow.
-5. Returns and complaint domain implementation.
+1. Mobile/API tracking-number assignment if mobile operators need to set AWB values directly.
+2. Label/PDF generation service using the new identifier and parcel schema.
+3. COD settlement model and admin handling flow.
+4. Returns and complaint domain implementation.
 
 ## Recommended Identifier Standards
 

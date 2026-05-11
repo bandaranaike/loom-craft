@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateOfflineOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Http\Requests\Admin\UpdateShipmentStatusRequest;
+use App\Http\Requests\Admin\UpdateShipmentTrackingRequest;
 use App\Models\Order;
 use App\Models\Shipment;
 use App\Services\Fulfillment\FulfillmentStatusService;
@@ -88,6 +89,23 @@ class OrderController extends Controller
         );
 
         return back()->with('status', 'Shipment status updated.');
+    }
+
+    public function updateShipmentTracking(
+        UpdateShipmentTrackingRequest $request,
+        Order $order,
+        Shipment $shipment,
+    ): RedirectResponse {
+        $this->fulfillmentStatusService->updateShipmentTracking(
+            $order,
+            $shipment,
+            $request->user(),
+            $request->validated('carrier'),
+            $request->validated('tracking_number'),
+            $request->validated('service_level'),
+        );
+
+        return back()->with('status', 'Shipment tracking updated.');
     }
 
     public function destroy(Order $order): RedirectResponse
