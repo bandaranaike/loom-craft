@@ -9,6 +9,21 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // 1. Expand enum to include all possible values (old + new)
+        Schema::table('orders', function (Blueprint $table): void {
+            $table->enum('status', [
+                'pending',
+                'paid',
+                'confirmed',
+                'shipped',
+                'delivered',
+                'fulfilled',
+                'closed',
+                'cancelled',
+            ])->default('pending')->change();
+        });
+
+        // 2. Update data
         DB::table('orders')
             ->where('status', 'shipped')
             ->update(['status' => 'confirmed']);
@@ -17,6 +32,7 @@ return new class extends Migration
             ->where('status', 'delivered')
             ->update(['status' => 'fulfilled']);
 
+        // 3. Shrink enum to final desired values
         Schema::table('orders', function (Blueprint $table): void {
             $table->enum('status', [
                 'pending',
@@ -31,6 +47,21 @@ return new class extends Migration
 
     public function down(): void
     {
+        // 1. Expand enum to include all possible values (new + old)
+        Schema::table('orders', function (Blueprint $table): void {
+            $table->enum('status', [
+                'pending',
+                'paid',
+                'confirmed',
+                'shipped',
+                'delivered',
+                'fulfilled',
+                'closed',
+                'cancelled',
+            ])->default('pending')->change();
+        });
+
+        // 2. Revert data
         DB::table('orders')
             ->where('status', 'fulfilled')
             ->update(['status' => 'delivered']);
@@ -39,6 +70,7 @@ return new class extends Migration
             ->where('status', 'closed')
             ->update(['status' => 'delivered']);
 
+        // 3. Revert enum to original values
         Schema::table('orders', function (Blueprint $table): void {
             $table->enum('status', [
                 'pending',
