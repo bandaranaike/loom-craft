@@ -129,6 +129,8 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Added server-rendered shipment label generation for admin web and authenticated mobile/API print flows.
 - Added explicit phase 1 shipment workflow statuses and checkpoint timestamps for vendor preparing, vendor handoff to admin, admin receiving, quality check, packing, dispatch, and delivery.
 - Added admin order-page fulfillment timeline visibility for those checkpoint timestamps.
+- Added Blade-to-PDF 4x6 shipment label downloads for admin web and authenticated mobile/API label access.
+- Added real SVG Code 128 barcodes and SVG QR code generation for the shipment label.
 
 ## Completed So Far
 
@@ -172,14 +174,18 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 - The static `bill.html` concept now has a server-side Blade rendering path backed by live order, invoice, shipment, address, parcel, and product data.
 - Admin web users can open a printable shipment label from the admin order page.
+- Admin web users can download a 4x6 PDF shipment label from the admin order page.
 - Authenticated mobile/API users with `stickers:read` can render the same print-ready shipment label over the API.
-- Native binary PDF generation is now approved for implementation using Blade-to-PDF; current output is still browser-printable HTML that can be saved as PDF by the client.
+- Authenticated mobile/API users with `stickers:read` can download the same 4x6 PDF shipment label over the API.
+- Native binary PDF generation is implemented with Blade-to-PDF, Code 128 barcodes, QR code output, and the PNG assets from `.ai/knowledge/assets/guidelines/bill.html`.
+- PDF rendering requires the PHP GD extension because Dompdf needs it to embed the PNG logo and handling icons from the source label design.
 
 ### Documentation And Tests
 
 - Core fulfillment docs were updated to reflect the new numbering and shipment/invoice baseline.
 - Focused Pest coverage was added for schema, identifier generation, sticker payload data, and tracking-assignment dispatch guards.
 - Focused Pest coverage now verifies the confirmed admin fulfillment checkpoint workflow, invalid skipped transitions, schema support for checkpoint timestamps, and mobile/API compatibility with the updated first vendor status.
+- Focused Pest coverage now verifies HTML label rendering, admin PDF downloads, authenticated mobile/API PDF downloads, barcode/QR output, and sticker-scope authorization.
 
 ## Remaining Work By Track
 
@@ -211,13 +217,17 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ### Track 3: Label And PDF Generation
 
-- Replace the static `bill.html` concept with a server-side label generator. Print-ready HTML label rendering is implemented.
-- Implement Blade-to-PDF generation for the existing label template.
-- Match `.ai/knowledge/assets/guidelines/bill.html` as closely as possible.
-- Target a 4x6 thermal label layout.
-- Add barcode and QR code support.
-- Add downloadable PDF endpoints for admin use. Admin web and authenticated mobile/API HTML label endpoints are already implemented.
-- Decide exactly what the barcode and QR code encode during implementation, with the likely default being shipment/tracking lookup data.
+- Replace the static `bill.html` concept with a server-side label generator. Implemented.
+- Implement Blade-to-PDF generation for the existing label template. Implemented.
+- Match `.ai/knowledge/assets/guidelines/bill.html` as closely as possible. Implemented using the source PNG assets and matching layout/styles.
+- Target a 4x6 thermal label layout. Implemented.
+- Add barcode and QR code support. Implemented with SVG Code 128 barcodes and SVG QR codes.
+- Add downloadable PDF endpoints for admin use. Implemented for admin web and authenticated mobile/API label access.
+- Barcode encoding:
+  - Main barcode encodes the courier tracking/AWB value.
+  - Order barcode encodes the order number.
+  - Invoice barcode encodes the invoice number.
+  - QR code encodes the public order tracking URL when available, otherwise shipment/tracking fallback data.
 
 ### Track 4: Mobile And Admin Fulfillment Actions
 
@@ -248,11 +258,10 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ## Suggested Next Slices
 
-1. Implement Blade-to-PDF 4x6 thermal labels matching `.ai/knowledge/assets/guidelines/bill.html`, including barcode and QR support.
-2. Implement COD settlement/remittance tracking and connect COD settlement to vendor payout eligibility.
-3. Implement returns routed back to admin, using Sri Lanka Post Courier for phase 1 return shipping.
-4. Implement complaint handling with links to shipment, return, refund, replacement, courier claim, or manual resolution.
-5. Revisit mobile app and mobile-only fulfillment actions after the admin web process is stable.
+1. Implement COD settlement/remittance tracking and connect COD settlement to vendor payout eligibility.
+2. Implement returns routed back to admin, using Sri Lanka Post Courier for phase 1 return shipping.
+3. Implement complaint handling with links to shipment, return, refund, replacement, courier claim, or manual resolution.
+4. Revisit mobile app and mobile-only fulfillment actions after the admin web process is stable.
 
 ## Recommended Identifier Standards
 
@@ -384,6 +393,9 @@ Current priority adjustment:
 - 2026-05-12:
   Implemented the first remaining slice:
   explicit shipment statuses for vendor preparing, vendor handoff to admin, admin received, quality checked, packed, ready for dispatch, dispatched, and delivered; shipment checkpoint timestamps; admin order-page timeline visibility; and tests for valid and invalid workflow transitions.
+- 2026-05-12:
+  Implemented the label/PDF slice:
+  added Blade-to-PDF dependencies, 4x6 PDF download endpoints for admin web and authenticated mobile/API label access, SVG Code 128 barcode generation, SVG QR generation, bill.html PNG asset embedding, and focused PDF rendering tests. PHP GD was installed because Dompdf requires it for PNG assets.
 
 ## Test Plan
 

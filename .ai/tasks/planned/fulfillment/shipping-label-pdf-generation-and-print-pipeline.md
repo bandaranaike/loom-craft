@@ -2,9 +2,9 @@
 
 ## Metadata
 
-- Status: planned
+- Status: completed
 - Created: 2026-04-23
-- Updated: 2026-05-08
+- Updated: 2026-05-12
 - Source: user request
 - Priority: high
 
@@ -51,19 +51,32 @@ Define and then implement a proper server-side shipping-document pipeline for Lo
 
 ## Risks Or Open Questions
 
-- Recommended baseline approach: move `bill.html` into a Laravel view or dedicated document template and render with structured shipment data before converting to PDF.
-- Identifier and parcel-data foundations are now in place, so the remaining uncertainty is about rendering approach, caching/versioning, and document-type separation rather than missing core order/shipment keys.
-- It is unclear whether PDFs should be generated on demand every time or cached per shipment version.
-- It is unclear whether documents must be immutable once a shipment is handed to the courier.
-- It is unclear which paper sizes and printers are target devices: A4, 4x6 thermal, or both.
-- It is unclear whether branding-heavy labels and courier-compliant labels are the same document or two separate document types.
-- It is unclear whether order barcode, invoice barcode, and tracking barcode all need machine-readable standards like Code128.
-- It is unclear whether the mobile app needs direct print support or only file download/open behavior.
+- Implemented baseline:
+  - `bill.html` is represented by the Laravel Blade view at `resources/views/fulfillment/shipment-label.blade.php`.
+  - The label uses structured shipment data from `App\Services\Fulfillment\ShipmentLabelDataBuilder`.
+  - PDFs are generated on demand using `barryvdh/laravel-dompdf`.
+  - The phase 1 print size is 4x6 thermal.
+  - Barcode support uses SVG Code 128 output from `picqer/php-barcode-generator`.
+  - QR support uses SVG output from `endroid/qr-code`.
+  - The main tracking barcode encodes the courier tracking/AWB value.
+  - The order barcode encodes the order number.
+  - The invoice barcode encodes the invoice number.
+  - The QR code encodes the public order tracking URL when available, otherwise shipment/tracking fallback data.
+  - Admin web and authenticated mobile/API PDF download endpoints are implemented.
+- Deferred:
+  - Persistent document caching/versioning.
+  - Immutable generated-document records after courier handoff.
+  - Return labels and packing slips as separate document types.
+  - Direct native mobile printer SDK integration.
+- Infrastructure note:
+  - PHP GD is required because Dompdf needs it to embed the PNG logo and handling icons from `.ai/knowledge/assets/guidelines/bill.html`.
 
 ## Test Plan
 
-- No code tests for planning-only work
-- Before implementation, validate required fields against current order, address, product, and shipment data sources
+- `php artisan test --compact tests/Feature/ShipmentLabelRenderingTest.php`
+- `php artisan test --compact tests/Feature/ShipmentLabelRenderingTest.php tests/Feature/ShipmentTrackingAssignmentTest.php tests/Feature/OrderOperationsTest.php tests/Feature/FulfillmentStatusWorkflowTest.php`
+- `pnpm run types`
+- `composer audit`
 
 ## Documentation Updates Required
 
@@ -73,4 +86,6 @@ Define and then implement a proper server-side shipping-document pipeline for Lo
 
 ## Completion Notes
 
-Fill this section only when the task is done.
+Completed on 2026-05-12.
+
+Implemented Blade-to-PDF 4x6 shipment labels matching `.ai/knowledge/assets/guidelines/bill.html` as closely as practical with the existing live order/shipment payload. Added admin web and authenticated mobile/API PDF download endpoints, real SVG barcode/QR generation, and tests for HTML rendering, PDF rendering, and authorization.

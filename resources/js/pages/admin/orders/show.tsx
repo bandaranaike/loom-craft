@@ -498,21 +498,34 @@ export default function AdminOrderShow() {
                             <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                                 <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Print label</p>
                                 <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                    Open the server-rendered shipping label in a print-ready page.
+                                    Open the server-rendered shipping label or download the 4x6 PDF for phone printing.
                                 </p>
-                                <a
-                                    href={
-                                        adminOrderShipmentLabel({
-                                            order: order.id,
-                                            shipment: order.shipment.id,
-                                        }).url
-                                    }
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
-                                >
-                                    Open printable label
-                                </a>
+                                <div className="mt-4 grid gap-3">
+                                    <a
+                                        href={
+                                            adminOrderShipmentLabel({
+                                                order: order.id,
+                                                shipment: order.shipment.id,
+                                            }).url
+                                        }
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                                    >
+                                        Open printable label
+                                    </a>
+                                    <a
+                                        href={
+                                            adminOrderShipmentLabel.download({
+                                                order: order.id,
+                                                shipment: order.shipment.id,
+                                            }).url
+                                        }
+                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) bg-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-on-strong) uppercase transition hover:bg-(--welcome-strong-hover)"
+                                    >
+                                        Download PDF label
+                                    </a>
+                                </div>
                             </div>
                         )}
 

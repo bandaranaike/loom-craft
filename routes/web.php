@@ -179,6 +179,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.orders.shipments.tracking.update');
         Route::get('orders/{order}/shipments/{shipment}/label', AdminOrderShipmentLabelController::class)
             ->name('admin.orders.shipments.label.show');
+        Route::get('orders/{order}/shipments/{shipment}/label.pdf', [AdminOrderShipmentLabelController::class, 'download'])
+            ->name('admin.orders.shipments.label.download');
         Route::patch('orders/{order}/offline', [AdminOrderController::class, 'updateOffline'])
             ->name('admin.orders.offline.update');
         Route::delete('orders/{order}', [AdminOrderController::class, 'destroy'])

@@ -20,5 +20,6 @@ Route::prefix('v1')->group(function (): void {
         Route::post('notifications/register', NotificationRegistrationController::class);
         Route::get('admin/orders/{order}/sticker-data', OrderStickerDataController::class);
         Route::get('admin/orders/{order}/shipments/{shipment}/label', OrderShipmentLabelController::class);
+        Route::get('admin/orders/{order}/shipments/{shipment}/label.pdf', [OrderShipmentLabelController::class, 'download']);
     });
 });

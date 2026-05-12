@@ -9,6 +9,10 @@ use App\Models\Shipment;
 
 class ShipmentLabelDataBuilder
 {
+    public function __construct(
+        private readonly ShipmentLabelCodeGenerator $codeGenerator,
+    ) {}
+
     /**
      * @return array<string, mixed>
      */
@@ -24,13 +28,21 @@ class ShipmentLabelDataBuilder
         $shippingAddress = $order->addresses->firstWhere('type', 'shipping');
         $primaryItem = $order->items->first();
 
+        $orderNumber = $order->order_number ?? $order->public_id ?? sprintf('Order #%d', $order->id);
+        $invoiceNumber = $order->invoice?->invoice_number ?? 'Pending';
+        $shipmentNumber = $shipment->shipment_number ?? sprintf('Shipment #%d', $shipment->id);
+        $trackingNumber = $shipment->tracking_number ?? 'Pending';
+        $trackingPayload = $order->public_id === null
+            ? sprintf('%s | %s', $shipmentNumber, $trackingNumber)
+            : route('orders.show', ['order' => $order->public_id]);
+
         return [
             'document_title' => sprintf('Shipment Label %s', $shipment->shipment_number ?? $shipment->id),
-            'order_number' => $order->order_number ?? $order->public_id ?? sprintf('Order #%d', $order->id),
+            'order_number' => $orderNumber,
             'public_id' => $order->public_id,
-            'invoice_number' => $order->invoice?->invoice_number ?? 'Pending',
-            'shipment_number' => $shipment->shipment_number ?? sprintf('Shipment #%d', $shipment->id),
-            'tracking_number' => $shipment->tracking_number ?? 'Pending',
+            'invoice_number' => $invoiceNumber,
+            'shipment_number' => $shipmentNumber,
+            'tracking_number' => $trackingNumber,
             'carrier' => $shipment->carrier ?? 'Pending',
             'service_level' => $shipment->service_level ?? 'Standard',
             'order_date' => $order->placed_at?->format('d M Y') ?? $order->created_at?->format('d M Y'),
@@ -48,6 +60,14 @@ class ShipmentLabelDataBuilder
                 'quantity' => $item->quantity,
                 'vendor' => $item->vendor?->display_name,
             ])->values()->all(),
+            'codes' => [
+                'tracking_payload' => $trackingPayload,
+                'tracking_barcode' => $this->codeGenerator->barcodeDataUri($trackingNumber, 2.2, 58),
+                'order_barcode' => $this->codeGenerator->barcodeDataUri($orderNumber, 1.2, 36),
+                'invoice_barcode' => $this->codeGenerator->barcodeDataUri($invoiceNumber, 1.2, 36),
+                'tracking_qr' => $this->codeGenerator->qrDataUri($trackingPayload),
+            ],
+            'assets' => $this->assets(),
             'print_generated_at' => now()->format('d M Y H:i'),
         ];
     }
@@ -109,6 +129,25 @@ class ShipmentLabelDataBuilder
             'item_count' => $itemCount,
             'dimensions' => $dimensions === '' ? null : sprintf('%s %s', $dimensions, $product?->dimension_unit ?? 'cm'),
             'vendor' => $item?->vendor?->display_name,
+        ];
+    }
+
+    /**
+     * @return array<string, string|null>
+     */
+    private function assets(): array
+    {
+        $basePath = base_path('.ai/knowledge/assets/guidelines');
+
+        return [
+            'logo' => $this->codeGenerator->imageDataUri($basePath.'/LoomCraftLogo.png')
+                ?? $this->codeGenerator->imageDataUri(public_path('brand/logo-dark.png')),
+            'fragile' => $this->codeGenerator->imageDataUri($basePath.'/fragile.png'),
+            'hand_made' => $this->codeGenerator->imageDataUri($basePath.'/hand-made.png'),
+            'handle_with_care' => $this->codeGenerator->imageDataUri($basePath.'/handle-with-care.png'),
+            'keep_dry' => $this->codeGenerator->imageDataUri($basePath.'/keep-dry.png'),
+            'recycle' => $this->codeGenerator->imageDataUri($basePath.'/recycle.png'),
+            'made_in_sri_lanka' => $this->codeGenerator->imageDataUri($basePath.'/made-in-sri-lanka.png'),
         ];
     }
 }

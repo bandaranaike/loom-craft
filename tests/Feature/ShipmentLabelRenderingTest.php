@@ -24,9 +24,26 @@ it('renders an admin printable shipment label with live order data', function ()
         ->assertSee($shipment->shipment_number, false)
         ->assertSee('7734567890', false)
         ->assertSee('DHL eCommerce', false)
-        ->assertSee('Guest Buyer', false)
+        ->assertSee('GUEST BUYER', false)
         ->assertSee('Handwoven Cotton Area Rug', false)
-        ->assertSee('PRD-LABEL-001', false);
+        ->assertSee('PRD-LABEL-001', false)
+        ->assertSee('data:image/svg+xml;base64', false)
+        ->assertSee('Tracking QR code', false);
+});
+
+it('downloads an admin pdf shipment label', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $order = createShipmentLabelOrder();
+    $shipment = $order->shipments()->firstOrFail();
+
+    $response = $this->actingAs($admin)
+        ->get(route('admin.orders.shipments.label.download', ['order' => $order->id, 'shipment' => $shipment->id]));
+
+    $response->assertOk()
+        ->assertHeader('content-type', 'application/pdf')
+        ->assertHeader('content-disposition', sprintf('attachment; filename=%s-label.pdf', strtolower($shipment->shipment_number)));
+
+    expect($response->getContent())->toStartWith('%PDF');
 });
 
 it('renders the mobile api label for authorized sticker tokens', function () {
@@ -40,6 +57,21 @@ it('renders the mobile api label for authorized sticker tokens', function () {
         ->assertOk()
         ->assertSee($shipment->tracking_number, false)
         ->assertSee('Print', false);
+});
+
+it('downloads the mobile api pdf label for authorized sticker tokens', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $order = createShipmentLabelOrder();
+    $shipment = $order->shipments()->firstOrFail();
+
+    Sanctum::actingAs($admin, ['stickers:read']);
+
+    $response = $this->get("/api/v1/admin/orders/{$order->id}/shipments/{$shipment->id}/label.pdf");
+
+    $response->assertOk()
+        ->assertHeader('content-type', 'application/pdf');
+
+    expect($response->getContent())->toStartWith('%PDF');
 });
 
 it('rejects mobile api label rendering without sticker scope', function () {
