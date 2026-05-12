@@ -4,7 +4,7 @@
 
 - Status: in_progress
 - Created: 2026-04-23
-- Updated: 2026-05-08
+- Updated: 2026-05-12
 - Source: user request
 - Priority: high
 
@@ -32,6 +32,35 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Current state: active umbrella task with foundational fulfillment schema and payload work already implemented.
 - Recommended handling: keep this task as the master tracker while delivering the remaining work in focused slices.
 - Implementation style: complete one operational slice at a time, with tests and knowledge-doc updates after each slice.
+
+## Confirmed Business Decisions
+
+- Courier:
+  - Phase 1 courier is Sri Lanka Post Courier.
+  - Courier tracking/AWB numbers are entered manually by admin users now.
+  - Mobile tracking entry can be ignored for now because the mobile app is deferred.
+  - Courier API synchronization is deferred to a later phase.
+- Label and PDF generation:
+  - Blade-to-PDF generation is approved.
+  - Target print size is a 4x6 thermal label.
+  - The generated output should match `.ai/knowledge/assets/guidelines/bill.html` as closely as possible.
+  - Both barcode and QR code support are required.
+- Mobile app:
+  - Mobile app implementation is deferred for now.
+  - Mobile API expansion should only be implemented where needed to support already-existing authenticated API label access or future compatibility.
+- Order workflow:
+  - Confirmed phase 1 lifecycle:
+    order placed, payment pending/confirmed, vendor preparing, vendor handed to admin, admin received, quality checked, packed, tracking assigned, dispatched, delivered, closed.
+  - This matches the real operational process.
+- COD:
+  - Courier collects cash, courier remits to LoomCraft/admin, and admin marks COD as settled.
+  - Vendor payout depends on COD settlement.
+- Returns:
+  - Customer requests return, admin approves/rejects, parcel returns to admin, admin checks item, admin contacts vendor, then refund/replacement/close.
+  - Return shipping uses the same courier, Sri Lanka Post Courier, in phase 1.
+- Complaints:
+  - Complaint categories include damaged item, wrong item, late delivery, missing item, payment issue, and refund issue.
+  - Complaints may lead to refund, replacement, return, courier claim, or manual resolution.
 
 ## Acceptance Criteria
 
@@ -98,6 +127,8 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Added focused Pest coverage for schema presence, identifier generation, invoice creation, shipment numbering, and sticker payload exposure.
 - Added admin courier tracking assignment with immutable fulfillment history and dispatch guarded until carrier/tracking data exists.
 - Added server-rendered shipment label generation for admin web and authenticated mobile/API print flows.
+- Added explicit phase 1 shipment workflow statuses and checkpoint timestamps for vendor preparing, vendor handoff to admin, admin receiving, quality check, packing, dispatch, and delivery.
+- Added admin order-page fulfillment timeline visibility for those checkpoint timestamps.
 
 ## Completed So Far
 
@@ -142,27 +173,27 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - The static `bill.html` concept now has a server-side Blade rendering path backed by live order, invoice, shipment, address, parcel, and product data.
 - Admin web users can open a printable shipment label from the admin order page.
 - Authenticated mobile/API users with `stickers:read` can render the same print-ready shipment label over the API.
-- Native binary PDF generation remains deferred until a PDF renderer dependency is approved; current output is browser-printable HTML that can be saved as PDF by the client.
+- Native binary PDF generation is now approved for implementation using Blade-to-PDF; current output is still browser-printable HTML that can be saved as PDF by the client.
 
 ### Documentation And Tests
 
 - Core fulfillment docs were updated to reflect the new numbering and shipment/invoice baseline.
 - Focused Pest coverage was added for schema, identifier generation, sticker payload data, and tracking-assignment dispatch guards.
+- Focused Pest coverage now verifies the confirmed admin fulfillment checkpoint workflow, invalid skipped transitions, schema support for checkpoint timestamps, and mobile/API compatibility with the updated first vendor status.
 
 ## Remaining Work By Track
 
 ### Track 1: Fulfillment Workflow And Status Model
 
-- Define the canonical workflow from placed order to delivered/returned/closed.
+- Shipment-side phase 1 lifecycle is now implemented for vendor preparing, vendor handed to admin, admin received, quality checked, packed, tracking assigned, dispatched, delivered, and automatic order fulfillment on delivery.
+- Order-side payment pending/confirmed, fulfilled, closed, and cancelled statuses already exist.
 - Separate order status from shipment status more explicitly. 
 - Define allowed transitions for:
-  - `order`
-  - `payment`
-  - `shipment`
+  - `order` beyond the current pending/paid/confirmed/fulfilled/closed/cancelled baseline
+  - `payment` beyond the current pending/collection_pending/paid/failed/refunded baseline
   - `return`
   - `complaint`
 - Define which actor can perform each transition:
-  - admin web
   - vendor mobile
   - admin mobile
 
@@ -170,26 +201,29 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 - Decide whether the current one-shipment-at-placement baseline stays single-package only for phase 1.
 - Add shipment event/history tracking. `fulfillment_status_histories` now captures order, payment, shipment, and tracking-assignment history.
-- Add courier handoff timestamps and operator attribution.
-- Add tracking-number assignment workflow. Admin web assignment is implemented; mobile/API tracking assignment remains to be added if required.
+- Courier handoff and operational checkpoint timestamps now exist through shipment fields; operator attribution exists through `fulfillment_status_histories`.
+- Admin web tracking-number assignment is implemented.
+- Mobile/API tracking assignment is deferred because mobile app work is currently skipped.
 - Add proof-of-delivery fields and evidence handling.
 - Add failed-delivery and delivery-exception reasons.
+- Model Sri Lanka Post Courier as the phase 1 courier, with manually entered AWB/tracking numbers.
+- Defer courier API synchronization to a later phase.
 
 ### Track 3: Label And PDF Generation
 
 - Replace the static `bill.html` concept with a server-side label generator. Print-ready HTML label rendering is implemented.
-- Define the final print payload contract for:
-  - package label
-  - product sticker / packing detail
-  - invoice or packing slip if needed
-- Add downloadable/printable PDF or HTML endpoints for admin/mobile use. Admin web and authenticated mobile/API HTML label endpoints are implemented.
-- Confirm barcode/QR strategy and final print dimensions.
+- Implement Blade-to-PDF generation for the existing label template.
+- Match `.ai/knowledge/assets/guidelines/bill.html` as closely as possible.
+- Target a 4x6 thermal label layout.
+- Add barcode and QR code support.
+- Add downloadable PDF endpoints for admin use. Admin web and authenticated mobile/API HTML label endpoints are already implemented.
+- Decide exactly what the barcode and QR code encode during implementation, with the likely default being shipment/tracking lookup data.
 
 ### Track 4: Mobile And Admin Fulfillment Actions
 
-- Expand the mobile API beyond read-only sticker payloads.
-- Add safe shipment update actions.
-- Add shipment detail payloads for packing/dispatch.
+- Mobile app implementation is deferred for now.
+- Do not prioritize mobile-only fulfillment actions in the next slice.
+- Keep existing authenticated mobile/API label access working.
 - Add admin web fulfillment screens for:
   - shipment preparation
   - tracking assignment
@@ -198,9 +232,11 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ### Track 5: COD, Returns, And Complaints
 
-- Add COD settlement/remittance tracking.
-- Add return request and reverse-logistics records.
-- Add complaint workflow with links to order/shipment/return/refund/replacement.
+- Add COD settlement/remittance tracking for courier-collected cash.
+- Gate vendor payout eligibility on COD settlement where the order uses COD.
+- Add return request and reverse-logistics records for returns routed back to admin.
+- Support Sri Lanka Post Courier as the return courier for phase 1.
+- Add complaint workflow with links to order/shipment/return/refund/replacement and courier claims.
 - Add resolution and SLA fields.
 
 ### Track 6: Auditability And Multi-Vendor Rules
@@ -212,10 +248,11 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ## Suggested Next Slices
 
-1. Mobile/API tracking-number assignment if mobile operators need to set AWB values directly.
-2. Confirm barcode/QR strategy and decide whether to approve a server-side PDF dependency.
-3. COD settlement model and admin handling flow.
-4. Returns and complaint domain implementation.
+1. Implement Blade-to-PDF 4x6 thermal labels matching `.ai/knowledge/assets/guidelines/bill.html`, including barcode and QR support.
+2. Implement COD settlement/remittance tracking and connect COD settlement to vendor payout eligibility.
+3. Implement returns routed back to admin, using Sri Lanka Post Courier for phase 1 return shipping.
+4. Implement complaint handling with links to shipment, return, refund, replacement, courier claim, or manual resolution.
+5. Revisit mobile app and mobile-only fulfillment actions after the admin web process is stable.
 
 ## Recommended Identifier Standards
 
@@ -262,21 +299,30 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ## Risks Or Open Questions
 
-- It is not yet confirmed whether LoomCraft will support one courier only or multiple couriers with different tracking formats.
-    - Only one courier service for now.
-- It is not yet clear whether vendors need to see only their own items within a multi-vendor order or a vendor-scoped shipment view generated from the master order.
-    - We need to show both.
-    - Multivendor order when preparing the order items
-    - the vendor scoped the shipment view when the order was dispatched
-- COD rules are unclear: whether COD is only a payment method marker or requires settlement tracking against courier remittances.
-    - We need settlement tracking
-- Complaint handling is unclear: whether complaints are only customer-service cases or need operational links to shipment, return, refund, and replacement flows.
-    - need operational links to shipment, return, refund, and replacement flows
-- Reverse logistics is unclear: return to admin only, or in some cases return to vendor.
-    - return to admin. Admin will communicate with the vendor to determine the return flow.
-- Label generation engine is not yet chosen: Blade-to-PDF, headless browser PDF, external document service, or printable HTML rendered by client.
-    - Blade-to-PDF. Downloaded PDFs are printed by the admins' phones.
-- The current order lifecycle may not cleanly distinguish vendor-to-admin inbound movement from admin-to-customer outbound shipment.
+- Courier selection is resolved for phase 1:
+    - Use Sri Lanka Post Courier only.
+    - Admin users enter AWB/tracking numbers manually.
+    - Courier API synchronization is deferred.
+- Multi-vendor visibility is resolved at the business level:
+    - Show multi-vendor order preparation views while preparing order items.
+    - Show vendor-scoped shipment views after dispatch.
+    - Detailed schema/API representation still needs implementation.
+- COD is resolved at the business level:
+    - COD requires settlement tracking against courier remittances.
+    - Vendor payout depends on COD settlement.
+- Complaint handling is resolved at the business level:
+    - Complaints need operational links to shipment, return, refund, replacement, courier claim, and manual resolution flows.
+- Reverse logistics is resolved at the business level:
+    - Returns go back to admin.
+    - Admin communicates with the vendor to decide the final return outcome.
+    - Sri Lanka Post Courier is used for return shipping in phase 1.
+- Label generation is resolved at the business level:
+    - Use Blade-to-PDF.
+    - Target 4x6 thermal labels.
+    - Match `.ai/knowledge/assets/guidelines/bill.html` as closely as possible.
+    - Include both barcode and QR code support.
+- Mobile app implementation is intentionally deferred for now.
+- The current order lifecycle still needs implementation work to cleanly distinguish vendor-to-admin inbound movement from admin-to-customer outbound shipment.
 - Packaging and quality-control checkpoints are still operational concepts and must be mapped into concrete statuses, timestamps, and user actions.
 - Suggested identifier baseline:
     - `orders.public_id`: keep the existing customer-facing opaque `ORD-...` convention for lookup and sharing.
@@ -289,6 +335,7 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Courier tracking numbers are still expected to be assigned later in the fulfillment flow unless courier pre-booking is introduced.
 - Returns may need separate header and item tables plus a return-shipment tracking number, not just a status on `orders`.
 - Complaints may need severity, SLA target, resolution type, and links to refunds, returns, replacements, and courier incidents.
+- Complaint categories to support include damaged item, wrong item, late delivery, missing item, payment issue, and refund issue.
 - Shipment label parcel metrics currently have a data gap:
     - product dimensions exist today
     - shipment/package dimensions now exist at shipment level
@@ -313,6 +360,11 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Courier synchronization and tracking ingestion.
 - Complaint, return, and COD settlement handling.
 
+Current priority adjustment:
+
+- Admin web fulfillment, PDF labels, COD settlement, returns, and complaints should be completed before mobile app implementation.
+- Courier synchronization and tracking ingestion are deferred because Sri Lanka Post Courier tracking is entered manually in phase 1.
+
 3. Suggested additions not yet explicit in older tasks
 
 - Define proof-of-delivery evidence requirements: delivery timestamp, recipient name, courier proof reference, and failed-delivery reason.
@@ -326,6 +378,12 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
   Implemented the fulfillment foundation layer:
   order number, invoice table/number, shipment number, shipment parcel fields, automatic shipment creation on order placement, and richer sticker payload support.
   This task remains open because the operational workflow, courier actions, returns, complaints, and label/PDF pipeline are still pending.
+- 2026-05-12:
+  Confirmed phase 1 business decisions:
+  Sri Lanka Post Courier only, manual AWB/tracking entry, courier API later, Blade-to-PDF approved, 4x6 thermal labels, barcode and QR required, mobile app deferred, COD settlement required before vendor payout, returns route back to admin through the same courier, and complaints may resolve through refund, replacement, return, courier claim, or manual handling.
+- 2026-05-12:
+  Implemented the first remaining slice:
+  explicit shipment statuses for vendor preparing, vendor handoff to admin, admin received, quality checked, packed, ready for dispatch, dispatched, and delivered; shipment checkpoint timestamps; admin order-page timeline visibility; and tests for valid and invalid workflow transitions.
 
 ## Test Plan
 

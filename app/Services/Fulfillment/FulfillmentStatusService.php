@@ -88,9 +88,9 @@ class FulfillmentStatusService
             }
 
             return match ($this->resolveShipmentStatus($shipment->status)) {
-                ShipmentStatus::Pending => [ShipmentStatus::ReadyForPacking->value],
+                ShipmentStatus::Pending => [ShipmentStatus::VendorPreparing->value],
+                ShipmentStatus::VendorPreparing => [ShipmentStatus::VendorHandedToAdmin->value],
                 ShipmentStatus::ReadyForPacking => [ShipmentStatus::Packed->value],
-                ShipmentStatus::Packed => [ShipmentStatus::ReadyForDispatch->value],
                 default => [],
             };
         }
@@ -100,11 +100,20 @@ class FulfillmentStatusService
         }
 
         return match ($this->resolveShipmentStatus($shipment->status)) {
-            ShipmentStatus::Pending => [ShipmentStatus::ReadyForPacking->value],
+            ShipmentStatus::Pending => [ShipmentStatus::VendorPreparing->value],
+            ShipmentStatus::VendorPreparing => [ShipmentStatus::VendorHandedToAdmin->value],
+            ShipmentStatus::VendorHandedToAdmin => [ShipmentStatus::AdminReceived->value],
+            ShipmentStatus::AdminReceived => [ShipmentStatus::QualityChecked->value],
+            ShipmentStatus::QualityChecked => [ShipmentStatus::Packed->value],
             ShipmentStatus::ReadyForPacking => [ShipmentStatus::Packed->value],
             ShipmentStatus::Packed => [ShipmentStatus::ReadyForDispatch->value],
             ShipmentStatus::ReadyForDispatch => [ShipmentStatus::Dispatched->value],
-            ShipmentStatus::Dispatched => [ShipmentStatus::InTransit->value],
+            ShipmentStatus::Dispatched => [
+                ShipmentStatus::InTransit->value,
+                ShipmentStatus::Delivered->value,
+                ShipmentStatus::DeliveryFailed->value,
+                ShipmentStatus::ReturnToSender->value,
+            ],
             ShipmentStatus::InTransit => [
                 ShipmentStatus::Delivered->value,
                 ShipmentStatus::DeliveryFailed->value,
@@ -235,6 +244,26 @@ class FulfillmentStatusService
 
         $fromStatus = $shipment->status;
         $updates = ['status' => $next->value];
+
+        if ($next === ShipmentStatus::VendorPreparing && $shipment->vendor_preparing_at === null) {
+            $updates['vendor_preparing_at'] = now();
+        }
+
+        if ($next === ShipmentStatus::VendorHandedToAdmin && $shipment->vendor_handed_to_admin_at === null) {
+            $updates['vendor_handed_to_admin_at'] = now();
+        }
+
+        if ($next === ShipmentStatus::AdminReceived && $shipment->admin_received_at === null) {
+            $updates['admin_received_at'] = now();
+        }
+
+        if ($next === ShipmentStatus::QualityChecked && $shipment->quality_checked_at === null) {
+            $updates['quality_checked_at'] = now();
+        }
+
+        if ($next === ShipmentStatus::Packed && $shipment->packed_at === null) {
+            $updates['packed_at'] = now();
+        }
 
         if ($next === ShipmentStatus::Dispatched && $shipment->shipped_at === null) {
             $updates['shipped_at'] = now();

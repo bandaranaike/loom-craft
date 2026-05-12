@@ -163,13 +163,13 @@ it('allows vendors to advance shipment statuses through the mobile api', functio
     Sanctum::actingAs($vendorUser, ['orders:update']);
 
     $this->patchJson("/api/v1/orders/{$order->id}/shipments/{$shipment->id}/status", [
-        'status' => 'ready_for_packing',
+        'status' => 'vendor_preparing',
     ])->assertOk()
-        ->assertJsonPath('shipment.status', 'ready_for_packing');
+        ->assertJsonPath('shipment.status', 'vendor_preparing');
 
     $this->assertDatabaseHas('shipments', [
         'id' => $shipment->id,
-        'status' => 'ready_for_packing',
+        'status' => 'vendor_preparing',
     ]);
 });
 
@@ -181,7 +181,7 @@ it('rejects vendor shipment updates from unsupported starting states', function 
     Sanctum::actingAs($vendorUser, ['orders:update']);
 
     $this->patchJson("/api/v1/orders/{$order->id}/shipments/{$shipment->id}/status", [
-        'status' => 'ready_for_packing',
+        'status' => 'vendor_preparing',
     ])->assertUnprocessable()
         ->assertJsonValidationErrors('status');
 });

@@ -5,6 +5,10 @@ namespace App\Enums;
 enum ShipmentStatus: string
 {
     case Pending = 'pending';
+    case VendorPreparing = 'vendor_preparing';
+    case VendorHandedToAdmin = 'vendor_handed_to_admin';
+    case AdminReceived = 'admin_received';
+    case QualityChecked = 'quality_checked';
     case ReadyForPacking = 'ready_for_packing';
     case Packed = 'packed';
     case ReadyForDispatch = 'ready_for_dispatch';
@@ -30,6 +34,10 @@ enum ShipmentStatus: string
     {
         return match ($this) {
             self::Pending => 'Pending',
+            self::VendorPreparing => 'Vendor Preparing',
+            self::VendorHandedToAdmin => 'Vendor Handed To Admin',
+            self::AdminReceived => 'Admin Received',
+            self::QualityChecked => 'Quality Checked',
             self::ReadyForPacking => 'Ready For Packing',
             self::Packed => 'Packed',
             self::ReadyForDispatch => 'Ready For Dispatch',

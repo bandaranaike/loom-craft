@@ -51,6 +51,13 @@ type ShipmentSummary = {
     tracking_number: string | null;
     carrier: string | null;
     service_level: string | null;
+    vendor_preparing_at: string | null;
+    vendor_handed_to_admin_at: string | null;
+    admin_received_at: string | null;
+    quality_checked_at: string | null;
+    packed_at: string | null;
+    shipped_at: string | null;
+    delivered_at: string | null;
 };
 
 type AdminOrderSummary = {
@@ -117,6 +124,16 @@ const shipmentStatusLabel = (status: string) =>
         .split('_')
         .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
         .join(' ');
+
+const shipmentTimeline = (shipment: ShipmentSummary): { label: string; timestamp: string | null }[] => [
+    { label: 'Vendor preparing', timestamp: shipment.vendor_preparing_at },
+    { label: 'Vendor handed to admin', timestamp: shipment.vendor_handed_to_admin_at },
+    { label: 'Admin received', timestamp: shipment.admin_received_at },
+    { label: 'Quality checked', timestamp: shipment.quality_checked_at },
+    { label: 'Packed', timestamp: shipment.packed_at },
+    { label: 'Dispatched', timestamp: shipment.shipped_at },
+    { label: 'Delivered', timestamp: shipment.delivered_at },
+];
 
 const paymentProofHeading = (paymentMethod: string): string => {
     if (paymentMethod === 'bank_transfer') {
@@ -301,6 +318,17 @@ export default function AdminOrderShow() {
                                             <span className="text-(--welcome-body-text)">Tracking</span>
                                             <span className="text-right">{order.shipment.tracking_number ?? 'Not assigned'}</span>
                                         </div>
+                                        <div className="border-t border-(--welcome-border-soft) pt-3">
+                                            <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">Fulfillment timeline</p>
+                                            <div className="mt-3 space-y-2">
+                                                {shipmentTimeline(order.shipment).map(({ label, timestamp }) => (
+                                                    <div key={label} className="flex items-start justify-between gap-4">
+                                                        <span className="text-(--welcome-body-text)">{label}</span>
+                                                        <span className="text-right text-xs">{timestamp ?? 'Pending'}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </>
                                 )}
                                 <div className="flex items-center justify-between">
@@ -423,7 +451,7 @@ export default function AdminOrderShow() {
                                 className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
                             >
                                 <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Courier tracking</p>
-                                <p className="mt-3 text-sm text-(--welcome-body-text)">Assign the real courier reference before dispatching the parcel.</p>
+                                <p className="mt-3 text-sm text-(--welcome-body-text)">Assign the Sri Lanka Post Courier AWB before dispatching the parcel.</p>
                                 <div className="mt-4 space-y-4">
                                     <div className="space-y-2">
                                         <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Carrier</label>
@@ -431,7 +459,7 @@ export default function AdminOrderShow() {
                                             value={trackingForm.data.carrier}
                                             onChange={(event) => trackingForm.setData('carrier', event.target.value)}
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
-                                            placeholder="DHL eCommerce"
+                                            placeholder="Sri Lanka Post Courier"
                                         />
                                         <InputError message={trackingForm.errors.carrier} />
                                     </div>
@@ -451,7 +479,7 @@ export default function AdminOrderShow() {
                                             value={trackingForm.data.tracking_number}
                                             onChange={(event) => trackingForm.setData('tracking_number', event.target.value)}
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
-                                            placeholder="7734567890"
+                                            placeholder="Sri Lanka Post AWB"
                                         />
                                         <InputError message={trackingForm.errors.tracking_number} />
                                     </div>

@@ -43,6 +43,11 @@ it('adds fulfillment identifier and parcel columns', function () {
             'parcel_width',
             'parcel_height',
             'parcel_dimension_unit',
+            'vendor_preparing_at',
+            'vendor_handed_to_admin_at',
+            'admin_received_at',
+            'quality_checked_at',
+            'packed_at',
         ]))->toBeTrue()
         ->and(Schema::hasColumns('invoices', [
             'order_id',

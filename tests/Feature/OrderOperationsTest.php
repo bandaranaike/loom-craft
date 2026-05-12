@@ -128,7 +128,7 @@ it('shows mixed vendor orders with the vendors own items highlighted', function 
             ->where('order.items.0.is_vendor_owned', true)
             ->where('order.items.1.is_vendor_owned', false)
             ->where('order.shipment.status', 'pending')
-            ->where('order.shipment_status_options', ['ready_for_packing'])
+            ->where('order.shipment_status_options', ['vendor_preparing'])
         );
 });
 
@@ -150,14 +150,14 @@ it('allows vendors to advance their shipment status', function () {
     $this->actingAs($vendorUser)
         ->from(route('vendor.orders.show', ['order' => $order->id]))
         ->patch(route('vendor.orders.shipments.status.update', ['order' => $order->id, 'shipment' => $shipment->id]), [
-            'shipment_status' => 'ready_for_packing',
+            'shipment_status' => 'vendor_preparing',
         ])
         ->assertRedirect(route('vendor.orders.show', ['order' => $order->id]))
         ->assertSessionHas('status', 'Shipment status updated.');
 
     $this->assertDatabaseHas('shipments', [
         'id' => $shipment->id,
-        'status' => 'ready_for_packing',
+        'status' => 'vendor_preparing',
     ]);
 });
 
