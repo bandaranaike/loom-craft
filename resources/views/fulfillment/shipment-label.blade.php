@@ -6,6 +6,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <title>{{ $label['document_title'] }}</title>
     <style>
         @page {
@@ -34,7 +37,7 @@
             min-height: 100vh;
             padding: 10px;
             background: var(--page-bg);
-            font-family: DejaVu Sans, Arial, sans-serif;
+            font-family: Manrope, Arial, sans-serif;
             color: var(--ink);
         }
 
@@ -415,16 +418,14 @@
             padding-left: var(--space-sm);
         }
 
-        .barcode {
+        img.barcode {
             width: 100%;
             height: 58px;
             object-fit: fill;
         }
 
-        .barcode.small {
-            width: 100%;
+        img.barcode.small {
             height: 36px;
-            object-fit: fill;
         }
 
         body.pdf .barcode {
