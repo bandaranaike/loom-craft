@@ -60,6 +60,13 @@ class UpdateShipmentStatusRequest extends FormRequest
                     $this->validated('shipment_status'),
                     $this->user(),
                 )) {
+                    if ($this->validated('shipment_status') === ShipmentStatus::Dispatched->value
+                        && ($shipment->shipping_carrier_id === null || ! is_string($shipment->tracking_number) || $shipment->tracking_number === '')) {
+                        $validator->errors()->add('shipment_status', 'Assign a courier carrier and tracking number before dispatching this shipment.');
+
+                        return;
+                    }
+
                     $validator->errors()->add('shipment_status', 'Select a valid next shipment status.');
                 }
             },

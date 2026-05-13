@@ -4,9 +4,11 @@ namespace App\Http\Requests\Admin;
 
 use App\Models\Order;
 use App\Models\Shipment;
+use App\Models\ShippingService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Validator;
 
 class UpdateShipmentTrackingRequest extends FormRequest
 {
@@ -33,9 +35,35 @@ class UpdateShipmentTrackingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'carrier' => ['required', 'string', 'max:120'],
-            'service_level' => ['nullable', 'string', 'max:120'],
+            'shipping_carrier_id' => ['required', 'integer', 'exists:shipping_carriers,id'],
+            'shipping_service_id' => ['nullable', 'integer', 'exists:shipping_services,id'],
             'tracking_number' => ['required', 'string', 'max:120'],
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                if ($validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
+                $serviceId = $this->integer('shipping_service_id');
+
+                if ($serviceId === 0) {
+                    return;
+                }
+
+                $serviceBelongsToCarrier = ShippingService::query()
+                    ->whereKey($serviceId)
+                    ->where('shipping_carrier_id', $this->integer('shipping_carrier_id'))
+                    ->exists();
+
+                if (! $serviceBelongsToCarrier) {
+                    $validator->errors()->add('shipping_service_id', 'Select a service level for the selected carrier.');
+                }
+            },
         ];
     }
 
@@ -45,7 +73,9 @@ class UpdateShipmentTrackingRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'carrier.required' => 'Enter the courier or carrier name.',
+            'shipping_carrier_id.required' => 'Select a courier carrier.',
+            'shipping_carrier_id.exists' => 'Select a valid courier carrier.',
+            'shipping_service_id.exists' => 'Select a valid carrier service level.',
             'tracking_number.required' => 'Enter the courier tracking number.',
         ];
     }

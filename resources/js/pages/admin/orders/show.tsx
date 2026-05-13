@@ -49,6 +49,8 @@ type ShipmentSummary = {
     shipment_number: string | null;
     status: string;
     tracking_number: string | null;
+    shipping_carrier_id: number | null;
+    shipping_service_id: number | null;
     carrier: string | null;
     service_level: string | null;
     vendor_preparing_at: string | null;
@@ -58,6 +60,17 @@ type ShipmentSummary = {
     packed_at: string | null;
     shipped_at: string | null;
     delivered_at: string | null;
+};
+
+type ShippingServiceOption = {
+    id: number;
+    name: string;
+};
+
+type ShippingCarrierOption = {
+    id: number;
+    name: string;
+    services: ShippingServiceOption[];
 };
 
 type AdminOrderSummary = {
@@ -81,6 +94,7 @@ type AdminOrderSummary = {
     payment_status_options: string[];
     order_status_options: string[];
     shipment_status_options: string[];
+    shipping_carriers: ShippingCarrierOption[];
     can_manage_offline: boolean;
     can_delete: boolean;
 };
@@ -180,8 +194,8 @@ export default function AdminOrderShow() {
         shipment_status: order.shipment_status_options[0] ?? order.shipment?.status ?? 'pending',
     });
     const trackingForm = useForm({
-        carrier: order.shipment?.carrier ?? '',
-        service_level: order.shipment?.service_level ?? '',
+        shipping_carrier_id: order.shipment?.shipping_carrier_id?.toString() ?? '',
+        shipping_service_id: order.shipment?.shipping_service_id?.toString() ?? '',
         tracking_number: order.shipment?.tracking_number ?? '',
     });
     const deleteForm = useForm({});
@@ -190,6 +204,8 @@ export default function AdminOrderShow() {
     const billing = order.addresses.find((address) => address.type === 'billing');
     const proofIsImage = order.payment_proof?.mime_type.startsWith('image/') ?? false;
     const shouldShowCodSettlement = order.payment_method === 'cod' && form.data.payment_status === 'paid';
+    const selectedCarrier = order.shipping_carriers.find((carrier) => carrier.id.toString() === trackingForm.data.shipping_carrier_id);
+    const selectedCarrierServices = selectedCarrier?.services ?? [];
 
     const resetFormsFromOrder = useEffectEvent(() => {
         statusForm.setData('order_status', order.order_status_options[0] ?? order.status);
@@ -201,8 +217,8 @@ export default function AdminOrderShow() {
             cod_settlement_note: '',
         });
         trackingForm.setData({
-            carrier: order.shipment?.carrier ?? '',
-            service_level: order.shipment?.service_level ?? '',
+            shipping_carrier_id: order.shipment?.shipping_carrier_id?.toString() ?? '',
+            shipping_service_id: order.shipment?.shipping_service_id?.toString() ?? '',
             tracking_number: order.shipment?.tracking_number ?? '',
         });
         statusForm.clearErrors();
@@ -217,8 +233,8 @@ export default function AdminOrderShow() {
         order.order_status_options,
         order.payment_method,
         order.payment_status,
-        order.shipment?.carrier,
-        order.shipment?.service_level,
+        order.shipment?.shipping_carrier_id,
+        order.shipment?.shipping_service_id,
         order.shipment?.status,
         order.shipment?.tracking_number,
         order.shipment_status_options,
@@ -465,23 +481,41 @@ export default function AdminOrderShow() {
                                 <div className="mt-4 space-y-4">
                                     <div className="space-y-2">
                                         <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Carrier</label>
-                                        <input
-                                            value={trackingForm.data.carrier}
-                                            onChange={(event) => trackingForm.setData('carrier', event.target.value)}
+                                        <select
+                                            value={trackingForm.data.shipping_carrier_id}
+                                            onChange={(event) =>
+                                                trackingForm.setData({
+                                                    ...trackingForm.data,
+                                                    shipping_carrier_id: event.target.value,
+                                                    shipping_service_id: '',
+                                                })
+                                            }
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
-                                            placeholder="Sri Lanka Post Courier"
-                                        />
-                                        <InputError message={trackingForm.errors.carrier} />
+                                        >
+                                            <option value="">Select carrier</option>
+                                            {order.shipping_carriers.map((carrier) => (
+                                                <option key={carrier.id} value={carrier.id}>
+                                                    {carrier.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <InputError message={trackingForm.errors.shipping_carrier_id} />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Service level</label>
-                                        <input
-                                            value={trackingForm.data.service_level}
-                                            onChange={(event) => trackingForm.setData('service_level', event.target.value)}
+                                        <select
+                                            value={trackingForm.data.shipping_service_id}
+                                            onChange={(event) => trackingForm.setData('shipping_service_id', event.target.value)}
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
-                                            placeholder="Standard"
-                                        />
-                                        <InputError message={trackingForm.errors.service_level} />
+                                        >
+                                            <option value="">Select service level</option>
+                                            {selectedCarrierServices.map((service) => (
+                                                <option key={service.id} value={service.id}>
+                                                    {service.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <InputError message={trackingForm.errors.shipping_service_id} />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Tracking number / AWB</label>

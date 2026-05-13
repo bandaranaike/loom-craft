@@ -9,6 +9,8 @@ use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\ShippingCarrier;
+use App\Models\ShippingService;
 use App\Services\Fulfillment\FulfillmentStatusService;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
@@ -25,7 +27,7 @@ class ShowAdminOrder
         Gate::authorize('viewAny', Order::class);
 
         $order = Order::query()
-            ->with(['items.product.vendor', 'addresses', 'payment', 'user', 'shipments'])
+            ->with(['items.product.vendor', 'addresses', 'payment', 'user', 'shipments.shippingCarrier', 'shipments.shippingService'])
             ->findOrFail($orderId);
 
         $payment = $order->payment;
@@ -88,8 +90,10 @@ class ShowAdminOrder
                 'shipment_number' => $shipment->shipment_number,
                 'status' => $shipment->status,
                 'tracking_number' => $shipment->tracking_number,
-                'carrier' => $shipment->carrier,
-                'service_level' => $shipment->service_level,
+                'shipping_carrier_id' => $shipment->shipping_carrier_id,
+                'shipping_service_id' => $shipment->shipping_service_id,
+                'carrier' => $shipment->shippingCarrier?->name ?? $shipment->carrier,
+                'service_level' => $shipment->shippingService?->name ?? $shipment->service_level,
                 'vendor_preparing_at' => $shipment->vendor_preparing_at?->toDateTimeString(),
                 'vendor_handed_to_admin_at' => $shipment->vendor_handed_to_admin_at?->toDateTimeString(),
                 'admin_received_at' => $shipment->admin_received_at?->toDateTimeString(),
@@ -102,6 +106,7 @@ class ShowAdminOrder
             $this->fulfillmentStatusService->paymentStatusOptionsFor($payment),
             $this->fulfillmentStatusService->allowedNextOrderStatuses($order, auth()->user()),
             $shipment === null ? [] : $this->fulfillmentStatusService->allowedNextShipmentStatuses($order, $shipment, auth()->user()),
+            $this->shippingCarriers(),
             Gate::allows('manageOffline', $order),
             Gate::allows('delete', $order),
         );
@@ -122,5 +127,32 @@ class ShowAdminOrder
             'mime_type' => $payment->bank_transfer_slip_mime_type ?? 'application/octet-stream',
             'uploaded_at' => $payment->bank_transfer_slip_uploaded_at?->toDateTimeString(),
         ];
+    }
+
+    /**
+     * @return list<array{id: int, name: string, services: list<array{id: int, name: string}>}>
+     */
+    private function shippingCarriers(): array
+    {
+        return ShippingCarrier::query()
+            ->where('is_active', true)
+            ->with(['services' => fn ($query) => $query
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->map(static fn (ShippingCarrier $carrier): array => [
+                'id' => $carrier->id,
+                'name' => $carrier->name,
+                'services' => $carrier->services
+                    ->map(static fn (ShippingService $service): array => [
+                        'id' => $service->id,
+                        'name' => $service->name,
+                    ])
+                    ->all(),
+            ])
+            ->all();
     }
 }

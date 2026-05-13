@@ -163,6 +163,12 @@ For each cart item:
 - Each order currently creates exactly one linked invoice record automatically.
 - Invoice records store:
   - `invoice_number`
+
+### 5.6 Shipment Tracking Assignment
+
+- Admin-managed shipping carriers and carrier service levels populate dropdowns on the admin order page.
+- Shipment tracking assignment stores `shipping_carrier_id`, optional `shipping_service_id`, tracking/AWB number, and display snapshots for carrier and service labels.
+- A shipment cannot move to `dispatched` until a carrier and tracking number are assigned.
   - `status`
   - `currency`
   - `subtotal`

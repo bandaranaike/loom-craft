@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\OrderShipmentLabelController as AdminOrderShipmen
 use App\Http\Controllers\Admin\ProductApprovalController;
 use App\Http\Controllers\Admin\ProductCategoryController as AdminProductCategoryController;
 use App\Http\Controllers\Admin\ProductColorController as AdminProductColorController;
+use App\Http\Controllers\Admin\ShippingCarrierController as AdminShippingCarrierController;
 use App\Http\Controllers\Admin\VendorApprovalController;
 use App\Http\Controllers\Admin\VendorInquiryController as AdminVendorInquiryController;
 use App\Http\Controllers\Admin\YouTubeAuthorizationController;
@@ -209,6 +210,20 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.product-colors.update');
         Route::delete('product-colors/{productColor}', [AdminProductColorController::class, 'destroy'])
             ->name('admin.product-colors.destroy');
+        Route::get('shipping-carriers', [AdminShippingCarrierController::class, 'index'])
+            ->name('admin.shipping-carriers.index');
+        Route::post('shipping-carriers', [AdminShippingCarrierController::class, 'store'])
+            ->name('admin.shipping-carriers.store');
+        Route::patch('shipping-carriers/{shippingCarrier}', [AdminShippingCarrierController::class, 'update'])
+            ->name('admin.shipping-carriers.update');
+        Route::delete('shipping-carriers/{shippingCarrier}', [AdminShippingCarrierController::class, 'destroy'])
+            ->name('admin.shipping-carriers.destroy');
+        Route::post('shipping-carriers/{shippingCarrier}/services', [AdminShippingCarrierController::class, 'storeService'])
+            ->name('admin.shipping-carriers.services.store');
+        Route::patch('shipping-carriers/{shippingCarrier}/services/{shippingService}', [AdminShippingCarrierController::class, 'updateService'])
+            ->name('admin.shipping-carriers.services.update');
+        Route::delete('shipping-carriers/{shippingCarrier}/services/{shippingService}', [AdminShippingCarrierController::class, 'destroyService'])
+            ->name('admin.shipping-carriers.services.destroy');
         Route::get('vendor-inquiries/pending', [AdminVendorInquiryController::class, 'pending'])
             ->name('admin.vendor-inquiries.pending');
         Route::post('vendor-inquiries/{inquiry}/approve', [AdminVendorInquiryController::class, 'approve'])

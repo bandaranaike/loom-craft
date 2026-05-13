@@ -611,6 +611,7 @@ The AI must always generate:
 * Make the smallest coherent implementation that satisfies the task.
 * Run focused tests first; run broader checks only when the changed surface requires them.
 * Update only the task or knowledge documents affected by the work.
+* Do not run full-suite checks by default when focused tests and changed-surface checks already cover the slice.
 
 ## Backend
 

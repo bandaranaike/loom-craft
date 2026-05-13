@@ -11,6 +11,7 @@ import {
     Palette,
     ShieldCheck,
     Tags,
+    Truck,
     Video,
 } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
@@ -31,6 +32,7 @@ import { pending as adminFeedbackPending } from '@/routes/admin/feedback';
 import { index as adminOrdersIndex } from '@/routes/admin/orders';
 import { index as adminProductCategoriesIndex } from '@/routes/admin/product-categories';
 import { index as adminProductColorsIndex } from '@/routes/admin/product-colors';
+import { index as adminShippingCarriersIndex } from '@/routes/admin/shipping-carriers';
 import { pending as adminProductsPending } from '@/routes/admin/products';
 import { pending as adminVendorInquiriesPending } from '@/routes/admin/vendor-inquiries';
 import { pending as adminVendorsPending } from '@/routes/admin/vendors';
@@ -107,6 +109,11 @@ export function AppSidebar() {
                       title: 'Product Colors',
                       href: adminProductColorsIndex(),
                       icon: Palette,
+                  },
+                  {
+                      title: 'Shipping Carriers',
+                      href: adminShippingCarriersIndex(),
+                      icon: Truck,
                   },
                   {
                       title: 'YouTube Connect',

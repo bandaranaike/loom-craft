@@ -23,6 +23,8 @@ class Shipment extends Model
         'vendor_id',
         'responsibility',
         'status',
+        'shipping_carrier_id',
+        'shipping_service_id',
         'carrier',
         'service_level',
         'tracking_number',
@@ -81,6 +83,16 @@ class Shipment extends Model
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    public function shippingCarrier(): BelongsTo
+    {
+        return $this->belongsTo(ShippingCarrier::class);
+    }
+
+    public function shippingService(): BelongsTo
+    {
+        return $this->belongsTo(ShippingService::class);
     }
 
     public function fulfillmentStatusHistories(): HasMany

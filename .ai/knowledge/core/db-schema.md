@@ -443,6 +443,8 @@ Tracks shipping responsibility and fulfillment.
 - `vendor_id` (bigint unsigned, FK -> vendors.id, nullable)
 - `responsibility` (varchar(255))
 - `status` (varchar(255))
+- `shipping_carrier_id` (bigint unsigned, FK -> shipping_carriers.id, nullable)
+- `shipping_service_id` (bigint unsigned, FK -> shipping_services.id, nullable)
 - `carrier` (varchar(255), nullable)
 - `service_level` (varchar(255), nullable)
 - `tracking_number` (varchar(255), nullable)
@@ -460,6 +462,42 @@ Tracks shipping responsibility and fulfillment.
 
 Indexes:
 - `shipments_shipment_number_unique` on `shipment_number`
+
+Implementation note:
+- `carrier` and `service_level` remain as display snapshots for labels/API compatibility. New admin tracking assignment uses `shipping_carrier_id` and `shipping_service_id`.
+
+---
+
+### shipping_carriers
+
+Admin-managed courier carrier dictionary for shipment tracking dropdowns.
+
+- `id` (bigint unsigned, PK)
+- `name` (varchar(255), unique)
+- `code` (varchar(255), nullable, unique)
+- `is_active` (boolean, default `true`)
+- `sort_order` (int unsigned, default `0`)
+- `created_at` (timestamp, nullable)
+- `updated_at` (timestamp, nullable)
+
+---
+
+### shipping_services
+
+Admin-managed service levels belonging to a shipping carrier.
+
+- `id` (bigint unsigned, PK)
+- `shipping_carrier_id` (bigint unsigned, FK -> shipping_carriers.id)
+- `name` (varchar(255))
+- `code` (varchar(255), nullable)
+- `is_active` (boolean, default `true`)
+- `sort_order` (int unsigned, default `0`)
+- `created_at` (timestamp, nullable)
+- `updated_at` (timestamp, nullable)
+
+Indexes:
+- Unique (`shipping_carrier_id`, `name`)
+- Unique (`shipping_carrier_id`, `code`)
 
 ---
 

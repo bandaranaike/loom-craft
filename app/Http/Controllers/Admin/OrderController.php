@@ -106,9 +106,9 @@ class OrderController extends Controller
             $order,
             $shipment,
             $request->user(),
-            $request->validated('carrier'),
+            $request->integer('shipping_carrier_id'),
             $request->validated('tracking_number'),
-            $request->validated('service_level'),
+            $request->integer('shipping_service_id') ?: null,
         );
 
         return back()->with('status', 'Shipment tracking updated.');

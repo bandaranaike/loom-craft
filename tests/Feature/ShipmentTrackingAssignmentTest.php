@@ -2,6 +2,8 @@
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ShippingCarrier;
+use App\Models\ShippingService;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,12 +14,14 @@ it('allows admins to assign courier tracking to a shipment', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $order = createShipmentTrackingOrder();
     $shipment = $order->shipments()->firstOrFail();
+    $carrier = ShippingCarrier::factory()->create(['name' => 'DHL eCommerce']);
+    $service = ShippingService::factory()->for($carrier, 'carrier')->create(['name' => 'Standard']);
 
     $this->actingAs($admin)
         ->from(route('admin.orders.show', ['order' => $order->id]))
         ->patch(route('admin.orders.shipments.tracking.update', ['order' => $order->id, 'shipment' => $shipment->id]), [
-            'carrier' => 'DHL eCommerce',
-            'service_level' => 'Standard',
+            'shipping_carrier_id' => $carrier->id,
+            'shipping_service_id' => $service->id,
             'tracking_number' => '7734567890',
         ])
         ->assertRedirect(route('admin.orders.show', ['order' => $order->id]))
@@ -25,6 +29,8 @@ it('allows admins to assign courier tracking to a shipment', function () {
 
     $this->assertDatabaseHas('shipments', [
         'id' => $shipment->id,
+        'shipping_carrier_id' => $carrier->id,
+        'shipping_service_id' => $service->id,
         'carrier' => 'DHL eCommerce',
         'service_level' => 'Standard',
         'tracking_number' => '7734567890',
@@ -52,7 +58,9 @@ it('prevents shipment dispatch until courier tracking is assigned', function () 
             'shipment_status' => 'dispatched',
         ])
         ->assertRedirect(route('admin.orders.show', ['order' => $order->id]))
-        ->assertSessionHasErrors('shipment_status');
+        ->assertSessionHasErrors([
+            'shipment_status' => 'Assign a courier carrier and tracking number before dispatching this shipment.',
+        ]);
 
     $this->assertDatabaseHas('shipments', [
         'id' => $shipment->id,
@@ -90,6 +98,8 @@ function createShipmentTrackingOrder(
     ?string $trackingNumber = null,
 ): Order {
     $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $shippingCarrier = $carrier === null ? null : ShippingCarrier::factory()->create(['name' => $carrier]);
+    $shippingService = $shippingCarrier === null ? null : ShippingService::factory()->for($shippingCarrier, 'carrier')->create(['name' => 'Standard']);
     $vendor = Vendor::factory()->for($vendorUser)->create([
         'status' => 'approved',
     ]);
@@ -125,6 +135,8 @@ function createShipmentTrackingOrder(
         'vendor_id' => $vendor->id,
         'responsibility' => 'platform',
         'status' => 'ready_for_dispatch',
+        'shipping_carrier_id' => $shippingCarrier?->id,
+        'shipping_service_id' => $shippingService?->id,
         'carrier' => $carrier,
         'service_level' => 'Standard',
         'tracking_number' => $trackingNumber,

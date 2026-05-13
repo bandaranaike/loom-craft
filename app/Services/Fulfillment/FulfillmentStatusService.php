@@ -10,6 +10,8 @@ use App\Models\FulfillmentStatusHistory;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Shipment;
+use App\Models\ShippingCarrier;
+use App\Models\ShippingService;
 use App\Models\User;
 use InvalidArgumentException;
 
@@ -326,17 +328,26 @@ class FulfillmentStatusService
         Order $order,
         Shipment $shipment,
         User $actor,
-        string $carrier,
+        int $shippingCarrierId,
         string $trackingNumber,
-        ?string $serviceLevel = null,
+        ?int $shippingServiceId = null,
     ): void {
         if ($actor->role !== 'admin' || $shipment->order_id !== $order->id) {
             throw new InvalidArgumentException('The requested shipment tracking update is not allowed.');
         }
 
+        $carrier = ShippingCarrier::query()->findOrFail($shippingCarrierId);
+        $service = $shippingServiceId === null
+            ? null
+            : ShippingService::query()
+                ->where('shipping_carrier_id', $carrier->id)
+                ->findOrFail($shippingServiceId);
+
         $shipment->update([
-            'carrier' => $carrier,
-            'service_level' => $serviceLevel,
+            'shipping_carrier_id' => $carrier->id,
+            'shipping_service_id' => $service?->id,
+            'carrier' => $carrier->name,
+            'service_level' => $service?->name,
             'tracking_number' => $trackingNumber,
         ]);
 
@@ -348,7 +359,7 @@ class FulfillmentStatusService
             fromStatus: $shipment->status,
             toStatus: $shipment->status,
             reason: 'tracking_updated',
-            note: sprintf('Tracking number %s assigned to %s.', $trackingNumber, $carrier),
+            note: sprintf('Tracking number %s assigned to %s.', $trackingNumber, $carrier->name),
         );
     }
 
@@ -367,8 +378,7 @@ class FulfillmentStatusService
 
     private function shipmentHasTracking(Shipment $shipment): bool
     {
-        return is_string($shipment->carrier)
-            && $shipment->carrier !== ''
+        return $shipment->shipping_carrier_id !== null
             && is_string($shipment->tracking_number)
             && $shipment->tracking_number !== '';
     }
