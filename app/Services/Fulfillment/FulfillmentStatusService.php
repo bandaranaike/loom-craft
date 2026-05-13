@@ -206,7 +206,10 @@ class FulfillmentStatusService
         );
     }
 
-    public function updatePaymentStatus(Order $order, Payment $payment, string $nextStatus, User $actor, ?string $reason = null, ?string $note = null): void
+    /**
+     * @param  array{remitted_amount?: string|null, reference?: string|null, note?: string|null}  $codSettlement
+     */
+    public function updatePaymentStatus(Order $order, Payment $payment, string $nextStatus, User $actor, ?string $reason = null, ?string $note = null, array $codSettlement = []): void
     {
         $next = $this->resolvePaymentStatus($nextStatus);
 
@@ -215,12 +218,25 @@ class FulfillmentStatusService
         }
 
         $fromStatus = $payment->status;
-
-        $payment->update([
+        $updates = [
             'status' => $next->value,
             'verified_by' => $actor->id,
             'verified_at' => now(),
-        ]);
+        ];
+
+        if ($payment->method === 'cod' && $next === PaymentStatus::Paid) {
+            $updates = [
+                ...$updates,
+                'cod_collected_amount' => $payment->amount,
+                'cod_remitted_amount' => $codSettlement['remitted_amount'] ?? $payment->amount,
+                'cod_remittance_reference' => $codSettlement['reference'] ?? null,
+                'cod_settlement_note' => $codSettlement['note'] ?? null,
+                'cod_settled_by' => $actor->id,
+                'cod_settled_at' => now(),
+            ];
+        }
+
+        $payment->update($updates);
 
         $this->recordHistory(
             order: $order,
@@ -230,7 +246,7 @@ class FulfillmentStatusService
             fromStatus: $fromStatus,
             toStatus: $next->value,
             reason: $reason,
-            note: $note,
+            note: $note ?? $codSettlement['note'] ?? null,
         );
     }
 

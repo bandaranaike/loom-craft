@@ -112,7 +112,8 @@ No additional fields are introduced beyond `.ai/knowledge/core/db-schema.md`.
 - PayPal card uses PayPal Card Fields on the checkout page, but still creates and captures a PayPal order server-side.
 - Stripe proceeds to payment capture.
 - Bank transfer is **pending** until admin verification.
-- COD is marked as pending/processing until fulfillment.
+- COD is marked as collection pending until the courier remits cash to LoomCraft/admin. Admin settlement requires the remitted amount to match the payment amount before COD moves to `paid`.
+- Vendor payout for COD orders depends on COD settlement; COD payouts must not be marked paid until the payment has `cod_settled_at`.
 - For both PayPal methods:
   - the customer confirms the LKR to USD conversion first
   - the converted USD amount is created from the latest stored exchange-rate snapshot

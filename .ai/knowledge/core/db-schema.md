@@ -479,6 +479,12 @@ Payment records for checkout and verification.
 - `exchange_rate_source` (varchar(255), nullable)
 - `exchange_rate_fetched_at` (timestamp, nullable)
 - `provider_reference` (varchar(255), nullable)
+- `cod_collected_amount` (decimal(10,2), nullable)
+- `cod_remitted_amount` (decimal(10,2), nullable)
+- `cod_remittance_reference` (varchar(255), nullable)
+- `cod_settlement_note` (text, nullable)
+- `cod_settled_by` (bigint unsigned, FK -> users.id, nullable)
+- `cod_settled_at` (timestamp, nullable)
 - `verified_by` (bigint unsigned, FK -> users.id, nullable)
 - `verified_at` (timestamp, nullable)
 - `created_at` (timestamp, nullable)
@@ -525,6 +531,9 @@ Earnings distribution to vendors.
 - `updated_at` (timestamp, nullable)
 
 No explicit standalone indexes defined in the dump.
+
+Implementation note:
+- COD-linked vendor payouts are eligible for payment only after the order payment is `paid` and has `cod_settled_at`.
 
 ---
 

@@ -242,8 +242,8 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ### Track 5: COD, Returns, And Complaints
 
-- Add COD settlement/remittance tracking for courier-collected cash.
-- Gate vendor payout eligibility on COD settlement where the order uses COD.
+- Add COD settlement/remittance tracking for courier-collected cash. Implemented on `payments` with collected/remitted amounts, remittance reference, settlement note, settled-by user, and settled-at timestamp.
+- Gate vendor payout eligibility on COD settlement where the order uses COD. Implemented in `VendorPayout::isEligibleForPayment()` and enforced when marking COD payouts as paid.
 - Add return request and reverse-logistics records for returns routed back to admin.
 - Support Sri Lanka Post Courier as the return courier for phase 1.
 - Add complaint workflow with links to order/shipment/return/refund/replacement and courier claims.
@@ -258,10 +258,9 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ## Suggested Next Slices
 
-1. Implement COD settlement/remittance tracking and connect COD settlement to vendor payout eligibility.
-2. Implement returns routed back to admin, using Sri Lanka Post Courier for phase 1 return shipping.
-3. Implement complaint handling with links to shipment, return, refund, replacement, courier claim, or manual resolution.
-4. Revisit mobile app and mobile-only fulfillment actions after the admin web process is stable.
+1. Implement returns routed back to admin, using Sri Lanka Post Courier for phase 1 return shipping.
+2. Implement complaint handling with links to shipment, return, refund, replacement, courier claim, or manual resolution.
+3. Revisit mobile app and mobile-only fulfillment actions after the admin web process is stable.
 
 ## Recommended Identifier Standards
 
@@ -396,6 +395,12 @@ Current priority adjustment:
 - 2026-05-12:
   Implemented the label/PDF slice:
   added Blade-to-PDF dependencies, 4x6 PDF download endpoints for admin web and authenticated mobile/API label access, SVG Code 128 barcode generation, SVG QR generation, bill.html PNG asset embedding, and focused PDF rendering tests. PHP GD was installed because Dompdf requires it for PNG assets.
+- 2026-05-13:
+  Implemented COD settlement/remittance tracking and vendor payout dependency:
+  admin COD settlement now requires a remitted amount matching the payment amount before moving COD to paid; payments store COD collected/remitted amounts, remittance reference, settlement note, settled-by user, and settled-at timestamp; COD vendor payouts are blocked from `paid` status until settlement exists.
+- 2026-05-13:
+  Future Codex work should use the lean workflow by default:
+  inspect only task-relevant files, avoid broad repository scans unless needed, make the smallest coherent slice, run focused tests first, run broader checks only when the changed surface requires them, and update only the documents touched by the work.
 
 ## Test Plan
 

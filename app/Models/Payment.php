@@ -32,6 +32,12 @@ class Payment extends Model
         'bank_transfer_slip_original_name',
         'bank_transfer_slip_mime_type',
         'bank_transfer_slip_uploaded_at',
+        'cod_collected_amount',
+        'cod_remitted_amount',
+        'cod_remittance_reference',
+        'cod_settlement_note',
+        'cod_settled_by',
+        'cod_settled_at',
         'verified_by',
         'verified_at',
     ];
@@ -45,6 +51,7 @@ class Payment extends Model
             'verified_at' => 'datetime',
             'exchange_rate_fetched_at' => 'datetime',
             'bank_transfer_slip_uploaded_at' => 'datetime',
+            'cod_settled_at' => 'datetime',
         ];
     }
 
@@ -56,6 +63,11 @@ class Payment extends Model
     public function verifiedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function codSettledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cod_settled_by');
     }
 
     public function fulfillmentStatusHistories(): HasMany

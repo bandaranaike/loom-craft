@@ -169,6 +169,9 @@ export default function AdminOrderShow() {
 
     const form = useForm({
         payment_status: order.payment_status,
+        cod_remitted_amount: order.payment_method === 'cod' ? order.total : '',
+        cod_remittance_reference: '',
+        cod_settlement_note: '',
     });
     const statusForm = useForm({
         order_status: order.order_status_options[0] ?? order.status,
@@ -186,11 +189,17 @@ export default function AdminOrderShow() {
     const shipping = order.addresses.find((address) => address.type === 'shipping');
     const billing = order.addresses.find((address) => address.type === 'billing');
     const proofIsImage = order.payment_proof?.mime_type.startsWith('image/') ?? false;
+    const shouldShowCodSettlement = order.payment_method === 'cod' && form.data.payment_status === 'paid';
 
     const resetFormsFromOrder = useEffectEvent(() => {
         statusForm.setData('order_status', order.order_status_options[0] ?? order.status);
         shipmentForm.setData('shipment_status', order.shipment_status_options[0] ?? order.shipment?.status ?? 'pending');
-        form.setData('payment_status', order.payment_status);
+        form.setData({
+            payment_status: order.payment_status,
+            cod_remitted_amount: order.payment_method === 'cod' ? order.total : '',
+            cod_remittance_reference: '',
+            cod_settlement_note: '',
+        });
         trackingForm.setData({
             carrier: order.shipment?.carrier ?? '',
             service_level: order.shipment?.service_level ?? '',
@@ -206,6 +215,7 @@ export default function AdminOrderShow() {
         resetFormsFromOrder();
     }, [
         order.order_status_options,
+        order.payment_method,
         order.payment_status,
         order.shipment?.carrier,
         order.shipment?.service_level,
@@ -556,6 +566,41 @@ export default function AdminOrderShow() {
                                         </select>
                                         <InputError message={form.errors.payment_status} />
                                     </div>
+                                    {shouldShowCodSettlement && (
+                                        <div className="space-y-4 rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-1) p-4">
+                                            <div className="space-y-2">
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">COD remitted amount</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    value={form.data.cod_remitted_amount}
+                                                    onChange={(event) => form.setData('cod_remitted_amount', event.target.value)}
+                                                    className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm"
+                                                />
+                                                <InputError message={form.errors.cod_remitted_amount} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Remittance reference</label>
+                                                <input
+                                                    type="text"
+                                                    value={form.data.cod_remittance_reference}
+                                                    onChange={(event) => form.setData('cod_remittance_reference', event.target.value)}
+                                                    className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm"
+                                                />
+                                                <InputError message={form.errors.cod_remittance_reference} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Settlement note</label>
+                                                <textarea
+                                                    value={form.data.cod_settlement_note}
+                                                    onChange={(event) => form.setData('cod_settlement_note', event.target.value)}
+                                                    className="min-h-24 w-full rounded-[18px] border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm"
+                                                />
+                                                <InputError message={form.errors.cod_settlement_note} />
+                                            </div>
+                                        </div>
+                                    )}
                                     <button
                                         type="submit"
                                         disabled={form.processing}

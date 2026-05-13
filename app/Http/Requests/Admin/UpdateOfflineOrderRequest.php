@@ -38,6 +38,9 @@ class UpdateOfflineOrderRequest extends FormRequest
                     ? PaymentStatus::values()
                     : app(FulfillmentStatusService::class)->paymentStatusOptionsFor($payment)
             )],
+            'cod_remitted_amount' => ['nullable', 'numeric', 'min:0', 'decimal:0,2'],
+            'cod_remittance_reference' => ['nullable', 'string', 'max:120'],
+            'cod_settlement_note' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -55,6 +58,20 @@ class UpdateOfflineOrderRequest extends FormRequest
 
                 if ($payment === null) {
                     return;
+                }
+
+                if ($payment->method === 'cod' && $this->validated('payment_status') === PaymentStatus::Paid->value) {
+                    $remittedAmount = $this->validated('cod_remitted_amount');
+
+                    if ($remittedAmount === null || $remittedAmount === '') {
+                        $validator->errors()->add('cod_remitted_amount', 'Enter the COD remitted amount.');
+
+                        return;
+                    }
+
+                    if (is_numeric($remittedAmount) && round((float) $remittedAmount, 2) !== round((float) $payment->amount, 2)) {
+                        $validator->errors()->add('cod_remitted_amount', 'The COD remitted amount must match the order payment amount.');
+                    }
                 }
 
                 if (! app(FulfillmentStatusService::class)->canTransitionPayment(
@@ -77,6 +94,8 @@ class UpdateOfflineOrderRequest extends FormRequest
         return [
             'payment_status.required' => 'Select a payment status.',
             'payment_status.in' => 'Select a valid payment status.',
+            'cod_remitted_amount.numeric' => 'Enter a valid COD remitted amount.',
+            'cod_remitted_amount.decimal' => 'Enter the COD remitted amount with no more than two decimal places.',
         ];
     }
 }

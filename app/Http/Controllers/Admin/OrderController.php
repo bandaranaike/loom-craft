@@ -61,6 +61,7 @@ class OrderController extends Controller
         Order $order,
     ): RedirectResponse {
         $payment = $order->payment;
+        $validated = $request->validated();
 
         if ($payment === null) {
             abort(404);
@@ -69,8 +70,13 @@ class OrderController extends Controller
         $this->fulfillmentStatusService->updatePaymentStatus(
             $order,
             $payment,
-            $request->validated('payment_status'),
+            $validated['payment_status'],
             $request->user(),
+            codSettlement: [
+                'remitted_amount' => $validated['cod_remitted_amount'] ?? null,
+                'reference' => $validated['cod_remittance_reference'] ?? null,
+                'note' => $validated['cod_settlement_note'] ?? null,
+            ],
         );
 
         return back()->with('status', 'Offline payment status updated.');

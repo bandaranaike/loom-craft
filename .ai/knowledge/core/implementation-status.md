@@ -165,3 +165,4 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Public navigation now includes a dedicated Contact Us link, and the admin sidebar includes a Contact Messages entry.
 - Product show gallery (`/products/{product}`) now supports clickable thumbnail switching, rounded main-image corners, and conditional floating thumbnails that dock only while the selected image bottom remains below the viewport; once the image bottom is visible, thumbnails fall back to inline below the image.
 - Product pages now include a modern review experience with delivered-order gating, star-based rating input, published customer feedback, and aggregate rating summary data from the new `product_reviews` table.
+- COD settlement/remittance tracking is implemented for admin offline-payment review: COD paid status requires matching remittance amount, stores remittance metadata on `payments`, and blocks COD vendor payouts from paid status until settlement exists.

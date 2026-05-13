@@ -4,6 +4,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\VendorPayout;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -53,6 +54,110 @@ it('prevents non-admins from updating offline payment and order statuses', funct
         'order_id' => $order->id,
         'status' => 'collection_pending',
         'verified_by' => null,
+    ]);
+});
+
+it('records cod remittance details when admins settle collection payments', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $order = createOfflineOrder(paymentMethod: 'cod');
+
+    $this->actingAs($admin)
+        ->from(route('admin.orders.show', ['order' => $order->id]))
+        ->patch(route('admin.orders.offline.update', ['order' => $order->id]), [
+            'payment_status' => 'paid',
+            'cod_remitted_amount' => '180.00',
+            'cod_remittance_reference' => 'SLP-BATCH-1001',
+            'cod_settlement_note' => 'Courier settlement batch 1001.',
+        ])
+        ->assertRedirect(route('admin.orders.show', ['order' => $order->id]))
+        ->assertSessionHas('status', 'Offline payment status updated.');
+
+    $this->assertDatabaseHas('payments', [
+        'order_id' => $order->id,
+        'method' => 'cod',
+        'status' => 'paid',
+        'cod_collected_amount' => '180.00',
+        'cod_remitted_amount' => '180.00',
+        'cod_remittance_reference' => 'SLP-BATCH-1001',
+        'cod_settlement_note' => 'Courier settlement batch 1001.',
+        'cod_settled_by' => $admin->id,
+        'verified_by' => $admin->id,
+    ]);
+
+    $payment = $order->payment()->firstOrFail()->fresh();
+
+    expect($payment->cod_settled_at)->not->toBeNull()
+        ->and($payment->verified_at)->not->toBeNull();
+});
+
+it('requires matching cod remittance before collection payments are settled', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $order = createOfflineOrder(paymentMethod: 'cod');
+
+    $this->actingAs($admin)
+        ->from(route('admin.orders.show', ['order' => $order->id]))
+        ->patch(route('admin.orders.offline.update', ['order' => $order->id]), [
+            'payment_status' => 'paid',
+            'cod_remitted_amount' => '179.00',
+        ])
+        ->assertRedirect(route('admin.orders.show', ['order' => $order->id]))
+        ->assertSessionHasErrors(['cod_remitted_amount']);
+
+    $this->assertDatabaseHas('payments', [
+        'order_id' => $order->id,
+        'status' => 'collection_pending',
+        'cod_settled_at' => null,
+    ]);
+});
+
+it('blocks cod vendor payouts until courier remittance is settled', function () {
+    $order = createOfflineOrder(paymentMethod: 'cod');
+    $vendorId = $order->items()->firstOrFail()->vendor_id;
+
+    $payout = VendorPayout::query()->create([
+        'vendor_id' => $vendorId,
+        'order_id' => $order->id,
+        'amount' => '180.00',
+        'currency' => 'LKR',
+        'status' => 'pending',
+    ]);
+
+    expect($payout->isEligibleForPayment())->toBeFalse();
+
+    $payout->status = 'paid';
+    $payout->paid_at = now();
+    $payout->save();
+})->throws(InvalidArgumentException::class, 'COD vendor payouts cannot be paid until COD remittance is settled.');
+
+it('allows cod vendor payouts after courier remittance is settled', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $order = createOfflineOrder(paymentMethod: 'cod');
+    $vendorId = $order->items()->firstOrFail()->vendor_id;
+
+    $this->actingAs($admin)
+        ->patch(route('admin.orders.offline.update', ['order' => $order->id]), [
+            'payment_status' => 'paid',
+            'cod_remitted_amount' => '180.00',
+        ]);
+
+    $payout = VendorPayout::query()->create([
+        'vendor_id' => $vendorId,
+        'order_id' => $order->id,
+        'amount' => '180.00',
+        'currency' => 'LKR',
+        'status' => 'pending',
+    ]);
+
+    expect($payout->isEligibleForPayment())->toBeTrue();
+
+    $payout->update([
+        'status' => 'paid',
+        'paid_at' => now(),
+    ]);
+
+    $this->assertDatabaseHas('vendor_payouts', [
+        'id' => $payout->id,
+        'status' => 'paid',
     ]);
 });
 

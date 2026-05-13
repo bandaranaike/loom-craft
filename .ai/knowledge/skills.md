@@ -603,6 +603,15 @@ The AI must ALWAYS prioritize:
 
 The AI must always generate:
 
+## Codex Usage
+
+* Default to lean task execution.
+* Read only files directly relevant to the requested slice before editing.
+* Avoid broad repository scans, repeated command output, and exploratory checks unless they are needed to remove uncertainty.
+* Make the smallest coherent implementation that satisfies the task.
+* Run focused tests first; run broader checks only when the changed surface requires them.
+* Update only the task or knowledge documents affected by the work.
+
 ## Backend
 
 * Clean services
