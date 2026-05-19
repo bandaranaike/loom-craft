@@ -258,6 +258,43 @@ Typical status progression (may vary by payment method):
 - Each review stores:
   - `rating` from 1 to 5
   - written feedback in `review`
+
+---
+
+## 9) Returns
+
+- Returns are modeled separately from order and shipment status using `order_returns` and `order_return_items`.
+- Phase 1 reverse logistics routes parcels back to admin through Sri Lanka Post Courier, with AWB/tracking entered manually by admin.
+- Return numbers use `RET-YYYYMM-######`.
+- Current return status flow:
+  1. `requested`
+  2. `approved` or `rejected`
+  3. `in_transit`
+  4. `received_by_admin`
+  5. `inspected`
+  6. `vendor_review` when vendor input is needed
+  7. `resolved`
+  8. `closed`
+- Admin actions record immutable `fulfillment_status_histories` rows with `domain = return`.
+- Return records can store the linked outbound shipment, return courier/service, return tracking number, parcel metrics, customer/admin notes, item condition, and intended resolution.
+
+---
+
+## 10) Complaints
+
+- Complaints are modeled as operational records with a `CMP-YYYYMM-######` complaint number.
+- Supported categories are damaged item, wrong item, late delivery, missing item, payment issue, and refund issue.
+- Complaints may link to an order, shipment, return, and payment so admins can trace the affected operational record.
+- Current complaint status flow:
+  1. `open`
+  2. `in_review`
+  3. optional waiting states: `waiting_for_customer`, `waiting_for_vendor`, `waiting_for_courier`
+  4. `resolved`
+  5. `closed`
+- Complaints can also be `cancelled` from active states.
+- Admin complaint actions record immutable `fulfillment_status_histories` rows with `domain = complaint`.
+- SLA fields are tracked through `first_response_due_at`, `sla_due_at`, `first_responded_at`, `resolved_at`, and `closed_at`.
+- Resolution metadata can store a resolution type, resolution note, and courier claim reference.
 - Public product pages surface:
   - average rating
   - review count

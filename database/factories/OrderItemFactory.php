@@ -2,10 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\OrderItem>
+ * @extends Factory<OrderItem>
  */
 class OrderItemFactory extends Factory
 {
@@ -17,7 +21,14 @@ class OrderItemFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'order_id' => Order::factory(),
+            'product_id' => Product::factory(),
+            'vendor_id' => Vendor::factory(),
+            'quantity' => 1,
+            'unit_price' => '180.00',
+            'commission_rate' => '100.00',
+            'commission_amount' => '180.00',
+            'line_total' => '180.00',
         ];
     }
 }

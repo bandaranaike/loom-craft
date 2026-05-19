@@ -120,6 +120,16 @@ class Order extends Model
         return $this->hasMany(FulfillmentStatusHistory::class);
     }
 
+    public function returns(): HasMany
+    {
+        return $this->hasMany(OrderReturn::class);
+    }
+
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class);
+    }
+
     public function disputes(): HasMany
     {
         return $this->hasMany(Dispute::class);

@@ -542,7 +542,7 @@ export default function AdminOrderShow() {
                             <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                                 <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Print label</p>
                                 <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                    Open the server-rendered shipping label or download the 4x6 PDF for phone printing.
+                                    Open the server-rendered shipping label or download the matching PDF for phone printing.
                                 </p>
                                 <div className="mt-4 grid gap-3">
                                     <a

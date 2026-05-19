@@ -100,6 +100,16 @@ class Shipment extends Model
         return $this->hasMany(FulfillmentStatusHistory::class);
     }
 
+    public function returns(): HasMany
+    {
+        return $this->hasMany(OrderReturn::class);
+    }
+
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class);
+    }
+
     private static function newShipmentNumber(self $shipment): string
     {
         $date = $shipment->created_at instanceof Carbon

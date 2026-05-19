@@ -29,7 +29,7 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ## Execution Status
 
-- Current state: active umbrella task with foundational fulfillment schema and payload work already implemented.
+- Current state: active umbrella task with foundational fulfillment schema, payload work, label/PDF generation, COD settlement, backend return logistics, and backend complaint workflow already implemented.
 - Recommended handling: keep this task as the master tracker while delivering the remaining work in focused slices.
 - Implementation style: complete one operational slice at a time, with tests and knowledge-doc updates after each slice.
 
@@ -131,6 +131,8 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Added admin order-page fulfillment timeline visibility for those checkpoint timestamps.
 - Added Blade-to-PDF 4x6 shipment label downloads for admin web and authenticated mobile/API label access.
 - Added real SVG Code 128 barcodes and SVG QR code generation for the shipment label.
+- Added backend return logistics records, return item records, return status transitions, return tracking assignment, and return history audit entries.
+- Added backend complaint workflow fields, complaint status transitions, SLA/resolution metadata, operational links, and complaint history audit entries.
 
 ## Completed So Far
 
@@ -244,10 +246,11 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 - Add COD settlement/remittance tracking for courier-collected cash. Implemented on `payments` with collected/remitted amounts, remittance reference, settlement note, settled-by user, and settled-at timestamp.
 - Gate vendor payout eligibility on COD settlement where the order uses COD. Implemented in `VendorPayout::isEligibleForPayment()` and enforced when marking COD payouts as paid.
-- Add return request and reverse-logistics records for returns routed back to admin.
-- Support Sri Lanka Post Courier as the return courier for phase 1.
-- Add complaint workflow with links to order/shipment/return/refund/replacement and courier claims.
-- Add resolution and SLA fields.
+- Add return request and reverse-logistics records for returns routed back to admin. Implemented with `order_returns` and `order_return_items`.
+- Support Sri Lanka Post Courier as the return courier for phase 1. Implemented as manual return carrier/service/tracking assignment using the existing shipping carrier dictionary and display snapshots.
+- Remaining return work: build admin UI screens/forms for return intake and status movement, add customer-facing return request entry if required, and connect return resolution to refund/replacement execution.
+- Add complaint workflow with links to order/shipment/return/refund/replacement and courier claims. Backend complaint workflow is implemented for order, shipment, return, payment, resolution, and courier-claim references; direct refund/replacement execution remains a follow-up integration.
+- Add resolution and SLA fields. Implemented with severity, first-response due, SLA due, first-response, resolved/closed timestamps, resolution type/note, and courier claim reference.
 
 ### Track 6: Auditability And Multi-Vendor Rules
 
@@ -258,8 +261,8 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 
 ## Suggested Next Slices
 
-1. Implement returns routed back to admin, using Sri Lanka Post Courier for phase 1 return shipping.
-2. Implement complaint handling with links to shipment, return, refund, replacement, courier claim, or manual resolution.
+1. Add admin web UI for the backend return and complaint workflows.
+2. Connect resolved complaints/returns to refund, replacement, courier claim, or manual-resolution execution records.
 3. Revisit mobile app and mobile-only fulfillment actions after the admin web process is stable.
 
 ## Recommended Identifier Standards
@@ -401,6 +404,12 @@ Current priority adjustment:
 - 2026-05-13:
   Future Codex work should use the lean workflow by default:
   inspect only task-relevant files, avoid broad repository scans unless needed, make the smallest coherent slice, run focused tests first, run broader checks only when the changed surface requires them, and update only the documents touched by the work.
+- 2026-05-19:
+  Implemented the backend return logistics slice:
+  added `order_returns` and `order_return_items`, return numbering, item-level return quantities/conditions/resolution intent, return carrier/service/tracking assignment, return status transitions from request through closure, fulfillment history support for `domain=return`, admin routes/controllers/requests, and focused Pest coverage.
+- 2026-05-19:
+  Implemented the backend complaint workflow slice:
+  added operational complaint numbering, order/shipment/return/payment links, category and severity fields, first-response/SLA/resolution timestamps, resolution/courier-claim metadata, complaint status transitions from open through closure/cancellation, fulfillment history support for `domain=complaint`, admin routes/controllers/requests, and focused Pest coverage.
 
 ## Test Plan
 

@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\ContactSubmissionController as AdminContactSubmissionController;
 use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\OrderReturnController as AdminOrderReturnController;
 use App\Http\Controllers\Admin\OrderShipmentLabelController as AdminOrderShipmentLabelController;
 use App\Http\Controllers\Admin\ProductApprovalController;
 use App\Http\Controllers\Admin\ProductCategoryController as AdminProductCategoryController;
@@ -178,6 +180,16 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.orders.shipments.status.update');
         Route::patch('orders/{order}/shipments/{shipment}/tracking', [AdminOrderController::class, 'updateShipmentTracking'])
             ->name('admin.orders.shipments.tracking.update');
+        Route::post('orders/{order}/returns', [AdminOrderReturnController::class, 'store'])
+            ->name('admin.orders.returns.store');
+        Route::patch('orders/{order}/returns/{orderReturn}/status', [AdminOrderReturnController::class, 'updateStatus'])
+            ->name('admin.orders.returns.status.update');
+        Route::patch('orders/{order}/returns/{orderReturn}/tracking', [AdminOrderReturnController::class, 'updateTracking'])
+            ->name('admin.orders.returns.tracking.update');
+        Route::post('orders/{order}/complaints', [AdminComplaintController::class, 'store'])
+            ->name('admin.orders.complaints.store');
+        Route::patch('complaints/{complaint}/status', [AdminComplaintController::class, 'updateStatus'])
+            ->name('admin.complaints.status.update');
         Route::get('orders/{order}/shipments/{shipment}/label', AdminOrderShipmentLabelController::class)
             ->name('admin.orders.shipments.label.show');
         Route::get('orders/{order}/shipments/{shipment}/label.pdf', [AdminOrderShipmentLabelController::class, 'download'])

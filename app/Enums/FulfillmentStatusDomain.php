@@ -7,4 +7,6 @@ enum FulfillmentStatusDomain: string
     case Order = 'order';
     case Payment = 'payment';
     case Shipment = 'shipment';
+    case Return = 'return';
+    case Complaint = 'complaint';
 }

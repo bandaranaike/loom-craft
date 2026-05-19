@@ -34,6 +34,7 @@ Last updated: 2026-05-08
 - [carrier-and-service-management-for-shipments](/var/www/loom-craft/.ai/tasks/completed/fulfillment/carrier-and-service-management-for-shipments.md)
 - [order-details-and-tracking](/var/www/loom-craft/.ai/tasks/completed/fulfillment/order-details-and-tracking.md)
 - [order-history-and-operations](/var/www/loom-craft/.ai/tasks/completed/fulfillment/order-history-and-operations.md)
+- [shipment-label-print-button-download-parity](/var/www/loom-craft/.ai/tasks/completed/fulfillment/shipment-label-print-button-download-parity.md)
 
 ### Mobile
 

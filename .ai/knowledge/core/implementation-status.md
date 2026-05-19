@@ -1,6 +1,6 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-05-08
+Last reviewed: 2026-05-19
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implementation-guide.md`, `.ai/knowledge/core/best-practices.md`, `.ai/knowledge/core/guardrails.md`, `.ai/knowledge/core/db-schema.md`, and `.ai/knowledge/core/order-process.md`.
@@ -121,8 +121,8 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 ## Partial / Gaps vs Architecture Scope
 
 - PayPal wallet approval/capture flow and PayPal direct card checkout are implemented; Stripe remains record/status-only and bank transfer admin verification workflow UI is still missing.
-- Shipment, disputes, complaints, and product reports are modeled at DB level but not surfaced as completed user/admin workflows.
-- Shipment numbering and parcel metrics are now modeled, but courier booking workflows, shipment events, proof-of-delivery capture, and return logistics are still pending.
+- Shipment, disputes, and product reports are modeled at DB level but not surfaced as completed user/admin workflows.
+- Shipment numbering, parcel metrics, backend return logistics, and backend complaint workflow are now modeled, but courier booking workflows, shipment events, proof-of-delivery capture, return UI screens, and complaint UI screens are still pending.
 - Product dead weight is still not stored in the catalog or fulfillment domain.
 - Vendor shipping management and vendor payments/earnings pages are not implemented.
 - Admin vendor CRUD beyond pending/approve/reject is not implemented.
@@ -167,3 +167,5 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Product pages now include a modern review experience with delivered-order gating, star-based rating input, published customer feedback, and aggregate rating summary data from the new `product_reviews` table.
 - COD settlement/remittance tracking is implemented for admin offline-payment review: COD paid status requires matching remittance amount, stores remittance metadata on `payments`, and blocks COD vendor payouts from paid status until settlement exists.
 - Admin shipping carrier/service management is implemented: admins can maintain carriers and service levels, admin order tracking uses dropdowns backed by those records, shipments store carrier/service references plus display snapshots, and dispatch validation now explains when tracking data is missing.
+- Backend return logistics are implemented: admins can record return requests, attach returned order items, assign Sri Lanka Post Courier-style return tracking, move returns through requested/approved/in-transit/admin-received/inspected/vendor-review/resolved/closed states, and every return state change is captured in fulfillment history.
+- Backend complaint workflow is implemented: admins can record complaints linked to orders, shipments, returns, and payments; categorize and prioritize complaints; track SLA timestamps; move complaints through open/review/waiting/resolved/closed states; and capture every complaint status change in fulfillment history.

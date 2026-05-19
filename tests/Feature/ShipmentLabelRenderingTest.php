@@ -19,6 +19,7 @@ it('renders an admin printable shipment label with live order data', function ()
 
     $response->assertOk()
         ->assertSee('LoomCraft', false)
+        ->assertSee(route('admin.orders.shipments.label.download', ['order' => $order->id, 'shipment' => $shipment->id]), false)
         ->assertSee($order->order_number, false)
         ->assertSee($order->invoice->invoice_number, false)
         ->assertSee($shipment->shipment_number, false)
@@ -44,6 +45,7 @@ it('downloads an admin pdf shipment label', function () {
         ->assertHeader('content-disposition', sprintf('attachment; filename=%s-label.pdf', strtolower($shipment->shipment_number)));
 
     expect($response->getContent())->toStartWith('%PDF');
+    expect(roundedPdfMediaBox($response->getContent()))->toBe([0, 0, 465, 567]);
 });
 
 it('renders the mobile api label for authorized sticker tokens', function () {
@@ -72,6 +74,7 @@ it('downloads the mobile api pdf label for authorized sticker tokens', function 
         ->assertHeader('content-type', 'application/pdf');
 
     expect($response->getContent())->toStartWith('%PDF');
+    expect(roundedPdfMediaBox($response->getContent()))->toBe([0, 0, 465, 567]);
 });
 
 it('rejects mobile api label rendering without sticker scope', function () {
@@ -164,4 +167,14 @@ function createShipmentLabelOrder(): Order
     ]);
 
     return $order->fresh(['invoice', 'items.product', 'items.vendor', 'addresses', 'shipments', 'payment']);
+}
+
+/**
+ * @return list<int>
+ */
+function roundedPdfMediaBox(string $pdf): array
+{
+    preg_match('/\/MediaBox\s*\[\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\]/', $pdf, $matches);
+
+    return array_map(static fn (string $value): int => (int) round((float) $value), array_slice($matches, 1));
 }

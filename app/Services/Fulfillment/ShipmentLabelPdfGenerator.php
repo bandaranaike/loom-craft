@@ -1,0 +1,102 @@
+<?php
+
+namespace App\Services\Fulfillment;
+
+use Spatie\Browsershot\Browsershot;
+
+class ShipmentLabelPdfGenerator
+{
+    /**
+     * @param  array<string, mixed>  $label
+     */
+    public function generate(array $label): string
+    {
+        $html = view('fulfillment.shipment-label', [
+            'label' => $label,
+            'printMode' => 'pdf',
+        ])->render();
+
+        $browsershot = Browsershot::html($html)
+            ->showBackground()
+            ->margins(0, 0, 0, 0)
+            ->paperSize(620, 756, 'px')
+            ->windowSize(620, 756)
+            ->timeout((int) config('services.browsershot.timeout', 60))
+            ->setOption('preferCSSPageSize', true)
+            ->setEnv(['HOME' => storage_path('app/browsershot')])
+            ->addChromiumArguments([
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+                '--disable-crash-reporter',
+                '--disable-breakpad',
+                '--no-zygote',
+                '--disable-setuid-sandbox',
+                '--disable-software-rasterizer',
+                '--disable-extensions',
+                '--font-render-hinting=none',
+                '--disable-features=VizDisplayCompositor',
+                '--remote-debugging-port=0',
+            ]);
+
+        $this->configureExecutablePaths($browsershot);
+
+        if ((bool) config('services.browsershot.no_sandbox', true)) {
+            $browsershot->noSandbox();
+        }
+
+        return $browsershot->pdf();
+    }
+
+    private function configureExecutablePaths(Browsershot $browsershot): void
+    {
+        $chromePath = $this->chromePath();
+        $nodeBinary = config('services.browsershot.node_binary');
+        $npmBinary = config('services.browsershot.npm_binary');
+        $nodeModulePath = config('services.browsershot.node_module_path');
+
+        if (is_string($chromePath) && $chromePath !== '') {
+            $browsershot->setChromePath($chromePath);
+        }
+
+        if (is_string($nodeBinary) && $nodeBinary !== '') {
+            $browsershot->setNodeBinary($nodeBinary);
+        }
+
+        if (is_string($npmBinary) && $npmBinary !== '') {
+            $browsershot->setNpmBinary($npmBinary);
+        }
+
+        if (is_string($nodeModulePath) && $nodeModulePath !== '') {
+            $browsershot->setNodeModulePath($nodeModulePath);
+        }
+    }
+
+    private function chromePath(): ?string
+    {
+        $configuredPath = config('services.browsershot.chrome_path');
+
+        if (is_string($configuredPath) && $configuredPath !== '') {
+            return $configuredPath;
+        }
+
+        $storageMatches = glob(storage_path('app/browsershot/chrome/*/chrome-linux64/chrome')) ?: [];
+
+        rsort($storageMatches);
+
+        if (isset($storageMatches[0])) {
+            return $storageMatches[0];
+        }
+
+        $homePath = $_SERVER['HOME'] ?? $_SERVER['USERPROFILE'] ?? null;
+
+        if (! is_string($homePath) || $homePath === '') {
+            return null;
+        }
+
+        $matches = glob($homePath.'/.cache/puppeteer/chrome/*/chrome-linux64/chrome') ?: [];
+
+        rsort($matches);
+
+        return $matches[0] ?? null;
+    }
+}

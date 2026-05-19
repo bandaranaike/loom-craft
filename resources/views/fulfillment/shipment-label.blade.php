@@ -1,7 +1,7 @@
 @php
     $isPdf = ($printMode ?? 'web') === 'pdf';
 @endphp
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -12,7 +12,7 @@
     <title>{{ $label['document_title'] }}</title>
     <style>
         @page {
-            size: 4in 6in;
+            size: 465pt 567pt; /* 620px x 756px at 96dpi */
             margin: 0;
         }
 
@@ -30,9 +30,12 @@
 
         * {
             box-sizing: border-box;
+            page-break-inside: avoid;
         }
 
         body {
+            width: 465pt;
+            height: 567pt;
             margin: 0;
             min-height: 100vh;
             padding: 10px;
@@ -41,10 +44,26 @@
             color: var(--ink);
         }
 
+        @page {
+            size: 465pt 567pt;
+            margin: 0;
+        }
+
+
+        body.pdf .label {
+            width: 465pt;
+            height: 567pt;
+            min-height: 0;
+        }
+
         body.pdf {
+            overflow: hidden;
             min-height: auto;
             padding: 0;
             background: #ffffff;
+            width: 465pt;
+            height: 567pt;
+            margin: 0;
         }
 
         .actions {
@@ -84,10 +103,15 @@
         }
 
         body.pdf .label {
-            width: 4in;
-            min-height: 6in;
-            border-radius: 0;
-            border: 0;
+            width: 465pt;
+            height: 567pt;
+            min-height: 0;
+            border-radius: 13.5pt;
+            overflow: hidden;
+        }
+
+        body.pdf .shell {
+            height: 100%;
         }
 
         .shell,
@@ -114,14 +138,19 @@
             border-top: var(--panel-rule);
         }
 
+        .footer,
+        .barcode-card,
+        .care-card,
+        .specs-card,
+        .hero,
+        .topbar {
+            page-break-inside: avoid;
+        }
+
         .topbar {
             border-top: 0;
             grid-template-columns: minmax(80px, 0.26fr) minmax(532px, 1.76fr);
             align-items: stretch;
-        }
-
-        body.pdf .topbar {
-            grid-template-columns: 82px 302px;
         }
 
         .topbar > * + *,
@@ -167,22 +196,9 @@
             padding: var(--space);
         }
 
-        body.pdf .meta-card,
-        body.pdf .address-block,
-        body.pdf .specs-card,
-        body.pdf .care-card,
-        body.pdf .barcode-card > div,
-        body.pdf .origin-card {
-            padding: 8px;
-        }
-
         .meta-grid {
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 6px 10px;
-        }
-
-        body.pdf .meta-grid {
-            gap: 4px 6px;
         }
 
         .meta-item {
@@ -210,18 +226,10 @@
             overflow-wrap: anywhere;
         }
 
-        body.pdf .meta-value {
-            font-size: 10px;
-        }
-
         .address-card {
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 10px;
             align-items: stretch;
-        }
-
-        body.pdf .address-card {
-            gap: 0;
         }
 
         .section-label,
@@ -264,11 +272,6 @@
             font-size: 14px;
         }
 
-        body.pdf .address,
-        body.pdf .micro-line {
-            font-size: 10px;
-        }
-
         .address {
             margin: 8px 0 0;
             line-height: 1.55;
@@ -294,21 +297,12 @@
             overflow-wrap: anywhere;
         }
 
-        body.pdf .product-title {
-            font-size: 12px;
-        }
-
         .spec-grid {
             display: grid;
             grid-template-columns: auto 1fr auto 1fr;
             gap: 6px 12px;
             margin-top: 10px;
             font-size: 13px;
-        }
-
-        body.pdf .spec-grid {
-            gap: 4px 8px;
-            font-size: 9px;
         }
 
         .spec-grid dt {
@@ -336,20 +330,12 @@
             gap: 6px 4px;
         }
 
-        body.pdf .care-grid {
-            gap: 3px;
-        }
-
         .care-item {
             padding: 6px 4px;
             align-content: start;
             justify-items: center;
             gap: 4px;
             text-align: center;
-        }
-
-        body.pdf .care-item {
-            padding: 3px 2px;
         }
 
         .care-icon {
@@ -359,20 +345,11 @@
             filter: grayscale(1) brightness(0) contrast(1.2);
         }
 
-        body.pdf .care-icon {
-            width: 28px;
-            height: 28px;
-        }
-
         .care-title {
             font-size: 8px;
             font-weight: 800;
             letter-spacing: 0.06em;
             line-height: 1.2;
-        }
-
-        body.pdf .care-title {
-            font-size: 6px;
         }
 
         .origin-card {
@@ -385,20 +362,10 @@
             padding-left: 8px;
         }
 
-        body.pdf .origin-card {
-            margin-top: -12px;
-            margin-bottom: -8px;
-            padding-top: 8px;
-        }
-
         .origin-seal {
             width: auto;
             height: 90px;
             object-fit: contain;
-        }
-
-        body.pdf .origin-seal {
-            height: 54px;
         }
 
         .barcode-card {
@@ -406,11 +373,6 @@
             grid-template-columns: minmax(0, 1fr) 138px;
             gap: 10px;
             align-items: stretch;
-        }
-
-        body.pdf .barcode-card {
-            grid-template-columns: 268px 96px;
-            gap: 6px;
         }
 
         .barcode-card > * + * {
@@ -426,14 +388,6 @@
 
         img.barcode.small {
             height: 36px;
-        }
-
-        body.pdf .barcode {
-            height: 38px;
-        }
-
-        body.pdf .barcode.small {
-            height: 22px;
         }
 
         .barcode-meta {
@@ -454,19 +408,10 @@
             overflow-wrap: anywhere;
         }
 
-        body.pdf .barcode-no {
-            font-size: 10px;
-        }
-
         .refs-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 8px;
             margin-top: 10px;
-        }
-
-        body.pdf .refs-grid {
-            gap: 6px;
-            margin-top: 6px;
         }
 
         .ref-block {
@@ -479,20 +424,12 @@
             letter-spacing: 0.08em;
         }
 
-        body.pdf .ref-label {
-            font-size: 7px;
-        }
-
         .ref-value {
             font-size: 12px;
             font-weight: 700;
             line-height: 1.35;
             color: var(--ink);
             overflow-wrap: anywhere;
-        }
-
-        body.pdf .ref-value {
-            font-size: 8px;
         }
 
         .track-box {
@@ -508,11 +445,6 @@
             place-items: center;
             padding: 5px;
             box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.18);
-        }
-
-        body.pdf .qr-box {
-            width: 72px;
-            height: 72px;
         }
 
         .qr-box img {
@@ -536,10 +468,6 @@
             overflow-wrap: anywhere;
         }
 
-        body.pdf .track-subtitle {
-            font-size: 7px;
-        }
-
         @media print {
             body {
                 min-height: auto;
@@ -552,10 +480,8 @@
             }
 
             .label {
-                width: 4in;
-                min-height: 6in;
-                border-radius: 0;
-                border: 0;
+                width: 620px;
+                min-height: 756px;
             }
         }
 
@@ -606,7 +532,7 @@
 <body class="{{ $isPdf ? 'pdf' : 'web' }}">
 @unless ($isPdf)
     <div class="actions">
-        <button type="button" onclick="window.print()">Print</button>
+        <a href="{{ $downloadUrl }}">Print</a>
     </div>
 @endunless
 
@@ -657,7 +583,9 @@
                     <h2 class="recipient">{{ mb_strtoupper($label['ship_to']['name']) }}</h2>
                     <p class="address">
                         @foreach ($label['ship_to']['lines'] as $line)
-                            {{ $line }}@if (! $loop->last)<br>@endif
+                            {{ $line }}@if (! $loop->last)
+                                <br>
+                            @endif
                         @endforeach
                     </p>
                     @if ($label['ship_to']['phone'])
@@ -671,7 +599,9 @@
                     <p class="address">
                         {{ $label['return_to']['name'] }}<br>
                         @foreach ($label['return_to']['lines'] as $line)
-                            {{ $line }}@if (! $loop->last)<br>@endif
+                            {{ $line }}@if (! $loop->last)
+                                <br>
+                            @endif
                         @endforeach
                     </p>
                 </div>

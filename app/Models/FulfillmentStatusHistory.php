@@ -19,6 +19,8 @@ class FulfillmentStatusHistory extends Model
         'order_id',
         'payment_id',
         'shipment_id',
+        'order_return_id',
+        'complaint_id',
         'domain',
         'from_status',
         'to_status',
@@ -41,6 +43,16 @@ class FulfillmentStatusHistory extends Model
     public function shipment(): BelongsTo
     {
         return $this->belongsTo(Shipment::class);
+    }
+
+    public function orderReturn(): BelongsTo
+    {
+        return $this->belongsTo(OrderReturn::class);
+    }
+
+    public function complaint(): BelongsTo
+    {
+        return $this->belongsTo(Complaint::class);
     }
 
     public function actor(): BelongsTo

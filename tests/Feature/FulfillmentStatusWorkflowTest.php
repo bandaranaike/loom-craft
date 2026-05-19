@@ -2,6 +2,8 @@
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ShippingCarrier;
+use App\Models\ShippingService;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,6 +17,8 @@ it('supports the confirmed admin fulfillment checkpoint workflow', function () {
         shipmentStatus: 'pending',
     );
     $shipment = $order->shipments()->firstOrFail();
+    $carrier = ShippingCarrier::factory()->create(['name' => 'Sri Lanka Post Courier']);
+    $service = ShippingService::factory()->for($carrier, 'carrier')->create(['name' => 'Standard']);
 
     foreach ([
         'vendor_preparing',
@@ -35,8 +39,8 @@ it('supports the confirmed admin fulfillment checkpoint workflow', function () {
 
     $this->actingAs($admin)
         ->patch(route('admin.orders.shipments.tracking.update', ['order' => $order->id, 'shipment' => $shipment->id]), [
-            'carrier' => 'Sri Lanka Post Courier',
-            'service_level' => 'Standard',
+            'shipping_carrier_id' => $carrier->id,
+            'shipping_service_id' => $service->id,
             'tracking_number' => 'LK-POST-001',
         ])
         ->assertSessionHas('status', 'Shipment tracking updated.');

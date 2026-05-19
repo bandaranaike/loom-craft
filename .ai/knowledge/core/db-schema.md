@@ -3,7 +3,7 @@
 Schema snapshot derived from `.ai/db.sql`, the latest SQL dump of the database, plus code-verified schema changes that landed after the last dump.
 
 Last synchronized with `.ai/db.sql`: 2026-04-05.
-Code-verified updates through: 2026-05-08.
+Code-verified updates through: 2026-05-19.
 
 ---
 
@@ -501,6 +501,52 @@ Indexes:
 
 ---
 
+### order_returns
+
+Operational reverse-logistics header for customer returns routed back to admin.
+
+- `id` (bigint unsigned, PK)
+- `return_number` (varchar(255), nullable, unique)
+- `order_id` (bigint unsigned, FK -> orders.id)
+- `shipment_id` (bigint unsigned, FK -> shipments.id, nullable)
+- `requested_by` (bigint unsigned, FK -> users.id, nullable)
+- `reviewed_by` (bigint unsigned, FK -> users.id, nullable)
+- `received_by` (bigint unsigned, FK -> users.id, nullable)
+- `shipping_carrier_id` (bigint unsigned, FK -> shipping_carriers.id, nullable)
+- `shipping_service_id` (bigint unsigned, FK -> shipping_services.id, nullable)
+- `status` (varchar(32))
+- `reason` (varchar(64))
+- `customer_note` (text, nullable)
+- `admin_note` (text, nullable)
+- `resolution` (varchar(64), nullable)
+- `carrier` / `service_level` / `tracking_number` (varchar(255), nullable)
+- return parcel metrics: `package_count`, `parcel_weight`, `weight_unit`, dimensions and dimension unit
+- checkpoint timestamps: `requested_at`, `approved_at`, `rejected_at`, `in_transit_at`, `admin_received_at`, `inspected_at`, `vendor_review_started_at`, `resolved_at`, `closed_at`, `cancelled_at`
+- `created_at` / `updated_at`
+
+Statuses:
+- `requested`, `approved`, `rejected`, `in_transit`, `received_by_admin`, `inspected`, `vendor_review`, `resolved`, `closed`, `cancelled`
+
+---
+
+### order_return_items
+
+Line-level items included in a return request.
+
+- `id` (bigint unsigned, PK)
+- `order_return_id` (bigint unsigned, FK -> order_returns.id)
+- `order_item_id` (bigint unsigned, FK -> order_items.id)
+- `quantity` (int unsigned)
+- `condition` (varchar(64), nullable)
+- `resolution` (varchar(64), nullable)
+- `note` (text, nullable)
+- `created_at` / `updated_at`
+
+Indexes:
+- Unique (`order_return_id`, `order_item_id`)
+
+---
+
 ### payments
 
 Payment records for checkout and verification.
@@ -598,20 +644,38 @@ Indexes:
 
 ### complaints
 
-General complaints not limited to a single product.
+Operational customer complaint records for order/payment/shipment/return issues.
 
 - `id` (bigint unsigned, PK)
+- `complaint_number` (varchar(255), nullable, unique)
 - `user_id` (bigint unsigned, FK -> users.id, nullable)
+- `order_id` (bigint unsigned, FK -> orders.id, nullable)
+- `shipment_id` (bigint unsigned, FK -> shipments.id, nullable)
+- `order_return_id` (bigint unsigned, FK -> order_returns.id, nullable)
+- `payment_id` (bigint unsigned, FK -> payments.id, nullable)
 - `guest_email` (varchar(255), nullable)
+- `category` (varchar(64), nullable): `damaged_item`, `wrong_item`, `late_delivery`, `missing_item`, `payment_issue`, `refund_issue`
+- `severity` (varchar(32), default `normal`): `low`, `normal`, `high`, `urgent`
 - `subject` (varchar(255))
 - `message` (text)
 - `status` (varchar(255))
+- `resolution_type` (varchar(64), nullable)
+- `resolution_note` (text, nullable)
+- `courier_claim_reference` (varchar(255), nullable)
 - `handled_by` (bigint unsigned, FK -> users.id, nullable)
+- `assigned_to` (bigint unsigned, FK -> users.id, nullable)
+- `opened_at`, `first_response_due_at`, `sla_due_at`, `first_responded_at`, `resolved_at`, `closed_at` (timestamps, nullable)
 - `created_at` (timestamp, nullable)
 - `updated_at` (timestamp, nullable)
 
 Indexes:
 - `complaints_status_index` on `status`
+- `complaints_order_id_status_index` on (`order_id`, `status`)
+- `complaints_category_status_index` on (`category`, `status`)
+- `complaints_sla_due_at_status_index` on (`sla_due_at`, `status`)
+
+Statuses:
+- `open`, `in_review`, `waiting_for_customer`, `waiting_for_vendor`, `waiting_for_courier`, `resolved`, `closed`, `cancelled`
 
 ---
 
@@ -711,6 +775,12 @@ Indexes:
 - `orders` 1-* `order_items`
 - `orders` 1-* `order_addresses`
 - `orders` 1-* `shipments`
+- `orders` 1-* `order_returns`
+- `orders` 1-* `complaints`
+- `shipments` 1-* `order_returns`
+- `shipments` 1-* `complaints`
+- `order_returns` 1-* `order_return_items`
+- `order_returns` 1-* `complaints`
 - `orders` 1-* `payments`
 - `vendors` 1-* `vendor_payouts`
 - `orders` 1-* `disputes`
