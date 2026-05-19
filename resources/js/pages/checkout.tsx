@@ -5,6 +5,7 @@ import InputError from '@/components/input-error';
 import PayPalCardFields from '@/components/paypal-card-fields';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { countryOptions } from '@/lib/countries';
+import { csrfHeaders } from '@/lib/csrf';
 import { formatMoney } from '@/lib/currency';
 import { show as cartShow } from '@/routes/cart';
 import { store as checkoutStore } from '@/routes/checkout';
@@ -156,11 +157,6 @@ export default function CheckoutPage({
                   1 / Number.parseFloat(paypal_quote.exchange_rate),
               ).toLocaleString('en-LK')} ${paypal_quote.original_currency}`;
 
-    const csrfToken = () =>
-        document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute('content') ?? '';
-
     const submitPayPalOrder = async (): Promise<void> => {
         setPaypalProcessing(true);
         form.clearErrors();
@@ -172,8 +168,8 @@ export default function CheckoutPage({
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-CSRF-TOKEN': csrfToken(),
                     'X-Requested-With': 'XMLHttpRequest',
+                    ...csrfHeaders(),
                 },
                 body: JSON.stringify(normalizedPayload()),
             });
@@ -224,8 +220,8 @@ export default function CheckoutPage({
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-CSRF-TOKEN': csrfToken(),
                     'X-Requested-With': 'XMLHttpRequest',
+                    ...csrfHeaders(),
                 },
                 body: JSON.stringify(normalizedPayload()),
             });
@@ -922,7 +918,6 @@ export default function CheckoutPage({
                                         captureOrderUrl={
                                             checkoutPayPalCardCapture().url
                                         }
-                                        csrfToken={csrfToken()}
                                         payload={normalizedPayload()}
                                         onValidationErrors={
                                             applyValidationErrors

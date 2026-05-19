@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { csrfHeaders } from '@/lib/csrf';
 
 declare global {
     interface Window {
@@ -29,7 +30,6 @@ type PayPalCardFieldsProps = {
     clientId: string;
     createOrderUrl: string;
     captureOrderUrl: string;
-    csrfToken: string;
     payload: Record<string, unknown>;
     onValidationErrors: (errors: ValidationErrors) => void;
     onSuccess: (redirectUrl: string) => void;
@@ -40,7 +40,6 @@ export default function PayPalCardFields({
     clientId,
     createOrderUrl,
     captureOrderUrl,
-    csrfToken,
     payload,
     onValidationErrors,
     onSuccess,
@@ -107,8 +106,8 @@ export default function PayPalCardFields({
                             headers: {
                                 'Content-Type': 'application/json',
                                 Accept: 'application/json',
-                                'X-CSRF-TOKEN': csrfToken,
                                 'X-Requested-With': 'XMLHttpRequest',
+                                ...csrfHeaders(),
                             },
                             body: JSON.stringify(payloadRef.current),
                         });
@@ -143,8 +142,8 @@ export default function PayPalCardFields({
                             headers: {
                                 'Content-Type': 'application/json',
                                 Accept: 'application/json',
-                                'X-CSRF-TOKEN': csrfToken,
                                 'X-Requested-With': 'XMLHttpRequest',
+                                ...csrfHeaders(),
                             },
                             body: JSON.stringify({ order_id: orderID }),
                         });
@@ -215,7 +214,7 @@ export default function PayPalCardFields({
         return () => {
             cancelled = true;
         };
-    }, [enabled, clientId, createOrderUrl, captureOrderUrl, csrfToken, onSuccess, onValidationErrors]);
+    }, [enabled, clientId, createOrderUrl, captureOrderUrl, onSuccess, onValidationErrors]);
 
     if (!enabled) {
         return null;
