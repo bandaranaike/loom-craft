@@ -417,7 +417,7 @@ Current priority adjustment:
 ## Test Plan
 
 - No code tests for planning-only work
-- Validate the child task set against current order and tracking implementation before starting development
+- Validate the child task set against cur rent order and tracking implementation before starting development
 
 ## Documentation Updates Required
 

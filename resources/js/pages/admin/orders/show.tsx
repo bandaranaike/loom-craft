@@ -4,6 +4,7 @@ import { index as adminOrdersIndex } from '@/actions/App/Http/Controllers/Admin/
 import {
     destroy as adminOrderDestroy,
     updateOffline as adminOrderUpdateOffline,
+    updateShipmentDeliveryEvidence as adminOrderUpdateShipmentDeliveryEvidence,
     updateShipmentStatus as adminOrderUpdateShipmentStatus,
     updateShipmentTracking as adminOrderUpdateShipmentTracking,
     updateStatus as adminOrderUpdateStatus,
@@ -60,6 +61,13 @@ type ShipmentSummary = {
     packed_at: string | null;
     shipped_at: string | null;
     delivered_at: string | null;
+    delivery_recipient_name: string | null;
+    delivery_proof_reference: string | null;
+    delivery_evidence_url: string | null;
+    delivery_note: string | null;
+    delivery_exception_reason: string | null;
+    delivery_exception_note: string | null;
+    failed_delivery_attempts: number;
 };
 
 type ShippingServiceOption = {
@@ -149,6 +157,15 @@ const shipmentTimeline = (shipment: ShipmentSummary): { label: string; timestamp
     { label: 'Delivered', timestamp: shipment.delivered_at },
 ];
 
+const deliveryExceptionOptions = [
+    ['damaged_parcel', 'Damaged parcel'],
+    ['lost_parcel', 'Lost parcel'],
+    ['customer_unreachable', 'Customer unreachable'],
+    ['address_issue', 'Address issue'],
+    ['customer_refused', 'Customer refused'],
+    ['other', 'Other'],
+] as const;
+
 const paymentProofHeading = (paymentMethod: string): string => {
     if (paymentMethod === 'bank_transfer') {
         return 'Final bank transfer slip';
@@ -192,6 +209,8 @@ export default function AdminOrderShow() {
     });
     const shipmentForm = useForm({
         shipment_status: order.shipment_status_options[0] ?? order.shipment?.status ?? 'pending',
+        delivery_exception_reason: '',
+        delivery_exception_note: '',
     });
     const trackingForm = useForm({
         shipping_carrier_id: order.shipment?.shipping_carrier_id?.toString() ?? '',
@@ -199,6 +218,17 @@ export default function AdminOrderShow() {
         tracking_number: order.shipment?.tracking_number ?? '',
     });
     const deleteForm = useForm({});
+    const deliveryEvidenceForm = useForm<{
+        recipient_name: string;
+        proof_reference: string;
+        evidence: File | null;
+        note: string;
+    }>({
+        recipient_name: order.shipment?.delivery_recipient_name ?? '',
+        proof_reference: order.shipment?.delivery_proof_reference ?? '',
+        evidence: null,
+        note: order.shipment?.delivery_note ?? '',
+    });
 
     const shipping = order.addresses.find((address) => address.type === 'shipping');
     const billing = order.addresses.find((address) => address.type === 'billing');
@@ -210,6 +240,8 @@ export default function AdminOrderShow() {
     const resetFormsFromOrder = useEffectEvent(() => {
         statusForm.setData('order_status', order.order_status_options[0] ?? order.status);
         shipmentForm.setData('shipment_status', order.shipment_status_options[0] ?? order.shipment?.status ?? 'pending');
+        shipmentForm.setData('delivery_exception_reason', '');
+        shipmentForm.setData('delivery_exception_note', '');
         form.setData({
             payment_status: order.payment_status,
             cod_remitted_amount: order.payment_method === 'cod' ? order.total : '',
@@ -225,6 +257,13 @@ export default function AdminOrderShow() {
         shipmentForm.clearErrors();
         form.clearErrors();
         trackingForm.clearErrors();
+        deliveryEvidenceForm.setData({
+            recipient_name: order.shipment?.delivery_recipient_name ?? '',
+            proof_reference: order.shipment?.delivery_proof_reference ?? '',
+            evidence: null,
+            note: order.shipment?.delivery_note ?? '',
+        });
+        deliveryEvidenceForm.clearErrors();
     });
 
     useEffect(() => {
@@ -237,6 +276,9 @@ export default function AdminOrderShow() {
         order.shipment?.shipping_service_id,
         order.shipment?.status,
         order.shipment?.tracking_number,
+        order.shipment?.delivery_note,
+        order.shipment?.delivery_proof_reference,
+        order.shipment?.delivery_recipient_name,
         order.shipment_status_options,
         order.status,
     ]);
@@ -344,6 +386,36 @@ export default function AdminOrderShow() {
                                             <span className="text-(--welcome-body-text)">Tracking</span>
                                             <span className="text-right">{order.shipment.tracking_number ?? 'Not assigned'}</span>
                                         </div>
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="text-(--welcome-body-text)">Failed attempts</span>
+                                            <span className="text-right">{order.shipment.failed_delivery_attempts}</span>
+                                        </div>
+                                        {order.shipment.delivery_exception_reason && (
+                                            <div className="rounded-[18px] border border-(--welcome-border) bg-(--welcome-surface-1) p-3">
+                                                <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">Latest exception</p>
+                                                <p className="mt-2 text-sm font-semibold">{shipmentStatusLabel(order.shipment.delivery_exception_reason)}</p>
+                                                {order.shipment.delivery_exception_note && (
+                                                    <p className="mt-1 text-sm text-(--welcome-body-text)">{order.shipment.delivery_exception_note}</p>
+                                                )}
+                                            </div>
+                                        )}
+                                        {(order.shipment.delivery_recipient_name || order.shipment.delivery_proof_reference || order.shipment.delivery_evidence_url) && (
+                                            <div className="rounded-[18px] border border-(--welcome-border) bg-(--welcome-surface-1) p-3">
+                                                <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">Delivery proof</p>
+                                                {order.shipment.delivery_recipient_name && <p className="mt-2 text-sm">Recipient: {order.shipment.delivery_recipient_name}</p>}
+                                                {order.shipment.delivery_proof_reference && <p className="text-sm">Reference: {order.shipment.delivery_proof_reference}</p>}
+                                                {order.shipment.delivery_evidence_url && (
+                                                    <a
+                                                        href={order.shipment.delivery_evidence_url}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="mt-2 inline-flex text-sm font-semibold underline"
+                                                    >
+                                                        View evidence
+                                                    </a>
+                                                )}
+                                            </div>
+                                        )}
                                         <div className="border-t border-(--welcome-border-soft) pt-3">
                                             <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">Fulfillment timeline</p>
                                             <div className="mt-3 space-y-2">
@@ -451,12 +523,114 @@ export default function AdminOrderShow() {
                                         </select>
                                         <InputError message={shipmentForm.errors.shipment_status} />
                                     </div>
+                                    {['delivery_failed', 'return_to_sender'].includes(shipmentForm.data.shipment_status) && (
+                                        <div className="space-y-4 rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-1) p-4">
+                                            <div className="space-y-2">
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Exception reason</label>
+                                                <select
+                                                    value={shipmentForm.data.delivery_exception_reason}
+                                                    onChange={(event) => shipmentForm.setData('delivery_exception_reason', event.target.value)}
+                                                    className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm"
+                                                >
+                                                    <option value="">Select reason</option>
+                                                    {deliveryExceptionOptions.map(([value, label]) => (
+                                                        <option key={value} value={value}>
+                                                            {label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <InputError message={shipmentForm.errors.delivery_exception_reason} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Exception note</label>
+                                                <textarea
+                                                    value={shipmentForm.data.delivery_exception_note}
+                                                    onChange={(event) => shipmentForm.setData('delivery_exception_note', event.target.value)}
+                                                    className="min-h-24 w-full rounded-[18px] border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-sm"
+                                                />
+                                                <InputError message={shipmentForm.errors.delivery_exception_note} />
+                                            </div>
+                                        </div>
+                                    )}
                                     <button
                                         type="submit"
                                         disabled={shipmentForm.processing}
                                         className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
                                     >
                                         {shipmentForm.processing ? 'Saving...' : 'Save shipment status'}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+
+                        {order.shipment && (
+                            <form
+                                onSubmit={(event) => {
+                                    event.preventDefault();
+                                    deliveryEvidenceForm.patch(
+                                        adminOrderUpdateShipmentDeliveryEvidence({
+                                            order: order.id,
+                                            shipment: order.shipment!.id,
+                                        }).url,
+                                        {
+                                            forceFormData: true,
+                                            preserveScroll: true,
+                                        },
+                                    );
+                                }}
+                                className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
+                            >
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Delivery confirmation</p>
+                                <p className="mt-3 text-sm text-(--welcome-body-text)">Record proof of delivery after the courier confirms the handoff.</p>
+                                <div className="mt-4 space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Recipient name</label>
+                                        <input
+                                            value={deliveryEvidenceForm.data.recipient_name}
+                                            onChange={(event) => deliveryEvidenceForm.setData('recipient_name', event.target.value)}
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                        />
+                                        <InputError message={deliveryEvidenceForm.errors.recipient_name} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Courier proof reference</label>
+                                        <input
+                                            value={deliveryEvidenceForm.data.proof_reference}
+                                            onChange={(event) => deliveryEvidenceForm.setData('proof_reference', event.target.value)}
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                        />
+                                        <InputError message={deliveryEvidenceForm.errors.proof_reference} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Evidence file</label>
+                                        <input
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png,.pdf"
+                                            onChange={(event) => deliveryEvidenceForm.setData('evidence', event.target.files?.[0] ?? null)}
+                                            className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                        />
+                                        <InputError message={deliveryEvidenceForm.errors.evidence} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Delivery note</label>
+                                        <textarea
+                                            value={deliveryEvidenceForm.data.note}
+                                            onChange={(event) => deliveryEvidenceForm.setData('note', event.target.value)}
+                                            className="min-h-24 w-full rounded-[18px] border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                        />
+                                        <InputError message={deliveryEvidenceForm.errors.note} />
+                                    </div>
+                                    {deliveryEvidenceForm.progress && (
+                                        <progress className="h-2 w-full" value={deliveryEvidenceForm.progress.percentage} max="100">
+                                            {deliveryEvidenceForm.progress.percentage}%
+                                        </progress>
+                                    )}
+                                    <button
+                                        type="submit"
+                                        disabled={deliveryEvidenceForm.processing}
+                                        className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
+                                    >
+                                        {deliveryEvidenceForm.processing ? 'Saving...' : 'Save delivery proof'}
                                     </button>
                                 </div>
                             </form>
@@ -541,9 +715,7 @@ export default function AdminOrderShow() {
                         {order.shipment && (
                             <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                                 <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Print label</p>
-                                <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                    Open the server-rendered shipping label or download the matching PDF for phone printing.
-                                </p>
+                                <p className="mt-3 text-sm text-(--welcome-body-text)">Open the server-rendered shipping label or download the matching PDF for phone printing.</p>
                                 <div className="mt-4 grid gap-3">
                                     <a
                                         href={
