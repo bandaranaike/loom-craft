@@ -36,6 +36,13 @@ class UpdateOrderReturnTrackingRequest extends FormRequest
             'shipping_carrier_id' => ['required', 'integer', Rule::exists('shipping_carriers', 'id')],
             'shipping_service_id' => ['nullable', 'integer', Rule::exists('shipping_services', 'id')],
             'tracking_number' => ['required', 'string', 'max:255'],
+            'package_count' => ['nullable', 'integer', 'min:1'],
+            'parcel_weight' => ['nullable', 'numeric', 'min:0'],
+            'weight_unit' => ['nullable', 'string', 'max:10'],
+            'parcel_length' => ['nullable', 'numeric', 'min:0'],
+            'parcel_width' => ['nullable', 'numeric', 'min:0'],
+            'parcel_height' => ['nullable', 'numeric', 'min:0'],
+            'parcel_dimension_unit' => ['nullable', 'string', 'max:10'],
         ];
     }
 }

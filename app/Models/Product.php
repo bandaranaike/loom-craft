@@ -36,6 +36,8 @@ class Product extends Model
         'dimension_width',
         'dimension_height',
         'dimension_unit',
+        'dead_weight',
+        'dead_weight_unit',
         'status',
     ];
 
@@ -46,6 +48,7 @@ class Product extends Model
     {
         return [
             'discount_percentage' => 'decimal:2',
+            'dead_weight' => 'decimal:2',
         ];
     }
 

@@ -477,6 +477,7 @@ class FulfillmentStatusService
         int $shippingCarrierId,
         string $trackingNumber,
         ?int $shippingServiceId = null,
+        array $parcelMetrics = [],
     ): void {
         if ($actor->role !== 'admin' || $orderReturn->order_id !== $order->id) {
             throw new InvalidArgumentException('The requested return tracking update is not allowed.');
@@ -495,6 +496,13 @@ class FulfillmentStatusService
             'carrier' => $carrier->name,
             'service_level' => $service?->name,
             'tracking_number' => $trackingNumber,
+            'package_count' => $parcelMetrics['package_count'] ?? $orderReturn->package_count,
+            'parcel_weight' => $parcelMetrics['parcel_weight'] ?? $orderReturn->parcel_weight,
+            'weight_unit' => $parcelMetrics['weight_unit'] ?? $orderReturn->weight_unit,
+            'parcel_length' => $parcelMetrics['parcel_length'] ?? $orderReturn->parcel_length,
+            'parcel_width' => $parcelMetrics['parcel_width'] ?? $orderReturn->parcel_width,
+            'parcel_height' => $parcelMetrics['parcel_height'] ?? $orderReturn->parcel_height,
+            'parcel_dimension_unit' => $parcelMetrics['parcel_dimension_unit'] ?? $orderReturn->parcel_dimension_unit,
         ]);
 
         $this->recordHistory(

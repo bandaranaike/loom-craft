@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
 use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
+ * @extends Factory<Product>
  */
 class ProductFactory extends Factory
 {
@@ -33,6 +34,8 @@ class ProductFactory extends Factory
             'dimension_width' => fake()->randomFloat(2, 10, 200),
             'dimension_height' => fake()->randomFloat(2, 1, 50),
             'dimension_unit' => 'cm',
+            'dead_weight' => fake()->randomFloat(2, 0.1, 10),
+            'dead_weight_unit' => 'kg',
             'status' => 'pending_review',
         ];
     }

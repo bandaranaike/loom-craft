@@ -123,7 +123,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - PayPal wallet approval/capture flow and PayPal direct card checkout are implemented; Stripe remains record/status-only and bank transfer admin verification workflow UI is still missing.
 - Shipment, disputes, and product reports are modeled at DB level but not surfaced as completed user/admin workflows.
 - Shipment numbering, parcel metrics, backend return logistics, and backend complaint workflow are now modeled, but courier booking workflows, shipment events, proof-of-delivery capture, return UI screens, and complaint UI screens are still pending.
-- Product dead weight is still not stored in the catalog or fulfillment domain.
+- Product dead weight is now stored in the catalog; product create/edit UI exposure remains a follow-up.
 - Vendor shipping management and vendor payments/earnings pages are not implemented.
 - Admin vendor CRUD beyond pending/approve/reject is not implemented.
 - Product moderation workflow UI beyond vendor submission status is not implemented.

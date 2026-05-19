@@ -114,7 +114,7 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - A dedicated `invoices` table now exists with immutable `invoice_number` generation and one invoice record per order in the current implementation.
 - Product catalog records already store `dimension_length`, `dimension_width`, `dimension_height`, and `dimension_unit`.
 - Shipment records now store `shipment_number`, `service_level`, `package_count`, `parcel_weight`, `weight_unit`, `parcel_length`, `parcel_width`, `parcel_height`, and `parcel_dimension_unit`.
-- The current system still does not store product dead weight.
+- Product records now store optional `dead_weight` and `dead_weight_unit`.
 - The admin/mobile sticker payload now exposes order number, invoice number, shipment number, tracking number, carrier/service, shipment parcel metrics, and product dimensions.
 
 ## Started Implementation Slice
@@ -296,11 +296,11 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
   quantity
   product dimensions from the catalog (`dimension_length`, `dimension_width`, `dimension_height`, `dimension_unit`)
 - Not available yet and should be planned explicitly:
-  product dead weight
+  product dead weight now exists on products
   guaranteed tracking number assignment workflow
   courier booking / handoff timestamps beyond the current shipment status timestamps
   proof-of-delivery evidence payload
-  return-shipment identifiers and parcel metrics
+  return-shipment identifiers and parcel metrics now exist on return records
 
 ## Label Planning Notes
 
@@ -351,7 +351,7 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
     - product dimensions exist today
     - shipment/package dimensions now exist at shipment level
     - shipment/package weight now exists at shipment level
-    - product dead weight still does not exist
+    - product dead weight now exists
     - invoice number now exists
 
 ## Proposed Scope Structure

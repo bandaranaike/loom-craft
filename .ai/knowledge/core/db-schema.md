@@ -234,6 +234,8 @@ Primary product catalog record.
 - `dimension_width` (decimal(10,2), nullable)
 - `dimension_height` (decimal(10,2), nullable)
 - `dimension_unit` (varchar(255), nullable)
+- `dead_weight` (decimal(10,2), nullable)
+- `dead_weight_unit` (varchar(10), nullable)
 - `status` (enum: `pending`, `paid`, `confirmed`, `shipped`, `delivered`, `cancelled`; default `pending`)
 - `created_at` (timestamp, nullable)
 - `updated_at` (timestamp, nullable)
@@ -819,4 +821,4 @@ Indexes:
 - `product_reviews` is not present in the SQL dump even though existing knowledge/tasks indicate reviews were implemented.
 - Several tables rely only on foreign-key support indexes and do not have separately named explicit indexes in the dump.
 - The database currently includes exchange-rate fields on `payments` plus a dedicated `exchange_rates` table, which means currency conversion is now part of persisted checkout/payment data.
-- Shipment parcel metrics now exist at shipment level, but product dead weight is still not modeled.
+- Shipment parcel metrics now exist at shipment level, return parcel metrics exist on return records, and product dead weight is modeled on products.

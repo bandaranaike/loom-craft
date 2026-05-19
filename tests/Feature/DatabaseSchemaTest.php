@@ -33,6 +33,10 @@ it('adds role column to users', function () {
 
 it('adds fulfillment identifier and parcel columns', function () {
     expect(Schema::hasColumns('orders', ['public_id', 'order_number']))->toBeTrue()
+        ->and(Schema::hasColumns('products', [
+            'dead_weight',
+            'dead_weight_unit',
+        ]))->toBeTrue()
         ->and(Schema::hasColumns('shipments', [
             'shipment_number',
             'service_level',

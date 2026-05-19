@@ -87,6 +87,15 @@ class OrderReturnController extends Controller
             shippingCarrierId: $request->integer('shipping_carrier_id'),
             trackingNumber: $request->validated('tracking_number'),
             shippingServiceId: $request->integer('shipping_service_id') ?: null,
+            parcelMetrics: $request->safe()->only([
+                'package_count',
+                'parcel_weight',
+                'weight_unit',
+                'parcel_length',
+                'parcel_width',
+                'parcel_height',
+                'parcel_dimension_unit',
+            ]),
         );
 
         return back()->with('status', 'Return tracking updated.');

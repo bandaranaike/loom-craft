@@ -124,6 +124,13 @@ it('tracks the phase one return parcel workflow back to admin', function () {
             'shipping_carrier_id' => $carrier->id,
             'shipping_service_id' => $service->id,
             'tracking_number' => 'SLP-RET-001',
+            'package_count' => 1,
+            'parcel_weight' => '2.50',
+            'weight_unit' => 'kg',
+            'parcel_length' => '30.00',
+            'parcel_width' => '20.00',
+            'parcel_height' => '10.00',
+            'parcel_dimension_unit' => 'cm',
         ])
         ->assertSessionHas('status', 'Return tracking updated.');
 
@@ -146,6 +153,8 @@ it('tracks the phase one return parcel workflow back to admin', function () {
         ->and($orderReturn->shipping_service_id)->toBe($service->id)
         ->and($orderReturn->carrier)->toBe('Sri Lanka Post Courier')
         ->and($orderReturn->tracking_number)->toBe('SLP-RET-001')
+        ->and($orderReturn->parcel_weight)->toBe('2.50')
+        ->and($orderReturn->parcel_dimension_unit)->toBe('cm')
         ->and($orderReturn->approved_at)->not->toBeNull()
         ->and($orderReturn->in_transit_at)->not->toBeNull()
         ->and($orderReturn->admin_received_at)->not->toBeNull()
