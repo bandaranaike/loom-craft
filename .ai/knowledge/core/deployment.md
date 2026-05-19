@@ -67,6 +67,16 @@ find /var/www/loom-craft -type d -exec chmod g+s {} +
 
 Add GitHub Actions public key to `/home/deploy/.ssh/authorized_keys`.
 
+If deployment fails because `deploy` cannot write `shared/storage/logs/laravel.log`, repair shared runtime ownership once as root:
+
+```bash
+mkdir -p /var/www/loom-craft/shared/storage/logs
+touch /var/www/loom-craft/shared/storage/logs/laravel.log
+chown -R deploy:www-data /var/www/loom-craft/shared/storage
+find /var/www/loom-craft/shared/storage -type d -exec chmod 2775 {} +
+find /var/www/loom-craft/shared/storage -type f -exec chmod 0664 {} +
+```
+
 ---
 
 ## 4) MariaDB (Local-Only)
@@ -340,12 +350,12 @@ jobs:
           sudo find /var/www/loom-craft/shared/storage "${RELEASE_DIR}/bootstrap/cache" -type f -exec chmod 0664 {} +
 
           cd "${RELEASE_DIR}"
-          php artisan migrate --force
-          php artisan config:cache
+          LOG_CHANNEL=stderr php artisan migrate --force
+          LOG_CHANNEL=stderr php artisan config:cache
 
           ln -sfn "${RELEASE_DIR}" /var/www/loom-craft/current
 
-          php /var/www/loom-craft/current/artisan queue:restart
+          LOG_CHANNEL=stderr php /var/www/loom-craft/current/artisan queue:restart
           sudo systemctl reload php8.4-fpm
           sudo systemctl reload nginx
 

@@ -136,16 +136,16 @@ jobs:
             # Fallback: try to chmod essential directories and ignore errors for files we don't own (like user uploads)
             chmod -R ug+rwX "${SHARED_DIR}/storage/logs" "${SHARED_DIR}/storage/framework" "${RELEASE_DIR}/bootstrap/cache" 2>/dev/null || true
             find "${SHARED_DIR}/storage/logs" "${SHARED_DIR}/storage/framework" "${RELEASE_DIR}/bootstrap/cache" -type d -exec chmod g+s {} + 2>/dev/null || true
-            touch "${SHARED_DIR}/storage/logs/laravel.log"
+            touch "${SHARED_DIR}/storage/logs/laravel.log" 2>/dev/null || true
           fi
 
           cd "${RELEASE_DIR}"
-          php artisan migrate --force
-          php artisan optimize:clear
-          php artisan optimize
+          LOG_CHANNEL=stderr php artisan migrate --force
+          LOG_CHANNEL=stderr php artisan optimize:clear
+          LOG_CHANNEL=stderr php artisan optimize
 
           ln -sfn "${RELEASE_DIR}" "${CURRENT_LINK}"
-          php "${CURRENT_LINK}/artisan" queue:restart
+          LOG_CHANNEL=stderr php "${CURRENT_LINK}/artisan" queue:restart
 
           if sudo -n true >/dev/null 2>&1; then
             sudo systemctl reload php8.4-fpm
