@@ -103,6 +103,9 @@ jobs:
           RELEASE_DIR="${APP_ROOT}/releases/${RELEASE_SHA}"
           SHARED_DIR="${APP_ROOT}/shared"
           CURRENT_LINK="${APP_ROOT}/current"
+          WEB_GROUP="www-data"
+
+          umask 0002
 
           mkdir -p "${RELEASE_DIR}"
           tar -xzf "/tmp/release-${RELEASE_SHA}.tar.gz" -C "${RELEASE_DIR}"
@@ -120,16 +123,20 @@ jobs:
           rm -rf "${RELEASE_DIR}/public/storage"
           ln -sfn "${RELEASE_DIR}/storage/app/public" "${RELEASE_DIR}/public/storage"
 
-          mkdir -p "${SHARED_DIR}/bootstrap/cache"
-          rm -rf "${RELEASE_DIR}/bootstrap/cache"
-          ln -sfn "${SHARED_DIR}/bootstrap/cache" "${RELEASE_DIR}/bootstrap/cache"
+          mkdir -p "${RELEASE_DIR}/bootstrap/cache"
+          rm -f "${RELEASE_DIR}/bootstrap/cache/"*.php
 
           # Ensure storage and cache are writable. We use sudo if available to handle files owned by the web server user.
           if sudo -n true >/dev/null 2>&1; then
-            sudo chmod -R ug+rwx "${SHARED_DIR}/storage" "${SHARED_DIR}/bootstrap/cache"
+            sudo touch "${SHARED_DIR}/storage/logs/laravel.log"
+            sudo chown -R "${USER}:${WEB_GROUP}" "${SHARED_DIR}/storage" "${RELEASE_DIR}/bootstrap/cache"
+            sudo find "${SHARED_DIR}/storage" "${RELEASE_DIR}/bootstrap/cache" -type d -exec chmod 2775 {} +
+            sudo find "${SHARED_DIR}/storage" "${RELEASE_DIR}/bootstrap/cache" -type f -exec chmod 0664 {} +
           else
             # Fallback: try to chmod essential directories and ignore errors for files we don't own (like user uploads)
-            chmod -R ug+rwx "${SHARED_DIR}/storage/logs" "${SHARED_DIR}/storage/framework" "${SHARED_DIR}/bootstrap/cache" 2>/dev/null || true
+            chmod -R ug+rwX "${SHARED_DIR}/storage/logs" "${SHARED_DIR}/storage/framework" "${RELEASE_DIR}/bootstrap/cache" 2>/dev/null || true
+            find "${SHARED_DIR}/storage/logs" "${SHARED_DIR}/storage/framework" "${RELEASE_DIR}/bootstrap/cache" -type d -exec chmod g+s {} + 2>/dev/null || true
+            touch "${SHARED_DIR}/storage/logs/laravel.log"
           fi
 
           cd "${RELEASE_DIR}"

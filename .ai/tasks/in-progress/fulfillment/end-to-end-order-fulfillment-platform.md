@@ -1,4 +1,4 @@
-# Task: End To End Order Fulfillment Platform
+# Task: End-To-End Order Fulfillment Platform
 
 ## Metadata
 
@@ -24,7 +24,7 @@ Define the full LoomCraft order-operations program across website admin, vendor/
 and PDF generation, delivery confirmation, complaint handling, and reverse-logistics returns. This task is the umbrella planning item that ties the detailed implementation tasks
 together.
 
-This merged task now absorbs the earlier workflow-planning and shipment-domain planning items so there is one canonical planning brief for order handling, shipment status design,
+This merged task now absorbs the earlier workflow-planning and shipment-domain planning items, so there is one canonical planning brief for order handling, shipment status design,
 delivery operations, returns, complaints, labels, courier tracking, and admin/mobile operational responsibilities.
 
 ## Execution Status
@@ -417,7 +417,7 @@ Current priority adjustment:
 ## Test Plan
 
 - No code tests for planning-only work
-- Validate the child task set against cur rent order and tracking implementation before starting development
+- Validate the child task set against the current order and tracking implementation before starting development
 
 ## Documentation Updates Required
 

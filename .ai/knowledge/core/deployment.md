@@ -62,6 +62,7 @@ usermod -aG www-data deploy
 mkdir -p /var/www/loom-craft/{releases,shared,repo}
 chown -R deploy:www-data /var/www/loom-craft
 chmod -R 775 /var/www/loom-craft
+find /var/www/loom-craft -type d -exec chmod g+s {} +
 ```
 
 Add GitHub Actions public key to `/home/deploy/.ssh/authorized_keys`.
@@ -96,10 +97,10 @@ Create persistent shared paths:
 
 ```bash
 mkdir -p /var/www/loom-craft/shared/storage
-mkdir -p /var/www/loom-craft/shared/bootstrap/cache
 touch /var/www/loom-craft/shared/.env
 chown -R deploy:www-data /var/www/loom-craft/shared
-chmod -R 775 /var/www/loom-craft/shared/storage /var/www/loom-craft/shared/bootstrap/cache
+chmod -R 775 /var/www/loom-craft/shared/storage
+find /var/www/loom-craft/shared/storage -type d -exec chmod g+s {} +
 ```
 
 Set production `.env` at `/var/www/loom-craft/shared/.env` with at least:
@@ -312,6 +313,9 @@ jobs:
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
           set -euo pipefail
           RELEASE_DIR=/var/www/loom-craft/releases/${GITHUB_SHA}
+          WEB_GROUP=www-data
+          umask 0002
+
           mkdir -p "${RELEASE_DIR}"
           tar -xzf /tmp/release-${GITHUB_SHA}.tar.gz -C "${RELEASE_DIR}"
 
@@ -319,11 +323,21 @@ jobs:
           rm -rf "${RELEASE_DIR}/storage"
           ln -sfn /var/www/loom-craft/shared/storage "${RELEASE_DIR}/storage"
           mkdir -p /var/www/loom-craft/shared/storage/app/public
+          mkdir -p /var/www/loom-craft/shared/storage/framework/cache
+          mkdir -p /var/www/loom-craft/shared/storage/framework/sessions
+          mkdir -p /var/www/loom-craft/shared/storage/framework/views
+          mkdir -p /var/www/loom-craft/shared/storage/logs
+
           rm -rf "${RELEASE_DIR}/public/storage"
           ln -sfn "${RELEASE_DIR}/storage/app/public" "${RELEASE_DIR}/public/storage"
-          mkdir -p /var/www/loom-craft/shared/bootstrap/cache
-          rm -rf "${RELEASE_DIR}/bootstrap/cache"
-          ln -sfn /var/www/loom-craft/shared/bootstrap/cache "${RELEASE_DIR}/bootstrap/cache"
+
+          mkdir -p "${RELEASE_DIR}/bootstrap/cache"
+          rm -f "${RELEASE_DIR}/bootstrap/cache/"*.php
+
+          sudo touch /var/www/loom-craft/shared/storage/logs/laravel.log
+          sudo chown -R "${USER}:${WEB_GROUP}" /var/www/loom-craft/shared/storage "${RELEASE_DIR}/bootstrap/cache"
+          sudo find /var/www/loom-craft/shared/storage "${RELEASE_DIR}/bootstrap/cache" -type d -exec chmod 2775 {} +
+          sudo find /var/www/loom-craft/shared/storage "${RELEASE_DIR}/bootstrap/cache" -type f -exec chmod 0664 {} +
 
           cd "${RELEASE_DIR}"
           php artisan migrate --force
