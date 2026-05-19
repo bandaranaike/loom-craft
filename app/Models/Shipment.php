@@ -42,6 +42,18 @@ class Shipment extends Model
         'parcel_dimension_unit',
         'shipped_at',
         'delivered_at',
+        'delivery_recipient_name',
+        'delivery_proof_reference',
+        'delivery_evidence_path',
+        'delivery_evidence_original_name',
+        'delivery_evidence_mime_type',
+        'delivery_evidence_uploaded_at',
+        'delivery_confirmed_by',
+        'delivery_note',
+        'delivery_exception_reason',
+        'delivery_exception_note',
+        'delivery_exception_at',
+        'failed_delivery_attempts',
     ];
 
     protected static function booted(): void
@@ -72,6 +84,8 @@ class Shipment extends Model
             'packed_at' => 'datetime',
             'shipped_at' => 'datetime',
             'delivered_at' => 'datetime',
+            'delivery_evidence_uploaded_at' => 'datetime',
+            'delivery_exception_at' => 'datetime',
         ];
     }
 
@@ -93,6 +107,11 @@ class Shipment extends Model
     public function shippingService(): BelongsTo
     {
         return $this->belongsTo(ShippingService::class);
+    }
+
+    public function deliveryConfirmedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'delivery_confirmed_by');
     }
 
     public function fulfillmentStatusHistories(): HasMany

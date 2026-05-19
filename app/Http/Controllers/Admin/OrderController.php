@@ -8,6 +8,7 @@ use App\DTOs\Order\OrderIndexData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateOfflineOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
+use App\Http\Requests\Admin\UpdateShipmentDeliveryEvidenceRequest;
 use App\Http\Requests\Admin\UpdateShipmentStatusRequest;
 use App\Http\Requests\Admin\UpdateShipmentTrackingRequest;
 use App\Models\Order;
@@ -92,6 +93,8 @@ class OrderController extends Controller
             $shipment,
             $request->validated('shipment_status'),
             $request->user(),
+            deliveryExceptionReason: $request->validated('delivery_exception_reason'),
+            deliveryExceptionNote: $request->validated('delivery_exception_note'),
         );
 
         return back()->with('status', 'Shipment status updated.');
@@ -112,6 +115,27 @@ class OrderController extends Controller
         );
 
         return back()->with('status', 'Shipment tracking updated.');
+    }
+
+    public function updateShipmentDeliveryEvidence(
+        UpdateShipmentDeliveryEvidenceRequest $request,
+        Order $order,
+        Shipment $shipment,
+    ): RedirectResponse {
+        $validated = $request->validated();
+        $file = $request->file('evidence');
+        $path = $file?->store('shipment-delivery-evidence', 'public');
+
+        $this->fulfillmentStatusService->recordDeliveryEvidence($order, $shipment, $request->user(), [
+            'recipient_name' => $validated['recipient_name'] ?? null,
+            'proof_reference' => $validated['proof_reference'] ?? null,
+            'evidence_path' => $path,
+            'evidence_original_name' => $file?->getClientOriginalName(),
+            'evidence_mime_type' => $file?->getClientMimeType(),
+            'note' => $validated['note'] ?? null,
+        ]);
+
+        return back()->with('status', 'Delivery evidence updated.');
     }
 
     public function destroy(Order $order): RedirectResponse

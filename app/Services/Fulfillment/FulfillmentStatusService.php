@@ -8,6 +8,7 @@ use App\Enums\FulfillmentStatusDomain;
 use App\Enums\OrderReturnStatus;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\ShipmentExceptionReason;
 use App\Enums\ShipmentStatus;
 use App\Models\Complaint;
 use App\Models\FulfillmentStatusHistory;
@@ -615,8 +616,16 @@ class FulfillmentStatusService
         );
     }
 
-    public function updateShipmentStatus(Order $order, Shipment $shipment, string $nextStatus, User $actor, ?string $reason = null, ?string $note = null): void
-    {
+    public function updateShipmentStatus(
+        Order $order,
+        Shipment $shipment,
+        string $nextStatus,
+        User $actor,
+        ?string $reason = null,
+        ?string $note = null,
+        ?string $deliveryExceptionReason = null,
+        ?string $deliveryExceptionNote = null,
+    ): void {
         $next = $this->resolveShipmentStatus($nextStatus);
 
         if (! $this->canTransitionShipment($order, $shipment, $next->value, $actor)) {
@@ -654,6 +663,21 @@ class FulfillmentStatusService
             $updates['delivered_at'] = now();
         }
 
+        if (in_array($next, [ShipmentStatus::DeliveryFailed, ShipmentStatus::ReturnToSender], true)) {
+            if ($deliveryExceptionReason === null) {
+                throw new InvalidArgumentException('A delivery exception reason is required for this shipment status.');
+            }
+
+            ShipmentExceptionReason::from($deliveryExceptionReason);
+
+            $updates['delivery_exception_reason'] = $deliveryExceptionReason;
+            $updates['delivery_exception_note'] = $deliveryExceptionNote;
+            $updates['delivery_exception_at'] = now();
+            $updates['failed_delivery_attempts'] = $next === ShipmentStatus::DeliveryFailed
+                ? $shipment->failed_delivery_attempts + 1
+                : $shipment->failed_delivery_attempts;
+        }
+
         $shipment->update($updates);
 
         $this->recordHistory(
@@ -663,8 +687,8 @@ class FulfillmentStatusService
             actor: $actor,
             fromStatus: $fromStatus,
             toStatus: $next->value,
-            reason: $reason,
-            note: $note,
+            reason: $reason ?? ($deliveryExceptionReason === null ? null : 'delivery_exception'),
+            note: $note ?? $deliveryExceptionNote,
         );
 
         if ($next === ShipmentStatus::Delivered && ! in_array($order->status, [OrderStatus::Fulfilled->value, OrderStatus::Closed->value, OrderStatus::Cancelled->value], true)) {
@@ -723,6 +747,38 @@ class FulfillmentStatusService
             toStatus: $shipment->status,
             reason: 'tracking_updated',
             note: sprintf('Tracking number %s assigned to %s.', $trackingNumber, $carrier->name),
+        );
+    }
+
+    /**
+     * @param  array{recipient_name?: string|null, proof_reference?: string|null, evidence_path?: string|null, evidence_original_name?: string|null, evidence_mime_type?: string|null, note?: string|null}  $data
+     */
+    public function recordDeliveryEvidence(Order $order, Shipment $shipment, User $actor, array $data): void
+    {
+        if ($actor->role !== 'admin' || $shipment->order_id !== $order->id) {
+            throw new InvalidArgumentException('The requested delivery evidence update is not allowed.');
+        }
+
+        $shipment->update([
+            'delivery_recipient_name' => $data['recipient_name'] ?? null,
+            'delivery_proof_reference' => $data['proof_reference'] ?? null,
+            'delivery_evidence_path' => $data['evidence_path'] ?? $shipment->delivery_evidence_path,
+            'delivery_evidence_original_name' => $data['evidence_original_name'] ?? $shipment->delivery_evidence_original_name,
+            'delivery_evidence_mime_type' => $data['evidence_mime_type'] ?? $shipment->delivery_evidence_mime_type,
+            'delivery_evidence_uploaded_at' => isset($data['evidence_path']) ? now() : $shipment->delivery_evidence_uploaded_at,
+            'delivery_confirmed_by' => $actor->id,
+            'delivery_note' => $data['note'] ?? null,
+        ]);
+
+        $this->recordHistory(
+            order: $order,
+            shipment: $shipment,
+            domain: FulfillmentStatusDomain::Shipment,
+            actor: $actor,
+            fromStatus: $shipment->status,
+            toStatus: $shipment->status,
+            reason: 'delivery_evidence_recorded',
+            note: $data['note'] ?? $data['proof_reference'] ?? null,
         );
     }
 

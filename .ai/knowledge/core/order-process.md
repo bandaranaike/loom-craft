@@ -249,9 +249,17 @@ Typical status progression (may vary by payment method):
   - shipment-level parcel metrics
 - Product catalog dimensions remain available, but they should be treated as catalog data, not guaranteed final packed-parcel measurements.
 
+### 8.5 Delivery Evidence And Exceptions
+
+- Admins can record proof-of-delivery details on shipments: recipient name, courier proof reference, uploaded evidence file, delivery note, and confirming admin.
+- Delivery failed and return-to-sender transitions require an exception reason.
+- Supported exception reasons are damaged parcel, lost parcel, customer unreachable, address issue, customer refused, and other.
+- Failed delivery attempts are counted on the shipment.
+- Exception transitions and proof updates are recorded in fulfillment history.
+
 ---
 
-## 8.5 Post-Delivery Reviews
+## 8.6 Post-Delivery Reviews
 
 - Authenticated customers can submit a product review only after at least one of their orders containing that product reaches `delivered`.
 - Reviews are limited to one record per `user_id` + `product_id`.

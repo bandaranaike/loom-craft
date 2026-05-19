@@ -212,8 +212,8 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 - Courier handoff and operational checkpoint timestamps now exist through shipment fields; operator attribution exists through `fulfillment_status_histories`.
 - Admin web tracking-number assignment is implemented.
 - Mobile/API tracking assignment is deferred because mobile app work is currently skipped.
-- Add proof-of-delivery fields and evidence handling.
-- Add failed-delivery and delivery-exception reasons.
+- Add proof-of-delivery fields and evidence handling. Implemented on shipments with recipient, proof reference, uploaded evidence metadata, confirming admin, and delivery note.
+- Add failed-delivery and delivery-exception reasons. Implemented for delivery failed and return-to-sender transitions with damaged parcel, lost parcel, customer unreachable, address issue, customer refused, and other.
 - Model Sri Lanka Post Courier as the phase 1 courier, with manually entered AWB/tracking numbers.
 - Defer courier API synchronization to a later phase.
 
@@ -410,6 +410,9 @@ Current priority adjustment:
 - 2026-05-19:
   Implemented the backend complaint workflow slice:
   added operational complaint numbering, order/shipment/return/payment links, category and severity fields, first-response/SLA/resolution timestamps, resolution/courier-claim metadata, complaint status transitions from open through closure/cancellation, fulfillment history support for `domain=complaint`, admin routes/controllers/requests, and focused Pest coverage.
+- 2026-05-19:
+  Implemented shipment exceptions and delivery evidence:
+  added shipment proof-of-delivery fields, uploaded evidence metadata, delivery exception reasons/notes/timestamps, failed delivery attempt counting, admin delivery-evidence endpoint, exception validation on failed-delivery/return-to-sender transitions, and focused Pest coverage.
 
 ## Test Plan
 

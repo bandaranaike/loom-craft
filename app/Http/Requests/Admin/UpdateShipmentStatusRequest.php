@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\ShipmentExceptionReason;
 use App\Enums\ShipmentStatus;
 use App\Models\Order;
 use App\Models\Shipment;
@@ -38,6 +39,8 @@ class UpdateShipmentStatusRequest extends FormRequest
     {
         return [
             'shipment_status' => ['required', Rule::in(ShipmentStatus::values())],
+            'delivery_exception_reason' => ['nullable', Rule::in(ShipmentExceptionReason::values())],
+            'delivery_exception_note' => ['nullable', 'string', 'max:5000'],
         ];
     }
 
@@ -68,6 +71,11 @@ class UpdateShipmentStatusRequest extends FormRequest
                     }
 
                     $validator->errors()->add('shipment_status', 'Select a valid next shipment status.');
+                }
+
+                if (in_array($this->validated('shipment_status'), [ShipmentStatus::DeliveryFailed->value, ShipmentStatus::ReturnToSender->value], true)
+                    && ! is_string($this->validated('delivery_exception_reason'))) {
+                    $validator->errors()->add('delivery_exception_reason', 'Select a delivery exception reason.');
                 }
             },
         ];

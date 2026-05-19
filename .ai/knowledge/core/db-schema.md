@@ -457,14 +457,18 @@ Tracks shipping responsibility and fulfillment.
 - `parcel_dimension_unit` (varchar(10), nullable)
 - `shipped_at` (timestamp, nullable)
 - `delivered_at` (timestamp, nullable)
+- proof-of-delivery fields: `delivery_recipient_name`, `delivery_proof_reference`, `delivery_evidence_path`, `delivery_evidence_original_name`, `delivery_evidence_mime_type`, `delivery_evidence_uploaded_at`, `delivery_confirmed_by`, `delivery_note`
+- exception fields: `delivery_exception_reason`, `delivery_exception_note`, `delivery_exception_at`, `failed_delivery_attempts`
 - `created_at` (timestamp, nullable)
 - `updated_at` (timestamp, nullable)
 
 Indexes:
 - `shipments_shipment_number_unique` on `shipment_number`
+- `shipments_delivery_exception_reason_status_index` on (`delivery_exception_reason`, `status`)
 
 Implementation note:
 - `carrier` and `service_level` remain as display snapshots for labels/API compatibility. New admin tracking assignment uses `shipping_carrier_id` and `shipping_service_id`.
+- Delivery evidence and delivery exception metadata are stored directly on the shipment record for phase 1.
 
 ---
 
