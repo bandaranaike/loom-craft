@@ -353,6 +353,15 @@ it('creates a pending order from checkout and clears the cart', function () {
         'package_count' => 1,
     ]);
 
+    $shipment = $order->shipments()->firstOrFail();
+    $orderItem = $order->items()->firstOrFail();
+
+    $this->assertDatabaseHas('shipment_items', [
+        'shipment_id' => $shipment->id,
+        'order_item_id' => $orderItem->id,
+        'quantity' => 1,
+    ]);
+
     $this->assertDatabaseMissing('cart_items', [
         'cart_id' => $cart->id,
     ]);

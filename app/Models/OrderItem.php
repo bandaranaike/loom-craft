@@ -46,4 +46,9 @@ class OrderItem extends Model
     {
         return $this->hasMany(Dispute::class);
     }
+
+    public function shipmentItems(): HasMany
+    {
+        return $this->hasMany(ShipmentItem::class);
+    }
 }

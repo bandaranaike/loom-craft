@@ -119,6 +119,11 @@ class Shipment extends Model
         return $this->hasMany(FulfillmentStatusHistory::class);
     }
 
+    public function items(): HasMany
+    {
+        return $this->hasMany(ShipmentItem::class);
+    }
+
     public function returns(): HasMany
     {
         return $this->hasMany(OrderReturn::class);

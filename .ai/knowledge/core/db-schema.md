@@ -472,6 +472,27 @@ Implementation note:
 
 ---
 
+### shipment_items
+
+Allocates order items to shipments for multi-vendor, multi-package, and later partial-shipment support.
+
+- `id` (bigint unsigned, PK)
+- `shipment_id` (bigint unsigned, FK -> shipments.id)
+- `order_item_id` (bigint unsigned, FK -> order_items.id)
+- `quantity` (int unsigned)
+- `created_at` / `updated_at`
+
+Indexes:
+- Unique (`shipment_id`, `order_item_id`)
+- `shipment_items_order_item_id_index` on `order_item_id`
+
+Phase 1 rule:
+- Order placement still creates one initial shipment.
+- Single-vendor shipments store `shipments.vendor_id`.
+- Multi-vendor shipments store `shipments.vendor_id = null` and use `shipment_items` for item allocation.
+
+---
+
 ### shipping_carriers
 
 Admin-managed courier carrier dictionary for shipment tracking dropdowns.

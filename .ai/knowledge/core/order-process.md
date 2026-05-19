@@ -188,6 +188,9 @@ For each cart item:
   - parcel measurements unset until packing
 - Shipment numbering uses the format `SHP-YYYYMM-######`.
 - Tracking numbers are expected to be attached later in fulfillment when the courier AWB is known.
+- Shipment item allocation is stored in `shipment_items`.
+- Phase 1 creates one shipment at order placement. Single-vendor shipments keep `shipments.vendor_id`; multi-vendor shipments use `shipments.vendor_id = null` and allocate items through `shipment_items`.
+- Future multi-package and partial-shipment work should create additional shipment rows and allocate the relevant item quantities through `shipment_items`.
 
 ---
 

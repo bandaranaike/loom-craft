@@ -47,6 +47,48 @@ it('assigns a shipment number and preserves parcel metrics on shipments', functi
         ->and($shipment->parcel_dimension_unit)->toBe('cm');
 });
 
+it('represents shipment item allocation for multi-vendor orders', function () {
+    $order = createFulfillmentFoundationOrder();
+    $otherVendor = Vendor::factory()->create(['status' => 'approved']);
+    $otherProduct = Product::factory()->for($otherVendor)->create([
+        'status' => 'active',
+        'selling_price' => '220.00',
+    ]);
+
+    $otherItem = $order->items()->create([
+        'product_id' => $otherProduct->id,
+        'vendor_id' => $otherVendor->id,
+        'quantity' => 2,
+        'unit_price' => '220.00',
+        'commission_rate' => '100.00',
+        'commission_amount' => '440.00',
+        'line_total' => '440.00',
+    ]);
+
+    $shipment = $order->shipments()->create([
+        'vendor_id' => null,
+        'responsibility' => 'platform',
+        'status' => 'pending',
+        'package_count' => 1,
+    ]);
+
+    foreach ($order->items as $item) {
+        $shipment->items()->create([
+            'order_item_id' => $item->id,
+            'quantity' => $item->quantity,
+        ]);
+    }
+
+    expect($shipment->vendor_id)->toBeNull()
+        ->and($shipment->items()->count())->toBe(2);
+
+    $this->assertDatabaseHas('shipment_items', [
+        'shipment_id' => $shipment->id,
+        'order_item_id' => $otherItem->id,
+        'quantity' => 2,
+    ]);
+});
+
 function createFulfillmentFoundationOrder(): Order
 {
     $vendorUser = User::factory()->create(['role' => 'vendor']);

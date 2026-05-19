@@ -255,8 +255,8 @@ delivery operations, returns, complaints, labels, courier tracking, and admin/mo
 ### Track 6: Auditability And Multi-Vendor Rules
 
 - Add immutable history for fulfillment state changes.
-- Define multi-vendor order handling vs vendor-scoped shipment handling.
-- Define multi-package behavior and whether it is phase 1 or later.
+- Define multi-vendor order handling vs vendor-scoped shipment handling. Implemented baseline: single-vendor shipments keep `vendor_id`; multi-vendor initial shipments use `vendor_id = null` and `shipment_items` allocation.
+- Define multi-package behavior and whether it is phase 1 or later. Phase 1 remains one initial shipment/package; `shipment_items` provides the allocation layer for later multi-package and partial shipment rows.
 - Add operator/action attribution for sensitive fulfillment steps.
 
 ## Suggested Next Slices

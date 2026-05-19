@@ -131,13 +131,13 @@ class PlaceOrder
                 'placed_at' => now(),
             ]);
 
-            $order->items()->createMany($lineItems);
+            $createdOrderItems = $order->items()->createMany($lineItems);
             $order->addresses()->createMany([
                 $data->shippingAddress->toArray('shipping'),
                 $data->billingAddress->toArray('billing'),
             ]);
 
-            $order->shipments()->create([
+            $shipment = $order->shipments()->create([
                 'vendor_id' => $this->resolveInitialShipmentVendorId($lineItems),
                 'responsibility' => $data->shippingResponsibility,
                 'status' => 'pending',
@@ -154,6 +154,15 @@ class PlaceOrder
                 'shipped_at' => null,
                 'delivered_at' => null,
             ]);
+
+            $shipment->items()->createMany(
+                $createdOrderItems
+                    ->map(fn ($item): array => [
+                        'order_item_id' => $item->id,
+                        'quantity' => $item->quantity,
+                    ])
+                    ->all()
+            );
 
             $order->payment()->create([
                 'method' => $data->paymentMethod,
