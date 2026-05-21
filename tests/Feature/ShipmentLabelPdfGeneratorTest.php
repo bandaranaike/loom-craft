@@ -18,11 +18,14 @@ it('builds a writable chrome runtime configuration', function () {
     $nodeBinary = invokePrivateMethod($generator, 'nodeBinary');
     $nodeModulePath = invokePrivateMethod($generator, 'nodeModulePath');
     $nodeEnvironment = invokePrivateMethod($generator, 'nodeEnvironment');
+    $chromiumArguments = invokePrivateMethod($generator, 'chromiumArguments');
 
     expect($runtimePathFromService)->toBe($runtimePath);
     expect($chromeUserDataDir)->toBe($runtimePath.'/chrome-profile');
     expect($nodeBinary)->toBe('/usr/bin/node');
     expect($nodeModulePath)->toBe(base_path('node_modules'));
+    expect($chromiumArguments)->toContain('disable-crash-reporter');
+    expect($chromiumArguments)->each->not->toStartWith('--');
     expect($nodeEnvironment)->toBe([
         'HOME' => $runtimePath,
         'XDG_CACHE_HOME' => $runtimePath.'/cache',

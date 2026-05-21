@@ -28,19 +28,7 @@ class ShipmentLabelPdfGenerator
             ->setOption('preferCSSPageSize', true)
             ->setNodeEnv($this->nodeEnvironment())
             ->userDataDir($this->chromeUserDataDir())
-            ->addChromiumArguments([
-                '--disable-gpu',
-                '--disable-dev-shm-usage',
-                '--disable-crash-reporter',
-                '--disable-breakpad',
-                '--no-zygote',
-                '--disable-setuid-sandbox',
-                '--disable-software-rasterizer',
-                '--disable-extensions',
-                '--font-render-hinting=none',
-                '--disable-features=VizDisplayCompositor',
-                '--remote-debugging-port=0',
-            ]);
+            ->addChromiumArguments($this->chromiumArguments());
 
         $this->configureExecutablePaths($browsershot);
 
@@ -68,6 +56,28 @@ class ShipmentLabelPdfGenerator
         if (is_string($nodeModulePath) && $nodeModulePath !== '') {
             $browsershot->setNodeModulePath($nodeModulePath);
         }
+    }
+
+    /**
+     * Browsershot prefixes each Chromium argument with "--".
+     *
+     * @return list<string>
+     */
+    private function chromiumArguments(): array
+    {
+        return [
+            'disable-gpu',
+            'disable-dev-shm-usage',
+            'disable-crash-reporter',
+            'disable-breakpad',
+            'no-zygote',
+            'disable-setuid-sandbox',
+            'disable-software-rasterizer',
+            'disable-extensions',
+            'font-render-hinting=none',
+            'disable-features=VizDisplayCompositor',
+            'remote-debugging-port=0',
+        ];
     }
 
     private function ensureRuntimeDirectories(): void
