@@ -131,6 +131,30 @@ jobs:
             PUPPETEER_SKIP_DOWNLOAD=1 npx --yes pnpm@10.31.0 install --frozen-lockfile --prod
           }
 
+          ensure_browsershot_chrome() {
+            BROWSERSHOT_CACHE_DIR="${SHARED_DIR}/storage/app/browsershot"
+            mkdir -p "${BROWSERSHOT_CACHE_DIR}"
+
+            CHROME_EXECUTABLE="$(find "${BROWSERSHOT_CACHE_DIR}/chrome" -type f -path "*/chrome-linux64/chrome" -perm -111 2>/dev/null | head -n 1 || true)"
+
+            if [ -n "${CHROME_EXECUTABLE}" ]; then
+              return
+            fi
+
+            find "${BROWSERSHOT_CACHE_DIR}/chrome" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | while read -r chrome_dir; do
+              if [ ! -x "${chrome_dir}/chrome-linux64/chrome" ]; then
+                rm -rf "${chrome_dir}"
+              fi
+            done
+
+            if command -v pnpm >/dev/null 2>&1; then
+              PUPPETEER_CACHE_DIR="${BROWSERSHOT_CACHE_DIR}" pnpm exec puppeteer browsers install chrome
+              return
+            fi
+
+            PUPPETEER_CACHE_DIR="${BROWSERSHOT_CACHE_DIR}" npx --yes pnpm@10.31.0 exec puppeteer browsers install chrome
+          }
+
           ensure_node_runtime
 
           ln -sfn "${SHARED_DIR}/.env" "${RELEASE_DIR}/.env"
@@ -164,6 +188,7 @@ jobs:
 
           cd "${RELEASE_DIR}"
           install_production_js_dependencies
+          ensure_browsershot_chrome
           LOG_CHANNEL=stderr php artisan migrate --force
           LOG_CHANNEL=stderr php artisan optimize:clear
           LOG_CHANNEL=stderr php artisan optimize

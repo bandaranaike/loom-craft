@@ -149,11 +149,14 @@ class ShipmentLabelPdfGenerator
     {
         $configuredPath = config('services.browsershot.chrome_path');
 
-        if (is_string($configuredPath) && $configuredPath !== '') {
+        if (is_string($configuredPath) && $configuredPath !== '' && is_executable($configuredPath)) {
             return $configuredPath;
         }
 
-        $storageMatches = glob(storage_path('app/browsershot/chrome/*/chrome-linux64/chrome')) ?: [];
+        $storageMatches = array_values(array_filter(
+            glob(storage_path('app/browsershot/chrome/*/chrome-linux64/chrome')) ?: [],
+            static fn (string $path): bool => is_executable($path),
+        ));
 
         rsort($storageMatches);
 
@@ -167,7 +170,10 @@ class ShipmentLabelPdfGenerator
             return null;
         }
 
-        $matches = glob($homePath.'/.cache/puppeteer/chrome/*/chrome-linux64/chrome') ?: [];
+        $matches = array_values(array_filter(
+            glob($homePath.'/.cache/puppeteer/chrome/*/chrome-linux64/chrome') ?: [],
+            static fn (string $path): bool => is_executable($path),
+        ));
 
         rsort($matches);
 

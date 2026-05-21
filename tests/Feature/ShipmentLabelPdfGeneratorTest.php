@@ -39,6 +39,14 @@ it('builds a writable chrome runtime configuration', function () {
     $filesystem->deleteDirectory($runtimePath);
 });
 
+it('ignores a configured chrome path that does not exist', function () {
+    app('config')->set('services.browsershot.chrome_path', '/missing/chrome');
+
+    $generator = new ShipmentLabelPdfGenerator;
+
+    expect(invokePrivateMethod($generator, 'chromePath'))->not->toBe('/missing/chrome');
+});
+
 function invokePrivateMethod(object $object, string $method, array $arguments = []): mixed
 {
     $reflection = new ReflectionClass($object);
