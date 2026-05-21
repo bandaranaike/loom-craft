@@ -84,6 +84,7 @@ class ShipmentLabelPdfGenerator
     private function ensureRuntimeDirectories(): void
     {
         foreach ([
+            $this->browserCachePath(),
             $this->runtimePath(),
             $this->chromeUserDataDir(),
             $this->chromeCrashDumpsDir(),
@@ -100,6 +101,7 @@ class ShipmentLabelPdfGenerator
     {
         return [
             'HOME' => $this->runtimePath(),
+            'PUPPETEER_CACHE_DIR' => $this->browserCachePath(),
             'XDG_CACHE_HOME' => $this->runtimePath().'/cache',
             'XDG_CONFIG_HOME' => $this->runtimePath().'/config',
         ];
@@ -114,6 +116,11 @@ class ShipmentLabelPdfGenerator
         }
 
         return storage_path('app/browsershot/runtime');
+    }
+
+    private function browserCachePath(): string
+    {
+        return storage_path('app/browsershot');
     }
 
     private function nodeBinary(): string

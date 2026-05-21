@@ -14,6 +14,7 @@ it('builds a writable chrome runtime configuration', function () {
     $generator = new ShipmentLabelPdfGenerator;
 
     $runtimePathFromService = invokePrivateMethod($generator, 'runtimePath');
+    $browserCachePath = invokePrivateMethod($generator, 'browserCachePath');
     $chromeUserDataDir = invokePrivateMethod($generator, 'chromeUserDataDir');
     $chromeCrashDumpsDir = invokePrivateMethod($generator, 'chromeCrashDumpsDir');
     $nodeBinary = invokePrivateMethod($generator, 'nodeBinary');
@@ -22,6 +23,7 @@ it('builds a writable chrome runtime configuration', function () {
     $chromiumArguments = invokePrivateMethod($generator, 'chromiumArguments');
 
     expect($runtimePathFromService)->toBe($runtimePath);
+    expect($browserCachePath)->toBe(storage_path('app/browsershot'));
     expect($chromeUserDataDir)->toBe($runtimePath.'/chrome-profile');
     expect($chromeCrashDumpsDir)->toBe($runtimePath.'/crashpad');
     expect($nodeBinary)->toBe('/usr/bin/node');
@@ -31,12 +33,14 @@ it('builds a writable chrome runtime configuration', function () {
     expect($chromiumArguments)->each->not->toStartWith('--');
     expect($nodeEnvironment)->toBe([
         'HOME' => $runtimePath,
+        'PUPPETEER_CACHE_DIR' => storage_path('app/browsershot'),
         'XDG_CACHE_HOME' => $runtimePath.'/cache',
         'XDG_CONFIG_HOME' => $runtimePath.'/config',
     ]);
 
     invokePrivateMethod($generator, 'ensureRuntimeDirectories');
 
+    expect($filesystem->isDirectory(storage_path('app/browsershot')))->toBeTrue();
     expect($filesystem->isDirectory($runtimePath))->toBeTrue();
     expect($filesystem->isDirectory($runtimePath.'/chrome-profile'))->toBeTrue();
     expect($filesystem->isDirectory($runtimePath.'/crashpad'))->toBeTrue();
