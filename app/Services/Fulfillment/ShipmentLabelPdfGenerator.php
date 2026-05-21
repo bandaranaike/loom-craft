@@ -69,6 +69,7 @@ class ShipmentLabelPdfGenerator
             'disable-gpu',
             'disable-dev-shm-usage',
             'disable-crash-reporter',
+            'crash-dumps-dir='.$this->chromeCrashDumpsDir(),
             'disable-breakpad',
             'no-zygote',
             'disable-setuid-sandbox',
@@ -85,6 +86,7 @@ class ShipmentLabelPdfGenerator
         foreach ([
             $this->runtimePath(),
             $this->chromeUserDataDir(),
+            $this->chromeCrashDumpsDir(),
             $this->runtimePath().'/cache',
             $this->runtimePath().'/config',
         ] as $directory) {
@@ -153,6 +155,11 @@ class ShipmentLabelPdfGenerator
     private function chromeUserDataDir(): string
     {
         return $this->runtimePath().'/chrome-profile';
+    }
+
+    private function chromeCrashDumpsDir(): string
+    {
+        return $this->runtimePath().'/crashpad';
     }
 
     private function chromePath(): ?string

@@ -15,6 +15,7 @@ it('builds a writable chrome runtime configuration', function () {
 
     $runtimePathFromService = invokePrivateMethod($generator, 'runtimePath');
     $chromeUserDataDir = invokePrivateMethod($generator, 'chromeUserDataDir');
+    $chromeCrashDumpsDir = invokePrivateMethod($generator, 'chromeCrashDumpsDir');
     $nodeBinary = invokePrivateMethod($generator, 'nodeBinary');
     $nodeModulePath = invokePrivateMethod($generator, 'nodeModulePath');
     $nodeEnvironment = invokePrivateMethod($generator, 'nodeEnvironment');
@@ -22,9 +23,11 @@ it('builds a writable chrome runtime configuration', function () {
 
     expect($runtimePathFromService)->toBe($runtimePath);
     expect($chromeUserDataDir)->toBe($runtimePath.'/chrome-profile');
+    expect($chromeCrashDumpsDir)->toBe($runtimePath.'/crashpad');
     expect($nodeBinary)->toBe('/usr/bin/node');
     expect($nodeModulePath)->toBe(base_path('node_modules'));
     expect($chromiumArguments)->toContain('disable-crash-reporter');
+    expect($chromiumArguments)->toContain('crash-dumps-dir='.$runtimePath.'/crashpad');
     expect($chromiumArguments)->each->not->toStartWith('--');
     expect($nodeEnvironment)->toBe([
         'HOME' => $runtimePath,
@@ -36,6 +39,7 @@ it('builds a writable chrome runtime configuration', function () {
 
     expect($filesystem->isDirectory($runtimePath))->toBeTrue();
     expect($filesystem->isDirectory($runtimePath.'/chrome-profile'))->toBeTrue();
+    expect($filesystem->isDirectory($runtimePath.'/crashpad'))->toBeTrue();
     expect($filesystem->isDirectory($runtimePath.'/cache'))->toBeTrue();
     expect($filesystem->isDirectory($runtimePath.'/config'))->toBeTrue();
 
