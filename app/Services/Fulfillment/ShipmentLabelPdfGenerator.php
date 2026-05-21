@@ -16,6 +16,8 @@ class ShipmentLabelPdfGenerator
             'printMode' => 'pdf',
         ])->render();
 
+        $this->ensureRuntimeDirectories();
+
         $browsershot = Browsershot::html($html)
             ->showBackground()
             ->margins(0, 0, 0, 0)
@@ -23,7 +25,8 @@ class ShipmentLabelPdfGenerator
             ->windowSize(620, 756)
             ->timeout((int) config('services.browsershot.timeout', 60))
             ->setOption('preferCSSPageSize', true)
-            ->setEnv(['HOME' => storage_path('app/browsershot')])
+            ->setNodeEnv($this->nodeEnvironment())
+            ->userDataDir($this->chromeUserDataDir())
             ->addChromiumArguments([
                 '--disable-gpu',
                 '--disable-dev-shm-usage',
@@ -69,6 +72,45 @@ class ShipmentLabelPdfGenerator
         if (is_string($nodeModulePath) && $nodeModulePath !== '') {
             $browsershot->setNodeModulePath($nodeModulePath);
         }
+    }
+
+    private function ensureRuntimeDirectories(): void
+    {
+        foreach ([
+            $this->runtimePath(),
+            $this->chromeUserDataDir(),
+            $this->runtimePath().'/cache',
+            $this->runtimePath().'/config',
+        ] as $directory) {
+            if (! is_dir($directory)) {
+                mkdir($directory, 0775, true);
+            }
+        }
+    }
+
+    private function nodeEnvironment(): array
+    {
+        return [
+            'HOME' => $this->runtimePath(),
+            'XDG_CACHE_HOME' => $this->runtimePath().'/cache',
+            'XDG_CONFIG_HOME' => $this->runtimePath().'/config',
+        ];
+    }
+
+    private function runtimePath(): string
+    {
+        $configuredPath = config('services.browsershot.runtime_path');
+
+        if (is_string($configuredPath) && $configuredPath !== '') {
+            return $configuredPath;
+        }
+
+        return storage_path('app/browsershot/runtime');
+    }
+
+    private function chromeUserDataDir(): string
+    {
+        return $this->runtimePath().'/chrome-profile';
     }
 
     private function chromePath(): ?string
