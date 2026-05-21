@@ -3,6 +3,7 @@
 namespace App\Services\Fulfillment;
 
 use Spatie\Browsershot\Browsershot;
+use Symfony\Component\Process\ExecutableFinder;
 
 class ShipmentLabelPdfGenerator
 {
@@ -53,9 +54,8 @@ class ShipmentLabelPdfGenerator
     private function configureExecutablePaths(Browsershot $browsershot): void
     {
         $chromePath = $this->chromePath();
-        $nodeBinary = config('services.browsershot.node_binary');
-        $npmBinary = config('services.browsershot.npm_binary');
-        $nodeModulePath = config('services.browsershot.node_module_path');
+        $nodeBinary = $this->nodeBinary();
+        $nodeModulePath = $this->nodeModulePath();
 
         if (is_string($chromePath) && $chromePath !== '') {
             $browsershot->setChromePath($chromePath);
@@ -63,10 +63,6 @@ class ShipmentLabelPdfGenerator
 
         if (is_string($nodeBinary) && $nodeBinary !== '') {
             $browsershot->setNodeBinary($nodeBinary);
-        }
-
-        if (is_string($npmBinary) && $npmBinary !== '') {
-            $browsershot->setNpmBinary($npmBinary);
         }
 
         if (is_string($nodeModulePath) && $nodeModulePath !== '') {
@@ -106,6 +102,42 @@ class ShipmentLabelPdfGenerator
         }
 
         return storage_path('app/browsershot/runtime');
+    }
+
+    private function nodeBinary(): string
+    {
+        $configuredPath = config('services.browsershot.node_binary');
+
+        if (is_string($configuredPath) && $configuredPath !== '') {
+            return $configuredPath;
+        }
+
+        $finder = new ExecutableFinder;
+
+        foreach (['node', 'nodejs', '/usr/bin/node', '/usr/local/bin/node', '/opt/homebrew/bin/node'] as $binary) {
+            if ($path = $finder->find($binary)) {
+                return $path;
+            }
+
+            if (is_string($binary) && str_starts_with($binary, '/')) {
+                if (is_file($binary) && is_executable($binary)) {
+                    return $binary;
+                }
+            }
+        }
+
+        throw new \RuntimeException('Unable to locate a Node.js binary for Browsershot. Set BROWSERSHOT_NODE_BINARY to an absolute path.');
+    }
+
+    private function nodeModulePath(): string
+    {
+        $configuredPath = config('services.browsershot.node_module_path');
+
+        if (is_string($configuredPath) && $configuredPath !== '') {
+            return $configuredPath;
+        }
+
+        return base_path('node_modules');
     }
 
     private function chromeUserDataDir(): string
