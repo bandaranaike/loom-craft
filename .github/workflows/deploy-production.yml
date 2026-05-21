@@ -111,20 +111,15 @@ jobs:
           tar -xzf "/tmp/release-${RELEASE_SHA}.tar.gz" -C "${RELEASE_DIR}"
 
           ensure_node_runtime() {
-            if command -v node >/dev/null 2>&1 && node -e 'process.exit(Number(process.versions.node.split(".")[0]) >= 22 ? 0 : 1)'; then
+            if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1 && node -e 'process.exit(Number(process.versions.node.split(".")[0]) >= 22 ? 0 : 1)'; then
               return
             fi
 
-            if ! sudo -n true >/dev/null 2>&1; then
-              echo "Node.js 22+ is required for Browsershot."
-              echo "Install it manually on the VPS, then rerun the deployment:"
-              echo "curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -"
-              echo "sudo apt-get install -y nodejs"
-              exit 1
-            fi
-
-            curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-            sudo apt-get install -y nodejs
+            echo "Node.js 22+ and npm are required for Browsershot."
+            echo "Install them manually on the VPS, then rerun this deployment:"
+            echo "curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -"
+            echo "sudo apt-get install -y nodejs"
+            exit 1
           }
 
           ensure_pnpm() {
@@ -132,18 +127,8 @@ jobs:
               return
             fi
 
-            if command -v corepack >/dev/null 2>&1; then
-              corepack prepare pnpm@10.31.0 --activate
-              return
-            fi
-
-            if sudo -n true >/dev/null 2>&1; then
-              sudo npm install --global pnpm@10.31.0
-              return
-            fi
-
             echo "pnpm is required to install Browsershot's Node dependencies."
-            echo "Install it manually on the VPS, then rerun the deployment:"
+            echo "Install it manually on the VPS, then rerun this deployment:"
             echo "sudo npm install --global pnpm@10.31.0"
             exit 1
           }
