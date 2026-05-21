@@ -381,8 +381,7 @@
         }
 
         img.barcode {
-            width: 100%;
-            height: 58px;
+            height: 48px;
             object-fit: fill;
         }
 
@@ -677,22 +676,15 @@
         <section class="footer">
             <div class="card barcode-card">
                 <div>
-                    <p class="section-label">Shipment</p>
-                    <img src="{{ $label['codes']['tracking_barcode'] }}" alt="Tracking barcode" class="barcode">
-                    <div class="barcode-meta">
-                        <div class="barcode-no">{{ $label['tracking_number'] }}</div>
+                    <div class="ref-block">
+                        <div class="ref-label">Order No</div>
+                        <img src="{{ $label['codes']['order_barcode'] }}" alt="Order barcode" class="barcode">
+                        <div class="ref-value">{{ $label['order_number'] }}</div>
                     </div>
-                    <div class="refs-grid">
-                        <div class="ref-block">
-                            <div class="ref-label">Order No</div>
-                            <img src="{{ $label['codes']['order_barcode'] }}" alt="Order barcode" class="barcode small">
-                            <div class="ref-value">{{ $label['order_number'] }}</div>
-                        </div>
-                        <div class="ref-block">
-                            <div class="ref-label">Invoice No</div>
-                            <img src="{{ $label['codes']['invoice_barcode'] }}" alt="Invoice barcode" class="barcode small">
-                            <div class="ref-value">{{ $label['invoice_number'] }}</div>
-                        </div>
+                    <div class="ref-block">
+                        <div class="ref-label">Invoice No</div>
+                        <img src="{{ $label['codes']['invoice_barcode'] }}" alt="Invoice barcode" class="barcode">
+                        <div class="ref-value">{{ $label['invoice_number'] }}</div>
                     </div>
                 </div>
                 <div class="track-box">
