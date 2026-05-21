@@ -122,19 +122,16 @@ jobs:
             exit 1
           }
 
-          ensure_pnpm() {
+          install_production_js_dependencies() {
             if command -v pnpm >/dev/null 2>&1; then
+              PUPPETEER_SKIP_DOWNLOAD=1 pnpm install --frozen-lockfile --prod
               return
             fi
 
-            echo "pnpm is required to install Browsershot's Node dependencies."
-            echo "Install it manually on the VPS, then rerun this deployment:"
-            echo "sudo npm install --global pnpm@10.31.0"
-            exit 1
+            PUPPETEER_SKIP_DOWNLOAD=1 npx --yes pnpm@10.31.0 install --frozen-lockfile --prod
           }
 
           ensure_node_runtime
-          ensure_pnpm
 
           ln -sfn "${SHARED_DIR}/.env" "${RELEASE_DIR}/.env"
 
@@ -166,7 +163,7 @@ jobs:
           fi
 
           cd "${RELEASE_DIR}"
-          PUPPETEER_SKIP_DOWNLOAD=1 pnpm install --frozen-lockfile --prod
+          install_production_js_dependencies
           LOG_CHANNEL=stderr php artisan migrate --force
           LOG_CHANNEL=stderr php artisan optimize:clear
           LOG_CHANNEL=stderr php artisan optimize
