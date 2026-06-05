@@ -21,26 +21,18 @@ const menuItemClass =
     'rounded-full border border-transparent px-4 py-2 font-medium text-(--welcome-strong-70) transition hover:border-(--welcome-strong) hover:text-(--welcome-strong)';
 const mobileMenuItemClass =
     'block w-full border-b border-(--welcome-border-soft) px-1 py-3 text-left text-sm font-semibold tracking-[0.18em] text-(--welcome-muted-text) uppercase transition hover:text-(--welcome-strong)';
-const actionButtonClass =
-    'rounded-full border border-(--welcome-strong) px-4 py-2 font-medium transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)';
+const actionButtonClass = 'rounded-full border border-(--welcome-strong) px-4 py-2 font-medium transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)';
 const mobileActionButtonClass =
     'block w-full border-b border-(--welcome-border-soft) px-1 py-3 text-left text-sm font-semibold tracking-[0.18em] text-(--welcome-strong) uppercase transition hover:text-(--welcome-accent)';
 const iconButtonClass =
     'inline-flex h-9 w-9 items-center justify-center rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-muted-text) transition hover:bg-(--welcome-surface-1) hover:text-(--welcome-strong)';
 
-export default function PublicSiteLayout({
-    children,
-    canRegister = true,
-    showBrowseProducts = true,
-    headerActions,
-}: PublicSiteLayoutProps) {
+export default function PublicSiteLayout({ children, canRegister = true, showBrowseProducts = true, headerActions }: PublicSiteLayoutProps) {
     const { auth } = usePage<SharedData>().props;
     const { resolvedAppearance, updateAppearance } = useAppearance();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const isDark = resolvedAppearance === 'dark';
-    const toggleAppearanceLabel = isDark
-        ? 'Switch to light theme'
-        : 'Switch to dark theme';
+    const toggleAppearanceLabel = isDark ? 'Switch to light theme' : 'Switch to dark theme';
     const leftSidePatternStyle: CSSProperties = {
         backgroundImage: `linear-gradient(to right, var(--welcome-on-strong-95), var(--welcome-on-strong-45), transparent), url(${dumbaraPatterns}), url(${dumbaraPatterns})`,
         backgroundSize: '100% 100%, 170px auto, 140px auto',
@@ -65,44 +57,24 @@ export default function PublicSiteLayout({
         return (
             <>
                 {showBrowseProducts && (
-                    <Link
-                        href={productsIndex()}
-                        className={isMobile ? mobileMenuItemClass : menuItemClass}
-                        onClick={isMobile ? handleMenuItemClick : undefined}
-                    >
+                    <Link href={productsIndex()} className={isMobile ? mobileMenuItemClass : menuItemClass} onClick={isMobile ? handleMenuItemClick : undefined}>
                         Browse Products
                     </Link>
                 )}
-                <Link
-                    href={ContactController.show()}
-                    className={isMobile ? mobileMenuItemClass : menuItemClass}
-                    onClick={isMobile ? handleMenuItemClick : undefined}
-                >
+                <Link href={ContactController.show()} className={isMobile ? mobileMenuItemClass : menuItemClass} onClick={isMobile ? handleMenuItemClick : undefined}>
                     Contact Us
                 </Link>
                 {auth.user ? (
-                    <Link
-                        href={dashboard()}
-                        className={isMobile ? mobileActionButtonClass : actionButtonClass}
-                        onClick={isMobile ? handleMenuItemClick : undefined}
-                    >
+                    <Link href={dashboard()} className={isMobile ? mobileActionButtonClass : actionButtonClass} onClick={isMobile ? handleMenuItemClick : undefined}>
                         Enter Atelier
                     </Link>
                 ) : (
                     <>
-                        <Link
-                            href={login()}
-                            className={isMobile ? mobileMenuItemClass : menuItemClass}
-                            onClick={isMobile ? handleMenuItemClick : undefined}
-                        >
+                        <Link href={login()} className={isMobile ? mobileMenuItemClass : menuItemClass} onClick={isMobile ? handleMenuItemClick : undefined}>
                             Log in
                         </Link>
                         {canRegister && (
-                            <Link
-                                href={register()}
-                                className={isMobile ? mobileActionButtonClass : actionButtonClass}
-                                onClick={isMobile ? handleMenuItemClick : undefined}
-                            >
+                            <Link href={register()} className={isMobile ? mobileActionButtonClass : actionButtonClass} onClick={isMobile ? handleMenuItemClick : undefined}>
                                 Become a Patron
                             </Link>
                         )}
@@ -164,14 +136,9 @@ export default function PublicSiteLayout({
                         />
                     )}
                     {isMobileMenuOpen && (
-                        <div
-                            id="public-site-mobile-menu"
-                            className="absolute top-full right-0 left-0 z-30 px-6 pt-3 md:hidden"
-                        >
+                        <div id="public-site-mobile-menu" className="absolute top-full right-0 left-0 z-30 px-6 pt-3 md:hidden">
                             <nav className="mx-auto w-full max-w-6xl rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-1) px-5 py-4 text-sm shadow-[0_28px_70px_-30px_var(--welcome-shadow)]">
-                                <p className="pb-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Navigation
-                                </p>
+                                <p className="pb-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Navigation</p>
                                 {renderMenuActions(true)}
                                 <button
                                     type="button"
@@ -189,39 +156,23 @@ export default function PublicSiteLayout({
                 <main className="relative z-10">{children}</main>
 
                 <footer className="relative z-10 border-t border-(--welcome-border-soft) bg-(--welcome-surface-1)">
-                    <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 py-10 md:grid-cols-3">
+                    <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 pt-10 pb-2 md:grid-cols-3">
                         <div>
-                            <p className="font-['Playfair_Display',serif] text-2xl">
-                                LoomCraft
-                            </p>
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                Heritage Marketplace
-                            </p>
+                            <p className="font-['Playfair_Display',serif] text-2xl">LoomCraft</p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Heritage Marketplace</p>
                         </div>
                         <div>
                             <div className="mt-3 flex flex-wrap gap-3 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
-                                <Link
-                                    href={home()}
-                                    className="hover:text-(--welcome-strong)"
-                                >
+                                <Link href={home()} className="hover:text-(--welcome-strong)">
                                     Home
                                 </Link>
-                                <Link
-                                    href={productsIndex()}
-                                    className="hover:text-(--welcome-strong)"
-                                >
+                                <Link href={productsIndex()} className="hover:text-(--welcome-strong)">
                                     Products
                                 </Link>
-                                <Link
-                                    href={loomWeaveDemo()}
-                                    className="hover:text-(--welcome-strong)"
-                                >
-                                    Design Studio
+                                <Link href={loomWeaveDemo()} className="hover:text-(--welcome-strong)">
+                                    Design
                                 </Link>
-                                <Link
-                                    href={ContactController.show()}
-                                    className="hover:text-(--welcome-strong)"
-                                >
+                                <Link href={ContactController.show()} className="hover:text-(--welcome-strong)">
                                     Contact
                                 </Link>
                             </div>
@@ -232,6 +183,11 @@ export default function PublicSiteLayout({
                                 linkClassName="hover:text-(--welcome-strong)"
                             />
                         </div>
+                    </div>
+                    <div className="text-center pb-8">
+                        <a href="https://erbitron.com/" target="_blank" className='text-gray-700 dark:text-gray-400 text-xs tracking-[0.25em]'>
+                            Built by Erbitron
+                        </a>
                     </div>
                 </footer>
             </div>
