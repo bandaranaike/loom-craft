@@ -32,8 +32,23 @@ type CartItem = {
     has_discount: boolean;
     available_quantity: number | null;
     production_time_days: number | null;
+    shortage_quantity: number;
+    preparation_setup_days: number;
+    preparation_weaving_days: number;
+    preparation_buffer_days: number;
+    preparation_time_days: number;
     exceeds_available_stock: boolean;
     stock_delay_message: string | null;
+};
+
+type CartPreparationEstimate = {
+    distinct_product_count: number;
+    large_cart_threshold: number;
+    exceeds_large_cart_threshold: boolean;
+    total_days: number;
+    has_production_delay: boolean;
+    message: string | null;
+    workload_warning_message: string | null;
 };
 
 type CartSummary = {
@@ -42,6 +57,7 @@ type CartSummary = {
     items: CartItem[];
     item_count: number;
     subtotal: string;
+    preparation_estimate: CartPreparationEstimate;
 };
 
 type CheckoutPageProps = {
@@ -1031,6 +1047,13 @@ export default function CheckoutPage({
                                             message={item.stock_delay_message}
                                             className="mt-3 border-(--welcome-border-soft) bg-(--welcome-surface-3) text-(--welcome-strong)"
                                         />
+                                        {item.exceeds_available_stock && (
+                                            <p className="text-xs text-(--welcome-body-text)">
+                                                Prep estimate: {item.preparation_time_days} days
+                                                for {item.shortage_quantity} produced{' '}
+                                                {item.shortage_quantity === 1 ? 'piece' : 'pieces'}.
+                                            </p>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -1055,6 +1078,16 @@ export default function CheckoutPage({
                                     </span>
                                     <span>{cart.currency}</span>
                                 </div>
+                                {cart.preparation_estimate.message && (
+                                    <div className="rounded-2xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                            Preparation
+                                        </p>
+                                        <p className="mt-2 text-(--welcome-strong)">
+                                            {cart.preparation_estimate.message}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                             <p className="mt-4 text-xs text-(--welcome-body-text)">
                                 Shipping fees are arranged directly with the

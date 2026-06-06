@@ -3,7 +3,7 @@
 Schema snapshot derived from `.ai/db.sql`, the latest SQL dump of the database, plus code-verified schema changes that landed after the last dump.
 
 Last synchronized with `.ai/db.sql`: 2026-04-05.
-Code-verified updates through: 2026-05-19.
+Code-verified updates through: 2026-06-06.
 
 ---
 
@@ -249,6 +249,7 @@ Indexes:
 
 Important note:
 - The SQL dump currently defines a DB default of `7.00` for `commission_rate`. Project notes indicate create/edit flows and commission calculations use `COMMERCE_COMMISSION_RATE` from config/environment, with a current default of `100.00`. This is an application/schema mismatch that should be treated carefully.
+- `pieces_count` is treated by application logic as immediately available stock. `production_time_days` is treated as vendor-entered weaving time per produced item and is used by the cart/checkout preparation estimator when requested quantity exceeds available stock.
 
 ---
 
@@ -340,6 +341,9 @@ Indexes:
 - `updated_at` (timestamp, nullable)
 
 No explicit standalone indexes beyond foreign-key support.
+
+Application payload note:
+- No new cart tables or columns were added for preparation estimates. The cart summary response now derives `preparation_estimate` plus per-line shortage/preparation fields from `cart_items.quantity`, `products.pieces_count`, `products.production_time_days`, and `config('commerce.production_time_*')`.
 
 ---
 

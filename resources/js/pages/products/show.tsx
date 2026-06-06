@@ -73,6 +73,11 @@ type ProductDetails = {
 type ProductShowProps = {
     product: ProductDetails;
     cartCurrency: string;
+    productionEstimateConfig: {
+        setup_days: number;
+        buffer_rate: number;
+        default_weaving_days: number;
+    };
     canRegister?: boolean;
     status?: string | null;
     review_summary: {
@@ -137,6 +142,7 @@ const renderRatingStars = (
 export default function ProductShow({
     product,
     cartCurrency,
+    productionEstimateConfig,
     canRegister = true,
     status = null,
     review_summary,
@@ -177,11 +183,13 @@ export default function ProductShow({
                 form.data.quantity,
                 product.pieces_count,
                 product.production_time_days,
+                productionEstimateConfig,
             ),
         [
             form.data.quantity,
             product.pieces_count,
             product.production_time_days,
+            productionEstimateConfig,
         ],
     );
 

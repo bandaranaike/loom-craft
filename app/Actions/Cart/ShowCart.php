@@ -9,6 +9,7 @@ use App\DTOs\Cart\CartSummaryResult;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Services\ProductPreparationEstimator;
 use App\Services\ProductPricingService;
 use App\Services\ProductStockAvailabilityService;
 use App\ValueObjects\Money;
@@ -22,6 +23,7 @@ class ShowCart
     public function __construct(
         private ProductPricingService $productPricingService,
         private ProductStockAvailabilityService $productStockAvailabilityService,
+        private ProductPreparationEstimator $productPreparationEstimator,
     ) {}
 
     public function handle(CartSessionData $data): CartShowResult
@@ -36,7 +38,12 @@ class ShowCart
             'items.product.media' => fn ($query) => $query->orderBy('sort_order'),
         ]);
 
-        $items = $cart->items->map(function (CartItem $item): CartItemSummary {
+        $requestedQuantityByProductId = $cart->items
+            ->groupBy('product_id')
+            ->map(static fn ($items): int => (int) $items->sum('quantity'));
+        $preparationEstimateByProductId = collect();
+
+        $items = $cart->items->map(function (CartItem $item) use ($requestedQuantityByProductId, $preparationEstimateByProductId): CartItemSummary {
             $product = $item->product;
 
             if (! $product instanceof Product) {
@@ -51,7 +58,9 @@ class ShowCart
 
             $image = $product->media->firstWhere('type', 'image');
             $pricing = $this->productPricingService->forProduct($product);
-            $stockAvailability = $this->productStockAvailabilityService->forProduct($product, $item->quantity);
+            $requestedQuantity = $requestedQuantityByProductId->get($product->id, $item->quantity);
+            $stockAvailability = $this->productStockAvailabilityService->forProduct($product, $requestedQuantity);
+            $preparationEstimateByProductId->put($product->id, $this->productPreparationEstimator->forProduct($product, $requestedQuantity));
             $lineTotal = Money::fromString((string) $item->unit_price)
                 ->multiply($item->quantity);
             $originalLineTotal = Money::fromString($pricing->originalPrice)
@@ -73,6 +82,11 @@ class ShowCart
                 $pricing->hasDiscount,
                 $stockAvailability->availableQuantity,
                 $stockAvailability->productionTimeDays,
+                $stockAvailability->shortageQuantity,
+                $stockAvailability->preparationSetupDays,
+                $stockAvailability->preparationWeavingDays,
+                $stockAvailability->preparationBufferDays,
+                $stockAvailability->preparationTimeDays,
                 $stockAvailability->exceedsAvailableStock,
                 $stockAvailability->stockDelayMessage,
             );
@@ -90,6 +104,7 @@ class ShowCart
             $items,
             count($items),
             Money::fromString((string) $subtotalValue)->amount,
+            $this->productPreparationEstimator->forCart($preparationEstimateByProductId->values()),
         );
 
         return new CartShowResult($summary, $guestToken);

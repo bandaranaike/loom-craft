@@ -1,6 +1,6 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-05-19
+Last reviewed: 2026-06-06
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implementation-guide.md`, `.ai/knowledge/core/best-practices.md`, `.ai/knowledge/core/guardrails.md`, `.ai/knowledge/core/db-schema.md`, and `.ai/knowledge/core/order-process.md`.
@@ -46,6 +46,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Exchange-rate snapshots are stored historically and used to block stale PayPal conversions.
 - Exchange-rate syncing is implemented through a dedicated command and exchange-rate storage.
 - Cart, checkout, and order placement use centralized discounted pricing derived from product and category discounts.
+- Cart and checkout now expose a backend-calculated preparation estimate for made-to-order shortages. The estimate uses only the quantity beyond `products.pieces_count`, adds configurable setup/buffer time, assumes product preparation runs in parallel, and uses the most time-consuming product as the order preparation time. Large carts append a workload warning when the configured distinct-product threshold is exceeded.
 
 ### Orders
 - Order placement persists to:
@@ -170,3 +171,4 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Backend return logistics are implemented: admins can record return requests, attach returned order items, assign Sri Lanka Post Courier-style return tracking, move returns through requested/approved/in-transit/admin-received/inspected/vendor-review/resolved/closed states, and every return state change is captured in fulfillment history.
 - Backend complaint workflow is implemented: admins can record complaints linked to orders, shipments, returns, and payments; categorize and prioritize complaints; track SLA timestamps; move complaints through open/review/waiting/resolved/closed states; and capture every complaint status change in fulfillment history.
 - Shipment exception and delivery evidence backend support is implemented: admins can record proof-of-delivery details/files, failed-delivery and return-to-sender transitions require exception reasons, failed attempts are counted, and related events are captured in fulfillment history.
+- Stock-based production-time estimation is implemented through `ProductPreparationEstimator`, the cart summary payload, product-page quantity estimates, cart/checkout preparation notices, and `COMMERCE_PRODUCTION_TIME_*` configuration values.

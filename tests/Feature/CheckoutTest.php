@@ -235,9 +235,13 @@ it('shows stock delay warnings during checkout when quantity exceeds available p
             ->where('cart.items.0.exceeds_available_stock', true)
             ->where('cart.items.0.available_quantity', 1)
             ->where('cart.items.0.production_time_days', 10)
+            ->where('cart.items.0.shortage_quantity', 2)
+            ->where('cart.items.0.preparation_time_days', 25)
+            ->where('cart.preparation_estimate.total_days', 25)
+            ->where('cart.preparation_estimate.has_production_delay', true)
             ->where(
                 'cart.items.0.stock_delay_message',
-                'This quantity is not currently in stock. Your order will require additional production time and is expected to take about 10 days.',
+                'This quantity is not currently in stock. 2 pieces will need production and the preparation time is expected to take about 25 days.',
             )
         );
 });

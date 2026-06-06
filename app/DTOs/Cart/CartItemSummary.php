@@ -20,6 +20,11 @@ class CartItemSummary
         public bool $hasDiscount,
         public ?int $availableQuantity,
         public ?int $productionTimeDays,
+        public int $shortageQuantity,
+        public int $preparationSetupDays,
+        public float $preparationWeavingDays,
+        public int $preparationBufferDays,
+        public int $preparationTimeDays,
         public bool $exceedsAvailableStock,
         public ?string $stockDelayMessage,
     ) {}
@@ -45,6 +50,11 @@ class CartItemSummary
             'has_discount' => $this->hasDiscount,
             'available_quantity' => $this->availableQuantity,
             'production_time_days' => $this->productionTimeDays,
+            'shortage_quantity' => $this->shortageQuantity,
+            'preparation_setup_days' => $this->preparationSetupDays,
+            'preparation_weaving_days' => $this->preparationWeavingDays,
+            'preparation_buffer_days' => $this->preparationBufferDays,
+            'preparation_time_days' => $this->preparationTimeDays,
             'exceeds_available_stock' => $this->exceedsAvailableStock,
             'stock_delay_message' => $this->stockDelayMessage,
         ];

@@ -23,6 +23,11 @@ class ProductShowController extends Controller
         return Inertia::render('products/show', [
             ...$result->toArray(),
             'cartCurrency' => Currency::default()->code,
+            'productionEstimateConfig' => [
+                'setup_days' => (int) config('commerce.production_time_setup_days', 2),
+                'buffer_rate' => (float) config('commerce.production_time_buffer_rate', 0.10),
+                'default_weaving_days' => (float) config('commerce.production_time_default_weaving_days', 1),
+            ],
             'canRegister' => Features::enabled(Features::registration()),
             'status' => session('status'),
             'reviewStatus' => session('review_status'),

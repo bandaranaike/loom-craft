@@ -7,18 +7,25 @@ use App\ValueObjects\ProductStockAvailability;
 
 class ProductStockAvailabilityService
 {
+    public function __construct(private ProductPreparationEstimator $productPreparationEstimator) {}
+
     public function forProduct(Product $product, int $requestedQuantity): ProductStockAvailability
     {
+        $preparationEstimate = $this->productPreparationEstimator->forProduct($product, $requestedQuantity);
         $availableQuantity = $product->pieces_count;
         $productionTimeDays = $product->production_time_days;
-        $exceedsAvailableStock = $availableQuantity !== null && $requestedQuantity > $availableQuantity;
 
         return new ProductStockAvailability(
             $requestedQuantity,
             $availableQuantity,
             $productionTimeDays,
-            $exceedsAvailableStock,
-            $exceedsAvailableStock ? $this->buildDelayMessage($productionTimeDays) : null,
+            $preparationEstimate->shortageQuantity,
+            $preparationEstimate->setupDays,
+            $preparationEstimate->weavingDays,
+            $preparationEstimate->bufferDays,
+            $preparationEstimate->totalDays,
+            $preparationEstimate->exceedsAvailableStock,
+            $preparationEstimate->message,
         );
     }
 

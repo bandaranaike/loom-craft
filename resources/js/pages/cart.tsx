@@ -23,8 +23,23 @@ type CartItem = {
     has_discount: boolean;
     available_quantity: number | null;
     production_time_days: number | null;
+    shortage_quantity: number;
+    preparation_setup_days: number;
+    preparation_weaving_days: number;
+    preparation_buffer_days: number;
+    preparation_time_days: number;
     exceeds_available_stock: boolean;
     stock_delay_message: string | null;
+};
+
+type CartPreparationEstimate = {
+    distinct_product_count: number;
+    large_cart_threshold: number;
+    exceeds_large_cart_threshold: boolean;
+    total_days: number;
+    has_production_delay: boolean;
+    message: string | null;
+    workload_warning_message: string | null;
 };
 
 type CartSummary = {
@@ -33,6 +48,7 @@ type CartSummary = {
     items: CartItem[];
     item_count: number;
     subtotal: string;
+    preparation_estimate: CartPreparationEstimate;
 };
 
 type CartPageProps = {
@@ -194,6 +210,19 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                                 message={item.stock_delay_message}
                                                 className="mt-4 border-(--welcome-border-soft) bg-(--welcome-surface-1) text-(--welcome-strong)"
                                             />
+                                            {item.exceeds_available_stock && (
+                                                <div className="mt-3 grid gap-2 rounded-2xl border border-(--welcome-border-soft) bg-(--welcome-surface-1) px-4 py-3 text-xs text-(--welcome-body-text) sm:grid-cols-3">
+                                                    <span>
+                                                        Shortage: {item.shortage_quantity}
+                                                    </span>
+                                                    <span>
+                                                        Weaving: {item.preparation_weaving_days} days
+                                                    </span>
+                                                    <span>
+                                                        Prep estimate: {item.preparation_time_days} days
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -228,6 +257,16 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                         {cart.currency}
                                     </span>
                                 </div>
+                                {cart.preparation_estimate.message && (
+                                    <div className="rounded-2xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4 text-sm text-(--welcome-body-text)">
+                                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
+                                            Preparation
+                                        </p>
+                                        <p className="mt-2 text-(--welcome-strong)">
+                                            {cart.preparation_estimate.message}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                             <Link
                                 href={checkoutShow()}

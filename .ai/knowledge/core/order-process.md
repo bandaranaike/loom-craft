@@ -68,6 +68,10 @@ No additional fields are introduced beyond `.ai/knowledge/core/db-schema.md`.
 
 - Ensure cart currency remains canonical in LKR.
 - Re‑validate pricing and availability during checkout.
+- When requested cart quantity exceeds `products.pieces_count`, calculate preparation time from the shortage quantity only.
+- Production estimates include configurable setup days, product weaving time from `products.production_time_days`, and a configurable buffer rate.
+- Product preparation is assumed to run in parallel across the cart, so order preparation time is the maximum preparation time among cart products, not the sum.
+- If the configured distinct-product threshold is exceeded, append a workload warning to the cart/checkout preparation message.
 
 ---
 
@@ -118,6 +122,7 @@ No additional fields are introduced beyond `.ai/knowledge/core/db-schema.md`.
   - the customer confirms the LKR to USD conversion first
   - the converted USD amount is created from the latest stored exchange-rate snapshot
   - the final payment record stores both original LKR and settled USD values
+- Checkout displays the final backend-confirmed cart preparation estimate before order placement.
 
 ---
 

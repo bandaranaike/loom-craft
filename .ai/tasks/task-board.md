@@ -1,6 +1,6 @@
 # Task Board
 
-Last updated: 2026-05-08
+Last updated: 2026-06-06
 
 ## Planned
 
@@ -51,6 +51,7 @@ Last updated: 2026-05-08
 - [product-quantity](/var/www/loom-craft/.ai/tasks/completed/product/product-quantity.md)
 - [product-reviews-and-ratings](/var/www/loom-craft/.ai/tasks/completed/product/product-reviews-and-ratings.md)
 - [product-search-upgrade](/var/www/loom-craft/.ai/tasks/completed/product/product-search-upgrade.md)
+- [stock-based-production-time-algorithm](/var/www/loom-craft/.ai/tasks/completed/product/stock-based-production-time-algorithm.md)
 
 ### UI
 

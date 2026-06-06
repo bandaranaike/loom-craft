@@ -2,6 +2,8 @@
 
 namespace App\DTOs\Cart;
 
+use App\ValueObjects\CartPreparationEstimate;
+
 class CartSummaryResult
 {
     /**
@@ -13,6 +15,7 @@ class CartSummaryResult
         public array $items,
         public int $itemCount,
         public string $subtotal,
+        public CartPreparationEstimate $preparationEstimate,
     ) {}
 
     /**
@@ -29,6 +32,7 @@ class CartSummaryResult
             ),
             'item_count' => $this->itemCount,
             'subtotal' => $this->subtotal,
+            'preparation_estimate' => $this->preparationEstimate->toArray(),
         ];
     }
 }

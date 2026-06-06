@@ -8,6 +8,11 @@ final readonly class ProductStockAvailability
         public int $requestedQuantity,
         public ?int $availableQuantity,
         public ?int $productionTimeDays,
+        public int $shortageQuantity,
+        public int $preparationSetupDays,
+        public float $preparationWeavingDays,
+        public int $preparationBufferDays,
+        public int $preparationTimeDays,
         public bool $exceedsAvailableStock,
         public ?string $stockDelayMessage,
     ) {}
@@ -21,6 +26,11 @@ final readonly class ProductStockAvailability
             'requested_quantity' => $this->requestedQuantity,
             'available_quantity' => $this->availableQuantity,
             'production_time_days' => $this->productionTimeDays,
+            'shortage_quantity' => $this->shortageQuantity,
+            'preparation_setup_days' => $this->preparationSetupDays,
+            'preparation_weaving_days' => $this->preparationWeavingDays,
+            'preparation_buffer_days' => $this->preparationBufferDays,
+            'preparation_time_days' => $this->preparationTimeDays,
             'exceeds_available_stock' => $this->exceedsAvailableStock,
             'stock_delay_message' => $this->stockDelayMessage,
         ];
