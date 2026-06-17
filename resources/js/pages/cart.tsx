@@ -29,6 +29,8 @@ type CartItem = {
     preparation_buffer_days: number;
     preparation_time_days: number;
     exceeds_available_stock: boolean;
+    exceeds_maximum_preparation_days: boolean;
+    maximum_preparation_days: number;
     stock_delay_message: string | null;
 };
 
@@ -38,6 +40,8 @@ type CartPreparationEstimate = {
     exceeds_large_cart_threshold: boolean;
     total_days: number;
     has_production_delay: boolean;
+    exceeds_maximum_preparation_days: boolean;
+    maximum_preparation_days: number;
     message: string | null;
     workload_warning_message: string | null;
 };
@@ -215,11 +219,13 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                                     <span>
                                                         Shortage: {item.shortage_quantity}
                                                     </span>
+                                                    {!item.exceeds_maximum_preparation_days && (
+                                                        <span>
+                                                            Weaving: {item.preparation_weaving_days} days
+                                                        </span>
+                                                    )}
                                                     <span>
-                                                        Weaving: {item.preparation_weaving_days} days
-                                                    </span>
-                                                    <span>
-                                                        Prep estimate: {item.preparation_time_days} days
+                                                        Prep estimate: {item.preparation_time_days}{item.exceeds_maximum_preparation_days ? '+' : ''} days
                                                     </span>
                                                 </div>
                                             )}

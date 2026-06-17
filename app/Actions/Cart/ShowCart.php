@@ -60,7 +60,10 @@ class ShowCart
             $pricing = $this->productPricingService->forProduct($product);
             $requestedQuantity = $requestedQuantityByProductId->get($product->id, $item->quantity);
             $stockAvailability = $this->productStockAvailabilityService->forProduct($product, $requestedQuantity);
-            $preparationEstimateByProductId->put($product->id, $this->productPreparationEstimator->forProduct($product, $requestedQuantity));
+            $preparationEstimateByProductId->put(
+                $product->id,
+                $this->productPreparationEstimator->forProduct($product, $requestedQuantity),
+            );
             $lineTotal = Money::fromString((string) $item->unit_price)
                 ->multiply($item->quantity);
             $originalLineTotal = Money::fromString($pricing->originalPrice)
@@ -88,6 +91,8 @@ class ShowCart
                 $stockAvailability->preparationBufferDays,
                 $stockAvailability->preparationTimeDays,
                 $stockAvailability->exceedsAvailableStock,
+                $stockAvailability->exceedsMaximumPreparationDays,
+                $stockAvailability->maximumPreparationDays,
                 $stockAvailability->stockDelayMessage,
             );
         })->all();

@@ -27,6 +27,7 @@ class ProductShowController extends Controller
                 'setup_days' => (int) config('commerce.production_time_setup_days', 2),
                 'buffer_rate' => (float) config('commerce.production_time_buffer_rate', 0.10),
                 'default_weaving_days' => (float) config('commerce.production_time_default_weaving_days', 1),
+                'max_display_days' => (int) config('commerce.production_time_max_display_days', 60),
             ],
             'canRegister' => Features::enabled(Features::registration()),
             'status' => session('status'),

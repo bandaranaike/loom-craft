@@ -25,6 +25,8 @@ class ProductStockAvailabilityService
             $preparationEstimate->bufferDays,
             $preparationEstimate->totalDays,
             $preparationEstimate->exceedsAvailableStock,
+            $preparationEstimate->exceedsMaximumPreparationDays,
+            $preparationEstimate->maximumPreparationDays,
             $preparationEstimate->message,
         );
     }

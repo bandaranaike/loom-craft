@@ -26,6 +26,8 @@ class CartItemSummary
         public int $preparationBufferDays,
         public int $preparationTimeDays,
         public bool $exceedsAvailableStock,
+        public bool $exceedsMaximumPreparationDays,
+        public int $maximumPreparationDays,
         public ?string $stockDelayMessage,
     ) {}
 
@@ -56,6 +58,8 @@ class CartItemSummary
             'preparation_buffer_days' => $this->preparationBufferDays,
             'preparation_time_days' => $this->preparationTimeDays,
             'exceeds_available_stock' => $this->exceedsAvailableStock,
+            'exceeds_maximum_preparation_days' => $this->exceedsMaximumPreparationDays,
+            'maximum_preparation_days' => $this->maximumPreparationDays,
             'stock_delay_message' => $this->stockDelayMessage,
         ];
     }

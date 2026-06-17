@@ -4,7 +4,7 @@
 
 - Status: completed
 - Created: 2026-06-06
-- Updated: 2026-06-06
+- Updated: 2026-06-08
 - Source: user request
 - Priority: high
 
@@ -31,6 +31,7 @@
   - Cart item quantity can be updated in several frontend locations. Every quantity change must show the preparing time.
   - If the cart has multiple products, assume all product preparation runs in parallel. The order preparation time is always the preparation time of the most time-consuming product.
   - If the cart has more than 6 items, configurable through `.env`, append a warning such as: `The various product count is big in your cart and it may take longer than expected due to workload.`
+  - If the calculated order processing time exceeds 60 days, configurable through `.env`, show `60+ days` instead of the actual large number and tell the customer to contact the vendor before placing the order.
 
 ## Objective
 
@@ -54,6 +55,8 @@ Build a backend production-time calculation service that estimates preparation l
 14. The large-cart threshold defaults to `6` and is configurable through an environment-backed Laravel config value.
 15. The checkout flow displays the final backend-confirmed preparation estimate before order placement.
 16. Automated tests cover in-stock, partial-stock, out-of-stock, quantity-change, multi-item, large-cart warning, and checkout validation paths.
+17. If a calculated product or cart preparation estimate exceeds the configured maximum display days, the customer-facing estimate shows `{maximum}+ days`, hides the actual calculated day count, and displays a vendor-contact warning before order placement.
+18. The maximum preparation display threshold defaults to `60` and is configurable through `COMMERCE_PRODUCTION_TIME_MAX_DISPLAY_DAYS`.
 
 ## Proposed Algorithm
 
@@ -88,7 +91,10 @@ For a cart:
 line_preparation_days = preparation days for each product line shortage
 order_preparation_days = max(line_preparation_days)
 large_cart_threshold = config('commerce.production_time_large_cart_threshold', 6)
+max_display_days = config('commerce.production_time_max_display_days', 60)
 show_large_cart_warning = cart_distinct_product_count > large_cart_threshold
+show_vendor_contact_warning = order_preparation_days > max_display_days
+display_order_preparation_days = min(order_preparation_days, max_display_days)
 ```
 
 Use `max()` for the order estimate because product preparation is assumed to run in parallel. The total order preparation time is always the preparation time of the most time-consuming product in the cart.
@@ -100,6 +106,12 @@ The various product count is big in your cart and it may take longer than expect
 ```
 
 The exact wording can be polished during implementation, but the meaning must stay clear: large carts may take longer than the calculated estimate because vendor/admin workload can increase.
+
+If `show_vendor_contact_warning` is true, do not expose the actual calculated day count in the customer-facing total. Show `{max_display_days}+ days` and append a warning such as:
+
+```text
+The product order time is getting longer. Before placing this order, you must contact the vendor.
+```
 
 ## Quantity Change Surfaces
 
@@ -161,9 +173,11 @@ Each surface should use the backend response rather than recalculating independe
 - Unit test cart-level order preparation time uses the maximum product preparation time, not the sum.
 - Unit test large-cart warning appears when distinct cart product count exceeds the configured threshold.
 - Unit test duplicate product lines aggregate requested quantity before calculating shortage.
+- Unit test long estimates are capped at the configured maximum display days and require vendor contact.
 - Feature test cart add/update responses expose preparation estimate payloads.
 - Feature test every discovered quantity-change endpoint returns or refreshes preparation estimate payloads.
 - Feature test checkout/order placement uses the final backend estimate.
+- Feature test cart and checkout payloads hide actual long preparation day totals and show `{maximum}+ days`.
 - Frontend test or focused smoke check that quantity changes refresh the displayed estimate.
 
 ## Documentation Updates Required
@@ -179,4 +193,5 @@ Each surface should use the backend response rather than recalculating independe
 - Cart and checkout render preparation estimates from the backend payload; product detail quantity selection uses the same formula with backend-provided config for instant inline feedback before add-to-cart.
 - Order preparation time uses the longest product preparation time because product preparation is assumed to run in parallel.
 - Large carts append the configured workload warning when distinct cart product count exceeds the threshold.
+- Long preparation estimates are capped by `COMMERCE_PRODUCTION_TIME_MAX_DISPLAY_DAYS` (default `60`) in product, cart, and checkout displays. When the calculated time exceeds that threshold, the UI shows `60+ days` and tells the customer to contact the vendor before placing the order instead of showing the actual calculated day count.
 - Added focused Pest coverage for estimator behavior, cart payloads, large-cart warning, and checkout preparation payloads.

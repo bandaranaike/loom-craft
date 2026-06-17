@@ -10,6 +10,8 @@ final readonly class CartPreparationEstimate
         public bool $exceedsLargeCartThreshold,
         public int $totalDays,
         public bool $hasProductionDelay,
+        public bool $exceedsMaximumPreparationDays,
+        public int $maximumPreparationDays,
         public ?string $message,
         public ?string $workloadWarningMessage,
     ) {}
@@ -25,6 +27,8 @@ final readonly class CartPreparationEstimate
             'exceeds_large_cart_threshold' => $this->exceedsLargeCartThreshold,
             'total_days' => $this->totalDays,
             'has_production_delay' => $this->hasProductionDelay,
+            'exceeds_maximum_preparation_days' => $this->exceedsMaximumPreparationDays,
+            'maximum_preparation_days' => $this->maximumPreparationDays,
             'message' => $this->message,
             'workload_warning_message' => $this->workloadWarningMessage,
         ];

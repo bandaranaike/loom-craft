@@ -99,6 +99,54 @@ it('shows a stock delay warning in the cart when quantity exceeds available piec
         );
 });
 
+it('hides actual long preparation days in cart payloads', function () {
+    config()->set('commerce.production_time_setup_days', 2);
+    config()->set('commerce.production_time_buffer_rate', 0.10);
+    config()->set('commerce.production_time_max_display_days', 60);
+
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'pieces_count' => 0,
+        'production_time_days' => 20,
+        'selling_price' => '180.00',
+    ]);
+
+    $cart = Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'LKR',
+    ]);
+
+    $cart->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 5,
+        'unit_price' => '180.00',
+    ]);
+
+    $this->withCookie('loomcraft_guest_token', 'guest-token')
+        ->get(route('cart.show'))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('cart')
+            ->where('cart.items.0.preparation_time_days', 60)
+            ->where('cart.items.0.exceeds_maximum_preparation_days', true)
+            ->where('cart.items.0.maximum_preparation_days', 60)
+            ->where('cart.preparation_estimate.total_days', 60)
+            ->where('cart.preparation_estimate.exceeds_maximum_preparation_days', true)
+            ->where('cart.preparation_estimate.maximum_preparation_days', 60)
+            ->where('cart.items.0.stock_delay_message', fn (string $message): bool => str_contains($message, '60+ days')
+                && str_contains($message, 'must contact the vendor')
+                && ! str_contains($message, '113 days'))
+            ->where('cart.preparation_estimate.message', fn (string $message): bool => str_contains($message, '60+ days')
+                && str_contains($message, 'must contact the vendor')
+                && ! str_contains($message, '113 days'))
+        );
+});
+
 it('shows a large cart workload warning when distinct product count exceeds the configured threshold', function () {
     config()->set('commerce.production_time_large_cart_threshold', 1);
 

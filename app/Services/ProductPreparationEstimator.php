@@ -25,6 +25,8 @@ class ProductPreparationEstimator
                 bufferDays: 0,
                 totalDays: 0,
                 exceedsAvailableStock: false,
+                exceedsMaximumPreparationDays: false,
+                maximumPreparationDays: $this->maximumDisplayDays(),
                 message: null,
             );
         }
@@ -32,7 +34,10 @@ class ProductPreparationEstimator
         $setupDays = (int) config('commerce.production_time_setup_days', 2);
         $weavingDays = $this->resolveWeavingDays($product) * $shortageQuantity;
         $bufferDays = (int) ceil(($setupDays + $weavingDays) * $this->bufferRate());
-        $totalDays = (int) ceil($setupDays + $weavingDays + $bufferDays);
+        $calculatedTotalDays = (int) ceil($setupDays + $weavingDays + $bufferDays);
+        $maximumDisplayDays = $this->maximumDisplayDays();
+        $exceedsMaximumPreparationDays = $calculatedTotalDays > $maximumDisplayDays;
+        $totalDays = $exceedsMaximumPreparationDays ? $maximumDisplayDays : $calculatedTotalDays;
 
         return new ProductPreparationEstimate(
             requestedQuantity: $requestedQuantity,
@@ -43,7 +48,9 @@ class ProductPreparationEstimator
             bufferDays: $bufferDays,
             totalDays: $totalDays,
             exceedsAvailableStock: true,
-            message: $this->buildProductMessage($shortageQuantity, $totalDays),
+            exceedsMaximumPreparationDays: $exceedsMaximumPreparationDays,
+            maximumPreparationDays: $maximumDisplayDays,
+            message: $this->buildProductMessage($shortageQuantity, $totalDays, $exceedsMaximumPreparationDays),
         );
     }
 
@@ -59,6 +66,10 @@ class ProductPreparationEstimator
         $hasProductionDelay = $estimates->contains(
             static fn (ProductPreparationEstimate $estimate): bool => $estimate->exceedsAvailableStock,
         );
+        $exceedsMaximumPreparationDays = $estimates->contains(
+            static fn (ProductPreparationEstimate $estimate): bool => $estimate->exceedsMaximumPreparationDays,
+        );
+        $maximumDisplayDays = $this->maximumDisplayDays();
         $workloadWarningMessage = $exceedsLargeCartThreshold
             ? 'The various product count is big in your cart and it may take longer than expected due to workload.'
             : null;
@@ -69,27 +80,36 @@ class ProductPreparationEstimator
             exceedsLargeCartThreshold: $exceedsLargeCartThreshold,
             totalDays: $totalDays,
             hasProductionDelay: $hasProductionDelay,
-            message: $this->buildCartMessage($totalDays, $hasProductionDelay, $workloadWarningMessage),
+            exceedsMaximumPreparationDays: $exceedsMaximumPreparationDays,
+            maximumPreparationDays: $maximumDisplayDays,
+            message: $this->buildCartMessage($totalDays, $hasProductionDelay, $workloadWarningMessage, $exceedsMaximumPreparationDays),
             workloadWarningMessage: $workloadWarningMessage,
         );
     }
 
-    public function buildProductMessage(int $shortageQuantity, int $totalDays): string
+    public function buildProductMessage(int $shortageQuantity, int $totalDays, bool $exceedsMaximumPreparationDays): string
     {
         $pieceLabel = $shortageQuantity === 1 ? 'piece' : 'pieces';
+        $displayDays = $this->formatDisplayDays($totalDays, $exceedsMaximumPreparationDays);
 
-        return "This quantity is not currently in stock. {$shortageQuantity} {$pieceLabel} will need production and the preparation time is expected to take about {$totalDays} days.";
+        if ($exceedsMaximumPreparationDays) {
+            return "This quantity is not currently in stock. {$shortageQuantity} {$pieceLabel} will need production and the preparation time is expected to take {$displayDays}. The product order time is getting longer. Before placing this order, you must contact the vendor.";
+        }
+
+        return "This quantity is not currently in stock. {$shortageQuantity} {$pieceLabel} will need production and the preparation time is expected to take about {$displayDays}.";
     }
 
-    private function buildCartMessage(int $totalDays, bool $hasProductionDelay, ?string $workloadWarningMessage): ?string
+    private function buildCartMessage(int $totalDays, bool $hasProductionDelay, ?string $workloadWarningMessage, bool $exceedsMaximumPreparationDays): ?string
     {
         if (! $hasProductionDelay && $workloadWarningMessage === null) {
             return null;
         }
 
-        $message = $hasProductionDelay
-            ? "Your order preparation time is expected to take about {$totalDays} days because all product preparation runs in parallel."
-            : 'Your selected pieces are available now.';
+        $message = match (true) {
+            $hasProductionDelay && $exceedsMaximumPreparationDays => "Your order preparation time is expected to take {$this->formatDisplayDays($totalDays, true)} because all product preparation runs in parallel. The product order time is getting longer. Before placing this order, you must contact the vendor.",
+            $hasProductionDelay => "Your order preparation time is expected to take about {$this->formatDisplayDays($totalDays, false)} because all product preparation runs in parallel.",
+            default => 'Your selected pieces are available now.',
+        };
 
         if ($workloadWarningMessage !== null) {
             $message .= ' '.$workloadWarningMessage;
@@ -110,5 +130,15 @@ class ProductPreparationEstimator
     private function bufferRate(): float
     {
         return max(0.0, (float) config('commerce.production_time_buffer_rate', 0.10));
+    }
+
+    private function maximumDisplayDays(): int
+    {
+        return max(1, (int) config('commerce.production_time_max_display_days', 60));
+    }
+
+    private function formatDisplayDays(int $totalDays, bool $exceedsMaximumPreparationDays): string
+    {
+        return $exceedsMaximumPreparationDays ? "{$totalDays}+ days" : "{$totalDays} days";
     }
 }

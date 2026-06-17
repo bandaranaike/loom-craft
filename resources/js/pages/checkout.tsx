@@ -38,6 +38,8 @@ type CartItem = {
     preparation_buffer_days: number;
     preparation_time_days: number;
     exceeds_available_stock: boolean;
+    exceeds_maximum_preparation_days: boolean;
+    maximum_preparation_days: number;
     stock_delay_message: string | null;
 };
 
@@ -47,6 +49,8 @@ type CartPreparationEstimate = {
     exceeds_large_cart_threshold: boolean;
     total_days: number;
     has_production_delay: boolean;
+    exceeds_maximum_preparation_days: boolean;
+    maximum_preparation_days: number;
     message: string | null;
     workload_warning_message: string | null;
 };
@@ -1049,7 +1053,7 @@ export default function CheckoutPage({
                                         />
                                         {item.exceeds_available_stock && (
                                             <p className="text-xs text-(--welcome-body-text)">
-                                                Prep estimate: {item.preparation_time_days} days
+                                                Prep estimate: {item.preparation_time_days}{item.exceeds_maximum_preparation_days ? '+' : ''} days
                                                 for {item.shortage_quantity} produced{' '}
                                                 {item.shortage_quantity === 1 ? 'piece' : 'pieces'}.
                                             </p>

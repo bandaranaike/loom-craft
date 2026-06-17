@@ -7,6 +7,8 @@ export type ProductStockAvailability = {
     preparationBufferDays: number;
     preparationTimeDays: number;
     exceedsAvailableStock: boolean;
+    exceedsMaximumPreparationDays: boolean;
+    maximumPreparationDays: number;
     stockDelayMessage: string | null;
 };
 
@@ -14,21 +16,31 @@ export type ProductPreparationConfig = {
     setup_days: number;
     buffer_rate: number;
     default_weaving_days: number;
+    max_display_days: number;
 };
 
 const defaultPreparationConfig: ProductPreparationConfig = {
     setup_days: 2,
     buffer_rate: 0.1,
     default_weaving_days: 1,
+    max_display_days: 60,
 };
 
 export const buildStockDelayMessage = (
     shortageQuantity: number,
     preparationTimeDays: number,
+    exceedsMaximumPreparationDays: boolean,
 ): string => {
     const pieceLabel = shortageQuantity === 1 ? 'piece' : 'pieces';
+    const displayDays = exceedsMaximumPreparationDays
+        ? `${preparationTimeDays}+ days`
+        : `${preparationTimeDays} days`;
 
-    return `This quantity is not currently in stock. ${shortageQuantity} ${pieceLabel} will need production and the preparation time is expected to take about ${preparationTimeDays} days.`;
+    if (exceedsMaximumPreparationDays) {
+        return `This quantity is not currently in stock. ${shortageQuantity} ${pieceLabel} will need production and the preparation time is expected to take ${displayDays}. The product order time is getting longer. Before placing this order, you must contact the vendor.`;
+    }
+
+    return `This quantity is not currently in stock. ${shortageQuantity} ${pieceLabel} will need production and the preparation time is expected to take about ${displayDays}.`;
 };
 
 export const resolveProductStockAvailability = (
@@ -53,9 +65,15 @@ export const resolveProductStockAvailability = (
                   Math.max(0, config.buffer_rate),
           )
         : 0;
-    const preparationTimeDays = Math.ceil(
+    const calculatedPreparationTimeDays = Math.ceil(
         preparationSetupDays + preparationWeavingDays + preparationBufferDays,
     );
+    const maximumPreparationDays = Math.max(1, config.max_display_days);
+    const exceedsMaximumPreparationDays =
+        calculatedPreparationTimeDays > maximumPreparationDays;
+    const preparationTimeDays = exceedsMaximumPreparationDays
+        ? maximumPreparationDays
+        : calculatedPreparationTimeDays;
 
     return {
         availableQuantity,
@@ -66,8 +84,14 @@ export const resolveProductStockAvailability = (
         preparationBufferDays,
         preparationTimeDays,
         exceedsAvailableStock,
+        exceedsMaximumPreparationDays,
+        maximumPreparationDays,
         stockDelayMessage: exceedsAvailableStock
-            ? buildStockDelayMessage(shortageQuantity, preparationTimeDays)
+            ? buildStockDelayMessage(
+                  shortageQuantity,
+                  preparationTimeDays,
+                  exceedsMaximumPreparationDays,
+              )
             : null,
     };
 };

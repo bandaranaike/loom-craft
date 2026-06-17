@@ -80,9 +80,19 @@
         "hex": "#d6c2a1"
     },
     {
+        "name": "Cream",
+        "slug": "cream",
+        "hex": "#fffdd0"
+    },
+    {
         "name": "Brown",
         "slug": "brown",
         "hex": "#8b5e3c"
+    },
+    {
+        "name": "Tan",
+        "slug": "tan",
+        "hex": "#d2b48c"
     },
     {
         "name": "Pink",
@@ -103,5 +113,20 @@
         "name": "Gold",
         "slug": "gold",
         "hex": "#d4af37"
+    },
+    {
+        "name": "Ivory",
+        "slug": "ivory",
+        "hex": "#fffff0"
+    },
+    {
+        "name": "Navy",
+        "slug": "navy",
+        "hex": "#000080"
+    },
+    {
+        "name": "Charcoal",
+        "slug": "charcoal",
+        "hex": "#36454f"
     }
 ]

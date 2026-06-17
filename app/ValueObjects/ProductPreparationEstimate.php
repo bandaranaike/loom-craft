@@ -13,6 +13,8 @@ final readonly class ProductPreparationEstimate
         public int $bufferDays,
         public int $totalDays,
         public bool $exceedsAvailableStock,
+        public bool $exceedsMaximumPreparationDays,
+        public int $maximumPreparationDays,
         public ?string $message,
     ) {}
 
@@ -30,6 +32,8 @@ final readonly class ProductPreparationEstimate
             'buffer_days' => $this->bufferDays,
             'total_days' => $this->totalDays,
             'exceeds_available_stock' => $this->exceedsAvailableStock,
+            'exceeds_maximum_preparation_days' => $this->exceedsMaximumPreparationDays,
+            'maximum_preparation_days' => $this->maximumPreparationDays,
             'message' => $this->message,
         ];
     }

@@ -3,6 +3,14 @@
 ## Goal
 Generate a structured JSON catalog from product images uploaded into `.ai/knowledge/assets/source-products/<category-folder>/`, using filename-based product codes and inferred metadata.
 
+## Trigger Phrase
+When the user says "Please generate products meta", perform this workflow:
+- Scan image files inside `.ai/knowledge/assets/source-products/`.
+- Ignore any `archived` folders and their contents.
+- Generate `.ai/knowledge/assets/generated/products.generated.json` using `.ai/knowledge/assets/generated/products.generated.schema.json`.
+- Compare generated product colors against `resources/data/product-colors.json`.
+- Add any missing standardized colors required by the new products to `resources/data/product-colors.json` in the same task run.
+
 ## Confirmed Inputs from User
 1. Images will be uploaded in category folders like:
 - `.ai/knowledge/assets/source-products/wall-hangers/`

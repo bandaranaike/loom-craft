@@ -44,6 +44,49 @@ it('calculates preparation time from shortage quantity only', function () {
         ->and($estimate->message)->toContain('13 days');
 });
 
+it('caps long product preparation estimates and requires vendor contact', function () {
+    config()->set('commerce.production_time_setup_days', 2);
+    config()->set('commerce.production_time_buffer_rate', 0.10);
+    config()->set('commerce.production_time_max_display_days', 60);
+
+    $product = Product::factory()->create([
+        'pieces_count' => 0,
+        'production_time_days' => 20,
+    ]);
+
+    $estimate = app(ProductPreparationEstimator::class)->forProduct($product, 5);
+
+    expect($estimate->totalDays)->toBe(60)
+        ->and($estimate->exceedsMaximumPreparationDays)->toBeTrue()
+        ->and($estimate->maximumPreparationDays)->toBe(60)
+        ->and($estimate->message)->toContain('60+ days')
+        ->and($estimate->message)->toContain('must contact the vendor')
+        ->and($estimate->message)->not->toContain('113 days');
+});
+
+it('caps long cart preparation estimates and requires vendor contact', function () {
+    config()->set('commerce.production_time_setup_days', 2);
+    config()->set('commerce.production_time_buffer_rate', 0.10);
+    config()->set('commerce.production_time_max_display_days', 60);
+
+    $estimator = app(ProductPreparationEstimator::class);
+    $product = Product::factory()->create([
+        'pieces_count' => 0,
+        'production_time_days' => 20,
+    ]);
+
+    $cartEstimate = $estimator->forCart(collect([
+        $estimator->forProduct($product, 5),
+    ]));
+
+    expect($cartEstimate->totalDays)->toBe(60)
+        ->and($cartEstimate->exceedsMaximumPreparationDays)->toBeTrue()
+        ->and($cartEstimate->maximumPreparationDays)->toBe(60)
+        ->and($cartEstimate->message)->toContain('60+ days')
+        ->and($cartEstimate->message)->toContain('must contact the vendor')
+        ->and($cartEstimate->message)->not->toContain('113 days');
+});
+
 it('uses the most time-consuming product for cart preparation time', function () {
     $estimator = app(ProductPreparationEstimator::class);
 

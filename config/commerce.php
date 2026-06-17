@@ -24,4 +24,6 @@ return [
     'production_time_default_weaving_days' => (float) env('COMMERCE_PRODUCTION_TIME_DEFAULT_WEAVING_DAYS', 1),
 
     'production_time_large_cart_threshold' => (int) env('COMMERCE_PRODUCTION_TIME_LARGE_CART_THRESHOLD', 6),
+
+    'production_time_max_display_days' => (int) env('COMMERCE_PRODUCTION_TIME_MAX_DISPLAY_DAYS', 60),
 ];

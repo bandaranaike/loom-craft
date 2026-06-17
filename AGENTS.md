@@ -234,6 +234,7 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 - Vendor product create/edit flows and backend commission calculations use `COMMERCE_COMMISSION_RATE` from `.env` via `config/commerce.php`. Current default is `100.00`.
 - Products use a required `product_code` field. It must be unique across all products, is vendor-managed in create/edit flows, and should be validated with Laravel Form Requests.
 - Products also use an auto-generated unique `slug` derived from the product name. Public product URLs must use `/product/{slug}` and slug conflicts should be resolved by appending an incrementing number.
+- When the user says "Please generate products meta", scan image files inside `.ai/knowledge/assets/source-products/`, ignore archived folders, generate `.ai/knowledge/assets/generated/products.generated.json` according to `.ai/knowledge/assets/generated/products.generated.schema.json`, and update `resources/data/product-colors.json` with any missing standardized colors used by the new products.
 - PayPal checkout integration is available via:
   - `POST /checkout/paypal/create` (`checkout.paypal.create`)
   - `GET /checkout/paypal/approved` (`checkout.paypal.approved`)

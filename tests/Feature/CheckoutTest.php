@@ -246,6 +246,52 @@ it('shows stock delay warnings during checkout when quantity exceeds available p
         );
 });
 
+it('hides actual long preparation days during checkout', function () {
+    config()->set('commerce.production_time_setup_days', 2);
+    config()->set('commerce.production_time_buffer_rate', 0.10);
+    config()->set('commerce.production_time_max_display_days', 60);
+
+    $vendorUser = User::factory()->create(['role' => 'vendor']);
+    $vendor = Vendor::factory()->for($vendorUser)->create([
+        'status' => 'approved',
+    ]);
+
+    $product = Product::factory()->for($vendor)->create([
+        'status' => 'active',
+        'pieces_count' => 0,
+        'production_time_days' => 20,
+        'selling_price' => '180.00',
+    ]);
+
+    $cart = Cart::query()->create([
+        'guest_token' => 'guest-token',
+        'currency' => 'LKR',
+    ]);
+
+    $cart->items()->create([
+        'product_id' => $product->id,
+        'quantity' => 5,
+        'unit_price' => '180.00',
+    ]);
+
+    $this->withCookie('loomcraft_guest_token', 'guest-token')
+        ->get(route('checkout.show'))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('checkout')
+            ->where('cart.items.0.preparation_time_days', 60)
+            ->where('cart.items.0.exceeds_maximum_preparation_days', true)
+            ->where('cart.preparation_estimate.total_days', 60)
+            ->where('cart.preparation_estimate.exceeds_maximum_preparation_days', true)
+            ->where('cart.items.0.stock_delay_message', fn (string $message): bool => str_contains($message, '60+ days')
+                && str_contains($message, 'must contact the vendor')
+                && ! str_contains($message, '113 days'))
+            ->where('cart.preparation_estimate.message', fn (string $message): bool => str_contains($message, '60+ days')
+                && str_contains($message, 'must contact the vendor')
+                && ! str_contains($message, '113 days'))
+        );
+});
+
 it('creates a pending order from checkout and clears the cart', function () {
     $commissionRate = (string) config('commerce.commission_rate');
     $vendorUser = User::factory()->create(['role' => 'vendor']);

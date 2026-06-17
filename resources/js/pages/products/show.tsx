@@ -77,6 +77,7 @@ type ProductShowProps = {
         setup_days: number;
         buffer_rate: number;
         default_weaving_days: number;
+        max_display_days: number;
     };
     canRegister?: boolean;
     status?: string | null;

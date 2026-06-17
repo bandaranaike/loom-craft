@@ -1,9 +1,10 @@
 # Task Board
 
-Last updated: 2026-06-06
+Last updated: 2026-06-15
 
 ## Planned
 
+- [commerce/category-quantity-order-discounts](/var/www/loom-craft/.ai/tasks/planned/commerce/category-quantity-order-discounts.md)
 - [fulfillment/order-stickers-and-label-printing-requirements](/var/www/loom-craft/.ai/tasks/planned/fulfillment/order-stickers-and-label-printing-requirements.md)
 - [fulfillment/shipping-label-pdf-generation-and-print-pipeline](/var/www/loom-craft/.ai/tasks/planned/fulfillment/shipping-label-pdf-generation-and-print-pipeline.md)
 - [mobile/fulfillment-mobile-api-support](/var/www/loom-craft/.ai/tasks/planned/mobile/fulfillment-mobile-api-support.md)
