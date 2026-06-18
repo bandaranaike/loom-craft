@@ -9,6 +9,7 @@ use App\Enums\PaymentStatus;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductVariation;
 use App\ValueObjects\Currency;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,7 @@ class PlaceOrder
             ]);
         }
 
-        $cart->load('items.product.vendor', 'items.product.categories');
+        $cart->load('items.product.vendor', 'items.product.categories', 'items.productVariation');
 
         if ($cart->items->isEmpty()) {
             throw ValidationException::withMessages([
@@ -61,12 +62,15 @@ class PlaceOrder
                     ]);
                 }
 
+                $variation = $this->resolveVariationForCheckout($item->productVariation, $product, $item->product_variation_label);
                 $unitPrice = Money::fromString((string) $item->unit_price);
                 $lineTotal = $unitPrice->multiply($item->quantity);
                 $commissionAmount = $lineTotal->percentageOf($commissionRate);
 
                 $lineItems[] = [
                     'product_id' => $product->id,
+                    'product_variation_id' => $variation->id,
+                    'product_variation_label' => $variation->label,
                     'vendor_id' => $product->vendor_id,
                     'quantity' => $item->quantity,
                     'unit_price' => $unitPrice->amount,
@@ -230,7 +234,7 @@ class PlaceOrder
     }
 
     /**
-     * @param  list<array{vendor_id: int, product_id: int, quantity: int, unit_price: string, commission_rate: string, commission_amount: string, line_total: string}>  $lineItems
+     * @param  list<array{vendor_id: int, product_id: int, product_variation_id: int, product_variation_label: string, quantity: int, unit_price: string, commission_rate: string, commission_amount: string, line_total: string}>  $lineItems
      */
     private function resolveInitialShipmentVendorId(array $lineItems): ?int
     {
@@ -246,5 +250,28 @@ class PlaceOrder
         $vendorId = $vendorIds->first();
 
         return is_int($vendorId) ? $vendorId : null;
+    }
+
+    private function resolveVariationForCheckout(?ProductVariation $cartVariation, Product $product, ?string $cartVariationLabel): ProductVariation
+    {
+        if ($cartVariation instanceof ProductVariation && $cartVariation->product_id === $product->id) {
+            return $cartVariation;
+        }
+
+        if ($cartVariationLabel !== null) {
+            throw ValidationException::withMessages([
+                'cart' => 'One or more selected sizes are no longer available.',
+            ]);
+        }
+
+        $fallbackVariation = $product->variations()->first();
+
+        if (! $fallbackVariation instanceof ProductVariation) {
+            throw ValidationException::withMessages([
+                'cart' => 'One or more selected sizes are no longer available.',
+            ]);
+        }
+
+        return $fallbackVariation;
     }
 }

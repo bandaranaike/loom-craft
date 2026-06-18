@@ -101,11 +101,14 @@ function createShipmentLabelOrder(): Order
         'product_code' => 'PRD-LABEL-001',
         'status' => 'active',
         'selling_price' => '180.00',
+        'dimension_unit' => 'cm',
+    ]);
+    $variation = $product->variations()->firstOrFail();
+    $variation->forceFill([
         'dimension_length' => '160.00',
         'dimension_width' => '230.00',
         'dimension_height' => '2.00',
-        'dimension_unit' => 'cm',
-    ]);
+    ])->save();
 
     $order = Order::query()->create([
         'status' => 'confirmed',
@@ -121,6 +124,8 @@ function createShipmentLabelOrder(): Order
 
     $order->items()->create([
         'product_id' => $product->id,
+        'product_variation_id' => $variation->id,
+        'product_variation_label' => $variation->label,
         'vendor_id' => $vendor->id,
         'quantity' => 1,
         'unit_price' => '180.00',

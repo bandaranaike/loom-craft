@@ -28,6 +28,7 @@ class ShowPublicProduct
         $product = Product::query()
             ->with([
                 'vendor',
+                'variations',
                 'media' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
                 'categories' => fn ($query) => $query
                     ->where('is_active', true)
@@ -68,6 +69,7 @@ class ShowPublicProduct
         }
 
         $pricing = $this->productPricingService->forProduct($product);
+        $defaultVariation = $product->variations->first();
         $reviewSummary = [
             'average_rating' => $product->reviews_avg_rating !== null
                 ? number_format((float) $product->reviews_avg_rating, 1, '.', '')
@@ -125,9 +127,9 @@ class ShowPublicProduct
                 $product->pieces_count,
                 $product->production_time_days,
                 new ProductDimensions(
-                    $product->dimension_length !== null ? (float) $product->dimension_length : null,
-                    $product->dimension_width !== null ? (float) $product->dimension_width : null,
-                    $product->dimension_height !== null ? (float) $product->dimension_height : null,
+                    $defaultVariation?->dimension_length !== null ? (float) $defaultVariation->dimension_length : null,
+                    $defaultVariation?->dimension_width !== null ? (float) $defaultVariation->dimension_width : null,
+                    $defaultVariation?->dimension_height !== null ? (float) $defaultVariation->dimension_height : null,
                     $product->dimension_unit,
                 ),
                 new ProductVendorSummary(
@@ -153,6 +155,22 @@ class ShowPublicProduct
                         'id' => $color->id,
                         'name' => $color->name,
                         'slug' => $color->slug,
+                    ])
+                    ->values()
+                    ->all(),
+                $product->variations
+                    ->map(fn ($variation): array => [
+                        'id' => $variation->id,
+                        'label' => $variation->label,
+                        'vendor_price' => Money::fromString((string) $variation->vendor_price)->amount,
+                        'original_price' => $this->productPricingService->forVariation($product, $variation)->originalPrice,
+                        'selling_price' => $this->productPricingService->forVariation($product, $variation)->discountedPrice,
+                        'dimensions' => (new ProductDimensions(
+                            $variation->dimension_length !== null ? (float) $variation->dimension_length : null,
+                            $variation->dimension_width !== null ? (float) $variation->dimension_width : null,
+                            $variation->dimension_height !== null ? (float) $variation->dimension_height : null,
+                            $product->dimension_unit,
+                        ))->toArray(),
                     ])
                     ->values()
                     ->all(),

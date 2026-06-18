@@ -56,9 +56,9 @@ class OrderStickerDataResource extends JsonResource
                     'product_code' => $item->product?->product_code,
                     'vendor_name' => $item->vendor?->display_name,
                     'quantity' => $item->quantity,
-                    'dimension_length' => $item->product?->dimension_length !== null ? (float) $item->product->dimension_length : null,
-                    'dimension_width' => $item->product?->dimension_width !== null ? (float) $item->product->dimension_width : null,
-                    'dimension_height' => $item->product?->dimension_height !== null ? (float) $item->product->dimension_height : null,
+                    'dimension_length' => $item->productVariation?->dimension_length !== null ? (float) $item->productVariation->dimension_length : null,
+                    'dimension_width' => $item->productVariation?->dimension_width !== null ? (float) $item->productVariation->dimension_width : null,
+                    'dimension_height' => $item->productVariation?->dimension_height !== null ? (float) $item->productVariation->dimension_height : null,
                     'dimension_unit' => $item->product?->dimension_unit,
                 ])
                 ->values()

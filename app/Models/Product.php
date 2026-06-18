@@ -32,9 +32,6 @@ class Product extends Model
         'materials',
         'pieces_count',
         'production_time_days',
-        'dimension_length',
-        'dimension_width',
-        'dimension_height',
         'dimension_unit',
         'dead_weight',
         'dead_weight_unit',
@@ -92,6 +89,11 @@ class Product extends Model
     public function media(): HasMany
     {
         return $this->hasMany(ProductMedia::class);
+    }
+
+    public function variations(): HasMany
+    {
+        return $this->hasMany(ProductVariation::class)->orderBy('sort_order')->orderBy('id');
     }
 
     public function cartItems(): HasMany

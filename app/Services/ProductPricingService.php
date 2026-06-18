@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductVariation;
 use App\ValueObjects\Money;
 use App\ValueObjects\ProductPricing;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,6 +20,20 @@ class ProductPricingService
 
         return $this->fromValues(
             (string) $product->selling_price,
+            $this->normalizePercentage($product->discount_percentage),
+            $categories,
+        );
+    }
+
+    public function forVariation(Product $product, ProductVariation $variation): ProductPricing
+    {
+        $product->loadMissing('categories');
+
+        /** @var Collection<int, ProductCategory> $categories */
+        $categories = $product->categories;
+
+        return $this->fromValues(
+            (string) $variation->selling_price,
             $this->normalizePercentage($product->discount_percentage),
             $categories,
         );

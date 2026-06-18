@@ -10,6 +10,8 @@ import { show as vendorShow } from '@/routes/vendors';
 type CartItem = {
     id: number;
     product_id: number;
+    product_variation_id: number | null;
+    product_variation_label: string | null;
     name: string;
     vendor_name: string;
     vendor_slug: string | null;
@@ -152,6 +154,11 @@ export default function CartPage({ cart, canRegister = true }: CartPageProps) {
                                                     <p className="font-['Playfair_Display',serif] text-xl">
                                                         {item.name}
                                                     </p>
+                                                    {item.product_variation_label && (
+                                                        <p className="text-xs uppercase tracking-[0.25em] text-(--welcome-muted-text)">
+                                                            Size {item.product_variation_label}
+                                                        </p>
+                                                    )}
                                                     <div className="text-sm text-(--welcome-body-text)">
                                                         <p>
                                                             Unit price{' '}

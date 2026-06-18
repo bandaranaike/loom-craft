@@ -33,7 +33,7 @@ This document defines the end-to-end ordering workflow for LoomCraft, aligned wi
 - **Vendor**: `vendors`
 - **User**: `users`
 
-No additional fields are introduced beyond `.ai/knowledge/core/db-schema.md`.
+Product variations add size-specific pricing and dimensions through `product_variations` plus selected variation snapshots on cart/order items.
 
 ---
 
@@ -54,9 +54,12 @@ No additional fields are introduced beyond `.ai/knowledge/core/db-schema.md`.
 - Validate product status is purchasable (e.g., `active`).
 - Add or increment `cart_items`:
   - `product_id`
+  - `product_variation_id`
+  - `product_variation_label`
   - `quantity`
-  - `unit_price` = product `selling_price`
-- Unit price is **always derived** from product selling price; never user‑provided.
+  - `unit_price` = selected variation customer price
+- Cart lines merge only when both product and selected variation match.
+- Unit price is **always derived** from the selected variation selling price after active discounts; never user‑provided.
 
 ### 3.3 Update Cart
 
@@ -94,7 +97,7 @@ No additional fields are introduced beyond `.ai/knowledge/core/db-schema.md`.
 ### 4.3 Pricing & Commission
 
 - For each item:
-  - `unit_price` = product `selling_price`
+  - `unit_price` = selected variation customer price after product/category discounts
   - `commission_rate` = **7.00**
   - `commission_amount` calculated per line
   - `line_total` = `unit_price * quantity`
@@ -147,12 +150,15 @@ For each cart item:
 - Create `order_items` with:
   - `order_id`
   - `product_id`
+  - `product_variation_id`
+  - `product_variation_label`
   - `vendor_id`
   - `quantity`
   - `unit_price`
   - `commission_rate` (7.00)
   - `commission_amount`
   - `line_total`
+- The selected variation label and charged unit price are persisted as order item snapshots.
 
 ### 5.3 Create Order Addresses
 
@@ -255,7 +261,7 @@ Typical status progression (may vary by payment method):
   - `carrier`
   - `service_level`
   - shipment-level parcel metrics
-- Product catalog dimensions remain available, but they should be treated as catalog data, not guaranteed final packed-parcel measurements.
+- Product variation dimensions remain available for the selected ordered size, but they should be treated as catalog data, not guaranteed final packed-parcel measurements.
 
 ### 8.5 Delivery Evidence And Exceptions
 

@@ -107,6 +107,14 @@ it('updates vendor owned products and recalculates selling price', function () {
         ->toEqualCanonicalizing($updatedCategories->pluck('id')->all());
     expect($product->fresh()->colors()->pluck('product_colors.id')->all())
         ->toEqualCanonicalizing($updatedColors->pluck('id')->all());
+
+    $this->assertDatabaseHas('product_variations', [
+        'product_id' => $product->id,
+        'label' => 'Standard',
+        'dimension_length' => '120.00',
+        'dimension_width' => '40.00',
+        'dimension_height' => '2.00',
+    ]);
 });
 
 it('prevents vendors from editing products they do not own', function () {

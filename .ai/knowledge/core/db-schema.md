@@ -3,7 +3,7 @@
 Schema snapshot derived from `.ai/db.sql`, the latest SQL dump of the database, plus code-verified schema changes that landed after the last dump.
 
 Last synchronized with `.ai/db.sql`: 2026-04-05.
-Code-verified updates through: 2026-06-06.
+Code-verified updates through: 2026-06-18.
 
 ---
 
@@ -230,9 +230,6 @@ Primary product catalog record.
 - `materials` (text, nullable)
 - `pieces_count` (int unsigned, nullable)
 - `production_time_days` (int unsigned, nullable)
-- `dimension_length` (decimal(10,2), nullable)
-- `dimension_width` (decimal(10,2), nullable)
-- `dimension_height` (decimal(10,2), nullable)
 - `dimension_unit` (varchar(255), nullable)
 - `dead_weight` (decimal(10,2), nullable)
 - `dead_weight_unit` (varchar(10), nullable)
@@ -250,6 +247,35 @@ Indexes:
 Important note:
 - The SQL dump currently defines a DB default of `7.00` for `commission_rate`. Project notes indicate create/edit flows and commission calculations use `COMMERCE_COMMISSION_RATE` from config/environment, with a current default of `100.00`. This is an application/schema mismatch that should be treated carefully.
 - `pieces_count` is treated by application logic as immediately available stock. `production_time_days` is treated as vendor-entered weaving time per produced item and is used by the cart/checkout preparation estimator when requested quantity exceeds available stock.
+- Product-level `vendor_price` and `selling_price` remain compatibility/listing fields and are synchronized from the current starting variation price.
+
+---
+
+### product_variations
+
+Purchasable size/price options for one product design.
+
+- `id` (bigint unsigned, PK)
+- `product_id` (bigint unsigned, FK -> products.id, cascade delete)
+- `label` (varchar(255))
+- `vendor_price` (decimal(10,2))
+- `selling_price` (decimal(10,2))
+- `dimension_length` (decimal(10,2), nullable)
+- `dimension_width` (decimal(10,2), nullable)
+- `dimension_height` (decimal(10,2), nullable)
+- `sort_order` (int unsigned, default `0`)
+- `created_at` (timestamp, nullable)
+- `updated_at` (timestamp, nullable)
+
+Indexes:
+- unique index on (`product_id`, `label`)
+- index on (`product_id`, `sort_order`)
+
+Important note:
+- Variation length/width/height are the product size for that purchasable option. `products.dimension_unit` remains the shared unit for those variation dimensions.
+
+Application note:
+- Vendor product create/edit requires at least one variation. Public product pages expose all variations so changing size updates the displayed price immediately.
 
 ---
 
@@ -335,6 +361,8 @@ Indexes:
 - `id` (bigint unsigned, PK)
 - `cart_id` (bigint unsigned, FK -> carts.id)
 - `product_id` (bigint unsigned, FK -> products.id)
+- `product_variation_id` (bigint unsigned, FK -> product_variations.id, nullable, null on delete)
+- `product_variation_label` (varchar(255), nullable)
 - `quantity` (int unsigned)
 - `unit_price` (decimal(10,2))
 - `created_at` (timestamp, nullable)
@@ -343,6 +371,7 @@ Indexes:
 No explicit standalone indexes beyond foreign-key support.
 
 Application payload note:
+- Cart lines are keyed by product plus selected variation so the same design can be added in multiple sizes without merging into one line.
 - No new cart tables or columns were added for preparation estimates. The cart summary response now derives `preparation_estimate` plus per-line shortage/preparation fields from `cart_items.quantity`, `products.pieces_count`, `products.production_time_days`, and `config('commerce.production_time_*')`.
 
 ---
@@ -379,6 +408,8 @@ Indexes:
 - `id` (bigint unsigned, PK)
 - `order_id` (bigint unsigned, FK -> orders.id)
 - `product_id` (bigint unsigned, FK -> products.id)
+- `product_variation_id` (bigint unsigned, FK -> product_variations.id, nullable, null on delete)
+- `product_variation_label` (varchar(255), nullable)
 - `vendor_id` (bigint unsigned, FK -> vendors.id)
 - `quantity` (int unsigned)
 - `unit_price` (decimal(10,2))
@@ -390,6 +421,9 @@ Indexes:
 
 Indexes:
 - `order_items_vendor_id_index` on `vendor_id`
+
+Application note:
+- `product_variation_label` and `unit_price` snapshot the selected size and charged price so historical orders do not change when product variations are later edited.
 
 ---
 

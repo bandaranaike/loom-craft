@@ -1,4 +1,5 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
 import ProductColorSelector from '@/components/product-color-selector';
@@ -36,10 +37,36 @@ const textAreaClassName =
 const fileInputClassName =
     'w-full rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] file:mr-4 file:rounded-full file:border-0 file:bg-(--welcome-strong) file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.3em] file:text-(--welcome-on-strong) hover:file:bg-(--welcome-strong-hover) focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
 
+type VariationDraft = {
+    key: string;
+    label: string;
+    vendor_price: string;
+    dimension_length: string;
+    dimension_width: string;
+    dimension_height: string;
+};
+
+const variationKey = () => Math.random().toString(36).slice(2);
+
 export default function ProductCreate() {
     const { base_currency, commission_rate, vendor_name, vendor_slug, categories, colors, status } = usePage<Props>().props;
-    const [vendorPrice, setVendorPrice] = useState('');
+    const [variations, setVariations] = useState<VariationDraft[]>([
+        { key: variationKey(), label: '16*16', vendor_price: '', dimension_length: '', dimension_width: '', dimension_height: '' },
+    ]);
     const [discountPercentage, setDiscountPercentage] = useState('');
+    const vendorPrice = variations[0]?.vendor_price ?? '';
+
+    const updateVariation = (index: number, field: keyof Omit<VariationDraft, 'key'>, value: string) => {
+        setVariations((current) => current.map((variation, variationIndex) => (variationIndex === index ? { ...variation, [field]: value } : variation)));
+    };
+
+    const addVariation = () => {
+        setVariations((current) => [...current, { key: variationKey(), label: '', vendor_price: '', dimension_length: '', dimension_width: '', dimension_height: '' }]);
+    };
+
+    const removeVariation = (index: number) => {
+        setVariations((current) => (current.length === 1 ? current : current.filter((_, variationIndex) => variationIndex !== index)));
+    };
 
     const baseSellingPrice = useMemo(() => {
         const parsed = Number.parseFloat(vendorPrice);
@@ -104,7 +131,7 @@ export default function ProductCreate() {
                         <div className="grid gap-3 rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
                             <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Pricing Preview</p>
                             <div className="flex items-center justify-between text-sm text-(--welcome-body-text)">
-                                <span>Vendor price</span>
+                                <span>Starting vendor price</span>
                                 <span>{vendorPrice ? formatMoney(vendorPrice, base_currency) : '—'}</span>
                             </div>
                             <div className="flex items-center justify-between text-sm text-(--welcome-body-text)">
@@ -152,24 +179,7 @@ export default function ProductCreate() {
                                                     <InputError message={errors.name} className="text-xs" />
                                                 </div>
                                                 <div className="grid gap-5 lg:col-span-3 lg:grid-cols-2">
-                                                    <div className="grid gap-2">
-                                                        <label htmlFor="vendor_price" className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                            Vendor price
-                                                        </label>
-                                                        <input
-                                                            id="vendor_price"
-                                                            type="number"
-                                                            name="vendor_price"
-                                                            step="0.01"
-                                                            min="0"
-                                                            value={vendorPrice}
-                                                            onChange={(event) => setVendorPrice(event.target.value)}
-                                                            placeholder="1500.00"
-                                                            className={inputClassName}
-                                                            required
-                                                        />
-                                                        <InputError message={errors.vendor_price} className="text-xs" />
-                                                    </div>
+                                                    <input type="hidden" name="vendor_price" value={vendorPrice} />
                                                     <div className="grid gap-2">
                                                         <label
                                                             htmlFor="discount_percentage"
@@ -193,6 +203,139 @@ export default function ProductCreate() {
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        <div className="grid gap-3 lg:col-span-2">
+                                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                                <p className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">Sizes and prices</p>
+                                                <button
+                                                    type="button"
+                                                    onClick={addVariation}
+                                                    className="inline-flex items-center justify-center rounded-full border border-(--welcome-strong) p-2 text-(--welcome-strong) transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                                                    title="Add size"
+                                                >
+                                                    <Plus className="size-4" />
+                                                </button>
+                                            </div>
+                                            <div className="grid gap-3">
+                                                {variations.map((variation, index) => (
+                                                    <div
+                                                        key={variation.key}
+                                                        className="grid gap-3 rounded-[20px] border border-(--welcome-border) bg-(--welcome-surface-2) p-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_0.8fr_0.8fr_0.8fr_auto]"
+                                                    >
+                                                        <div className="grid gap-2">
+                                                            <label
+                                                                htmlFor={`variation_label_${index}`}
+                                                                className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase"
+                                                            >
+                                                                Size
+                                                            </label>
+                                                            <input
+                                                                id={`variation_label_${index}`}
+                                                                type="text"
+                                                                name={`variations[${index}][label]`}
+                                                                value={variation.label}
+                                                                onChange={(event) => updateVariation(index, 'label', event.target.value)}
+                                                                placeholder="16*16"
+                                                                className={inputClassName}
+                                                                required
+                                                            />
+                                                            <InputError message={errors[`variations.${index}.label`]} className="text-xs" />
+                                                        </div>
+                                                        <div className="grid gap-2">
+                                                            <label
+                                                                htmlFor={`variation_vendor_price_${index}`}
+                                                                className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase"
+                                                            >
+                                                                Vendor price
+                                                            </label>
+                                                            <input
+                                                                id={`variation_vendor_price_${index}`}
+                                                                type="number"
+                                                                name={`variations[${index}][vendor_price]`}
+                                                                step="0.01"
+                                                                min="0"
+                                                                value={variation.vendor_price}
+                                                                onChange={(event) => updateVariation(index, 'vendor_price', event.target.value)}
+                                                                placeholder="2600.00"
+                                                                className={inputClassName}
+                                                                required
+                                                            />
+                                                            <InputError message={errors[`variations.${index}.vendor_price`]} className="text-xs" />
+                                                        </div>
+                                                        <div className="grid gap-2">
+                                                            <label
+                                                                htmlFor={`variation_dimension_length_${index}`}
+                                                                className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase"
+                                                            >
+                                                                Length
+                                                            </label>
+                                                            <input
+                                                                id={`variation_dimension_length_${index}`}
+                                                                type="number"
+                                                                name={`variations[${index}][dimension_length]`}
+                                                                step="0.01"
+                                                                min="0"
+                                                                value={variation.dimension_length}
+                                                                onChange={(event) => updateVariation(index, 'dimension_length', event.target.value)}
+                                                                placeholder="120"
+                                                                className={inputClassName}
+                                                            />
+                                                            <InputError message={errors[`variations.${index}.dimension_length`]} className="text-xs" />
+                                                        </div>
+                                                        <div className="grid gap-2">
+                                                            <label
+                                                                htmlFor={`variation_dimension_width_${index}`}
+                                                                className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase"
+                                                            >
+                                                                Width
+                                                            </label>
+                                                            <input
+                                                                id={`variation_dimension_width_${index}`}
+                                                                type="number"
+                                                                name={`variations[${index}][dimension_width]`}
+                                                                step="0.01"
+                                                                min="0"
+                                                                value={variation.dimension_width}
+                                                                onChange={(event) => updateVariation(index, 'dimension_width', event.target.value)}
+                                                                placeholder="60"
+                                                                className={inputClassName}
+                                                            />
+                                                            <InputError message={errors[`variations.${index}.dimension_width`]} className="text-xs" />
+                                                        </div>
+                                                        <div className="grid gap-2">
+                                                            <label
+                                                                htmlFor={`variation_dimension_height_${index}`}
+                                                                className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase"
+                                                            >
+                                                                Height
+                                                            </label>
+                                                            <input
+                                                                id={`variation_dimension_height_${index}`}
+                                                                type="number"
+                                                                name={`variations[${index}][dimension_height]`}
+                                                                step="0.01"
+                                                                min="0"
+                                                                value={variation.dimension_height}
+                                                                onChange={(event) => updateVariation(index, 'dimension_height', event.target.value)}
+                                                                placeholder="2"
+                                                                className={inputClassName}
+                                                            />
+                                                            <InputError message={errors[`variations.${index}.dimension_height`]} className="text-xs" />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeVariation(index)}
+                                                            disabled={variations.length === 1}
+                                                            className="inline-flex size-11 items-center justify-center self-end rounded-full border border-(--welcome-muted-text) text-(--welcome-muted-text) transition hover:bg-(--welcome-muted-text) hover:text-(--welcome-on-strong) disabled:cursor-not-allowed disabled:opacity-40"
+                                                            title="Remove size"
+                                                        >
+                                                            <Trash2 className="size-4" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <InputError message={errors.variations} className="text-xs" />
                                         </div>
 
                                         <div className="grid gap-2 lg:col-span-2">
@@ -268,38 +411,6 @@ export default function ProductCreate() {
                                                 </label>
                                                 <input id="dimension_unit" type="text" name="dimension_unit" placeholder="cm" className={inputClassName} />
                                                 <InputError message={errors.dimension_unit} className="text-xs" />
-                                            </div>
-                                        </div>
-
-                                        <div className="grid gap-4 sm:grid-cols-3 lg:col-span-2">
-                                            <div className="grid gap-2">
-                                                <label htmlFor="dimension_length" className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                    Length
-                                                </label>
-                                                <input
-                                                    id="dimension_length"
-                                                    type="number"
-                                                    step="0.01"
-                                                    min="0"
-                                                    name="dimension_length"
-                                                    placeholder="120"
-                                                    className={inputClassName}
-                                                />
-                                                <InputError message={errors.dimension_length} className="text-xs" />
-                                            </div>
-                                            <div className="grid gap-2">
-                                                <label htmlFor="dimension_width" className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                    Width
-                                                </label>
-                                                <input id="dimension_width" type="number" step="0.01" min="0" name="dimension_width" placeholder="60" className={inputClassName} />
-                                                <InputError message={errors.dimension_width} className="text-xs" />
-                                            </div>
-                                            <div className="grid gap-2">
-                                                <label htmlFor="dimension_height" className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                    Height
-                                                </label>
-                                                <input id="dimension_height" type="number" step="0.01" min="0" name="dimension_height" placeholder="2" className={inputClassName} />
-                                                <InputError message={errors.dimension_height} className="text-xs" />
                                             </div>
                                         </div>
 

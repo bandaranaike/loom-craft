@@ -35,6 +35,7 @@ class ShowCart
         $cart->load([
             'items.product.vendor',
             'items.product.categories',
+            'items.productVariation',
             'items.product.media' => fn ($query) => $query->orderBy('sort_order'),
         ]);
 
@@ -57,7 +58,10 @@ class ShowCart
             }
 
             $image = $product->media->firstWhere('type', 'image');
-            $pricing = $this->productPricingService->forProduct($product);
+            $variation = $item->productVariation ?? $product->variations()->first();
+            $pricing = $variation === null
+                ? $this->productPricingService->forProduct($product)
+                : $this->productPricingService->forVariation($product, $variation);
             $requestedQuantity = $requestedQuantityByProductId->get($product->id, $item->quantity);
             $stockAvailability = $this->productStockAvailabilityService->forProduct($product, $requestedQuantity);
             $preparationEstimateByProductId->put(
@@ -72,6 +76,8 @@ class ShowCart
             return new CartItemSummary(
                 $item->id,
                 $product->id,
+                $variation?->id,
+                $variation?->label ?? $item->product_variation_label,
                 $product->name,
                 $vendor->display_name,
                 $vendor->slug,
@@ -175,7 +181,7 @@ class ShowCart
                 return $cart;
             }
 
-            $guestCart->load('items.product.categories');
+            $guestCart->load('items.product.categories', 'items.productVariation');
 
             foreach ($guestCart->items as $item) {
                 $product = $item->product;
@@ -184,13 +190,23 @@ class ShowCart
                     continue;
                 }
 
-                $unitPrice = $this->productPricingService->forProduct($product)->discountedPrice;
-                $existing = $cart->items()->where('product_id', $product->id)->first();
+                $variation = $item->productVariation ?? $product->variations()->first();
+
+                if ($variation === null) {
+                    continue;
+                }
+
+                $unitPrice = $this->productPricingService->forVariation($product, $variation)->discountedPrice;
+                $existing = $cart->items()
+                    ->where('product_id', $product->id)
+                    ->where('product_variation_id', $variation->id)
+                    ->first();
 
                 if ($existing) {
                     $existing->update([
                         'quantity' => $existing->quantity + $item->quantity,
                         'unit_price' => $unitPrice,
+                        'product_variation_label' => $variation->label,
                     ]);
 
                     continue;
@@ -198,6 +214,8 @@ class ShowCart
 
                 $cart->items()->create([
                     'product_id' => $product->id,
+                    'product_variation_id' => $variation->id,
+                    'product_variation_label' => $variation->label,
                     'quantity' => $item->quantity,
                     'unit_price' => $unitPrice,
                 ]);

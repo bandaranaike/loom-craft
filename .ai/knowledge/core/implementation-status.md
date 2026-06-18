@@ -1,6 +1,6 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-06-06
+Last reviewed: 2026-06-18
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implementation-guide.md`, `.ai/knowledge/core/best-practices.md`, `.ai/knowledge/core/guardrails.md`, `.ai/knowledge/core/db-schema.md`, and `.ai/knowledge/core/order-process.md`.
@@ -46,6 +46,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Exchange-rate snapshots are stored historically and used to block stale PayPal conversions.
 - Exchange-rate syncing is implemented through a dedicated command and exchange-rate storage.
 - Cart, checkout, and order placement use centralized discounted pricing derived from product and category discounts.
+- Product size-price variations are implemented. Vendor product create/edit pages manage repeatable size rows with dimensions, public product pages update the displayed price and dimensions when size changes, cart lines stay separate by selected size, and order items snapshot the selected size label and charged price.
 - Cart and checkout now expose a backend-calculated preparation estimate for made-to-order shortages. The estimate uses only the quantity beyond `products.pieces_count`, adds configurable setup/buffer time, assumes product preparation runs in parallel, and uses the most time-consuming product as the order preparation time. Large carts append a workload warning when the configured distinct-product threshold is exceeded.
 
 ### Orders
@@ -69,7 +70,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
   - `service_level`
   - `package_count`
   - parcel weight and packed dimensions
-- Admin mobile sticker payloads now include order/invoice/shipment identifiers plus parcel metrics and product dimensions.
+- Admin mobile sticker payloads now include order/invoice/shipment identifiers plus parcel metrics and selected variation dimensions.
 
 ### Vendor Features
 - Vendor registration form and submission (`/vendor/register`).
@@ -79,6 +80,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Product creation enforces:
   - fixed commission `7.00`,
   - derived selling price (`vendor_price + 7%`),
+  - one or more size-price variations with dimensions, with product-level starting price synchronized from variation pricing,
   - image upload to `public` disk,
   - optional video upload through `VideoUploader` contract.
 - Vendor feedback submission page and create action (`/vendor/feedback`) implemented.

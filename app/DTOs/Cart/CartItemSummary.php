@@ -7,6 +7,8 @@ class CartItemSummary
     public function __construct(
         public int $id,
         public int $productId,
+        public ?int $productVariationId,
+        public ?string $productVariationLabel,
         public string $name,
         public string $vendorName,
         public ?string $vendorSlug,
@@ -39,6 +41,8 @@ class CartItemSummary
         return [
             'id' => $this->id,
             'product_id' => $this->productId,
+            'product_variation_id' => $this->productVariationId,
+            'product_variation_label' => $this->productVariationLabel,
             'name' => $this->name,
             'vendor_name' => $this->vendorName,
             'vendor_slug' => $this->vendorSlug,

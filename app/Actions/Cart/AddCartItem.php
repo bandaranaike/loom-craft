@@ -6,6 +6,7 @@ use App\DTOs\Cart\CartItemStoreData;
 use App\DTOs\Cart\CartMutationResult;
 use App\Models\Cart;
 use App\Models\Product;
+use App\Models\ProductVariation;
 use App\Services\ProductPricingService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -29,7 +30,7 @@ class AddCartItem
             ]);
         }
 
-        $product = Product::query()->with(['vendor', 'categories'])->findOrFail($data->productId);
+        $product = Product::query()->with(['vendor', 'categories', 'variations'])->findOrFail($data->productId);
 
         if ($product->status !== 'active' || $product->vendor?->status !== 'approved') {
             throw ValidationException::withMessages([
@@ -37,24 +38,46 @@ class AddCartItem
             ]);
         }
 
-        $unitPrice = $this->productPricingService->forProduct($product)->discountedPrice;
+        $variation = $this->resolveVariation($product, $data->productVariationId);
+        $unitPrice = $this->productPricingService->forVariation($product, $variation)->discountedPrice;
 
-        $existing = $cart->items()->where('product_id', $product->id)->first();
+        $existing = $cart->items()
+            ->where('product_id', $product->id)
+            ->where('product_variation_id', $variation->id)
+            ->first();
 
         if ($existing) {
             $existing->update([
                 'quantity' => $existing->quantity + $data->quantity,
                 'unit_price' => $unitPrice,
+                'product_variation_label' => $variation->label,
             ]);
         } else {
             $cart->items()->create([
                 'product_id' => $product->id,
+                'product_variation_id' => $variation->id,
+                'product_variation_label' => $variation->label,
                 'quantity' => $data->quantity,
                 'unit_price' => $unitPrice,
             ]);
         }
 
         return new CartMutationResult($cart->id, $guestToken);
+    }
+
+    private function resolveVariation(Product $product, ?int $variationId): ProductVariation
+    {
+        $variation = $variationId === null
+            ? $product->variations->first()
+            : $product->variations->firstWhere('id', $variationId);
+
+        if (! $variation instanceof ProductVariation) {
+            throw ValidationException::withMessages([
+                'product_variation_id' => 'Select an available size.',
+            ]);
+        }
+
+        return $variation;
     }
 
     /**

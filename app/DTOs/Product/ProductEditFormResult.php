@@ -15,12 +15,10 @@ class ProductEditFormResult
      *     materials: string|null,
      *     pieces_count: int|null,
      *     production_time_days: int|null,
-     *     dimension_length: float|null,
-     *     dimension_width: float|null,
-     *     dimension_height: float|null,
      *     dimension_unit: string|null,
      *     category_ids: list<int>,
      *     color_ids: list<int>,
+     *     variations: list<array{id: int, label: string, vendor_price: string, dimension_length: float|null, dimension_width: float|null, dimension_height: float|null}>,
      *     images: list<array{id: int, url: string}>
      * }  $product
      */

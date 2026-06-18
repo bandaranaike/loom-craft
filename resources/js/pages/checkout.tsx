@@ -20,6 +20,8 @@ import type { SharedData } from '@/types';
 
 type CartItem = {
     id: number;
+    product_variation_id: number | null;
+    product_variation_label: string | null;
     name: string;
     vendor_name: string;
     vendor_slug: string | null;
@@ -1021,6 +1023,11 @@ export default function CheckoutPage({
                                         <p className="text-sm font-semibold">
                                             {item.name}
                                         </p>
+                                        {item.product_variation_label && (
+                                            <p className="text-[10px] tracking-[0.2em] text-(--welcome-muted-text) uppercase">
+                                                Size {item.product_variation_label}
+                                            </p>
+                                        )}
                                         <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             {item.vendor_slug ? (
                                                 <Link href={vendorShow(item.vendor_slug)}>

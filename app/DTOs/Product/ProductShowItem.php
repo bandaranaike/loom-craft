@@ -8,6 +8,7 @@ class ProductShowItem
      * @param  list<ProductMediaItem>  $images
      * @param  list<array{id: int, name: string, slug: string}>  $categories
      * @param  list<array{id: int, name: string, slug: string}>  $colors
+     * @param  list<array{id: int, label: string, vendor_price: string, original_price: string, selling_price: string, dimensions: array{length: float|null, width: float|null, height: float|null, unit: string|null}}>  $variations
      */
     public function __construct(
         public int $id,
@@ -29,6 +30,7 @@ class ProductShowItem
         public array $images,
         public array $categories,
         public array $colors,
+        public array $variations,
         public ?string $videoUrl,
     ) {}
 
@@ -60,6 +62,7 @@ class ProductShowItem
             ),
             'categories' => $this->categories,
             'colors' => $this->colors,
+            'variations' => $this->variations,
             'video_url' => $this->videoUrl,
         ];
     }

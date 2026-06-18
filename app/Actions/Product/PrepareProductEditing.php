@@ -19,6 +19,7 @@ class PrepareProductEditing
             'media' => fn ($query) => $query
                 ->where('type', 'image')
                 ->orderBy('sort_order'),
+            'variations',
             'categories' => fn ($query) => $query
                 ->where('is_active', true)
                 ->orderBy('sort_order')
@@ -67,9 +68,6 @@ class PrepareProductEditing
                 'materials' => $product->materials,
                 'pieces_count' => $product->pieces_count,
                 'production_time_days' => $product->production_time_days,
-                'dimension_length' => $product->dimension_length !== null ? (float) $product->dimension_length : null,
-                'dimension_width' => $product->dimension_width !== null ? (float) $product->dimension_width : null,
-                'dimension_height' => $product->dimension_height !== null ? (float) $product->dimension_height : null,
                 'dimension_unit' => $product->dimension_unit,
                 'category_ids' => $product->categories
                     ->pluck('id')
@@ -79,6 +77,17 @@ class PrepareProductEditing
                 'color_ids' => $product->colors
                     ->pluck('id')
                     ->map(static fn (int|string $id): int => (int) $id)
+                    ->values()
+                    ->all(),
+                'variations' => $product->variations
+                    ->map(static fn ($variation): array => [
+                        'id' => $variation->id,
+                        'label' => $variation->label,
+                        'vendor_price' => (string) $variation->vendor_price,
+                        'dimension_length' => $variation->dimension_length !== null ? (float) $variation->dimension_length : null,
+                        'dimension_width' => $variation->dimension_width !== null ? (float) $variation->dimension_width : null,
+                        'dimension_height' => $variation->dimension_height !== null ? (float) $variation->dimension_height : null,
+                    ])
                     ->values()
                     ->all(),
                 'images' => $product->media

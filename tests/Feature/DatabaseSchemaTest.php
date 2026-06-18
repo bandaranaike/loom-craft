@@ -37,6 +37,16 @@ it('adds fulfillment identifier and parcel columns', function () {
             'dead_weight',
             'dead_weight_unit',
         ]))->toBeTrue()
+        ->and(Schema::hasColumns('product_variations', [
+            'dimension_length',
+            'dimension_width',
+            'dimension_height',
+        ]))->toBeTrue()
+        ->and(Schema::hasColumns('products', [
+            'dimension_length',
+            'dimension_width',
+            'dimension_height',
+        ]))->toBeFalse()
         ->and(Schema::hasColumns('shipments', [
             'shipment_number',
             'service_level',

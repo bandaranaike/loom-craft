@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Cart;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,12 +19,13 @@ class StoreCartItemRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
             'product_id' => ['required', 'integer', 'exists:products,id'],
+            'product_variation_id' => ['nullable', 'integer', 'exists:product_variations,id'],
             'quantity' => ['required', 'integer', 'min:1', 'max:25'],
             'currency' => ['nullable', 'string', Rule::in(['LKR'])],
         ];
@@ -37,6 +39,7 @@ class StoreCartItemRequest extends FormRequest
         return [
             'product_id.required' => 'Select a product to add to your cart.',
             'product_id.exists' => 'That product is not available.',
+            'product_variation_id.exists' => 'Select an available size.',
             'quantity.required' => 'Select a quantity.',
             'quantity.min' => 'Quantity must be at least 1.',
             'quantity.max' => 'Quantity exceeds the maximum allowed.',

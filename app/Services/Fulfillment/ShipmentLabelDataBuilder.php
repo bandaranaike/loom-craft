@@ -22,7 +22,7 @@ class ShipmentLabelDataBuilder
             abort(404);
         }
 
-        $order->loadMissing(['addresses', 'invoice', 'items.product', 'items.vendor', 'user']);
+        $order->loadMissing(['addresses', 'invoice', 'items.product', 'items.productVariation', 'items.vendor', 'user']);
         $shipment->loadMissing(['vendor']);
 
         $shippingAddress = $order->addresses->firstWhere('type', 'shipping');
@@ -116,8 +116,9 @@ class ShipmentLabelDataBuilder
     private function primaryProduct(?OrderItem $item, int $itemCount): array
     {
         $product = $item?->product;
+        $variation = $item?->productVariation;
 
-        $dimensions = collect([$product?->dimension_length, $product?->dimension_width, $product?->dimension_height])
+        $dimensions = collect([$variation?->dimension_length, $variation?->dimension_width, $variation?->dimension_height])
             ->filter(fn (mixed $value): bool => $value !== null)
             ->map(fn (mixed $value): string => (string) $value)
             ->implode(' x ');

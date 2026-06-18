@@ -18,7 +18,7 @@ class UpdateCartItem
     {
         Gate::authorize('access', Cart::class);
 
-        $cartItem = CartItem::query()->with(['cart', 'product.categories'])->findOrFail($data->cartItemId);
+        $cartItem = CartItem::query()->with(['cart', 'product.categories', 'productVariation'])->findOrFail($data->cartItemId);
         $cart = $cartItem->cart;
 
         Gate::authorize('manage', [$cart, $data->guestToken]);
@@ -35,9 +35,17 @@ class UpdateCartItem
             throw new \RuntimeException('Cart item product is missing.');
         }
 
+        $variation = $cartItem->productVariation ?? $product->variations()->first();
+
+        if ($variation === null) {
+            throw new \RuntimeException('Cart item variation is missing.');
+        }
+
         $cartItem->update([
             'quantity' => $data->quantity,
-            'unit_price' => $this->productPricingService->forProduct($product)->discountedPrice,
+            'unit_price' => $this->productPricingService->forVariation($product, $variation)->discountedPrice,
+            'product_variation_id' => $variation->id,
+            'product_variation_label' => $variation->label,
         ]);
 
         return new CartMutationResult($cart->id, $cart->guest_token);

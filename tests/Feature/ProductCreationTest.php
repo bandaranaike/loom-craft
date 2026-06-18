@@ -100,6 +100,14 @@ it('creates products for approved vendors', function () {
     expect($product->categories()->count())->toBe(2);
     expect($product->colors()->count())->toBe(2);
 
+    $this->assertDatabaseHas('product_variations', [
+        'product_id' => $product->id,
+        'label' => 'Standard',
+        'dimension_length' => '120.50',
+        'dimension_width' => '60.00',
+        'dimension_height' => '2.50',
+    ]);
+
     $this->assertSame(2, $product->media()->where('type', 'image')->count());
 
     $this->assertDatabaseHas('product_media', [
