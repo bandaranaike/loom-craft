@@ -49,6 +49,10 @@ Route::get('privacy-policy', fn () => Inertia::render('privacy-policy'))
     ->name('privacy-policy');
 Route::get('terms-of-service', fn () => Inertia::render('terms-of-service'))
     ->name('terms-of-service');
+Route::get('manage-plans', fn () => Inertia::render('manage-plans'))
+    ->name('plans.manage');
+Route::redirect('autopay/cancel', '/manage-plans')
+    ->name('autopay.cancel');
 
 Route::get('products', [ProductIndexController::class, 'index'])
     ->name('products.index');

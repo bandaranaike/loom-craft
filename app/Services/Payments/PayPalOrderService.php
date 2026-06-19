@@ -2,7 +2,9 @@
 
 namespace App\Services\Payments;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -20,6 +22,9 @@ class PayPalOrderService
 
     /**
      * @return array{order_id: string, approve_url: string}
+     *
+     * @throws ConnectionException
+     * @throws RequestException
      */
     public function createOrder(
         string $currencyCode,
@@ -47,6 +52,10 @@ class PayPalOrderService
         ];
     }
 
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
     public function createCardOrder(string $currencyCode, string $amount): string
     {
         $response = $this->createOrderPayload($currencyCode, $amount);
@@ -61,11 +70,14 @@ class PayPalOrderService
 
     /**
      * @return array{capture_id: string, status: string}
+     *
+     * @throws ConnectionException
+     * @throws RequestException
      */
     public function captureOrder(string $orderId): array
     {
         $response = $this->api()
-            ->post("/v2/checkout/orders/{$orderId}/capture")
+            ->post("/v2/checkout/orders/$orderId/capture")
             ->throw()
             ->json();
 
@@ -82,6 +94,10 @@ class PayPalOrderService
         ];
     }
 
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
     private function api(): PendingRequest
     {
         return Http::baseUrl($this->baseUrl())
@@ -92,6 +108,9 @@ class PayPalOrderService
 
     /**
      * @return array<string, mixed>
+     *
+     * @throws ConnectionException
+     * @throws RequestException
      */
     private function createOrderPayload(
         string $currencyCode,
@@ -125,6 +144,10 @@ class PayPalOrderService
             ->json();
     }
 
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
     private function accessToken(): string
     {
         $response = Http::baseUrl($this->baseUrl())
