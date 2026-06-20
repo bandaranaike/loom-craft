@@ -196,12 +196,9 @@ export default function ProductIndex({
                     <div className="rounded-[36px] border border-(--welcome-border) bg-(--welcome-surface-1) p-6 shadow-[0_30px_80px_-45px_var(--welcome-shadow-medium)]">
                         <div className="space-y-4">
                             <div className="flex items-center justify-between gap-3">
-                                <label
-                                    htmlFor="search"
-                                    className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase"
-                                >
-                                    Search the catalog
-                                </label>
+                                <p className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                    Refine results
+                                </p>
                                 <div className="flex items-center gap-2">
                                     {isLoading && (
                                         <Spinner className="text-(--welcome-strong)" />
@@ -217,16 +214,6 @@ export default function ProductIndex({
                                     )}
                                 </div>
                             </div>
-                            <input
-                                id="search"
-                                type="search"
-                                placeholder="Search by product name"
-                                value={searchInput}
-                                onChange={(event) =>
-                                    setSearchInput(event.currentTarget.value)
-                                }
-                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
-                            />
 
                             <button
                                 type="button"
@@ -246,40 +233,12 @@ export default function ProductIndex({
                             <div
                                 className={`grid gap-4 overflow-hidden transition-all duration-300 md:grid md:overflow-visible ${
                                     isMobileFilterOpen
-                                        ? 'max-h-[1000px] opacity-100'
+                                        ? 'max-h-250 opacity-100'
                                         : 'max-h-0 opacity-0 md:max-h-none md:opacity-100'
                                 }`}
                             >
                                 <div className="grid gap-3 md:grid-cols-2">
-                                    <div className="grid gap-2">
-                                        <span className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                            Category
-                                        </span>
-                                        <select
-                                            value={categoryFilter}
-                                            onChange={(event) => {
-                                                const nextCategory =
-                                                    event.currentTarget.value;
-                                                setCategoryFilter(nextCategory);
-                                                applyFilters({
-                                                    category: nextCategory,
-                                                });
-                                            }}
-                                            className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
-                                        >
-                                            <option value="">All</option>
-                                            {categories.map((category) => (
-                                                <option
-                                                    key={category.id}
-                                                    value={category.slug}
-                                                >
-                                                    {category.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className="grid gap-2">
+                                    <div className="grid gap-2 col-span-2">
                                         <span className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Vendor
                                         </span>
@@ -399,7 +358,7 @@ export default function ProductIndex({
                                                                 color.slug,
                                                             )
                                                         }
-                                                        className={`relative grid h-8 w-8 cursor-pointer place-items-center rounded-md border p   -1 transition ${
+                                                        className={`relative grid h-8 w-8 cursor-pointer place-items-center rounded-md border p-1 transition ${
                                                             checked
                                                                 ? 'border-(--welcome-strong) bg-(--welcome-surface-1)'
                                                                 : 'border-(--welcome-border) bg-(--welcome-surface-3) hover:border-(--welcome-strong-50)'
@@ -410,12 +369,17 @@ export default function ProductIndex({
                                                         <span
                                                             className="block h-5 w-5 rounded-sm border border-black/10"
                                                             style={{
-                                                                backgroundColor: resolveProductColorSwatch(color.slug),
+                                                                backgroundColor:
+                                                                    resolveProductColorSwatch(
+                                                                        color.slug,
+                                                                    ),
                                                             }}
                                                         />
                                                         <span
                                                             className={`pointer-events-none absolute inset-0 grid place-items-center text-xs font-bold text-white mix-blend-difference transition ${
-                                                                checked ? 'opacity-100' : 'opacity-0'
+                                                                checked
+                                                                    ? 'opacity-100'
+                                                                    : 'opacity-0'
                                                             }`}
                                                         >
                                                             ✓
@@ -427,6 +391,59 @@ export default function ProductIndex({
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="mx-auto w-full max-w-6xl px-6 pb-6">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div className="w-full max-w-md space-y-2">
+                            <input
+                                id="product-search"
+                                type="search"
+                                placeholder="Search by product name"
+                                value={searchInput}
+                                onChange={(event) =>
+                                    setSearchInput(event.currentTarget.value)
+                                }
+                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                            />
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 lg:justify-end">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setCategoryFilter('');
+                                    applyFilters({ category: '' });
+                                }}
+                                className={`rounded-full border px-3 py-1 text-xs tracking-[0.2em] uppercase ${
+                                    categoryFilter === ''
+                                        ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
+                                        : 'border-(--welcome-border) text-(--welcome-muted-text)'
+                                }`}
+                            >
+                                All
+                            </button>
+                            {categories.map((category) => (
+                                <button
+                                    key={category.id}
+                                    type="button"
+                                    onClick={() => {
+                                        setCategoryFilter(category.slug);
+                                        applyFilters({
+                                            category: category.slug,
+                                        });
+                                    }}
+                                    className={`rounded-full border px-3 py-1 text-xs tracking-[0.2em] uppercase ${
+                                        categoryFilter === category.slug
+                                            ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
+                                            : 'border-(--welcome-border) text-(--welcome-muted-text)'
+                                    }`}
+                                >
+                                    {category.name}
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </section>
@@ -523,7 +540,7 @@ export default function ProductIndex({
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-16">
                     {products.length === 0 ? (
-                        <div className="rounded-[32px] border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-10 text-center text-sm text-(--welcome-muted-text)">
+                        <div className="rounded-4xl border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-10 text-center text-sm text-(--welcome-muted-text)">
                             <p>No products found for the current filters.</p>
                             <button
                                 type="button"

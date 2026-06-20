@@ -164,7 +164,7 @@ export default function VendorShow() {
                                     Live
                                 </span>
                             </div>
-                            <div className="flex items-center gap-4 rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-4">
+                            <div className="flex items-center gap-4 rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-4">
                                 {vendor.logo_url ? (
                                     <img
                                         src={vendor.logo_url}
