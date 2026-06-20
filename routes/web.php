@@ -83,6 +83,8 @@ Route::post('checkout/paypal/card/create', [CheckoutPayPalController::class, 'cr
     ->name('checkout.paypal.card.create');
 Route::post('checkout/paypal/card/capture', [CheckoutPayPalController::class, 'captureCard'])
     ->name('checkout.paypal.card.capture');
+Route::get('checkout/paypal/success', [CheckoutPayPalController::class, 'success'])
+    ->name('checkout.paypal.success');
 Route::get('checkout/paypal/approved', [CheckoutPayPalController::class, 'approved'])
     ->name('checkout.paypal.approved');
 Route::get('checkout/paypal/cancelled', [CheckoutPayPalController::class, 'cancelled'])

@@ -765,6 +765,17 @@ it('returns to checkout when stripe checkout is cancelled', function () {
         ->assertSessionHas('status', 'Stripe checkout was cancelled.');
 });
 
+it('shows a public PayPal success page for account auto return', function () {
+    $this->get(route('checkout.paypal.success'))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('checkout/paypal-success')
+            ->where('headline', 'Thank you for your payment.')
+            ->where('receiptMessage', 'Your transaction has been completed, and a receipt for your purchase has been emailed to you. Log into your PayPal account to view transaction details.')
+            ->where('detailsMessage', 'Payment transaction details will be emailed to the buyer.')
+        );
+});
+
 it('creates a PayPal order and stores pending checkout data in session', function () {
     config()->set('services.paypal.client_id', 'paypal-client');
     config()->set('services.paypal.client_secret', 'paypal-secret');

@@ -15,6 +15,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Inertia\Response;
 use RuntimeException;
 use Throwable;
 
@@ -185,6 +187,15 @@ class CheckoutPayPalController extends Controller
         return redirect()
             ->route('checkout.show')
             ->with('status', 'PayPal checkout was cancelled.');
+    }
+
+    public function success(): Response
+    {
+        return Inertia::render('checkout/paypal-success', [
+            'headline' => 'Thank you for your payment.',
+            'receiptMessage' => 'Your transaction has been completed, and a receipt for your purchase has been emailed to you. Log into your PayPal account to view transaction details.',
+            'detailsMessage' => 'Payment transaction details will be emailed to the buyer.',
+        ]);
     }
 
     public function captureCard(
