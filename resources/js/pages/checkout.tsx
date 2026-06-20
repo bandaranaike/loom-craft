@@ -280,10 +280,8 @@ export default function CheckoutPage({
         shipping_responsibility: 'platform',
         payment_method:
             default_payment_method ??
-            (payment_methods.includes('stripe')
-                ? 'stripe'
-                : payment_methods[0]) ??
-            'stripe',
+            (payment_methods.includes('stripe') ? 'stripe' : payment_methods[0]) ??
+            '',
         shipping_full_name: auth.user?.name ?? '',
         shipping_line1: '',
         shipping_line2: '',
@@ -1101,6 +1099,7 @@ export default function CheckoutPage({
                                         form.processing ||
                                         paypalProcessing ||
                                         stripeProcessing ||
+                                        form.data.payment_method === '' ||
                                         (form.data.payment_method ===
                                             'stripe' &&
                                             !stripe_configured) ||

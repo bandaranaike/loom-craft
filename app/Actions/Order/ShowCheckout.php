@@ -8,6 +8,7 @@ use App\DTOs\Order\CheckoutViewResult;
 use App\Models\Cart;
 use App\Models\OrderAddress;
 use App\Models\User;
+use App\Support\PaymentMethods;
 use Illuminate\Support\Facades\Gate;
 
 class ShowCheckout
@@ -23,7 +24,7 @@ class ShowCheckout
         return new CheckoutViewResult(
             $cartResult->cart,
             $cartResult->cart->currency,
-            ['stripe', 'paypal', 'paypal_card', 'bank_transfer', 'cod'],
+            PaymentMethods::enabled(),
             $data->user?->name,
             $data->user?->email,
             $this->resolveDefaultCountryCode($data->user),

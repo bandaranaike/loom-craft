@@ -10,6 +10,7 @@ use App\Http\Requests\Order\StoreCheckoutRequest;
 use App\Services\Payments\PayPalOrderService;
 use App\Services\Payments\PayPalPaymentQuoteService;
 use App\Services\Payments\StripeCheckoutService;
+use App\Support\PaymentMethods;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -34,8 +35,9 @@ class CheckoutController extends Controller
                 ->with('status', 'Your cart is empty.');
         }
 
-        $paypalConfigured = app(PayPalOrderService::class)->isConfigured();
-        $stripeConfigured = $stripeCheckoutService->isConfigured();
+        $paypalConfigured = (PaymentMethods::isEnabled('paypal') || PaymentMethods::isEnabled('paypal_card'))
+            && app(PayPalOrderService::class)->isConfigured();
+        $stripeConfigured = PaymentMethods::isEnabled('stripe') && $stripeCheckoutService->isConfigured();
         $paypalQuote = null;
         $paypalUnavailableReason = null;
 
@@ -70,7 +72,7 @@ class CheckoutController extends Controller
      */
     private function defaultPaymentMethod(array $paymentMethods, bool $stripeConfigured): ?string
     {
-        if ($stripeConfigured && in_array('stripe', $paymentMethods, true)) {
+        if ($stripeConfigured && PaymentMethods::isEnabled('stripe') && in_array('stripe', $paymentMethods, true)) {
             return 'stripe';
         }
 

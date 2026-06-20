@@ -9,6 +9,14 @@ return [
 
     'paypal_currency' => env('COMMERCE_PAYPAL_CURRENCY', 'USD'),
 
+    'payment_methods' => [
+        'stripe' => env('COMMERCE_PAYMENT_STRIPE_ENABLED', true),
+        'paypal' => env('COMMERCE_PAYMENT_PAYPAL_ENABLED', true),
+        'paypal_card' => env('COMMERCE_PAYMENT_PAYPAL_CARD_ENABLED', true),
+        'bank_transfer' => env('COMMERCE_PAYMENT_BANK_TRANSFER_ENABLED', true),
+        'cod' => env('COMMERCE_PAYMENT_COD_ENABLED', true),
+    ],
+
     'exchange_rate_stale_hours' => (int) env('COMMERCE_EXCHANGE_RATE_STALE_HOURS', 24),
 
     'exchange_rate_source' => env('COMMERCE_EXCHANGE_RATE_SOURCE', 'open_er_api'),

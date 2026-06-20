@@ -141,6 +141,50 @@ it('falls back to the first available checkout payment method when stripe is not
         );
 });
 
+it('only exposes enabled checkout payment methods', function () {
+    $defaultPaymentMethods = config('commerce.payment_methods');
+
+    config()->set('commerce.payment_methods', [
+        'stripe' => false,
+        'paypal' => true,
+        'paypal_card' => false,
+        'bank_transfer' => true,
+        'cod' => false,
+    ]);
+
+    try {
+        $vendorUser = User::factory()->create(['role' => 'vendor']);
+        $vendor = Vendor::factory()->for($vendorUser)->create([
+            'status' => 'approved',
+        ]);
+
+        $product = Product::factory()->for($vendor)->create([
+            'status' => 'active',
+            'selling_price' => '180.00',
+        ]);
+
+        Cart::query()->create([
+            'guest_token' => 'guest-token',
+            'currency' => 'LKR',
+        ])->items()->create([
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'unit_price' => '180.00',
+        ]);
+
+        $this->withCookie('loomcraft_guest_token', 'guest-token')
+            ->get(route('checkout.show'))
+            ->assertSuccessful()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('checkout')
+                ->where('payment_methods', ['paypal', 'bank_transfer'])
+                ->where('default_payment_method', 'paypal')
+            );
+    } finally {
+        config()->set('commerce.payment_methods', $defaultPaymentMethods);
+    }
+});
+
 it('does not expose shipping responsibility options on checkout', function () {
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $vendor = Vendor::factory()->for($vendorUser)->create([
@@ -537,6 +581,46 @@ it('does not place a stripe order through the generic checkout endpoint', functi
         ->assertSessionHasErrors(['payment_method']);
 
     expect(Order::query()->count())->toBe(0);
+});
+
+it('rejects checkout payment methods disabled in commerce config', function () {
+    $defaultPaymentMethods = config('commerce.payment_methods');
+
+    config()->set('commerce.payment_methods.bank_transfer', false);
+
+    try {
+        $response = $this
+            ->from(route('checkout.show'))
+            ->post(route('checkout.store'), [
+                'guest_name' => 'Heritage Patron',
+                'guest_email' => 'patron@example.com',
+                'currency' => 'LKR',
+                'shipping_responsibility' => 'platform',
+                'payment_method' => 'bank_transfer',
+                'shipping_full_name' => 'Heritage Patron',
+                'shipping_line1' => '1 Loom Street',
+                'shipping_line2' => 'Suite 2',
+                'shipping_city' => 'Kandy',
+                'shipping_region' => 'Central',
+                'shipping_postal_code' => '20000',
+                'shipping_country_code' => 'LK',
+                'shipping_phone' => '0770000000',
+                'billing_full_name' => 'Heritage Patron',
+                'billing_line1' => '1 Loom Street',
+                'billing_line2' => null,
+                'billing_city' => 'Kandy',
+                'billing_region' => 'Central',
+                'billing_postal_code' => '20000',
+                'billing_country_code' => 'LK',
+                'billing_phone' => '0770000000',
+            ]);
+
+        $response->assertSessionHasErrors(['payment_method']);
+
+        expect(Order::query()->count())->toBe(0);
+    } finally {
+        config()->set('commerce.payment_methods', $defaultPaymentMethods);
+    }
 });
 
 it('returns a stripe checkout url and stores pending checkout data in session', function () {

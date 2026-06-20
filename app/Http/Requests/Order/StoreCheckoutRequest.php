@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Order;
 
+use App\Support\PaymentMethods;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,7 +20,7 @@ class StoreCheckoutRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -29,7 +31,7 @@ class StoreCheckoutRequest extends FormRequest
             'guest_email' => [Rule::requiredIf($requiresGuest), 'email', 'max:255'],
             'currency' => ['required', Rule::in(['LKR'])],
             'shipping_responsibility' => ['required', Rule::in(['platform'])],
-            'payment_method' => ['required', Rule::in(['paypal', 'paypal_card', 'stripe', 'bank_transfer', 'cod'])],
+            'payment_method' => ['required', Rule::in(PaymentMethods::enabled())],
             'paypal_conversion_confirmed' => [
                 Rule::excludeIf(! in_array($this->input('payment_method'), ['paypal', 'paypal_card'], true)),
                 'accepted',
