@@ -1,11 +1,5 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import {
-    CheckCircle2,
-    CreditCard,
-    Landmark,
-    WalletCards,
-    type LucideIcon,
-} from 'lucide-react';
+import { CheckCircle2, CreditCard, Landmark, WalletCards, type LucideIcon } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-alert';
 import InputError from '@/components/input-error';
@@ -18,10 +12,7 @@ import { cn } from '@/lib/utils';
 import { show as cartShow } from '@/routes/cart';
 import { store as checkoutStore } from '@/routes/checkout';
 import { create as checkoutPayPalCreate } from '@/routes/checkout/paypal';
-import {
-    capture as checkoutPayPalCardCapture,
-    create as checkoutPayPalCardCreate,
-} from '@/routes/checkout/paypal/card';
+import { capture as checkoutPayPalCardCapture, create as checkoutPayPalCardCreate } from '@/routes/checkout/paypal/card';
 import { create as checkoutStripeCreate } from '@/routes/checkout/stripe';
 import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
@@ -155,23 +146,13 @@ type PaymentMethodSelectorProps = {
     error?: string;
 };
 
-function PaymentMethodSelector({
-    idPrefix,
-    paymentMethods,
-    selectedPaymentMethod,
-    onChange,
-    error,
-}: PaymentMethodSelectorProps) {
+function PaymentMethodSelector({ idPrefix, paymentMethods, selectedPaymentMethod, onChange, error }: PaymentMethodSelectorProps) {
     return (
         <fieldset className="space-y-3">
             <div className="space-y-1">
-                <legend className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                    Payment method
-                </legend>
+                <legend className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Payment method</legend>
                 <p className="text-sm text-(--welcome-body-text)">
-                    Choose how you would like to pay. Stripe is selected by
-                    default for card payments, while PayPal may require a USD
-                    conversion confirmation.
+                    Choose how you would like to pay. Stripe is selected by default for card payments, while PayPal may require a USD conversion confirmation.
                 </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -186,50 +167,28 @@ function PaymentMethodSelector({
                             htmlFor={inputId}
                             className={cn(
                                 'relative flex min-h-34 cursor-pointer flex-col gap-4 rounded-3xl border bg-(--welcome-surface-3) p-4 transition hover:border-(--welcome-strong) hover:shadow-[0_18px_45px_-35px_var(--welcome-shadow)]',
-                                selected
-                                    ? 'border-(--welcome-strong) shadow-[0_22px_55px_-38px_var(--welcome-shadow)]'
-                                    : 'border-(--welcome-border-soft)',
+                                selected ? 'border-(--welcome-strong) shadow-[0_22px_55px_-38px_var(--welcome-shadow)]' : 'border-(--welcome-border-soft)',
                             )}
                         >
-                            <input
-                                id={inputId}
-                                type="radio"
-                                name="payment_method"
-                                value={method}
-                                checked={selected}
-                                onChange={() => onChange(method)}
-                                className="sr-only"
-                            />
+                            <input id={inputId} type="radio" name="payment_method" value={method} checked={selected} onChange={() => onChange(method)} className="sr-only" />
                             <span className="flex items-start justify-between gap-3">
                                 <span className="flex h-10 items-center">
                                     {method === 'stripe' ? (
-                                        <img
-                                            src={stripeLogo}
-                                            alt="Stripe"
-                                            className="h-7 w-auto object-contain"
-                                        />
+                                        <img src={stripeLogo} alt="Stripe" className="h-7 w-auto object-contain" />
                                     ) : method === 'paypal' ? (
-                                        <img
-                                            src={paypalLogo}
-                                            alt="PayPal"
-                                            className="h-7 w-auto object-contain"
-                                        />
+                                        <img src={paypalLogo} alt="PayPal" className="h-7 w-auto object-contain" />
                                     ) : Icon ? (
                                         <span className="inline-flex size-10 items-center justify-center rounded-full border border-(--welcome-border-soft) bg-(--welcome-surface-1) text-(--welcome-strong)">
                                             <Icon className="size-5" />
                                         </span>
                                     ) : (
-                                        <span className="text-sm font-semibold text-(--welcome-strong)">
-                                            {defaultPaymentLabel(method)}
-                                        </span>
+                                        <span className="text-sm font-semibold text-(--welcome-strong)">{defaultPaymentLabel(method)}</span>
                                     )}
                                 </span>
                                 <span
                                     className={cn(
                                         'inline-flex size-5 items-center justify-center rounded-full border transition',
-                                        selected
-                                            ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
-                                            : 'border-(--welcome-border) text-transparent',
+                                        selected ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)' : 'border-(--welcome-border) text-transparent',
                                     )}
                                     aria-hidden="true"
                                 >
@@ -237,12 +196,8 @@ function PaymentMethodSelector({
                                 </span>
                             </span>
                             <span className="space-y-1">
-                                <span className="block text-sm font-semibold text-(--welcome-strong)">
-                                    {defaultPaymentLabel(method)}
-                                </span>
-                                <span className="block text-xs leading-5 text-(--welcome-body-text)">
-                                    {defaultPaymentDescription(method)}
-                                </span>
+                                <span className="block text-sm font-semibold text-(--welcome-strong)">{defaultPaymentLabel(method)}</span>
+                                <span className="block text-xs leading-5 text-(--welcome-body-text)">{defaultPaymentDescription(method)}</span>
                             </span>
                         </label>
                     );
@@ -278,10 +233,7 @@ export default function CheckoutPage({
         guest_email: guest_email ?? '',
         currency,
         shipping_responsibility: 'platform',
-        payment_method:
-            default_payment_method ??
-            (payment_methods.includes('stripe') ? 'stripe' : payment_methods[0]) ??
-            '',
+        payment_method: default_payment_method ?? (payment_methods.includes('stripe') ? 'stripe' : payment_methods[0]) ?? '',
         shipping_full_name: auth.user?.name ?? '',
         shipping_line1: '',
         shipping_line2: '',
@@ -319,10 +271,7 @@ export default function CheckoutPage({
         };
     };
 
-    const isPayPalUnavailable =
-        !paypal_configured ||
-        paypal_quote === null ||
-        paypal_unavailable_reason;
+    const isPayPalUnavailable = !paypal_configured || paypal_quote === null || paypal_unavailable_reason;
     const paypalExchangeRateLabel =
         paypal_quote === null
             ? null
@@ -350,14 +299,9 @@ export default function CheckoutPage({
                     errors?: Record<string, string | string[]>;
                 };
 
-                Object.entries(payload.errors ?? {}).forEach(
-                    ([field, value]) => {
-                        form.setError(
-                            field as keyof typeof form.errors,
-                            Array.isArray(value) ? value[0] : value,
-                        );
-                    },
-                );
+                Object.entries(payload.errors ?? {}).forEach(([field, value]) => {
+                    form.setError(field as keyof typeof form.errors, Array.isArray(value) ? value[0] : value);
+                });
 
                 return;
             }
@@ -451,16 +395,11 @@ export default function CheckoutPage({
         });
     };
 
-    const applyValidationErrors = (
-        errors: Record<string, string | string[]>,
-    ): void => {
+    const applyValidationErrors = (errors: Record<string, string | string[]>): void => {
         form.clearErrors();
 
         Object.entries(errors).forEach(([field, value]) => {
-            form.setError(
-                field as keyof typeof form.errors,
-                Array.isArray(value) ? value[0] : value,
-            );
+            form.setError(field as keyof typeof form.errors, Array.isArray(value) ? value[0] : value);
         });
     };
 
@@ -476,10 +415,7 @@ export default function CheckoutPage({
         <>
             <Head title="Checkout — LoomCraft">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link
-                    href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
-                    rel="stylesheet"
-                />
+                <link href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600" rel="stylesheet" />
             </Head>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-4 pb-16 lg:grid-cols-[1.2fr_0.8fr]">
@@ -488,109 +424,80 @@ export default function CheckoutPage({
                             Checkout Atelier
                         </div>
                         <div>
-                            <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">
-                                Confirm your heritage order
-                            </h1>
-                            <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                Provide shipping and billing details to secure
-                                your curated pieces.
-                            </p>
+                            <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight md:text-5xl">Confirm your heritage order</h1>
+                            <p className="mt-3 text-sm text-(--welcome-body-text)">Provide shipping and billing details to secure your curated pieces.</p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {!auth.user && (
                                 <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                        Guest information
-                                    </p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Guest information</p>
                                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
                                             <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Full name
+                                                <span aria-hidden="true" className="ml-1 text-red-500">
+                                                    *
+                                                </span>
                                             </label>
                                             <input
                                                 type="text"
                                                 name="guest_name"
+                                                required
                                                 value={form.data.guest_name}
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'guest_name',
-                                                        event.target.value,
-                                                    )
-                                                }
+                                                onChange={(event) => form.setData('guest_name', event.target.value)}
                                                 className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             />
-                                            <InputError
-                                                message={form.errors.guest_name}
-                                            />
+                                            <InputError message={form.errors.guest_name} />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                 Email address
+                                                <span aria-hidden="true" className="ml-1 text-red-500">
+                                                    *
+                                                </span>
                                             </label>
                                             <input
                                                 type="email"
                                                 name="guest_email"
+                                                required
                                                 value={form.data.guest_email}
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'guest_email',
-                                                        event.target.value,
-                                                    )
-                                                }
+                                                onChange={(event) => form.setData('guest_email', event.target.value)}
                                                 className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             />
-                                            <InputError
-                                                message={
-                                                    form.errors.guest_email
-                                                }
-                                            />
+                                            <InputError message={form.errors.guest_email} />
                                         </div>
                                     </div>
                                 </div>
                             )}
 
                             <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
-                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Shipping details
-                                </p>
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Shipping details</p>
                                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
                                         <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             Recipient name
+                                            <span aria-hidden="true" className="ml-1 text-red-500">
+                                                *
+                                            </span>
                                         </label>
                                         <input
                                             type="text"
                                             name="shipping_full_name"
+                                            required
                                             value={form.data.shipping_full_name}
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'shipping_full_name',
-                                                    event.target.value,
-                                                )
-                                            }
+                                            onChange={(event) => form.setData('shipping_full_name', event.target.value)}
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         />
-                                        <InputError
-                                            message={
-                                                form.errors.shipping_full_name
-                                            }
-                                        />
+                                        <InputError message={form.errors.shipping_full_name} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                            Phone (optional)
-                                        </label>
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Phone (optional)</label>
                                         <input
                                             type="text"
                                             name="shipping_phone"
                                             value={form.data.shipping_phone}
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'shipping_phone',
-                                                    event.target.value,
-                                                )
-                                            }
+                                            onChange={(event) => form.setData('shipping_phone', event.target.value)}
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         />
                                     </div>
@@ -598,37 +505,27 @@ export default function CheckoutPage({
                                 <div className="mt-4 space-y-2">
                                     <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                         Address line 1
+                                        <span aria-hidden="true" className="ml-1 text-red-500">
+                                            *
+                                        </span>
                                     </label>
                                     <input
                                         type="text"
                                         name="shipping_line1"
+                                        required
                                         value={form.data.shipping_line1}
-                                        onChange={(event) =>
-                                            form.setData(
-                                                'shipping_line1',
-                                                event.target.value,
-                                            )
-                                        }
+                                        onChange={(event) => form.setData('shipping_line1', event.target.value)}
                                         className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                     />
-                                    <InputError
-                                        message={form.errors.shipping_line1}
-                                    />
+                                    <InputError message={form.errors.shipping_line1} />
                                 </div>
                                 <div className="mt-4 space-y-2">
-                                    <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                        Address line 2 (optional)
-                                    </label>
+                                    <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Address line 2 (optional)</label>
                                     <input
                                         type="text"
                                         name="shipping_line2"
                                         value={form.data.shipping_line2}
-                                        onChange={(event) =>
-                                            form.setData(
-                                                'shipping_line2',
-                                                event.target.value,
-                                            )
-                                        }
+                                        onChange={(event) => form.setData('shipping_line2', event.target.value)}
                                         className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                     />
                                 </div>
@@ -636,98 +533,60 @@ export default function CheckoutPage({
                                     <div className="space-y-2">
                                         <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                             City
+                                            <span aria-hidden="true" className="ml-1 text-red-500">
+                                                *
+                                            </span>
                                         </label>
                                         <input
                                             type="text"
                                             name="shipping_city"
+                                            required
                                             value={form.data.shipping_city}
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'shipping_city',
-                                                    event.target.value,
-                                                )
-                                            }
+                                            onChange={(event) => form.setData('shipping_city', event.target.value)}
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         />
-                                        <InputError
-                                            message={form.errors.shipping_city}
-                                        />
+                                        <InputError message={form.errors.shipping_city} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                            Region
-                                        </label>
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Region</label>
                                         <input
                                             type="text"
                                             name="shipping_region"
                                             value={form.data.shipping_region}
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'shipping_region',
-                                                    event.target.value,
-                                                )
-                                            }
+                                            onChange={(event) => form.setData('shipping_region', event.target.value)}
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                            Postal code
-                                        </label>
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Postal code</label>
                                         <input
                                             type="text"
                                             name="shipping_postal_code"
-                                            value={
-                                                form.data.shipping_postal_code
-                                            }
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'shipping_postal_code',
-                                                    event.target.value,
-                                                )
-                                            }
+                                            value={form.data.shipping_postal_code}
+                                            onChange={(event) => form.setData('shipping_postal_code', event.target.value)}
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         />
                                     </div>
                                 </div>
                                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                            Country
-                                        </label>
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Country</label>
                                         <select
                                             name="shipping_country_code"
-                                            value={
-                                                form.data.shipping_country_code
-                                            }
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'shipping_country_code',
-                                                    event.target.value,
-                                                )
-                                            }
+                                            value={form.data.shipping_country_code}
+                                            onChange={(event) => form.setData('shipping_country_code', event.target.value)}
                                             className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                         >
                                             {countryOptions.map((country) => (
-                                                <option
-                                                    key={country.code}
-                                                    value={country.code}
-                                                >
+                                                <option key={country.code} value={country.code}>
                                                     {country.name}
                                                 </option>
                                             ))}
                                         </select>
-                                        <InputError
-                                            message={
-                                                form.errors
-                                                    .shipping_country_code
-                                            }
-                                        />
+                                        <InputError message={form.errors.shipping_country_code} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                            Shipping handling
-                                        </label>
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Shipping handling</label>
                                         <div className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase shadow-xs">
                                             Platform handled
                                         </div>
@@ -737,237 +596,122 @@ export default function CheckoutPage({
 
                             <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                                 <div className="flex flex-wrap items-center justify-between gap-4">
-                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                        Billing details
-                                    </p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Billing details</p>
                                     <button
                                         type="button"
-                                        onClick={() =>
-                                            setMirrorBilling((prev) => !prev)
-                                        }
+                                        onClick={() => setMirrorBilling((prev) => !prev)}
                                         className="rounded-full border border-(--welcome-muted-text) px-4 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase transition hover:bg-(--welcome-muted-text) hover:text-(--welcome-on-strong)"
                                     >
-                                        {mirrorBilling
-                                            ? 'Use distinct billing'
-                                            : 'Mirror shipping'}
+                                        {mirrorBilling ? 'Use distinct billing' : 'Mirror shipping'}
                                     </button>
                                 </div>
                                 {mirrorBilling ? (
                                     <div className="mt-4 rounded-3xl border border-dashed border-(--welcome-border) bg-(--welcome-surface-1) p-5">
-                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                            Billing confirmed
-                                        </p>
-                                        <p className="mt-3 text-sm text-(--welcome-body-text)">
-                                            Your billing details are the same as
-                                            your shipping details.
-                                        </p>
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Billing confirmed</p>
+                                        <p className="mt-3 text-sm text-(--welcome-body-text)">Your billing details are the same as your shipping details.</p>
                                     </div>
                                 ) : (
                                     <>
                                         <div className="mt-4 grid gap-4 md:grid-cols-2">
                                             <div className="space-y-2">
-                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                    Billing name
-                                                </label>
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Billing name</label>
                                                 <input
                                                     type="text"
                                                     name="billing_full_name"
-                                                    value={
-                                                        form.data
-                                                            .billing_full_name
-                                                    }
-                                                    onChange={(event) =>
-                                                        form.setData(
-                                                            'billing_full_name',
-                                                            event.target.value,
-                                                        )
-                                                    }
+                                                    value={form.data.billing_full_name}
+                                                    onChange={(event) => form.setData('billing_full_name', event.target.value)}
                                                     className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                                 />
-                                                <InputError
-                                                    message={
-                                                        form.errors
-                                                            .billing_full_name
-                                                    }
-                                                />
+                                                <InputError message={form.errors.billing_full_name} />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                    Billing phone
-                                                </label>
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Billing phone</label>
                                                 <input
                                                     type="text"
                                                     name="billing_phone"
-                                                    value={
-                                                        form.data.billing_phone
-                                                    }
-                                                    onChange={(event) =>
-                                                        form.setData(
-                                                            'billing_phone',
-                                                            event.target.value,
-                                                        )
-                                                    }
+                                                    value={form.data.billing_phone}
+                                                    onChange={(event) => form.setData('billing_phone', event.target.value)}
                                                     className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                                 />
                                             </div>
                                         </div>
                                         <div className="mt-4 space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Address line 1
-                                            </label>
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Address line 1</label>
                                             <input
                                                 type="text"
                                                 name="billing_line1"
                                                 value={form.data.billing_line1}
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'billing_line1',
-                                                        event.target.value,
-                                                    )
-                                                }
+                                                onChange={(event) => form.setData('billing_line1', event.target.value)}
                                                 className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             />
-                                            <InputError
-                                                message={
-                                                    form.errors.billing_line1
-                                                }
-                                            />
+                                            <InputError message={form.errors.billing_line1} />
                                         </div>
                                         <div className="mt-4 space-y-2">
-                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Address line 2 (optional)
-                                            </label>
+                                            <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Address line 2 (optional)</label>
                                             <input
                                                 type="text"
                                                 name="billing_line2"
                                                 value={form.data.billing_line2}
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'billing_line2',
-                                                        event.target.value,
-                                                    )
-                                                }
+                                                onChange={(event) => form.setData('billing_line2', event.target.value)}
                                                 className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                             />
                                         </div>
                                         <div className="mt-4 grid gap-4 md:grid-cols-3">
                                             <div className="space-y-2">
-                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                    City
-                                                </label>
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">City</label>
                                                 <input
                                                     type="text"
                                                     name="billing_city"
-                                                    value={
-                                                        form.data.billing_city
-                                                    }
-                                                    onChange={(event) =>
-                                                        form.setData(
-                                                            'billing_city',
-                                                            event.target.value,
-                                                        )
-                                                    }
+                                                    value={form.data.billing_city}
+                                                    onChange={(event) => form.setData('billing_city', event.target.value)}
                                                     className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                                 />
-                                                <InputError
-                                                    message={
-                                                        form.errors.billing_city
-                                                    }
-                                                />
+                                                <InputError message={form.errors.billing_city} />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                    Region
-                                                </label>
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Region</label>
                                                 <input
                                                     type="text"
                                                     name="billing_region"
-                                                    value={
-                                                        form.data.billing_region
-                                                    }
-                                                    onChange={(event) =>
-                                                        form.setData(
-                                                            'billing_region',
-                                                            event.target.value,
-                                                        )
-                                                    }
+                                                    value={form.data.billing_region}
+                                                    onChange={(event) => form.setData('billing_region', event.target.value)}
                                                     className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                    Postal code
-                                                </label>
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Postal code</label>
                                                 <input
                                                     type="text"
                                                     name="billing_postal_code"
-                                                    value={
-                                                        form.data
-                                                            .billing_postal_code
-                                                    }
-                                                    onChange={(event) =>
-                                                        form.setData(
-                                                            'billing_postal_code',
-                                                            event.target.value,
-                                                        )
-                                                    }
+                                                    value={form.data.billing_postal_code}
+                                                    onChange={(event) => form.setData('billing_postal_code', event.target.value)}
                                                     className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                                 />
                                             </div>
                                         </div>
                                         <div className="mt-4 grid gap-4 md:grid-cols-2">
                                             <div className="space-y-2">
-                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                    Country
-                                                </label>
+                                                <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Country</label>
                                                 <select
                                                     name="billing_country_code"
-                                                    value={
-                                                        form.data
-                                                            .billing_country_code
-                                                    }
-                                                    onChange={(event) =>
-                                                        form.setData(
-                                                            'billing_country_code',
-                                                            event.target.value,
-                                                        )
-                                                    }
+                                                    value={form.data.billing_country_code}
+                                                    onChange={(event) => form.setData('billing_country_code', event.target.value)}
                                                     className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
                                                 >
-                                                    {countryOptions.map(
-                                                        (country) => (
-                                                            <option
-                                                                key={
-                                                                    country.code
-                                                                }
-                                                                value={
-                                                                    country.code
-                                                                }
-                                                            >
-                                                                {country.name}
-                                                            </option>
-                                                        ),
-                                                    )}
+                                                    {countryOptions.map((country) => (
+                                                        <option key={country.code} value={country.code}>
+                                                            {country.name}
+                                                        </option>
+                                                    ))}
                                                 </select>
-                                                <InputError
-                                                    message={
-                                                        form.errors
-                                                            .billing_country_code
-                                                    }
-                                                />
+                                                <InputError message={form.errors.billing_country_code} />
                                             </div>
                                             <PaymentMethodSelector
                                                 idPrefix="billing-payment-method"
                                                 paymentMethods={payment_methods}
-                                                selectedPaymentMethod={
-                                                    form.data.payment_method
-                                                }
-                                                onChange={
-                                                    handlePaymentMethodChange
-                                                }
-                                                error={
-                                                    form.errors.payment_method
-                                                }
+                                                selectedPaymentMethod={form.data.payment_method}
+                                                onChange={handlePaymentMethodChange}
+                                                error={form.errors.payment_method}
                                             />
                                         </div>
                                     </>
@@ -978,99 +722,46 @@ export default function CheckoutPage({
                                 <PaymentMethodSelector
                                     idPrefix="shipping-payment-method"
                                     paymentMethods={payment_methods}
-                                    selectedPaymentMethod={
-                                        form.data.payment_method
-                                    }
+                                    selectedPaymentMethod={form.data.payment_method}
                                     onChange={handlePaymentMethodChange}
                                     error={form.errors.payment_method}
                                 />
                             ) : null}
 
-                            <input
-                                type="hidden"
-                                name="shipping_responsibility"
-                                value={form.data.shipping_responsibility}
-                            />
+                            <input type="hidden" name="shipping_responsibility" value={form.data.shipping_responsibility} />
 
-                            <input
-                                type="hidden"
-                                name="currency"
-                                value={form.data.currency}
-                            />
+                            <input type="hidden" name="currency" value={form.data.currency} />
 
-                            {(form.data.payment_method === 'paypal' ||
-                                form.data.payment_method === 'paypal_card') &&
-                            paypal_quote ? (
+                            {(form.data.payment_method === 'paypal' || form.data.payment_method === 'paypal_card') && paypal_quote ? (
                                 <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-5">
-                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                        PayPal conversion
-                                    </p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">PayPal conversion</p>
                                     <div className="mt-4 space-y-3 text-sm text-(--welcome-strong)">
                                         <div className="flex items-center justify-between">
-                                            <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Total
-                                            </span>
-                                            <span>
-                                                {formatMoney(
-                                                    paypal_quote.original_amount,
-                                                    paypal_quote.original_currency,
-                                                )}
-                                            </span>
+                                            <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">Total</span>
+                                            <span>{formatMoney(paypal_quote.original_amount, paypal_quote.original_currency)}</span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Approx. USD
-                                            </span>
-                                            <span>
-                                                {formatMoney(
-                                                    paypal_quote.converted_amount,
-                                                    paypal_quote.converted_currency,
-                                                )}
-                                            </span>
+                                            <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">Approx. USD</span>
+                                            <span>{formatMoney(paypal_quote.converted_amount, paypal_quote.converted_currency)}</span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                                Rate
-                                            </span>
-                                            <span>
-                                                {paypalExchangeRateLabel}
-                                            </span>
+                                            <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">Rate</span>
+                                            <span>{paypalExchangeRateLabel}</span>
                                         </div>
                                     </div>
                                     <p className="mt-4 text-sm text-(--welcome-body-text)">
-                                        PayPal does not support LKR, so your
-                                        payment will be converted to USD
-                                        automatically using the latest stored
-                                        market rate.
+                                        PayPal does not support LKR, so your payment will be converted to USD automatically using the latest stored market rate.
                                     </p>
                                     <label className="mt-4 flex items-start gap-3 text-sm text-(--welcome-strong)">
                                         <input
                                             type="checkbox"
-                                            checked={
-                                                form.data
-                                                    .paypal_conversion_confirmed
-                                            }
-                                            onChange={(event) =>
-                                                form.setData(
-                                                    'paypal_conversion_confirmed',
-                                                    event.target.checked,
-                                                )
-                                            }
+                                            checked={form.data.paypal_conversion_confirmed}
+                                            onChange={(event) => form.setData('paypal_conversion_confirmed', event.target.checked)}
                                             className="mt-1 h-4 w-4 rounded border-(--welcome-border)"
                                         />
-                                        <span>
-                                            I understand that my LoomCraft total
-                                            stays in LKR and PayPal will charge
-                                            the approximate USD amount shown
-                                            above.
-                                        </span>
+                                        <span>I understand that my LoomCraft total stays in LKR and PayPal will charge the approximate USD amount shown above.</span>
                                     </label>
-                                    <InputError
-                                        message={
-                                            form.errors
-                                                .paypal_conversion_confirmed
-                                        }
-                                    />
+                                    <InputError message={form.errors.paypal_conversion_confirmed} />
                                 </div>
                             ) : null}
 
@@ -1078,12 +769,8 @@ export default function CheckoutPage({
                                 <PayPalCardFields
                                     enabled={!isPayPalUnavailable}
                                     clientId={paypal_client_id}
-                                    createOrderUrl={
-                                        checkoutPayPalCardCreate().url
-                                    }
-                                    captureOrderUrl={
-                                        checkoutPayPalCardCapture().url
-                                    }
+                                    createOrderUrl={checkoutPayPalCardCreate().url}
+                                    captureOrderUrl={checkoutPayPalCardCapture().url}
                                     payload={normalizedPayload()}
                                     onValidationErrors={applyValidationErrors}
                                     onSuccess={(redirectUrl) => {
@@ -1100,12 +787,8 @@ export default function CheckoutPage({
                                         paypalProcessing ||
                                         stripeProcessing ||
                                         form.data.payment_method === '' ||
-                                        (form.data.payment_method ===
-                                            'stripe' &&
-                                            !stripe_configured) ||
-                                        (form.data.payment_method ===
-                                            'paypal' &&
-                                            Boolean(isPayPalUnavailable))
+                                        (form.data.payment_method === 'stripe' && !stripe_configured) ||
+                                        (form.data.payment_method === 'paypal' && Boolean(isPayPalUnavailable))
                                     }
                                     className="inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:cursor-not-allowed disabled:opacity-70"
                                 >
@@ -1115,29 +798,19 @@ export default function CheckoutPage({
                                           ? 'Redirecting to PayPal...'
                                           : form.processing
                                             ? 'Securing order...'
-                                            : form.data.payment_method ===
-                                                'stripe'
+                                            : form.data.payment_method === 'stripe'
                                               ? 'Continue to Stripe'
-                                              : form.data.payment_method ===
-                                                  'paypal'
+                                              : form.data.payment_method === 'paypal'
                                                 ? 'Continue to PayPal'
                                                 : 'Place order'}
                                 </button>
                             ) : null}
-                            {form.data.payment_method === 'stripe' &&
-                            !stripe_configured ? (
-                                <p className="text-xs text-(--welcome-danger)">
-                                    Stripe is not configured yet. Add
-                                    `STRIPE_KEY` and `STRIPE_SECRET` in `.env`
-                                    and reload.
-                                </p>
+                            {form.data.payment_method === 'stripe' && !stripe_configured ? (
+                                <p className="text-xs text-(--welcome-danger)">Stripe is not configured yet. Add `STRIPE_KEY` and `STRIPE_SECRET` in `.env` and reload.</p>
                             ) : null}
-                            {(form.data.payment_method === 'paypal' ||
-                                form.data.payment_method === 'paypal_card') &&
-                            isPayPalUnavailable ? (
+                            {(form.data.payment_method === 'paypal' || form.data.payment_method === 'paypal_card') && isPayPalUnavailable ? (
                                 <p className="text-xs text-(--welcome-danger)">
-                                    {paypal_unavailable_reason ??
-                                        'PayPal is not configured yet. Add PayPal keys in `.env` and reload.'}
+                                    {paypal_unavailable_reason ?? 'PayPal is not configured yet. Add PayPal keys in `.env` and reload.'}
                                 </p>
                             ) : null}
                         </form>
@@ -1145,70 +818,31 @@ export default function CheckoutPage({
 
                     <aside className="rounded-4xl border border-(--welcome-border) bg-(--welcome-surface-1) p-6 shadow-[0_30px_80px_-45px_var(--welcome-shadow)]">
                         <div className="flex items-center justify-between">
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                Order Summary
-                            </p>
-                            <Link
-                                href={cartShow()}
-                                className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase underline"
-                            >
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Order Summary</p>
+                            <Link href={cartShow()} className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase underline">
                                 Edit cart
                             </Link>
                         </div>
                         <div className="mt-4 space-y-4">
                             {cart.items.map((item) => (
                                 <div key={item.id} className="space-y-1">
-                                    <p className="text-sm font-semibold">
-                                        {item.name}
-                                    </p>
+                                    <p className="text-sm font-semibold">{item.name}</p>
                                     {item.product_variation_label && (
-                                        <p className="text-[10px] tracking-[0.2em] text-(--welcome-muted-text) uppercase">
-                                            Size {item.product_variation_label}
-                                        </p>
+                                        <p className="text-[10px] tracking-[0.2em] text-(--welcome-muted-text) uppercase">Size {item.product_variation_label}</p>
                                     )}
                                     <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                        {item.vendor_slug ? (
-                                            <Link
-                                                href={vendorShow(
-                                                    item.vendor_slug,
-                                                )}
-                                            >
-                                                {item.vendor_name}
-                                            </Link>
-                                        ) : (
-                                            item.vendor_name
-                                        )}{' '}
-                                        • {item.quantity} ×{' '}
-                                        {formatMoney(
-                                            item.unit_price,
-                                            cart.currency,
-                                        )}
+                                        {item.vendor_slug ? <Link href={vendorShow(item.vendor_slug)}>{item.vendor_name}</Link> : item.vendor_name} • {item.quantity} ×{' '}
+                                        {formatMoney(item.unit_price, cart.currency)}
                                     </p>
                                     {item.has_discount && (
                                         <p className="text-xs text-(--welcome-muted-text) line-through decoration-(--welcome-muted-text) decoration-1">
-                                            {item.quantity} ×{' '}
-                                            {formatMoney(
-                                                item.original_unit_price,
-                                                cart.currency,
-                                            )}{' '}
-                                            •{' '}
-                                            {item.effective_discount_percentage}
-                                            % off
+                                            {item.quantity} × {formatMoney(item.original_unit_price, cart.currency)} • {item.effective_discount_percentage}% off
                                         </p>
                                     )}
-                                    <p className="text-sm text-(--welcome-strong)">
-                                        Line total{' '}
-                                        {formatMoney(
-                                            item.line_total,
-                                            cart.currency,
-                                        )}
-                                    </p>
+                                    <p className="text-sm text-(--welcome-strong)">Line total {formatMoney(item.line_total, cart.currency)}</p>
                                     {item.has_discount && (
                                         <p className="text-xs text-(--welcome-muted-text) line-through decoration-(--welcome-muted-text) decoration-1">
-                                            {formatMoney(
-                                                item.original_line_total,
-                                                cart.currency,
-                                            )}
+                                            {formatMoney(item.original_line_total, cart.currency)}
                                         </p>
                                     )}
                                     <DismissibleStockDelayAlert
@@ -1218,17 +852,9 @@ export default function CheckoutPage({
                                     />
                                     {item.exceeds_available_stock && (
                                         <p className="text-xs text-(--welcome-body-text)">
-                                            Prep estimate:{' '}
-                                            {item.preparation_time_days}
-                                            {item.exceeds_maximum_preparation_days
-                                                ? '+'
-                                                : ''}{' '}
-                                            days for {item.shortage_quantity}{' '}
-                                            produced{' '}
-                                            {item.shortage_quantity === 1
-                                                ? 'piece'
-                                                : 'pieces'}
-                                            .
+                                            Prep estimate: {item.preparation_time_days}
+                                            {item.exceeds_maximum_preparation_days ? '+' : ''} days for {item.shortage_quantity} produced{' '}
+                                            {item.shortage_quantity === 1 ? 'piece' : 'pieces'}.
                                         </p>
                                     )}
                                 </div>
@@ -1236,40 +862,26 @@ export default function CheckoutPage({
                         </div>
                         <div className="mt-6 space-y-3 border-t border-(--welcome-border-soft) pt-4 text-sm">
                             <div className="flex items-center justify-between">
-                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Items
-                                </span>
+                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">Items</span>
                                 <span>{cart.item_count}</span>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Subtotal
-                                </span>
-                                <span>
-                                    {formatMoney(cart.subtotal, cart.currency)}
-                                </span>
+                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">Subtotal</span>
+                                <span>{formatMoney(cart.subtotal, cart.currency)}</span>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                    Currency
-                                </span>
+                                <span className="tracking-[0.3em] text-(--welcome-muted-text) uppercase">Currency</span>
                                 <span>{cart.currency}</span>
                             </div>
                             {cart.preparation_estimate.message && (
                                 <div className="rounded-2xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
-                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                        Preparation
-                                    </p>
-                                    <p className="mt-2 text-(--welcome-strong)">
-                                        {cart.preparation_estimate.message}
-                                    </p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Preparation</p>
+                                    <p className="mt-2 text-(--welcome-strong)">{cart.preparation_estimate.message}</p>
                                 </div>
                             )}
                         </div>
                         <p className="mt-4 text-xs text-(--welcome-body-text)">
-                            Shipping fees are arranged directly with the
-                            responsible vendor or the LoomCraft team after
-                            confirmation.
+                            Shipping fees are arranged directly with the responsible vendor or the LoomCraft team after confirmation.
                         </p>
                     </aside>
                 </section>

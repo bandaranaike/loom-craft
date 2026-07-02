@@ -292,7 +292,7 @@ export default function AdminOrderShow() {
                         <div className="min-w-0 space-y-2">
                             <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Admin review</p>
                             <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">Order #{order.id}</h2>
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Public reference {order.public_id ?? 'Pending'}</p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Public reference {order.order_number ?? 'Pending'}</p>
                             <p className="text-sm text-(--welcome-body-text)">
                                 {order.customer_name ?? 'Guest customer'} • {order.customer_email ?? 'No email'}
                             </p>

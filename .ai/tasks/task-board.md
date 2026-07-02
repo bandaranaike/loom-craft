@@ -1,14 +1,17 @@
 # Task Board
 
-Last updated: 2026-06-18
+Last updated: 2026-07-02
 
 ## Planned
 
+- [communications/dialog-esms-order-notifications](/var/www/loom-craft/.ai/tasks/planned/communications/dialog-esms-order-notifications.md)
 - [commerce/category-quantity-order-discounts](/var/www/loom-craft/.ai/tasks/planned/commerce/category-quantity-order-discounts.md)
 - [fulfillment/order-stickers-and-label-printing-requirements](/var/www/loom-craft/.ai/tasks/planned/fulfillment/order-stickers-and-label-printing-requirements.md)
+- [fulfillment/order-number-visible-reference-and-public-id-url-only](/var/www/loom-craft/.ai/tasks/planned/fulfillment/order-number-visible-reference-and-public-id-url-only.md)
 - [fulfillment/shipping-label-pdf-generation-and-print-pipeline](/var/www/loom-craft/.ai/tasks/planned/fulfillment/shipping-label-pdf-generation-and-print-pipeline.md)
 - [mobile/fulfillment-mobile-api-support](/var/www/loom-craft/.ai/tasks/planned/mobile/fulfillment-mobile-api-support.md)
 - [mobile/fulfillment-mobile-app-implementation-brief](/var/www/loom-craft/.ai/tasks/planned/mobile/fulfillment-mobile-app-implementation-brief.md)
+- [ui/logged-in-sidebar-documentation-and-repository-link-removal](/var/www/loom-craft/.ai/tasks/planned/ui/logged-in-sidebar-documentation-and-repository-link-removal.md)
 
 ## In Progress
 
