@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import OrderStatusBadge, { statusLabel } from '@/components/order-status-badge';
 import { formatMoney } from '@/lib/currency';
 
 type OrderSummaryCardProps = {
@@ -58,20 +59,13 @@ export default function OrderSummaryCard({
             <div className={bodyClassName}>
                 <div className="flex items-center justify-between">
                     <span className={labelClassName}>Reference</span>
-                    <button
-                        type="button"
-                        onClick={onCopyReference}
-                        className={referenceButtonClassName}
-                        title={`Copy ${copiedReference}`}
-                    >
+                    <button type="button" onClick={onCopyReference} className={referenceButtonClassName} title={`Copy ${copiedReference}`}>
                         {truncatedReference}
                     </button>
                 </div>
                 <div className="flex items-center justify-between">
                     <span className={labelClassName}>Subtotal</span>
-                    <span className={valueClassName}>
-                        {formatMoney(orderSubtotal, orderCurrency)}
-                    </span>
+                    <span className={valueClassName}>{formatMoney(orderSubtotal, orderCurrency)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                     <span className={labelClassName}>Shipping</span>
@@ -80,42 +74,30 @@ export default function OrderSummaryCard({
                 {showOrderStatus && (
                     <div className="flex items-center justify-between">
                         <span className={labelClassName}>Order status</span>
-                        <span className={valueClassName}>{orderStatus}</span>
+                        <OrderStatusBadge status={orderStatus} domain="order" />
                     </div>
                 )}
                 <div className="flex items-center justify-between">
                     <span className={labelClassName}>Total</span>
-                    <span className={valueClassName}>
-                        {formatMoney(orderTotal, orderCurrency)}
-                    </span>
+                    <span className={valueClassName}>{formatMoney(orderTotal, orderCurrency)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                     <span className={labelClassName}>Payment</span>
                     <span className={valueClassName}>
-                        {paymentMethod} ({paymentStatus})
+                        {paymentMethod} ({statusLabel(paymentStatus, 'payment')})
                     </span>
                 </div>
                 {paymentAmount && paymentCurrency && (
                     <div className="flex items-center justify-between">
                         <span className={labelClassName}>Recorded</span>
-                        <span className={valueClassName}>
-                            {formatMoney(paymentAmount, paymentCurrency)}
-                        </span>
+                        <span className={valueClassName}>{formatMoney(paymentAmount, paymentCurrency)}</span>
                     </div>
                 )}
-                {paymentRecordedInDifferentCurrency &&
-                    paymentOriginalAmount &&
-                    paymentOriginalCurrency && (
-                        <p className="rounded-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-xs text-(--welcome-body-text)">
-                            This payment was processed in {paymentCurrency}. The
-                            original order total remains{' '}
-                            {formatMoney(
-                                paymentOriginalAmount,
-                                paymentOriginalCurrency,
-                            )}
-                            .
-                        </p>
-                    )}
+                {paymentRecordedInDifferentCurrency && paymentOriginalAmount && paymentOriginalCurrency && (
+                    <p className="rounded-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-xs text-(--welcome-body-text)">
+                        This payment was processed in {paymentCurrency}. The original order total remains {formatMoney(paymentOriginalAmount, paymentOriginalCurrency)}.
+                    </p>
+                )}
             </div>
             {footer && <div className="mt-6">{footer}</div>}
         </aside>

@@ -330,3 +330,136 @@ img {
 .break-all {
     word-break: break-all;
 }
+
+/* Dark mode */
+
+:root {
+    color-scheme: light dark;
+    supported-color-schemes: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    body,
+    .wrapper,
+    .body {
+        background-color: #1f1712 !important;
+        color: #f7ead9 !important;
+    }
+
+    .inner-body,
+    .panel-content {
+        background-color: #2a1d16 !important;
+        border-color: #5b4031 !important;
+        color: #f7ead9 !important;
+    }
+
+    h1,
+    h2,
+    h3,
+    p,
+    .table td,
+    .brand-name,
+    .header a {
+        color: #f7ead9 !important;
+    }
+
+    a,
+    .footer a,
+    .brand-tagline {
+        color: #f3b36e !important;
+    }
+
+    .subcopy,
+    .table th {
+        border-color: #5b4031 !important;
+    }
+
+    .subcopy p,
+    .footer p,
+    .footer a {
+        color: #d9c0a5 !important;
+    }
+
+    .button-blue,
+    .button-primary {
+        background-color: #f3b36e !important;
+        border-bottom-color: #f3b36e !important;
+        border-left-color: #f3b36e !important;
+        border-right-color: #f3b36e !important;
+        border-top-color: #f3b36e !important;
+        color: #23150f !important;
+    }
+}
+
+[data-ogsc] body,
+[data-ogsc] .wrapper,
+[data-ogsc] .body,
+[data-ogsb] body,
+[data-ogsb] .wrapper,
+[data-ogsb] .body {
+    background-color: #1f1712 !important;
+    color: #f7ead9 !important;
+}
+
+[data-ogsc] .inner-body,
+[data-ogsc] .panel-content,
+[data-ogsb] .inner-body,
+[data-ogsb] .panel-content {
+    background-color: #2a1d16 !important;
+    border-color: #5b4031 !important;
+    color: #f7ead9 !important;
+}
+
+[data-ogsc] h1,
+[data-ogsc] h2,
+[data-ogsc] h3,
+[data-ogsc] p,
+[data-ogsc] .table td,
+[data-ogsc] .brand-name,
+[data-ogsc] .header a,
+[data-ogsb] h1,
+[data-ogsb] h2,
+[data-ogsb] h3,
+[data-ogsb] p,
+[data-ogsb] .table td,
+[data-ogsb] .brand-name,
+[data-ogsb] .header a {
+    color: #f7ead9 !important;
+}
+
+[data-ogsc] a,
+[data-ogsc] .footer a,
+[data-ogsc] .brand-tagline,
+[data-ogsb] a,
+[data-ogsb] .footer a,
+[data-ogsb] .brand-tagline {
+    color: #f3b36e !important;
+}
+
+[data-ogsc] .subcopy,
+[data-ogsc] .table th,
+[data-ogsb] .subcopy,
+[data-ogsb] .table th {
+    border-color: #5b4031 !important;
+}
+
+[data-ogsc] .subcopy p,
+[data-ogsc] .footer p,
+[data-ogsc] .footer a,
+[data-ogsb] .subcopy p,
+[data-ogsb] .footer p,
+[data-ogsb] .footer a {
+    color: #d9c0a5 !important;
+}
+
+[data-ogsc] .button-blue,
+[data-ogsc] .button-primary,
+[data-ogsb] .button-blue,
+[data-ogsb] .button-primary {
+    background-color: #f3b36e !important;
+    border-bottom-color: #f3b36e !important;
+    border-left-color: #f3b36e !important;
+    border-right-color: #f3b36e !important;
+    border-top-color: #f3b36e !important;
+    color: #23150f !important;
+}

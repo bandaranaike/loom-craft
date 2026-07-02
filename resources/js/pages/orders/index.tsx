@@ -1,4 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import OrderStatusBadge from '@/components/order-status-badge';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import { index as ordersIndex, show as orderShow } from '@/routes/orders';
@@ -35,15 +36,9 @@ export default function OrdersIndex() {
             <div className="flex h-full min-w-0 flex-1 flex-col gap-4 overflow-x-hidden rounded-xl p-4">
                 <div className="rounded-xl border border-sidebar-border/70 bg-sidebar/30 p-6 dark:border-sidebar-border">
                     <div className="flex flex-col gap-2">
-                        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                            Order History
-                        </p>
-                        <h2 className="text-2xl font-semibold text-foreground">
-                            Track your LoomCraft orders
-                        </h2>
-                        <p className="text-sm text-muted-foreground">
-                            Review status updates and revisit order details.
-                        </p>
+                        <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Order History</p>
+                        <h2 className="text-2xl font-semibold text-foreground">Track your LoomCraft orders</h2>
+                        <p className="text-sm text-muted-foreground">Review status updates and revisit order details.</p>
                     </div>
                 </div>
 
@@ -61,19 +56,14 @@ export default function OrdersIndex() {
                             >
                                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                                     <div className="min-w-0 space-y-2">
-                                        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                            Reference {order.order_number ?? `#${order.id}`}
-                                        </p>
-                                        <p className="text-lg font-semibold">
-                                            {formatMoney(order.total, order.currency)}
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {order.item_count} items • {order.status}
-                                        </p>
+                                        <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Reference {order.order_number ?? `#${order.id}`}</p>
+                                        <p className="text-lg font-semibold">{formatMoney(order.total, order.currency)}</p>
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="text-sm text-muted-foreground">{order.item_count} items</span>
+                                            <OrderStatusBadge status={order.status} domain="order" />
+                                        </div>
                                     </div>
-                                    <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground md:text-right">
-                                        {order.placed_at ?? 'Pending'}
-                                    </div>
+                                    <div className="text-xs tracking-[0.3em] text-muted-foreground uppercase md:text-right">{order.placed_at ?? 'Pending'}</div>
                                 </div>
                             </Link>
                         ))}

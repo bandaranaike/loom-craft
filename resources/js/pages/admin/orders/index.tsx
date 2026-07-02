@@ -1,5 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { show as adminOrderShow } from '@/actions/App/Http/Controllers/Admin/OrderController';
+import OrderStatusBadge, { statusLabel } from '@/components/order-status-badge';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import { index as adminOrdersIndex } from '@/routes/admin/orders';
@@ -53,31 +54,19 @@ export default function AdminOrdersIndex() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Order Management">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link
-                    href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
-                    rel="stylesheet"
-                />
+                <link href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600" rel="stylesheet" />
             </Head>
             <div className="flex h-full min-w-0 flex-1 flex-col gap-6 overflow-x-hidden rounded-[24px] bg-(--welcome-on-strong) p-5 text-(--welcome-strong)">
                 <div className="rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-1) p-7 shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]">
                     <div className="flex flex-col gap-2">
-                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                            Order Management
-                        </p>
-                        <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">
-                            Monitor marketplace orders
-                        </h2>
-                        <p className="text-sm text-(--welcome-body-text)">
-                            Verify payments, track disputes, and coordinate shipping responsibility.
-                        </p>
+                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Order Management</p>
+                        <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">Monitor marketplace orders</h2>
+                        <p className="text-sm text-(--welcome-body-text)">Verify payments, track disputes, and coordinate shipping responsibility.</p>
                     </div>
 
                     <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                         <div className="space-y-2">
-                            <label
-                                htmlFor="status"
-                                className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)"
-                            >
+                            <label htmlFor="status" className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                 Filter by status
                             </label>
                             <select
@@ -89,23 +78,21 @@ export default function AdminOrdersIndex() {
                                 <option value="">All statuses</option>
                                 {statusOptions.map((status) => (
                                     <option key={status} value={status}>
-                                        {status}
+                                        {statusLabel(status, 'order')}
                                     </option>
                                 ))}
                             </select>
                         </div>
 
-                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                            Showing {orders.length} {selectedStatus ? `${selectedStatus} ` : ''}orders
+                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                            Showing {orders.length} {selectedStatus ? `${statusLabel(selectedStatus, 'order')} ` : ''}orders
                         </p>
                     </div>
                 </div>
 
                 {orders.length === 0 ? (
                     <div className="rounded-[24px] border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-6 text-sm text-(--welcome-muted-text)">
-                        {selectedStatus
-                            ? `No ${selectedStatus} orders found.`
-                            : 'No orders placed yet.'}
+                        {selectedStatus ? `No ${statusLabel(selectedStatus, 'order')} orders found.` : 'No orders placed yet.'}
                     </div>
                 ) : (
                     <div className="grid gap-4">
@@ -116,30 +103,20 @@ export default function AdminOrdersIndex() {
                             >
                                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                                     <div className="min-w-0">
-                                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                            {order.order_number ?? `Order #${order.id}`}
-                                        </p>
-                                        <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">
-                                            {formatMoney(order.total, order.currency)}
-                                        </p>
-                                        <p className="text-sm text-(--welcome-body-text)">
-                                            {order.item_count} items • {order.status}
-                                        </p>
-                                        <p className="text-sm text-(--welcome-body-text)">
-                                            {order.customer_name ?? 'Guest customer'}
-                                        </p>
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{order.order_number ?? `Order #${order.id}`}</p>
+                                        <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">{formatMoney(order.total, order.currency)}</p>
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="text-sm text-(--welcome-body-text)">{order.item_count} items</span>
+                                            <OrderStatusBadge status={order.status} domain="order" />
+                                        </div>
+                                        <p className="text-sm text-(--welcome-body-text)">{order.customer_name ?? 'Guest customer'}</p>
                                     </div>
                                     <div className="space-y-2 md:text-right">
                                         <p className="text-sm text-(--welcome-body-text)">
-                                            {order.payment_method} • {order.payment_status}
+                                            {order.payment_method} • {statusLabel(order.payment_status, 'payment')}
                                         </p>
-                                        <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                            {order.placed_at ?? 'Pending'}
-                                        </p>
-                                        <Link
-                                            href={adminOrderShow(order.id)}
-                                            className="inline-flex text-xs uppercase tracking-[0.3em] text-(--welcome-strong) underline"
-                                        >
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{order.placed_at ?? 'Pending'}</p>
+                                        <Link href={adminOrderShow(order.id)} className="inline-flex text-xs tracking-[0.3em] text-(--welcome-strong) uppercase underline">
                                             Review order
                                         </Link>
                                     </div>

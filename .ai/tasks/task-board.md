@@ -28,6 +28,7 @@ Last updated: 2026-07-02
 
 - [contact-us-page-and-admin-message-management](/var/www/loom-craft/.ai/tasks/completed/communications/contact-us-page-and-admin-message-management.md)
 - [dialog-esms-order-notifications](/var/www/loom-craft/.ai/tasks/completed/communications/dialog-esms-order-notifications.md)
+- [outlook-email-dark-mode-theme-fix](/var/www/loom-craft/.ai/tasks/completed/communications/outlook-email-dark-mode-theme-fix.md)
 - [password-reset-email-configuration-via-resend](/var/www/loom-craft/.ai/tasks/completed/communications/password-reset-email-configuration-via-resend.md)
 
 ### Fulfillment
@@ -36,6 +37,7 @@ Last updated: 2026-07-02
 - [carrier-and-service-management-for-shipments](/var/www/loom-craft/.ai/tasks/completed/fulfillment/carrier-and-service-management-for-shipments.md)
 - [order-details-and-tracking](/var/www/loom-craft/.ai/tasks/completed/fulfillment/order-details-and-tracking.md)
 - [order-history-and-operations](/var/www/loom-craft/.ai/tasks/completed/fulfillment/order-history-and-operations.md)
+- [order-link-auth-redirect-and-email-guidance](/var/www/loom-craft/.ai/tasks/completed/fulfillment/order-link-auth-redirect-and-email-guidance.md)
 - [order-number-visible-reference-and-public-id-url-only](/var/www/loom-craft/.ai/tasks/completed/fulfillment/order-number-visible-reference-and-public-id-url-only.md)
 - [shipment-label-print-button-download-parity](/var/www/loom-craft/.ai/tasks/completed/fulfillment/shipment-label-print-button-download-parity.md)
 
@@ -61,6 +63,7 @@ Last updated: 2026-07-02
 
 - [dashboard-navigation-and-mobile-overflow](/var/www/loom-craft/.ai/tasks/completed/ui/dashboard-navigation-and-mobile-overflow.md)
 - [home-page-content-simplification](/var/www/loom-craft/.ai/tasks/completed/ui/home-page-content-simplification.md)
+- [human-readable-order-status-badges](/var/www/loom-craft/.ai/tasks/completed/ui/human-readable-order-status-badges.md)
 - [logged-in-sidebar-documentation-and-repository-link-removal](/var/www/loom-craft/.ai/tasks/completed/ui/logged-in-sidebar-documentation-and-repository-link-removal.md)
 
 ### Vendor

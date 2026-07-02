@@ -97,7 +97,7 @@ class ShowOrder
             return;
         }
 
-        abort_unless($guestOrderId === $order->id, 403);
+        abort_unless($order->user_id === null || $guestOrderId === $order->id, 403);
     }
 
     /**

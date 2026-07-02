@@ -47,6 +47,7 @@ class OrderCustomerNotification extends Notification
             ->greeting('Hello from LoomCraft')
             ->line($this->message)
             ->line("Order number: {$this->orderNumber}")
+            ->line('If this order belongs to your LoomCraft account, sign in with that account to view the order link.')
             ->action('View order', $this->actionUrl)
             ->line('Thank you for choosing LoomCraft.');
     }

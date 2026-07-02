@@ -11,6 +11,7 @@ import {
 } from '@/actions/App/Http/Controllers/Admin/OrderController';
 import adminOrderShipmentLabel from '@/actions/App/Http/Controllers/Admin/OrderShipmentLabelController';
 import InputError from '@/components/input-error';
+import OrderStatusBadge, { statusLabel } from '@/components/order-status-badge';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import { show as vendorShow } from '@/routes/vendors';
@@ -111,42 +112,6 @@ type AdminOrderSummary = {
 type AdminOrderShowProps = {
     order: AdminOrderSummary;
 };
-
-const paymentStatusLabel = (status: string) => {
-    switch (status) {
-        case 'paid':
-            return 'Paid';
-        case 'failed':
-            return 'Failed';
-        case 'collection_pending':
-            return 'Collection pending';
-        default:
-            return 'Pending';
-    }
-};
-
-const orderStatusLabel = (status: string) => {
-    switch (status) {
-        case 'confirmed':
-            return 'Confirmed';
-        case 'fulfilled':
-            return 'Fulfilled';
-        case 'closed':
-            return 'Closed';
-        case 'cancelled':
-            return 'Cancelled';
-        case 'paid':
-            return 'Paid';
-        default:
-            return 'Pending';
-    }
-};
-
-const shipmentStatusLabel = (status: string) =>
-    status
-        .split('_')
-        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-        .join(' ');
 
 const shipmentTimeline = (shipment: ShipmentSummary): { label: string; timestamp: string | null }[] => [
     { label: 'Vendor preparing', timestamp: shipment.vendor_preparing_at },
@@ -300,9 +265,10 @@ export default function AdminOrderShow() {
                         </div>
                         <div className="min-w-0 md:text-right">
                             <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">{formatMoney(order.total, order.currency)}</p>
-                            <p className="text-sm text-(--welcome-body-text)">
-                                {order.payment_method} • {order.payment_status}
-                            </p>
+                            <div className="mt-2 flex flex-wrap justify-start gap-2 md:justify-end">
+                                <OrderStatusBadge status={order.payment_status} domain="payment" />
+                                <OrderStatusBadge status={order.status} domain="order" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -377,7 +343,7 @@ export default function AdminOrderShow() {
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span className="text-(--welcome-body-text)">Shipment status</span>
-                                            <span>{shipmentStatusLabel(order.shipment.status)}</span>
+                                            <OrderStatusBadge status={order.shipment.status} domain="shipment" />
                                         </div>
                                         <div className="flex items-center justify-between gap-4">
                                             <span className="text-(--welcome-body-text)">Carrier</span>
@@ -394,7 +360,7 @@ export default function AdminOrderShow() {
                                         {order.shipment.delivery_exception_reason && (
                                             <div className="rounded-[18px] border border-(--welcome-border) bg-(--welcome-surface-1) p-3">
                                                 <p className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">Latest exception</p>
-                                                <p className="mt-2 text-sm font-semibold">{shipmentStatusLabel(order.shipment.delivery_exception_reason)}</p>
+                                                <p className="mt-2 text-sm font-semibold">{statusLabel(order.shipment.delivery_exception_reason, 'shipment')}</p>
                                                 {order.shipment.delivery_exception_note && (
                                                     <p className="mt-1 text-sm text-(--welcome-body-text)">{order.shipment.delivery_exception_note}</p>
                                                 )}
@@ -470,7 +436,7 @@ export default function AdminOrderShow() {
                                         >
                                             {order.order_status_options.map((status) => (
                                                 <option key={status} value={status}>
-                                                    {orderStatusLabel(status)}
+                                                    {statusLabel(status, 'order')}
                                                 </option>
                                             ))}
                                         </select>
@@ -504,9 +470,7 @@ export default function AdminOrderShow() {
                                 <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Shipment workflow</p>
                                 <div className="mt-4 space-y-2 text-sm text-(--welcome-body-text)">
                                     <p>Shipment {order.shipment.shipment_number ?? `#${order.shipment.id}`}</p>
-                                    <p>
-                                        Current status: <span className="font-semibold text-(--welcome-strong)">{shipmentStatusLabel(order.shipment.status)}</span>
-                                    </p>
+                                    <OrderStatusBadge status={order.shipment.status} domain="shipment" />
                                 </div>
                                 <div className="mt-4 space-y-4">
                                     <div className="space-y-2">
@@ -518,7 +482,7 @@ export default function AdminOrderShow() {
                                         >
                                             {order.shipment_status_options.map((status) => (
                                                 <option key={status} value={status}>
-                                                    {shipmentStatusLabel(status)}
+                                                    {statusLabel(status, 'shipment')}
                                                 </option>
                                             ))}
                                         </select>
@@ -767,7 +731,7 @@ export default function AdminOrderShow() {
                                         >
                                             {order.payment_status_options.map((status) => (
                                                 <option key={status} value={status}>
-                                                    {paymentStatusLabel(status)}
+                                                    {statusLabel(status, 'payment')}
                                                 </option>
                                             ))}
                                         </select>

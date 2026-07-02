@@ -1,12 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import OrderStatusBadge, { statusLabel } from '@/components/order-status-badge';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import { dashboard } from '@/routes';
@@ -74,19 +69,13 @@ export default function Dashboard() {
     const { status, auth, order_histories } = usePage<SharedData & Props>().props;
     const isAdmin = auth?.user?.role === 'admin';
     const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
-    const selectedOrder = useMemo(
-        () => order_histories.find((order) => order.id === selectedOrderId) ?? null,
-        [order_histories, selectedOrderId],
-    );
+    const selectedOrder = useMemo(() => order_histories.find((order) => order.id === selectedOrderId) ?? null, [order_histories, selectedOrderId]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link
-                    href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
-                    rel="stylesheet"
-                />
+                <link href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600" rel="stylesheet" />
             </Head>
             <div className="flex h-full min-w-0 flex-1 flex-col gap-4 overflow-x-hidden rounded-xl p-4">
                 {status && (
@@ -97,26 +86,20 @@ export default function Dashboard() {
                 <div className="rounded-xl border border-sidebar-border/70 bg-sidebar/30 p-6 dark:border-sidebar-border">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-col gap-2">
-                            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                Order Library
-                            </p>
-                            <h2 className="text-2xl font-semibold text-foreground">
-                                View your orders and history
-                            </h2>
-                            <p className="text-sm text-muted-foreground">
-                                Click any order card to see full details in a popup.
-                            </p>
+                            <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Order Library</p>
+                            <h2 className="text-2xl font-semibold text-foreground">View your orders and history</h2>
+                            <p className="text-sm text-muted-foreground">Click any order card to see full details in a popup.</p>
                         </div>
                         <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                             <Link
                                 href={isAdmin ? adminOrdersIndex() : ordersIndex()}
-                                className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"
+                                className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold tracking-[0.3em] text-foreground uppercase transition hover:bg-foreground hover:text-background"
                             >
                                 {isAdmin ? 'All Orders' : 'Full Order History'}
                             </Link>
                             <Link
                                 href={auth?.vendor ? vendorProfileEdit() : vendorRegister()}
-                                className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"
+                                className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold tracking-[0.3em] text-foreground uppercase transition hover:bg-foreground hover:text-background"
                             >
                                 {auth?.vendor ? 'Vendor Profile' : 'Become Vendor'}
                             </Link>
@@ -126,7 +109,7 @@ export default function Dashboard() {
 
                 <div className="grid gap-4 lg:grid-cols-2">
                     {order_histories.length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-sidebar-border/80 p-10 text-center text-sm text-muted-foreground dark:border-sidebar-border lg:col-span-2">
+                        <div className="rounded-xl border border-dashed border-sidebar-border/80 p-10 text-center text-sm text-muted-foreground lg:col-span-2 dark:border-sidebar-border">
                             No orders yet. Place your first LoomCraft order to build history.
                         </div>
                     ) : (
@@ -138,23 +121,14 @@ export default function Dashboard() {
                                 className="flex h-full cursor-pointer flex-col gap-3 rounded-xl border border-sidebar-border/70 bg-background p-6 text-left shadow-xs transition hover:border-foreground/40 dark:border-sidebar-border"
                             >
                                 <div className="flex flex-wrap items-center justify-between gap-2">
-                                    <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                        {order.order_number ?? `Order #${order.id}`}
-                                    </p>
-                                    <span className="rounded-full border border-sidebar-border/60 px-3 py-1 text-xs uppercase tracking-[0.2em] text-muted-foreground dark:border-sidebar-border">
-                                        {order.status}
-                                    </span>
+                                    <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">{order.order_number ?? `Order #${order.id}`}</p>
+                                    <OrderStatusBadge status={order.status} domain="order" />
                                 </div>
-                                <p className="text-xl font-semibold text-foreground">
-                                    {formatMoney(order.total, order.currency)}
-                                </p>
+                                <p className="text-xl font-semibold text-foreground">{formatMoney(order.total, order.currency)}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    {order.items.length} items • {order.payment_method} (
-                                    {order.payment_status})
+                                    {order.items.length} items • {order.payment_method} ({statusLabel(order.payment_status, 'payment')})
                                 </p>
-                                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                    {order.placed_at ?? 'Pending'}
-                                </p>
+                                <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">{order.placed_at ?? 'Pending'}</p>
                             </button>
                         ))
                     )}
@@ -164,19 +138,13 @@ export default function Dashboard() {
                     <div className="rounded-xl border border-sidebar-border/70 bg-sidebar/20 p-6 dark:border-sidebar-border">
                         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                             <div>
-                                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                    Admin Review
-                                </p>
-                                <h2 className="text-2xl font-semibold text-foreground">
-                                    Pending vendor approvals
-                                </h2>
-                                <p className="text-sm text-muted-foreground">
-                                    Review and approve artisan applications.
-                                </p>
+                                <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Admin Review</p>
+                                <h2 className="text-2xl font-semibold text-foreground">Pending vendor approvals</h2>
+                                <p className="text-sm text-muted-foreground">Review and approve artisan applications.</p>
                             </div>
                             <Link
                                 href={adminVendorPending()}
-                                className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"
+                                className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold tracking-[0.3em] text-foreground uppercase transition hover:bg-foreground hover:text-background"
                             >
                                 Review Vendors
                             </Link>
@@ -196,83 +164,43 @@ export default function Dashboard() {
                         {selectedOrder && (
                             <>
                                 <DialogHeader>
-                                    <DialogTitle className="text-xl">
-                                        {selectedOrder.order_number ?? `Order #${selectedOrder.id}`}
-                                    </DialogTitle>
+                                    <DialogTitle className="text-xl">{selectedOrder.order_number ?? `Order #${selectedOrder.id}`}</DialogTitle>
                                     <DialogDescription>
-                                        {formatMoney(selectedOrder.total, selectedOrder.currency)} •{' '}
-                                        {selectedOrder.status} • {selectedOrder.payment_method} (
-                                        {selectedOrder.payment_status})
+                                        {formatMoney(selectedOrder.total, selectedOrder.currency)} • {statusLabel(selectedOrder.status, 'order')} • {selectedOrder.payment_method} (
+                                        {statusLabel(selectedOrder.payment_status, 'payment')})
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="space-y-6 text-sm">
-                                    <div className="grid gap-3 rounded-xl border border-sidebar-border/70 bg-sidebar/10 p-4 dark:border-sidebar-border md:grid-cols-3">
+                                    <div className="grid gap-3 rounded-xl border border-sidebar-border/70 bg-sidebar/10 p-4 md:grid-cols-3 dark:border-sidebar-border">
                                         <div>
-                                            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                                Placed
-                                            </p>
-                                            <p className="mt-1 text-foreground">
-                                                {selectedOrder.placed_at ?? 'Pending'}
-                                            </p>
+                                            <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Placed</p>
+                                            <p className="mt-1 text-foreground">{selectedOrder.placed_at ?? 'Pending'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                                Shipping
-                                            </p>
-                                            <p className="mt-1 text-foreground">
-                                                {selectedOrder.shipping_responsibility}
-                                            </p>
+                                            <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Shipping</p>
+                                            <p className="mt-1 text-foreground">{selectedOrder.shipping_responsibility}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                                Subtotal
-                                            </p>
-                                            <p className="mt-1 text-foreground">
-                                                {formatMoney(
-                                                    selectedOrder.subtotal,
-                                                    selectedOrder.currency,
-                                                )}
-                                            </p>
+                                            <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Subtotal</p>
+                                            <p className="mt-1 text-foreground">{formatMoney(selectedOrder.subtotal, selectedOrder.currency)}</p>
                                         </div>
                                     </div>
 
                                     <div className="space-y-3">
-                                        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                            Items
-                                        </p>
+                                        <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Items</p>
                                         {selectedOrder.items.map((item) => (
-                                            <div
-                                                key={item.id}
-                                                className="rounded-xl border border-sidebar-border/70 bg-background p-4 dark:border-sidebar-border"
-                                            >
+                                            <div key={item.id} className="rounded-xl border border-sidebar-border/70 bg-background p-4 dark:border-sidebar-border">
                                                 <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                                                     <div>
-                                                        <p className="font-semibold text-foreground">
-                                                            {item.product_name}
-                                                        </p>
-                                                        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                                            {item.vendor_slug ? (
-                                                                <Link href={vendorShow(item.vendor_slug)}>
-                                                                    {item.vendor_name}
-                                                                </Link>
-                                                            ) : (
-                                                                item.vendor_name
-                                                            )}
+                                                        <p className="font-semibold text-foreground">{item.product_name}</p>
+                                                        <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">
+                                                            {item.vendor_slug ? <Link href={vendorShow(item.vendor_slug)}>{item.vendor_name}</Link> : item.vendor_name}
                                                         </p>
                                                     </div>
                                                     <p className="text-muted-foreground">
-                                                        {item.quantity} ×{' '}
-                                                        {formatMoney(
-                                                            item.unit_price,
-                                                            selectedOrder.currency,
-                                                        )}
+                                                        {item.quantity} × {formatMoney(item.unit_price, selectedOrder.currency)}
                                                     </p>
-                                                    <p className="font-semibold text-foreground">
-                                                        {formatMoney(
-                                                            item.line_total,
-                                                            selectedOrder.currency,
-                                                        )}
-                                                    </p>
+                                                    <p className="font-semibold text-foreground">{formatMoney(item.line_total, selectedOrder.currency)}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -285,33 +213,18 @@ export default function Dashboard() {
                                                     key={`${address.type}-${address.line1}`}
                                                     className="rounded-xl border border-sidebar-border/70 bg-background p-4 dark:border-sidebar-border"
                                                 >
-                                                    <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                                        {address.type} address
-                                                    </p>
-                                                    <p className="mt-2 font-semibold text-foreground">
-                                                        {address.full_name}
-                                                    </p>
+                                                    <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">{address.type} address</p>
+                                                    <p className="mt-2 font-semibold text-foreground">{address.full_name}</p>
                                                     <p className="text-muted-foreground">
                                                         {address.line1}
-                                                        {address.line2
-                                                            ? `, ${address.line2}`
-                                                            : ''}
+                                                        {address.line2 ? `, ${address.line2}` : ''}
                                                     </p>
                                                     <p className="text-muted-foreground">
                                                         {address.city}
-                                                        {address.region
-                                                            ? `, ${address.region}`
-                                                            : ''}{' '}
-                                                        {address.postal_code ?? ''}
+                                                        {address.region ? `, ${address.region}` : ''} {address.postal_code ?? ''}
                                                     </p>
-                                                    <p className="text-muted-foreground">
-                                                        {address.country_code}
-                                                    </p>
-                                                    {address.phone && (
-                                                        <p className="text-muted-foreground">
-                                                            {address.phone}
-                                                        </p>
-                                                    )}
+                                                    <p className="text-muted-foreground">{address.country_code}</p>
+                                                    {address.phone && <p className="text-muted-foreground">{address.phone}</p>}
                                                 </div>
                                             ))}
                                         </div>
@@ -320,7 +233,7 @@ export default function Dashboard() {
                                     <div className="flex justify-end">
                                         <Link
                                             href={ordersShow(selectedOrder.public_id ?? `${selectedOrder.id}`)}
-                                            className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-foreground transition hover:bg-foreground hover:text-background"
+                                            className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold tracking-[0.3em] text-foreground uppercase transition hover:bg-foreground hover:text-background"
                                         >
                                             Open Full Page
                                         </Link>

@@ -27,8 +27,12 @@ class OrderController extends Controller
         ]);
     }
 
-    public function show(Request $request, Order $order, ShowOrder $action): Response
+    public function show(Request $request, Order $order, ShowOrder $action): Response|RedirectResponse
     {
+        if ($request->user() === null && $order->user_id !== null) {
+            return redirect()->guest(route('login'));
+        }
+
         $result = $action->handle(OrderShowData::fromRequest($request, $order));
 
         return Inertia::render('orders/show', [

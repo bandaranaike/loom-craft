@@ -21,8 +21,7 @@ it('assigns a durable public identifier when an order is created', function () {
 it('resolves the customer order page by public identifier', function () {
     $order = createTrackedOrder();
 
-    $this->withSession(['guest_order_id' => $order->id])
-        ->get(route('orders.show', ['order' => $order->public_id]))
+    $this->get(route('orders.show', ['order' => $order->public_id]))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('orders/show')
@@ -30,6 +29,51 @@ it('resolves the customer order page by public identifier', function () {
             ->where('order.order_number', $order->order_number)
             ->where('order.id', $order->id)
         );
+});
+
+it('redirects guests to login for account owned order links and remembers the order page', function () {
+    $customer = User::factory()->create();
+    $order = createTrackedOrder([
+        'user_id' => $customer->id,
+        'guest_name' => null,
+        'guest_email' => null,
+    ]);
+    $orderUrl = route('orders.show', ['order' => $order->public_id]);
+
+    $this->get($orderUrl)
+        ->assertRedirect(route('login'))
+        ->assertSessionHas('url.intended', $orderUrl);
+});
+
+it('allows the owning customer to view an account order by public identifier', function () {
+    $customer = User::factory()->create();
+    $order = createTrackedOrder([
+        'user_id' => $customer->id,
+        'guest_name' => null,
+        'guest_email' => null,
+    ]);
+
+    $this->actingAs($customer)
+        ->get(route('orders.show', ['order' => $order->public_id]))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('orders/show')
+            ->where('order.public_id', $order->public_id)
+        );
+});
+
+it('keeps account orders forbidden to other authenticated customers', function () {
+    $customer = User::factory()->create();
+    $otherCustomer = User::factory()->create();
+    $order = createTrackedOrder([
+        'user_id' => $customer->id,
+        'guest_name' => null,
+        'guest_email' => null,
+    ]);
+
+    $this->actingAs($otherCustomer)
+        ->get(route('orders.show', ['order' => $order->public_id]))
+        ->assertForbidden();
 });
 
 it('does not require the numeric internal id in the public customer order url', function () {

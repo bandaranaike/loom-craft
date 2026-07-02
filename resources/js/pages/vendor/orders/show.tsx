@@ -2,6 +2,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useEffectEvent } from 'react';
 import { updateShipmentStatus as vendorOrderUpdateShipmentStatus } from '@/actions/App/Http/Controllers/Vendor/OrderController';
 import InputError from '@/components/input-error';
+import OrderStatusBadge, { statusLabel } from '@/components/order-status-badge';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
 import { show as vendorOrdersShow, index as vendorOrdersIndex } from '@/routes/vendor/orders';
@@ -75,12 +76,6 @@ type VendorOrderShowProps = {
     order: VendorOrderSummary;
 };
 
-const shipmentStatusLabel = (status: string) =>
-    status
-        .split('_')
-        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-        .join(' ');
-
 export default function VendorOrderShow() {
     const { order } = usePage<VendorOrderShowProps>().props;
 
@@ -121,9 +116,10 @@ export default function VendorOrderShow() {
                         </div>
                         <div className="min-w-0 md:text-right">
                             <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">{formatMoney(order.total, order.currency)}</p>
-                            <p className="text-sm text-(--welcome-body-text)">
-                                {order.payment_method} • {order.payment_status} • {order.status}
-                            </p>
+                            <div className="mt-2 flex flex-wrap justify-start gap-2 md:justify-end">
+                                <OrderStatusBadge status={order.payment_status} domain="payment" />
+                                <OrderStatusBadge status={order.status} domain="order" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -239,9 +235,7 @@ export default function VendorOrderShow() {
                                 <p className="mt-3 text-sm text-amber-900">Move your shipment forward as packing work is completed.</p>
                                 <div className="mt-4 space-y-2">
                                     <p className="text-sm text-amber-950">Shipment {order.shipment.shipment_number ?? `#${order.shipment.id}`}</p>
-                                    <p className="text-sm text-amber-900">
-                                        Current status: <span className="font-semibold">{shipmentStatusLabel(order.shipment.status)}</span>
-                                    </p>
+                                    <OrderStatusBadge status={order.shipment.status} domain="shipment" />
                                 </div>
                                 <div className="mt-4 space-y-2">
                                     <select
@@ -251,7 +245,7 @@ export default function VendorOrderShow() {
                                     >
                                         {order.shipment_status_options.map((status) => (
                                             <option key={status} value={status}>
-                                                {shipmentStatusLabel(status)}
+                                                {statusLabel(status, 'shipment')}
                                             </option>
                                         ))}
                                     </select>
