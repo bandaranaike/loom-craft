@@ -14,6 +14,7 @@ type PaymentProof = {
 type OrderBankTransferSlipPanelProps = {
     canUploadPaymentProof: boolean;
     orderId: number;
+    orderNumber: string | null;
     orderPublicId: string | null;
     paymentProof: PaymentProof | null;
     proofIsImage: boolean;
@@ -29,6 +30,7 @@ type OrderBankTransferSlipPanelProps = {
 export default function OrderBankTransferSlipPanel({
     canUploadPaymentProof,
     orderId,
+    orderNumber,
     orderPublicId,
     paymentProof,
     proofIsImage,
@@ -42,7 +44,7 @@ export default function OrderBankTransferSlipPanel({
 }: OrderBankTransferSlipPanelProps) {
     const panelDescription =
         description ??
-        `Upload the final transfer slip for ${orderPublicId ?? `order #${orderId}`}. Keep the amount and reference visible in the document if possible.`;
+        `Upload the final transfer slip for ${orderNumber ?? `order #${orderId}`}. Keep the amount and reference visible in the document if possible.`;
 
     return (
         <div className={className}>

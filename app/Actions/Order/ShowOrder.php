@@ -67,6 +67,7 @@ class ShowOrder
         return new OrderSummaryResult(
             $order->id,
             $order->public_id,
+            $order->order_number,
             $order->status,
             $order->currency,
             Money::fromString((string) $order->subtotal)->amount,
@@ -116,7 +117,7 @@ class ShowOrder
         ];
     }
 
-    private function canUploadPaymentProof(?\App\Models\User $user, Order $order, ?int $guestOrderId): bool
+    private function canUploadPaymentProof(?User $user, Order $order, ?int $guestOrderId): bool
     {
         if ($order->payment?->method !== 'bank_transfer') {
             return false;

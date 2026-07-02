@@ -17,6 +17,7 @@ class OrderSummaryResult
     public function __construct(
         public int $id,
         public ?string $publicId,
+        public ?string $orderNumber,
         public string $status,
         public string $currency,
         public string $subtotal,
@@ -45,6 +46,7 @@ class OrderSummaryResult
         return [
             'id' => $this->id,
             'public_id' => $this->publicId,
+            'order_number' => $this->orderNumber,
             'status' => $this->status,
             'currency' => $this->currency,
             'subtotal' => $this->subtotal,

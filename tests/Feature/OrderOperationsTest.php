@@ -70,6 +70,7 @@ it('lists all orders for admins and supports filtering by status', function () {
             ->component('admin/orders/index')
             ->has('orders', 1)
             ->where('orders.0.id', $fulfilledOrder->id)
+            ->where('orders.0.order_number', $fulfilledOrder->order_number)
             ->where('orders.0.status', 'fulfilled')
             ->where('selected_status', 'fulfilled')
         );
@@ -110,6 +111,7 @@ it('lists only vendor related orders', function () {
             ->component('vendor/orders/index')
             ->has('orders', 1)
             ->where('orders.0.id', $matchingOrder->id)
+            ->where('orders.0.order_number', $matchingOrder->order_number)
             ->where('orders.0.vendor_item_count', 1)
         );
 });

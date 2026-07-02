@@ -40,6 +40,7 @@ class ListVendorOrders
                 return new VendorOrderListItem(
                     $order->id,
                     $order->public_id,
+                    $order->order_number,
                     $order->status,
                     $order->currency,
                     Money::fromString((string) $order->total)->amount,

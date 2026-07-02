@@ -4,6 +4,7 @@ import { truncatePublicId } from '@/lib/utils';
 type UsePublicOrderReferenceOptions = {
     id: number;
     publicId: string | null;
+    orderNumber: string | null;
 };
 
 type UsePublicOrderReferenceReturn = {
@@ -15,12 +16,12 @@ type UsePublicOrderReferenceReturn = {
 
 export function usePublicOrderReference({
     id,
-    publicId,
+    orderNumber,
 }: UsePublicOrderReferenceOptions): UsePublicOrderReferenceReturn {
     const [copiedText, copy] = useClipboard({ resetAfterMs: 2000 });
-    const publicOrderReference = publicId ?? `Order #${id}`;
+    const publicOrderReference = orderNumber ?? `Order #${id}`;
     const truncatedPublicOrderReference = truncatePublicId(
-        publicId,
+        orderNumber,
         publicOrderReference,
     );
 

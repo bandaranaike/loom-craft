@@ -48,5 +48,6 @@ it('shows order history for authenticated customers', function () {
             ->component('orders/index')
             ->has('orders', 1)
             ->where('orders.0.public_id', $order->public_id)
+            ->where('orders.0.order_number', $order->order_number)
         );
 });

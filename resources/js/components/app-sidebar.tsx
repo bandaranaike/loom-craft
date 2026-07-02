@@ -1,8 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-    BookOpen,
     Smartphone,
-    Folder,
     Inbox,
     LayoutGrid,
     Mailbox,
@@ -14,7 +12,6 @@ import {
     Truck,
     Video,
 } from 'lucide-react';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -44,19 +41,6 @@ import { index as vendorInquiriesIndex } from '@/routes/vendor/inquiries';
 import { index as vendorProductsIndex } from '@/routes/vendor/products';
 import type { NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
 
 export function AppSidebar() {
     const { auth } = usePage<SharedData>().props;
@@ -180,7 +164,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter className="mt-2 rounded-[20px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-2">
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

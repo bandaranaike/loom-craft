@@ -36,6 +36,7 @@ type OrderAddress = {
 type OrderSummary = {
     id: number;
     public_id: string | null;
+    order_number: string | null;
     status: string;
     currency: string;
     subtotal: string;
@@ -93,6 +94,7 @@ export default function OrderShow() {
     } = usePublicOrderReference({
         id: order.id,
         publicId: order.public_id,
+        orderNumber: order.order_number,
     });
     const paymentRecordedInDifferentCurrency =
         order.payment_currency !== null &&
@@ -101,7 +103,7 @@ export default function OrderShow() {
 
     return (
         <>
-            <Head title={`${order.public_id ?? `Order ${order.id}`} — LoomCraft`} />
+            <Head title={`${order.order_number ?? `Order ${order.id}`} — LoomCraft`} />
             <PublicSiteLayout canRegister={!auth.user}>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-4 pb-16 pt-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
                     <div className="min-w-0 space-y-6">
@@ -109,7 +111,7 @@ export default function OrderShow() {
                             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                                 <div className="min-w-0 space-y-2">
                                     <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                        Public order reference
+                                        Order number
                                     </p>
                                     <h1 className="font-['Playfair_Display',serif] text-xl text-(--welcome-strong) md:text-2xl">
                                         <button
@@ -202,6 +204,7 @@ export default function OrderShow() {
                                     order.can_upload_payment_proof
                                 }
                                 orderId={order.id}
+                                orderNumber={order.order_number}
                                 orderPublicId={order.public_id}
                                 paymentProof={order.payment_proof}
                                 proofIsImage={proofIsImage}

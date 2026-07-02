@@ -1,6 +1,6 @@
 # LoomCraft — Implementation Status (Code-Verified)
 
-Last reviewed: 2026-06-18
+Last reviewed: 2026-07-02
 Scope: Verified against `routes/web.php`, `routes/settings.php`, `app/Http/Controllers`, `app/Actions`, `app/Services`, `resources/js/pages`, and `tests`.
 
 Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implementation-guide.md`, `.ai/knowledge/core/best-practices.md`, `.ai/knowledge/core/guardrails.md`, `.ai/knowledge/core/db-schema.md`, and `.ai/knowledge/core/order-process.md`.
@@ -46,6 +46,7 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Exchange-rate snapshots are stored historically and used to block stale PayPal conversions.
 - Exchange-rate syncing is implemented through a dedicated command and exchange-rate storage.
 - Cart, checkout, and order placement use centralized discounted pricing derived from product and category discounts.
+- Order placement now sends customer notifications by email and Dialog ESMS SMS when contact details are available.
 - Product size-price variations are implemented. Vendor product create/edit pages manage repeatable size rows with dimensions, public product pages update the displayed price and dimensions when size changes, cart lines stay separate by selected size, and order items snapshot the selected size label and charged price.
 - Cart and checkout now expose a backend-calculated preparation estimate for made-to-order shortages. The estimate uses only the quantity beyond `products.pieces_count`, adds configurable setup/buffer time, assumes product preparation runs in parallel, and uses the most time-consuming product as the order preparation time. Large carts append a workload warning when the configured distinct-product threshold is exceeded.
 
@@ -61,8 +62,9 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
 - Admin order list (`/admin/orders`) and vendor order items list (`/vendor/orders`) implemented.
 - Post-delivery product reviews are implemented with 1 to 5 star ratings, written feedback, one-review-per-customer-per-product enforcement, and public product-page display.
 - Orders now keep two distinct references:
-  - `public_id` for customer-facing lookup and URLs
-  - `order_number` for operational/admin/vendor document usage
+  - `public_id` for opaque customer URLs
+  - `order_number` for customer-visible order references and operational/admin/vendor document usage
+- Customer notifications are sent for order placed, order confirmed, order cancelled, shipment dispatched, and shipment delivered. Internal fulfillment preparation statuses do not notify the customer.
 - Orders now auto-create a one-to-one invoice record with `invoice_number`.
 - Orders now auto-create the initial shipment record at placement time.
 - Shipment records now support:

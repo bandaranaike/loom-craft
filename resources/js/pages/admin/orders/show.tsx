@@ -84,6 +84,7 @@ type ShippingCarrierOption = {
 type AdminOrderSummary = {
     id: number;
     public_id: string | null;
+    order_number: string | null;
     status: string;
     currency: string;
     subtotal: string;
@@ -285,14 +286,14 @@ export default function AdminOrderShow() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Admin Order #${order.id}`} />
+            <Head title={`Admin Order ${order.order_number ?? `#${order.id}`}`} />
             <div className="flex h-full min-w-0 flex-1 flex-col gap-6 overflow-x-hidden rounded-[24px] bg-(--welcome-on-strong) p-5 text-(--welcome-strong)">
                 <div className="rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-1) p-7 shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]">
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="min-w-0 space-y-2">
                             <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Admin review</p>
-                            <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">Order #{order.id}</h2>
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Public reference {order.order_number ?? 'Pending'}</p>
+                            <h2 className="font-['Playfair_Display',serif] text-3xl text-(--welcome-strong)">{order.order_number ?? `Order #${order.id}`}</h2>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Order number</p>
                             <p className="text-sm text-(--welcome-body-text)">
                                 {order.customer_name ?? 'Guest customer'} • {order.customer_email ?? 'No email'}
                             </p>

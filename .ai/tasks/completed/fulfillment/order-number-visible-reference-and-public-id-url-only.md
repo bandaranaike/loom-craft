@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Status: planned
+- Status: completed
 - Created: 2026-07-02
 - Updated: 2026-07-02
 - Source: user request
@@ -46,9 +46,7 @@ Make `orders.order_number` the human-visible order reference everywhere customer
 
 ## Risks Or Open Questions
 
-- Some existing pages and DTOs still use `public_id` as the current display label, so the change may need broad UI cleanup.
-- The app may have a few operational views where showing the public id remains intentional.
-- The current typo in the request text suggests the intended display source is `orders.order_number`, not a schema change.
+- None remaining for the implemented web views.
 
 ## Test Plan
 
@@ -62,4 +60,8 @@ Make `orders.order_number` the human-visible order reference everywhere customer
 
 ## Completion Notes
 
-Fill this section only when the task is done.
+- Implemented on 2026-07-02.
+- Added `order_number` to order DTO payloads for customer, admin, dashboard, and vendor order views.
+- Updated React order pages and shared reference components to display/copy `order_number`.
+- Kept `public_id` usage for customer order URLs and bank-transfer upload routes.
+- Added focused assertions for order-number payloads.

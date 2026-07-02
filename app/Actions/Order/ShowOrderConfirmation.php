@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\User;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -66,6 +67,7 @@ class ShowOrderConfirmation
         return new OrderSummaryResult(
             $order->id,
             $order->public_id,
+            $order->order_number,
             $order->status,
             $order->currency,
             Money::fromString((string) $order->subtotal)->amount,
@@ -104,7 +106,7 @@ class ShowOrderConfirmation
         ];
     }
 
-    private function canUploadPaymentProof(?\App\Models\User $user, Order $order, ?int $guestOrderId): bool
+    private function canUploadPaymentProof(?User $user, Order $order, ?int $guestOrderId): bool
     {
         if ($order->payment?->method !== 'bank_transfer') {
             return false;

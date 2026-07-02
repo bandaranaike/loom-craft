@@ -77,6 +77,7 @@ class ShowVendorOrder
         return new VendorOrderSummaryResult(
             $order->id,
             $order->public_id,
+            $order->order_number,
             $order->status,
             $order->currency,
             Money::fromString((string) $order->subtotal)->amount,

@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.2",
         "endroid/qr-code": "^6.1",
+        "erbitron/dialog-esms": "^1.0",
         "google/apiclient": "*",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/ai": "^0.3.2",

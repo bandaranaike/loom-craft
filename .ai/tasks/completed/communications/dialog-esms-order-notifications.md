@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Status: planned
+- Status: completed
 - Created: 2026-07-02
 - Updated: 2026-07-02
 - Source: user request
@@ -50,9 +50,8 @@ Add Dialog ESMS as the SMS delivery integration and wire order notifications so 
 
 ## Risks Or Open Questions
 
-- The exact set of customer-facing order statuses that should notify the user still needs to be chosen.
-- SMS delivery credentials and Dialog ESMS configuration shape may need environment updates.
-- Notification timing matters if order placement and status updates happen in separate transactions or queued jobs.
+- Production SMS delivery requires valid Dialog ESMS credentials in `DIALOG_ESMS_API_KEY`.
+- `DIALOG_ESMS_SOURCE_ADDRESS` can be set to control the SMS sender/source address.
 
 ## Test Plan
 
@@ -67,4 +66,9 @@ Add Dialog ESMS as the SMS delivery integration and wire order notifications so 
 
 ## Completion Notes
 
-Fill this section only when the task is done.
+- Implemented on 2026-07-02.
+- Installed `erbitron/dialog-esms` and published `config/dialog-esms.php`.
+- Added a custom Laravel notification channel for Dialog ESMS and a shared customer order notification.
+- Order placed notifications now send by email and SMS when recipient details are available.
+- Customer-facing status notifications are limited to order confirmed, order cancelled, shipment dispatched, and shipment delivered.
+- Added focused Pest coverage for order placement notifications, selected status notifications, and internal status suppression.

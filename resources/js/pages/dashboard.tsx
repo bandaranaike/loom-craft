@@ -56,6 +56,7 @@ type OrderAddress = {
 type OrderHistory = {
     id: number;
     public_id: string | null;
+    order_number: string | null;
     status: string;
     currency: string;
     subtotal: string;
@@ -138,7 +139,7 @@ export default function Dashboard() {
                             >
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                     <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                                        {order.public_id ?? `Order #${order.id}`}
+                                        {order.order_number ?? `Order #${order.id}`}
                                     </p>
                                     <span className="rounded-full border border-sidebar-border/60 px-3 py-1 text-xs uppercase tracking-[0.2em] text-muted-foreground dark:border-sidebar-border">
                                         {order.status}
@@ -196,7 +197,7 @@ export default function Dashboard() {
                             <>
                                 <DialogHeader>
                                     <DialogTitle className="text-xl">
-                                        {selectedOrder.public_id ?? `Order #${selectedOrder.id}`}
+                                        {selectedOrder.order_number ?? `Order #${selectedOrder.id}`}
                                     </DialogTitle>
                                     <DialogDescription>
                                         {formatMoney(selectedOrder.total, selectedOrder.currency)} •{' '}

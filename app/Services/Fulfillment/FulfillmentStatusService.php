@@ -20,12 +20,17 @@ use App\Models\Shipment;
 use App\Models\ShippingCarrier;
 use App\Models\ShippingService;
 use App\Models\User;
+use App\Services\OrderCustomerNotifier;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class FulfillmentStatusService
 {
+    public function __construct(
+        private readonly OrderCustomerNotifier $orderCustomerNotifier,
+    ) {}
+
     /**
      * @return list<string>
      */
@@ -295,6 +300,8 @@ class FulfillmentStatusService
             reason: $reason,
             note: $note,
         );
+
+        $this->orderCustomerNotifier->orderStatusChanged($order, $next->value);
     }
 
     /**
@@ -698,6 +705,8 @@ class FulfillmentStatusService
             reason: $reason ?? ($deliveryExceptionReason === null ? null : 'delivery_exception'),
             note: $note ?? $deliveryExceptionNote,
         );
+
+        $this->orderCustomerNotifier->shipmentStatusChanged($order, $next->value);
 
         if ($next === ShipmentStatus::Delivered && ! in_array($order->status, [OrderStatus::Fulfilled->value, OrderStatus::Closed->value, OrderStatus::Cancelled->value], true)) {
             $originalStatus = $order->status;

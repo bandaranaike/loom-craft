@@ -27,6 +27,7 @@ it('resolves the customer order page by public identifier', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('orders/show')
             ->where('order.public_id', $order->public_id)
+            ->where('order.order_number', $order->order_number)
             ->where('order.id', $order->id)
         );
 });

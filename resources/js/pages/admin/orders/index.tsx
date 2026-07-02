@@ -8,6 +8,7 @@ import type { BreadcrumbItem } from '@/types';
 type AdminOrderItem = {
     id: number;
     public_id: string | null;
+    order_number: string | null;
     status: string;
     currency: string;
     total: string;
@@ -116,7 +117,7 @@ export default function AdminOrdersIndex() {
                                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                                     <div className="min-w-0">
                                         <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                                            {order.public_id ?? `Order #${order.id}`}
+                                            {order.order_number ?? `Order #${order.id}`}
                                         </p>
                                         <p className="font-['Playfair_Display',serif] text-2xl text-(--welcome-strong)">
                                             {formatMoney(order.total, order.currency)}

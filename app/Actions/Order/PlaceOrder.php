@@ -10,6 +10,7 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Services\OrderCustomerNotifier;
 use App\ValueObjects\Currency;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,10 @@ use Illuminate\Validation\ValidationException;
 
 class PlaceOrder
 {
+    public function __construct(
+        private readonly OrderCustomerNotifier $orderCustomerNotifier,
+    ) {}
+
     public function handle(
         CheckoutStoreData $data,
         ?string $paymentProviderReference = null,
@@ -44,7 +49,7 @@ class PlaceOrder
             ]);
         }
 
-        return DB::transaction(function () use ($cart, $data, $paymentProviderReference, $commissionRate): OrderPlacementResult {
+        $result = DB::transaction(function () use ($cart, $data, $paymentProviderReference, $commissionRate): OrderPlacementResult {
             $lineItems = [];
             $subtotal = 0.0;
             $commissionTotal = 0.0;
@@ -189,6 +194,11 @@ class PlaceOrder
                 $cart->guest_token,
             );
         });
+
+        $order = Order::query()->findOrFail($result->orderId);
+        $this->orderCustomerNotifier->orderPlaced($order);
+
+        return $result;
     }
 
     private function resolveCart(CheckoutStoreData $data): Cart

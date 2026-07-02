@@ -134,15 +134,26 @@ Product variations add size-specific pricing and dimensions through `product_var
 ### 5.1 Create Order Record
 
 - Create `orders` with:
-  - `public_id` as the opaque customer-facing lookup key
-  - `order_number` as the human-friendly operational document number
+  - `public_id` as the opaque customer URL lookup key
+  - `order_number` as the human-visible order reference and operational document number
   - `user_id` or `guest_name` / `guest_email`
   - `status` (initial: `pending` or `paid` depending on method)
   - `currency` = `LKR`
   - `subtotal`, `commission_total`, `total`
   - `shipping_responsibility`
   - `placed_at`
-- The current implementation keeps `public_id` for customer URLs and also assigns a separate operational `order_number` in the format `ORD-YYYYMM-######`.
+- The current implementation keeps `public_id` for customer URLs and assigns a separate visible `order_number` in the format `ORD-YYYYMM-######`. Customer-facing order screens should display `order_number`; `public_id` should remain an opaque URL token.
+
+### 5.1.1 Customer Notifications
+
+- Order placement sends a customer notification through email and Dialog ESMS when the relevant recipient details are available.
+- Notification SMS delivery uses `DIALOG_ESMS_API_KEY`, optional `DIALOG_ESMS_BASE_URL`, optional `DIALOG_ESMS_CALLBACK_URL`, and optional `DIALOG_ESMS_SOURCE_ADDRESS`.
+- Customer-facing status notifications are intentionally limited to:
+  - order confirmed
+  - order cancelled
+  - shipment dispatched
+  - shipment delivered
+- Internal preparation statuses, such as vendor preparing, do not notify the customer.
 
 ### 5.2 Create Order Items
 

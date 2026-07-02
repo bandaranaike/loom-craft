@@ -4,14 +4,11 @@ Last updated: 2026-07-02
 
 ## Planned
 
-- [communications/dialog-esms-order-notifications](/var/www/loom-craft/.ai/tasks/planned/communications/dialog-esms-order-notifications.md)
 - [commerce/category-quantity-order-discounts](/var/www/loom-craft/.ai/tasks/planned/commerce/category-quantity-order-discounts.md)
 - [fulfillment/order-stickers-and-label-printing-requirements](/var/www/loom-craft/.ai/tasks/planned/fulfillment/order-stickers-and-label-printing-requirements.md)
-- [fulfillment/order-number-visible-reference-and-public-id-url-only](/var/www/loom-craft/.ai/tasks/planned/fulfillment/order-number-visible-reference-and-public-id-url-only.md)
 - [fulfillment/shipping-label-pdf-generation-and-print-pipeline](/var/www/loom-craft/.ai/tasks/planned/fulfillment/shipping-label-pdf-generation-and-print-pipeline.md)
 - [mobile/fulfillment-mobile-api-support](/var/www/loom-craft/.ai/tasks/planned/mobile/fulfillment-mobile-api-support.md)
 - [mobile/fulfillment-mobile-app-implementation-brief](/var/www/loom-craft/.ai/tasks/planned/mobile/fulfillment-mobile-app-implementation-brief.md)
-- [ui/logged-in-sidebar-documentation-and-repository-link-removal](/var/www/loom-craft/.ai/tasks/planned/ui/logged-in-sidebar-documentation-and-repository-link-removal.md)
 
 ## In Progress
 
@@ -30,6 +27,7 @@ Last updated: 2026-07-02
 ### Communications
 
 - [contact-us-page-and-admin-message-management](/var/www/loom-craft/.ai/tasks/completed/communications/contact-us-page-and-admin-message-management.md)
+- [dialog-esms-order-notifications](/var/www/loom-craft/.ai/tasks/completed/communications/dialog-esms-order-notifications.md)
 - [password-reset-email-configuration-via-resend](/var/www/loom-craft/.ai/tasks/completed/communications/password-reset-email-configuration-via-resend.md)
 
 ### Fulfillment
@@ -38,6 +36,7 @@ Last updated: 2026-07-02
 - [carrier-and-service-management-for-shipments](/var/www/loom-craft/.ai/tasks/completed/fulfillment/carrier-and-service-management-for-shipments.md)
 - [order-details-and-tracking](/var/www/loom-craft/.ai/tasks/completed/fulfillment/order-details-and-tracking.md)
 - [order-history-and-operations](/var/www/loom-craft/.ai/tasks/completed/fulfillment/order-history-and-operations.md)
+- [order-number-visible-reference-and-public-id-url-only](/var/www/loom-craft/.ai/tasks/completed/fulfillment/order-number-visible-reference-and-public-id-url-only.md)
 - [shipment-label-print-button-download-parity](/var/www/loom-craft/.ai/tasks/completed/fulfillment/shipment-label-print-button-download-parity.md)
 
 ### Mobile
@@ -62,6 +61,7 @@ Last updated: 2026-07-02
 
 - [dashboard-navigation-and-mobile-overflow](/var/www/loom-craft/.ai/tasks/completed/ui/dashboard-navigation-and-mobile-overflow.md)
 - [home-page-content-simplification](/var/www/loom-craft/.ai/tasks/completed/ui/home-page-content-simplification.md)
+- [logged-in-sidebar-documentation-and-repository-link-removal](/var/www/loom-craft/.ai/tasks/completed/ui/logged-in-sidebar-documentation-and-repository-link-removal.md)
 
 ### Vendor
 

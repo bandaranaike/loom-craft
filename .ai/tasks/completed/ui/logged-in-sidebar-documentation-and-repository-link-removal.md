@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Status: planned
+- Status: completed
 - Created: 2026-07-02
 - Updated: 2026-07-02
 - Source: user request
@@ -40,8 +40,7 @@ Remove the logged-in sidebar footer links for Documentation and Repository so th
 
 ## Risks Or Open Questions
 
-- The same link set also appears in the authenticated header component, so the intended scope should be verified before removing anything beyond the sidebar.
-- If the footer navigation is shared, the change may need a small structural cleanup rather than a simple item deletion.
+- None remaining for the authenticated React shell.
 
 ## Test Plan
 
@@ -54,4 +53,7 @@ Remove the logged-in sidebar footer links for Documentation and Repository so th
 
 ## Completion Notes
 
-Fill this section only when the task is done.
+- Implemented on 2026-07-02.
+- Removed Repository and Documentation links from the logged-in sidebar footer.
+- Removed the matching starter-kit links from the authenticated header/mobile menu so the shell is consistent.
+- Verified with TypeScript and production Vite build.

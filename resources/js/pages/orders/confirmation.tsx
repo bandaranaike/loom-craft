@@ -36,6 +36,7 @@ type OrderAddress = {
 type OrderSummary = {
     id: number;
     public_id: string | null;
+    order_number: string | null;
     status: string;
     currency: string;
     subtotal: string;
@@ -96,6 +97,7 @@ export default function OrderConfirmation({
     } = usePublicOrderReference({
         id: order.id,
         publicId: order.public_id,
+        orderNumber: order.order_number,
     });
     const paymentRecordedInDifferentCurrency =
         order.payment_currency !== null &&
@@ -105,7 +107,7 @@ export default function OrderConfirmation({
     return (
         <>
             <Head
-                title={`${order.public_id ?? `Order ${order.id}`} — LoomCraft`}
+                title={`${order.order_number ?? `Order ${order.id}`} — LoomCraft`}
             >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
@@ -212,6 +214,7 @@ export default function OrderConfirmation({
                                     order.can_upload_payment_proof
                                 }
                                 orderId={order.id}
+                                orderNumber={order.order_number}
                                 orderPublicId={order.public_id}
                                 paymentProof={order.payment_proof}
                                 proofIsImage={proofIsImage}
@@ -234,7 +237,7 @@ export default function OrderConfirmation({
                                 }}
                                 className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
                                 buttonClassName="inline-flex items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
-                                description={`Upload the final transfer slip for ${order.public_id ?? `order #${order.id}`}. This page already shows the exact order details so the proof stays tied to the correct payment.`}
+                                description={`Upload the final transfer slip for ${order.order_number ?? `order #${order.id}`}. This page already shows the exact order details so the proof stays tied to the correct payment.`}
                             />
                         )}
                     </div>
