@@ -44,7 +44,7 @@ class ListVendorOrderItems
                     $item->quantity,
                     Money::fromString((string) $item->line_total)->amount,
                     $order->shipping_responsibility,
-                    $order->placed_at?->toDateTimeString(),
+                    $order->placed_at?->toIso8601String(),
                 );
             })
             ->all();

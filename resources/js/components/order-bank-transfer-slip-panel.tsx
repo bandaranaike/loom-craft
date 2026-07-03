@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import InputError from '@/components/input-error';
+import { formatLocalDateTime } from '@/lib/dates';
 
 const fileInputClassName =
     'w-full rounded-[24px] border border-(--welcome-border) bg-(--welcome-surface-2) px-4 py-3 text-sm text-(--welcome-strong) shadow-[0_8px_20px_-18px_var(--welcome-shadow-strong)] file:mr-4 file:rounded-full file:border-0 file:bg-(--welcome-strong) file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.3em] file:text-(--welcome-on-strong) hover:file:bg-(--welcome-strong-hover) focus:border-(--welcome-strong) focus:outline-none focus:ring-2 focus:ring-(--welcome-strong-20)';
@@ -43,67 +44,31 @@ export default function OrderBankTransferSlipPanel({
     description,
 }: OrderBankTransferSlipPanelProps) {
     const panelDescription =
-        description ??
-        `Upload the final transfer slip for ${orderNumber ?? `order #${orderId}`}. Keep the amount and reference visible in the document if possible.`;
+        description ?? `Upload the final transfer slip for ${orderNumber ?? `order #${orderId}`}. Keep the amount and reference visible in the document if possible.`;
 
     return (
         <div className={className}>
-            <p className="text-xs uppercase tracking-[0.3em] text-(--welcome-muted-text)">
-                Final bank transfer slip
-            </p>
-            <p className="mt-3 text-sm text-(--welcome-body-text)">
-                {panelDescription}
-            </p>
+            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Final bank transfer slip</p>
+            <p className="mt-3 text-sm text-(--welcome-body-text)">{panelDescription}</p>
             {paymentProof && (
                 <div className="mt-4 space-y-3">
-                    <a
-                        href={paymentProof.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex text-sm text-(--welcome-strong) underline"
-                    >
+                    <a href={paymentProof.url} target="_blank" rel="noreferrer" className="inline-flex text-sm text-(--welcome-strong) underline">
                         {paymentProof.original_name}
                     </a>
-                    <p className="text-xs text-(--welcome-body-text)">
-                        Uploaded {paymentProof.uploaded_at ?? 'recently'}
-                    </p>
-                    {proofIsImage && (
-                        <img
-                            src={paymentProof.url}
-                            alt={paymentProof.original_name}
-                            className="rounded-[20px] border border-(--welcome-border) object-cover"
-                        />
-                    )}
+                    <p className="text-xs text-(--welcome-body-text)">Uploaded {formatLocalDateTime(paymentProof.uploaded_at, 'recently')}</p>
+                    {proofIsImage && <img src={paymentProof.url} alt={paymentProof.original_name} className="rounded-[20px] border border-(--welcome-border) object-cover" />}
                 </div>
             )}
             {canUploadPaymentProof ? (
                 <form onSubmit={onSubmit} className="mt-4 space-y-3">
-                    <input
-                        type="file"
-                        accept=".pdf,image/*"
-                        onChange={(event) =>
-                            onFileChange(event.target.files?.[0] ?? null)
-                        }
-                        className={fileInputClassName}
-                    />
+                    <input type="file" accept=".pdf,image/*" onChange={(event) => onFileChange(event.target.files?.[0] ?? null)} className={fileInputClassName} />
                     <InputError message={slipError} />
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className={buttonClassName}
-                    >
-                        {processing
-                            ? 'Uploading...'
-                            : paymentProof
-                              ? 'Replace slip'
-                              : 'Upload slip'}
+                    <button type="submit" disabled={processing} className={buttonClassName}>
+                        {processing ? 'Uploading...' : paymentProof ? 'Replace slip' : 'Upload slip'}
                     </button>
                 </form>
             ) : (
-                <p className="mt-4 text-sm text-(--welcome-body-text)">
-                    Proof upload is available only to the order owner or the
-                    original guest checkout session.
-                </p>
+                <p className="mt-4 text-sm text-(--welcome-body-text)">Proof upload is available only to the order owner or the original guest checkout session.</p>
             )}
         </div>
     );

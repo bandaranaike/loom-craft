@@ -3,6 +3,7 @@ import { Link } from '@inertiajs/react';
 import OrderStatusBadge, { statusLabel } from '@/components/order-status-badge';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
+import { formatLocalDateTime } from '@/lib/dates';
 import { show as vendorOrderShow } from '@/routes/vendor/orders';
 import { index as vendorOrdersIndex } from '@/routes/vendor/orders';
 import type { BreadcrumbItem } from '@/types';
@@ -72,7 +73,7 @@ export default function VendorOrdersIndex() {
                                             {order.payment_method} • {statusLabel(order.payment_status, 'payment')}
                                         </p>
                                         <OrderStatusBadge status={order.status} domain="order" className="ml-auto" />
-                                        <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">{order.placed_at ?? 'Pending'}</p>
+                                        <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">{formatLocalDateTime(order.placed_at)}</p>
                                     </div>
                                 </div>
                             </Link>

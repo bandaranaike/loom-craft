@@ -1,9 +1,10 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent, JSX, KeyboardEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-alert';
 import InputError from '@/components/input-error';
 import ProductColorSwatches from '@/components/product-color-swatches';
+import SeoHead from '@/components/seo-head';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import VendorInquiryForm from '@/components/vendor-inquiry-form';
 import PublicSiteLayout from '@/layouts/public-site-layout';
@@ -344,10 +345,33 @@ export default function ProductShow({
 
     return (
         <>
-            <Head title={`${product.name} — LoomCraft`}>
+            <SeoHead
+                title={`${product.name} — LoomCraft`}
+                description={product.description}
+                canonical={`/product/${product.slug}`}
+                image={selectedImage?.url ?? product.images[0]?.url ?? null}
+                schema={{
+                    '@context': 'https://schema.org',
+                    '@type': 'Product',
+                    name: product.name,
+                    description: product.description,
+                    image: product.images.map((image) => image.url),
+                    brand: {
+                        '@type': 'Organization',
+                        name: product.vendor.display_name,
+                    },
+                    offers: {
+                        '@type': 'Offer',
+                        price: product.selling_price,
+                        priceCurrency: 'LKR',
+                        availability: 'https://schema.org/InStock',
+                        url: `/product/${product.slug}`,
+                    },
+                }}
+            >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600" rel="stylesheet" />
-            </Head>
+            </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-6 pb-16 lg:grid-cols-[1.05fr_0.95fr]">
                     <div className="grid gap-6">

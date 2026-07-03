@@ -5,6 +5,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
@@ -21,6 +22,8 @@ it('shows order history for authenticated customers', function () {
         'selling_price' => '120.00',
     ]);
 
+    $placedAt = Carbon::parse('2026-04-05 10:00:00', 'UTC');
+
     $order = Order::query()->create([
         'user_id' => $customer->id,
         'status' => 'paid',
@@ -29,7 +32,7 @@ it('shows order history for authenticated customers', function () {
         'commission_total' => '8.40',
         'total' => '120.00',
         'shipping_responsibility' => 'platform',
-        'placed_at' => now(),
+        'placed_at' => $placedAt,
     ]);
 
     $order->items()->create([
@@ -49,5 +52,6 @@ it('shows order history for authenticated customers', function () {
             ->has('orders', 1)
             ->where('orders.0.public_id', $order->public_id)
             ->where('orders.0.order_number', $order->order_number)
+            ->where('orders.0.placed_at', $placedAt->toIso8601String())
         );
 });

@@ -46,7 +46,7 @@ class ListVendorOrders
                     Money::fromString((string) $order->total)->amount,
                     (int) $order->items_count,
                     (int) $order->vendor_items_count,
-                    $order->placed_at?->toDateTimeString(),
+                    $order->placed_at?->toIso8601String(),
                     $payment->method,
                     $payment->status,
                 );

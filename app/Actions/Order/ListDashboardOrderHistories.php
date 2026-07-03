@@ -64,7 +64,7 @@ class ListDashboardOrderHistories
                     Money::fromString((string) $order->commission_total)->amount,
                     Money::fromString((string) $order->total)->amount,
                     $order->shipping_responsibility,
-                    $order->placed_at?->toDateTimeString(),
+                    $order->placed_at?->toIso8601String(),
                     $order->payment?->method ?? 'pending',
                     $order->payment?->status ?? 'pending',
                     $order->payment?->amount,

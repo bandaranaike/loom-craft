@@ -1,6 +1,7 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import ProductCard, { type ProductCardItem } from '@/components/product-card';
+import SeoHead from '@/components/seo-head';
 import { Spinner } from '@/components/ui/spinner';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { resolveProductColorSwatch } from '@/lib/product-color-swatches';
@@ -170,13 +171,17 @@ export default function ProductIndex({
 
     return (
         <>
-            <Head title="Products — LoomCraft">
+            <SeoHead
+                title="Products — LoomCraft"
+                description="Browse approved LoomCraft products, handmade by verified artisans and curated for collectors."
+                canonical="/products"
+            >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
                     rel="stylesheet"
                 />
-            </Head>
+            </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-6 pt-6 pb-12 lg:grid-cols-[1.1fr_0.9fr]">
                     <div className="space-y-4">

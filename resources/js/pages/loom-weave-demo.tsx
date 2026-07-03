@@ -9,8 +9,8 @@ import {
 } from '@erbitron/loom-weave-kit';
 import { exportPNG } from '@erbitron/loom-weave-kit-export-canvas';
 import { useCompile, useDesignHistory } from '@erbitron/loom-weave-kit-react';
-import { Head } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import SeoHead from '@/components/seo-head';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 
 const baseColors: BaseColor[] = [
@@ -81,13 +81,17 @@ export default function LoomWeaveDemoPage() {
 
     return (
         <>
-            <Head title="Build your own woven — LoomCraft">
+            <SeoHead
+                title="Build your own woven — LoomCraft"
+                description="Try LoomCraft's woven design studio to paint a pattern, preview the weave, and export a PNG."
+                canonical="/loom-weave-demo"
+            >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
                     rel="stylesheet"
                 />
-            </Head>
+            </SeoHead>
             <PublicSiteLayout>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-6 pt-6 pb-10 lg:grid-cols-[1.1fr_0.9fr]">
                     <div className="space-y-4">

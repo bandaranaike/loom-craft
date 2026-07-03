@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 
 const sectionClassName =
@@ -7,13 +7,17 @@ const sectionClassName =
 export default function TermsOfService({ canRegister = true }: { canRegister?: boolean }) {
     return (
         <>
-            <Head title="Terms of Service — LoomCraft">
+            <SeoHead
+                title="Terms of Service — LoomCraft"
+                description="Review the LoomCraft terms that govern marketplace use, orders, payments, refunds, and account conduct."
+                canonical="/terms-of-service"
+            >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
                     rel="stylesheet"
                 />
-            </Head>
+            </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="mx-auto w-full max-w-4xl px-6 pb-10 pt-6">
                     <div className="space-y-4">

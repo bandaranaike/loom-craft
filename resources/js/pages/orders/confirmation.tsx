@@ -1,13 +1,15 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { store as storeBankTransferSlip } from '@/actions/App/Http/Controllers/OrderBankTransferSlipController';
 import OrderAddressCard from '@/components/order-address-card';
 import OrderBankTransferSlipPanel from '@/components/order-bank-transfer-slip-panel';
 import OrderProgress from '@/components/order-progress';
 import OrderSummaryCard from '@/components/order-summary-card';
 import OrderStatusBadge from '@/components/order-status-badge';
+import SeoHead from '@/components/seo-head';
 import { usePublicOrderReference } from '@/hooks/use-public-order-reference';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { formatMoney } from '@/lib/currency';
+import { formatLocalDateTime } from '@/lib/dates';
 import { index as ordersIndex } from '@/routes/orders';
 import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
@@ -97,10 +99,10 @@ export default function OrderConfirmation({ order, canRegister = true }: OrderCo
 
     return (
         <>
-            <Head title={`${order.order_number ?? `Order ${order.id}`} — LoomCraft`}>
+            <SeoHead title={`${order.order_number ?? `Order ${order.id}`} — LoomCraft`} noIndex>
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600" rel="stylesheet" />
-            </Head>
+            </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-4 pb-16 lg:grid-cols-[1.2fr_0.8fr]">
                     <div className="space-y-6">
@@ -124,7 +126,9 @@ export default function OrderConfirmation({ order, canRegister = true }: OrderCo
                                 <OrderStatusBadge status={order.payment_status} domain="payment" />
                             </div>
                             <p className="mt-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{copied ? 'Reference copied' : 'Tap the reference to copy'}</p>
-                            {order.placed_at && <p className="mt-1 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Placed {order.placed_at}</p>}
+                            {order.placed_at && (
+                                <p className="mt-1 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Placed {formatLocalDateTime(order.placed_at)}</p>
+                            )}
                         </div>
 
                         <OrderProgress progress={order.progress} />

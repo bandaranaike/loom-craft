@@ -1,9 +1,10 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { CheckCircle2, CreditCard, Landmark, WalletCards, type LucideIcon } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-alert';
 import InputError from '@/components/input-error';
 import PayPalCardFields from '@/components/paypal-card-fields';
+import SeoHead from '@/components/seo-head';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { countryOptions } from '@/lib/countries';
 import { csrfHeaders } from '@/lib/csrf';
@@ -413,10 +414,15 @@ export default function CheckoutPage({
 
     return (
         <>
-            <Head title="Checkout — LoomCraft">
+            <SeoHead
+                title="Checkout — LoomCraft"
+                description="Complete your LoomCraft order securely."
+                canonical="/checkout"
+                noIndex
+            >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600" rel="stylesheet" />
-            </Head>
+            </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-4 pb-16 lg:grid-cols-[1.2fr_0.8fr]">
                     <div className="space-y-6">

@@ -1,6 +1,7 @@
-import { Head, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import ProductCard, { type ProductCardItem } from '@/components/product-card';
+import SeoHead from '@/components/seo-head';
 import VendorInquiryForm from '@/components/vendor-inquiry-form';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { show as vendorShow } from '@/routes/vendors';
@@ -86,23 +87,26 @@ export default function VendorShow() {
 
     return (
         <>
-            <Head title={`${vendor.display_name} | LoomCraft`}>
-                <meta name="description" content={metaDescription} />
-                <meta
-                    property="og:title"
-                    content={`${vendor.display_name} | LoomCraft`}
-                />
-                <meta property="og:description" content={metaDescription} />
-                {socialImage && (
-                    <meta property="og:image" content={socialImage} />
-                )}
-                <link rel="canonical" href={pageUrl} />
+            <SeoHead
+                title={`${vendor.display_name} | LoomCraft`}
+                description={metaDescription}
+                canonical={pageUrl}
+                image={socialImage}
+                schema={{
+                    '@context': 'https://schema.org',
+                    '@type': 'Organization',
+                    name: vendor.display_name,
+                    url: pageUrl,
+                    image: socialImage ? [socialImage] : undefined,
+                    description: metaDescription,
+                }}
+            >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
                     rel="stylesheet"
                 />
-            </Head>
+            </SeoHead>
 
             <PublicSiteLayout canRegister={false}>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-6 pb-16 lg:grid-cols-[1.1fr_0.9fr]">

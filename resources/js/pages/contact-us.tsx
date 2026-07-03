@@ -1,7 +1,8 @@
-import { Head, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import ContactController from '@/actions/App/Http/Controllers/ContactController';
 import InputError from '@/components/input-error';
+import SeoHead from '@/components/seo-head';
 import { Spinner } from '@/components/ui/spinner';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 
@@ -42,13 +43,17 @@ export default function ContactUs({ status, formDefaults }: Props) {
 
     return (
         <>
-            <Head title="Contact Us">
+            <SeoHead
+                title="Contact Us — LoomCraft"
+                description="Contact LoomCraft for order help, artisan partnerships, support questions, and general inquiries."
+                canonical="/contact-us"
+            >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
                     rel="stylesheet"
                 />
-            </Head>
+            </SeoHead>
 
             <PublicSiteLayout>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pt-4 pb-16 lg:grid-cols-[1.05fr_0.95fr]">

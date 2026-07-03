@@ -28,7 +28,7 @@ class ListOrders
                 $order->currency,
                 Money::fromString((string) $order->total)->amount,
                 (int) $order->items_count,
-                $order->placed_at?->toDateTimeString(),
+                $order->placed_at?->toIso8601String(),
             ))
             ->all();
 

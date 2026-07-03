@@ -36,7 +36,10 @@ use App\Http\Controllers\Vendor\ProductController;
 use App\Http\Controllers\Vendor\VendorProfileController;
 use App\Http\Controllers\Vendor\VendorRegistrationController;
 use App\Http\Controllers\VendorPublicController;
+use App\Models\Product;
+use App\Models\Vendor;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 Route::get('/', HomeController::class)->name('home');
@@ -51,6 +54,174 @@ Route::get('terms-of-service', fn () => Inertia::render('terms-of-service'))
     ->name('terms-of-service');
 Route::get('manage-plans', fn () => Inertia::render('manage-plans'))
     ->name('plans.manage');
+Route::get('robots.txt', function () {
+    $content = implode("\n", [
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /admin/',
+        'Disallow: /dashboard',
+        'Disallow: /vendor/',
+        'Disallow: /checkout',
+        'Disallow: /cart',
+        'Disallow: /orders/',
+        'Disallow: /connected-devices',
+        'Disallow: /settings',
+        'Sitemap: '.route('sitemap.xml'),
+        '',
+    ]);
+
+    return response($content, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('robots.txt');
+Route::get('sitemap.xml', function () {
+    $today = now()->toDateString();
+
+    $pages = [
+        [
+            'loc' => route('home'),
+            'lastmod' => $today,
+            'images' => [],
+        ],
+        [
+            'loc' => route('products.index'),
+            'lastmod' => $today,
+            'images' => [],
+        ],
+        [
+            'loc' => route('contact.show'),
+            'lastmod' => $today,
+            'images' => [],
+        ],
+        [
+            'loc' => route('privacy-policy'),
+            'lastmod' => $today,
+            'images' => [],
+        ],
+        [
+            'loc' => route('terms-of-service'),
+            'lastmod' => $today,
+            'images' => [],
+        ],
+        [
+            'loc' => route('loom-weave-demo'),
+            'lastmod' => $today,
+            'images' => [],
+        ],
+    ];
+
+    $productEntries = Product::query()
+        ->where('status', 'active')
+        ->with([
+            'media' => fn ($query) => $query
+                ->where('type', 'image')
+                ->orderBy('sort_order')
+                ->orderBy('id'),
+        ])
+        ->orderByDesc('updated_at')
+        ->get(['id', 'name', 'slug', 'updated_at'])
+        ->map(function (Product $product) use ($today): array {
+            return [
+                'loc' => route('products.show', $product),
+                'lastmod' => optional($product->updated_at)->toDateString() ?? $today,
+                'images' => $product->media
+                    ->map(static fn ($media): array => [
+                        'loc' => Storage::disk('public')->url($media->path),
+                        'title' => $product->name,
+                        'caption' => $media->alt_text,
+                    ])
+                    ->values()
+                    ->all(),
+            ];
+        })
+        ->all();
+
+    $vendorEntries = Vendor::query()
+        ->where('status', 'approved')
+        ->orderByDesc('updated_at')
+        ->get(['display_name', 'slug', 'logo_path', 'cover_image_path', 'updated_at'])
+        ->map(function (Vendor $vendor) use ($today): array {
+            return [
+                'loc' => route('vendors.show', $vendor),
+                'lastmod' => optional($vendor->updated_at)->toDateString() ?? $today,
+                'images' => collect([
+                    $vendor->cover_image_path !== null
+                        ? [
+                            'loc' => Storage::disk('public')->url($vendor->cover_image_path),
+                            'title' => $vendor->display_name,
+                            'caption' => 'Cover image',
+                        ]
+                        : null,
+                    $vendor->logo_path !== null
+                        ? [
+                            'loc' => Storage::disk('public')->url($vendor->logo_path),
+                            'title' => $vendor->display_name,
+                            'caption' => 'Vendor logo',
+                        ]
+                        : null,
+                ])
+                    ->filter()
+                    ->values()
+                    ->all(),
+            ];
+        })
+        ->all();
+
+    $entries = array_merge($pages, $productEntries, $vendorEntries);
+    $hasImageEntries = collect($entries)->contains(
+        fn (array $entry): bool => is_array($entry['images'] ?? null) && $entry['images'] !== []
+    );
+
+    $imageNamespace = $hasImageEntries
+        ? ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'
+        : '';
+
+    $xmlEntries = collect($entries)->map(static function (array $entry): string {
+        $loc = htmlspecialchars($entry['loc'], ENT_XML1 | ENT_QUOTES, 'UTF-8');
+        $lastmod = isset($entry['lastmod']) && is_string($entry['lastmod']) ? sprintf('<lastmod>%s</lastmod>', htmlspecialchars($entry['lastmod'], ENT_XML1 | ENT_QUOTES, 'UTF-8')) : '';
+        $images = collect($entry['images'] ?? [])
+            ->map(static function (array $image): string {
+                $imageLines = [
+                    sprintf(
+                        '<image:loc>%s</image:loc>',
+                        htmlspecialchars($image['loc'], ENT_XML1 | ENT_QUOTES, 'UTF-8')
+                    ),
+                ];
+
+                if (isset($image['title']) && is_string($image['title']) && $image['title'] !== '') {
+                    $imageLines[] = sprintf(
+                        '<image:title>%s</image:title>',
+                        htmlspecialchars($image['title'], ENT_XML1 | ENT_QUOTES, 'UTF-8')
+                    );
+                }
+
+                if (isset($image['caption']) && is_string($image['caption']) && $image['caption'] !== '') {
+                    $imageLines[] = sprintf(
+                        '<image:caption>%s</image:caption>',
+                        htmlspecialchars($image['caption'], ENT_XML1 | ENT_QUOTES, 'UTF-8')
+                    );
+                }
+
+                return "<image:image>\n      ".implode("\n      ", $imageLines)."\n    </image:image>";
+            })
+            ->implode("\n");
+
+        $imageBlock = $images !== '' ? "\n{$images}" : '';
+
+        return <<<XML
+  <url>
+    <loc>{$loc}</loc>{$lastmod}{$imageBlock}
+  </url>
+XML;
+    })->implode("\n");
+
+    $xml = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"{$imageNamespace}>
+{$xmlEntries}
+</urlset>
+XML;
+
+    return response($xml, 200)->header('Content-Type', 'application/xml; charset=UTF-8');
+})->name('sitemap.xml');
 Route::redirect('autopay/cancel', '/manage-plans')
     ->name('autopay.cancel');
 

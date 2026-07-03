@@ -3,6 +3,7 @@ import { show as adminOrderShow } from '@/actions/App/Http/Controllers/Admin/Ord
 import OrderStatusBadge, { statusLabel } from '@/components/order-status-badge';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
+import { formatLocalDateTime } from '@/lib/dates';
 import { index as adminOrdersIndex } from '@/routes/admin/orders';
 import type { BreadcrumbItem } from '@/types';
 
@@ -115,7 +116,7 @@ export default function AdminOrdersIndex() {
                                         <p className="text-sm text-(--welcome-body-text)">
                                             {order.payment_method} • {statusLabel(order.payment_status, 'payment')}
                                         </p>
-                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{order.placed_at ?? 'Pending'}</p>
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{formatLocalDateTime(order.placed_at)}</p>
                                         <Link href={adminOrderShow(order.id)} className="inline-flex text-xs tracking-[0.3em] text-(--welcome-strong) uppercase underline">
                                             Review order
                                         </Link>

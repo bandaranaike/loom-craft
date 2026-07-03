@@ -33,6 +33,43 @@
 
         <title inertia>{{ config('app.name', 'Woven Wonder For Every Home') }}</title>
 
+        @if (request()->is(
+            'dashboard',
+            'checkout',
+            'checkout/*',
+            'cart',
+            'orders',
+            'orders/*',
+            'admin/*',
+            'vendor/*',
+            'connected-devices',
+            'connected-devices/*',
+            'settings',
+            'settings/*',
+            'login',
+            'register',
+            'forgot-password',
+            'reset-password',
+            'reset-password/*',
+            'confirm-password',
+            'verify-email',
+            'two-factor-challenge',
+            'manage-plans',
+            'autopay/*',
+        ))
+            <meta name="robots" content="noindex, nofollow">
+        @endif
+
+        @if (filled(config('services.google.analytics_id')))
+            <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('services.google.analytics_id') }}"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '{{ config('services.google.analytics_id') }}');
+            </script>
+        @endif
+
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">

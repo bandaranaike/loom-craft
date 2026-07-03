@@ -84,7 +84,7 @@ class ShowVendorOrder
             Money::fromString((string) $order->commission_total)->amount,
             Money::fromString((string) $order->total)->amount,
             $order->shipping_responsibility,
-            $order->placed_at?->toDateTimeString(),
+            $order->placed_at?->toIso8601String(),
             $payment->method,
             $payment->status,
             $order->user?->name ?? $order->guest_name,
@@ -119,7 +119,7 @@ class ShowVendorOrder
             'url' => Storage::disk('public')->url($payment->bank_transfer_slip_path),
             'original_name' => $payment->bank_transfer_slip_original_name ?? 'bank-transfer-slip',
             'mime_type' => $payment->bank_transfer_slip_mime_type ?? 'application/octet-stream',
-            'uploaded_at' => $payment->bank_transfer_slip_uploaded_at?->toDateTimeString(),
+            'uploaded_at' => $payment->bank_transfer_slip_uploaded_at?->toIso8601String(),
         ];
     }
 }

@@ -1,5 +1,6 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
 import DismissibleStockDelayAlert from '@/components/dismissible-stock-delay-alert';
+import SeoHead from '@/components/seo-head';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { formatMoney } from '@/lib/currency';
 import { destroy as cartItemDestroy, update as cartItemUpdate } from '@/routes/cart/items';
@@ -65,13 +66,18 @@ type CartPageProps = {
 export default function CartPage({ cart, canRegister = true }: CartPageProps) {
     return (
         <>
-            <Head title="Cart — LoomCraft">
+            <SeoHead
+                title="Cart — LoomCraft"
+                description="Review the pieces in your LoomCraft cart before checkout."
+                canonical="/cart"
+                noIndex
+            >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
                     rel="stylesheet"
                 />
-            </Head>
+            </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                     <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 pb-16 pt-4 lg:grid-cols-[1.2fr_0.8fr]">
                         <div className="space-y-6">

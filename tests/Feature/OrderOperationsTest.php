@@ -5,6 +5,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
@@ -173,6 +174,50 @@ it('does not expose offline payment controls to vendors', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('vendor/orders/show')
             ->where('order.can_manage_offline', false)
+        );
+});
+
+it('exposes UTC ISO timestamps for browser local order time rendering', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    [$vendorUser, $vendor] = createApprovedVendor();
+    $order = createManagedOrder(vendor: $vendor, paymentMethod: 'bank_transfer');
+    $placedAt = Carbon::parse('2026-04-05 10:00:00', 'UTC');
+    $slipUploadedAt = Carbon::parse('2026-04-05 10:30:00', 'UTC');
+    $shippedAt = Carbon::parse('2026-04-06 09:15:00', 'UTC');
+    $deliveredAt = Carbon::parse('2026-04-07 14:45:00', 'UTC');
+
+    $order->forceFill(['placed_at' => $placedAt])->save();
+
+    $order->shipments()->firstOrFail()->forceFill([
+        'shipped_at' => $shippedAt,
+        'delivered_at' => $deliveredAt,
+    ])->save();
+
+    $order->payment()->firstOrFail()->forceFill([
+        'bank_transfer_slip_path' => 'payment-proofs/slip.jpg',
+        'bank_transfer_slip_original_name' => 'slip.jpg',
+        'bank_transfer_slip_mime_type' => 'image/jpeg',
+        'bank_transfer_slip_uploaded_at' => $slipUploadedAt,
+    ])->save();
+
+    $this->actingAs($admin)
+        ->get(route('admin.orders.show', ['order' => $order->id]))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/orders/show')
+            ->where('order.placed_at', $placedAt->toIso8601String())
+            ->where('order.shipment.shipped_at', $shippedAt->toIso8601String())
+            ->where('order.shipment.delivered_at', $deliveredAt->toIso8601String())
+            ->where('order.payment_proof.uploaded_at', $slipUploadedAt->toIso8601String())
+        );
+
+    $this->actingAs($vendorUser)
+        ->get(route('vendor.orders.show', ['order' => $order->id]))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('vendor/orders/show')
+            ->where('order.placed_at', $placedAt->toIso8601String())
+            ->where('order.payment_proof.uploaded_at', $slipUploadedAt->toIso8601String())
         );
 });
 

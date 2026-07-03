@@ -1,13 +1,15 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { store as storeBankTransferSlip } from '@/actions/App/Http/Controllers/OrderBankTransferSlipController';
 import OrderAddressCard from '@/components/order-address-card';
 import OrderBankTransferSlipPanel from '@/components/order-bank-transfer-slip-panel';
 import OrderProgress from '@/components/order-progress';
 import OrderSummaryCard from '@/components/order-summary-card';
 import { statusLabel } from '@/components/order-status-badge';
+import SeoHead from '@/components/seo-head';
 import { usePublicOrderReference } from '@/hooks/use-public-order-reference';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { formatMoney } from '@/lib/currency';
+import { formatLocalDateTime } from '@/lib/dates';
 import { index as ordersIndex } from '@/routes/orders';
 import { show as vendorShow } from '@/routes/vendors';
 import type { SharedData } from '@/types';
@@ -97,7 +99,7 @@ export default function OrderShow() {
 
     return (
         <>
-            <Head title={`${order.order_number ?? `Order ${order.id}`} — LoomCraft`} />
+            <SeoHead title={`${order.order_number ?? `Order ${order.id}`} — LoomCraft`} noIndex />
             <PublicSiteLayout canRegister={!auth.user}>
                 <section className="relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-4 pt-4 pb-16 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
                     <div className="min-w-0 space-y-6">
@@ -116,7 +118,8 @@ export default function OrderShow() {
                                         </button>
                                     </h1>
                                     <p className="text-sm text-(--welcome-body-text)">
-                                        {order.placed_at ?? 'Pending placement'} • {order.payment_method} • payment {statusLabel(order.payment_status, 'payment')}
+                                        {formatLocalDateTime(order.placed_at, 'Pending placement')} • {order.payment_method} • payment{' '}
+                                        {statusLabel(order.payment_status, 'payment')}
                                     </p>
                                     <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{copied ? 'Reference copied' : 'Tap the reference to copy'}</p>
                                 </div>

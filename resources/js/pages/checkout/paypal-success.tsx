@@ -1,5 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowRight, CheckCircle2, MailCheck, ReceiptText } from 'lucide-react';
+import SeoHead from '@/components/seo-head';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { home } from '@/routes';
 import { index as productsIndex } from '@/routes/products';
@@ -24,13 +25,18 @@ export default function PayPalSuccess({
 }: PayPalSuccessProps) {
     return (
         <>
-            <Head title="Payment Complete - LoomCraft">
+            <SeoHead
+                title="Payment Complete - LoomCraft"
+                description="Your LoomCraft PayPal payment is complete."
+                canonical="/checkout/paypal/success"
+                noIndex
+            >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
                     rel="stylesheet"
                 />
-            </Head>
+            </SeoHead>
 
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="mx-auto grid w-full max-w-6xl gap-10 px-6 pt-4 pb-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">

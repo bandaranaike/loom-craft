@@ -5,6 +5,7 @@ import InputError from '@/components/input-error';
 import OrderStatusBadge, { statusLabel } from '@/components/order-status-badge';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
+import { formatLocalDateTime } from '@/lib/dates';
 import { show as vendorOrdersShow, index as vendorOrdersIndex } from '@/routes/vendor/orders';
 import { show as vendorShow } from '@/routes/vendors';
 import type { BreadcrumbItem } from '@/types';
@@ -206,7 +207,7 @@ export default function VendorOrderShow() {
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <span className="text-(--welcome-body-text)">Placed</span>
-                                    <span>{order.placed_at ?? 'Pending'}</span>
+                                    <span>{formatLocalDateTime(order.placed_at)}</span>
                                 </div>
                                 <div className="flex items-center justify-between font-semibold">
                                     <span>Total</span>
@@ -269,7 +270,7 @@ export default function VendorOrderShow() {
                                         <a href={order.payment_proof.url} target="_blank" rel="noreferrer" className="inline-flex text-sm text-(--welcome-strong) underline">
                                             {order.payment_proof.original_name}
                                         </a>
-                                        <p className="text-xs text-(--welcome-body-text)">Uploaded {order.payment_proof.uploaded_at ?? 'recently'}</p>
+                                        <p className="text-xs text-(--welcome-body-text)">Uploaded {formatLocalDateTime(order.payment_proof.uploaded_at, 'recently')}</p>
                                         {proofIsImage && (
                                             <img
                                                 src={order.payment_proof.url}

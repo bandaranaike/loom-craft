@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import OrderStatusBadge, { statusLabel } from '@/components/order-status-badge';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
+import { formatLocalDateTime } from '@/lib/dates';
 import { dashboard } from '@/routes';
 import { index as adminOrdersIndex } from '@/routes/admin/orders';
 import { pending as adminVendorPending } from '@/routes/admin/vendors';
@@ -128,7 +129,7 @@ export default function Dashboard() {
                                 <p className="text-sm text-muted-foreground">
                                     {order.items.length} items • {order.payment_method} ({statusLabel(order.payment_status, 'payment')})
                                 </p>
-                                <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">{order.placed_at ?? 'Pending'}</p>
+                                <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">{formatLocalDateTime(order.placed_at)}</p>
                             </button>
                         ))
                     )}
@@ -174,7 +175,7 @@ export default function Dashboard() {
                                     <div className="grid gap-3 rounded-xl border border-sidebar-border/70 bg-sidebar/10 p-4 md:grid-cols-3 dark:border-sidebar-border">
                                         <div>
                                             <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Placed</p>
-                                            <p className="mt-1 text-foreground">{selectedOrder.placed_at ?? 'Pending'}</p>
+                                            <p className="mt-1 text-foreground">{formatLocalDateTime(selectedOrder.placed_at)}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Shipping</p>

@@ -1,5 +1,6 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import ProductCard, { type ProductCardItem } from '@/components/product-card';
+import SeoHead from '@/components/seo-head';
 import PublicSiteLayout from '@/layouts/public-site-layout';
 import { dashboard, register } from '@/routes';
 import { index as productsIndex } from '@/routes/products';
@@ -49,13 +50,23 @@ export default function Welcome({
 
     return (
         <>
-            <Head title="LoomCraft — Heritage Woven Luxury">
+            <SeoHead
+                title="LoomCraft — Heritage Woven Luxury"
+                description="Handwoven Sri Lankan textiles, curated artisan pieces, and collectible home decor from verified LoomCraft vendors."
+                canonical="/"
+                schema={{
+                    '@context': 'https://schema.org',
+                    '@type': 'Organization',
+                    name: 'LoomCraft',
+                    url: '/',
+                }}
+            >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
                     rel="stylesheet"
                 />
-            </Head>
+            </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-4 pb-10 md:pt-6 md:pb-16">
                     <div className="space-y-5 lg:max-w-3xl">

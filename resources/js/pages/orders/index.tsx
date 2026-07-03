@@ -1,7 +1,9 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import OrderStatusBadge from '@/components/order-status-badge';
+import SeoHead from '@/components/seo-head';
 import AppLayout from '@/layouts/app-layout';
 import { formatMoney } from '@/lib/currency';
+import { formatLocalDateTime } from '@/lib/dates';
 import { index as ordersIndex, show as orderShow } from '@/routes/orders';
 import type { BreadcrumbItem } from '@/types';
 
@@ -32,7 +34,7 @@ export default function OrdersIndex() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Order History" />
+            <SeoHead title="Order History" noIndex />
             <div className="flex h-full min-w-0 flex-1 flex-col gap-4 overflow-x-hidden rounded-xl p-4">
                 <div className="rounded-xl border border-sidebar-border/70 bg-sidebar/30 p-6 dark:border-sidebar-border">
                     <div className="flex flex-col gap-2">
@@ -63,7 +65,7 @@ export default function OrdersIndex() {
                                             <OrderStatusBadge status={order.status} domain="order" />
                                         </div>
                                     </div>
-                                    <div className="text-xs tracking-[0.3em] text-muted-foreground uppercase md:text-right">{order.placed_at ?? 'Pending'}</div>
+                                    <div className="text-xs tracking-[0.3em] text-muted-foreground uppercase md:text-right">{formatLocalDateTime(order.placed_at)}</div>
                                 </div>
                             </Link>
                         ))}
