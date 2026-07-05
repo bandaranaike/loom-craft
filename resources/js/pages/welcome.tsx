@@ -39,12 +39,20 @@ const collections = [
     },
 ];
 
+type CategorySection = {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    products: ProductCardItem[];
+};
+
 export default function Welcome({
     canRegister = true,
-    latest_products,
+    category_sections,
 }: {
     canRegister?: boolean;
-    latest_products: ProductCardItem[];
+    category_sections: CategorySection[];
 }) {
     const { auth } = usePage<SharedData>().props;
 
@@ -118,30 +126,56 @@ export default function Welcome({
                 </section>
 
                 <section className="mx-auto w-full max-w-6xl px-6 pb-14 md:pb-16">
-                    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                        <div>
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                New Arrivals
-                            </p>
-                            <h2 className="font-['Playfair_Display',serif] text-3xl md:text-4xl">
-                                Shop the latest atelier pieces first.
-                            </h2>
-                        </div>
-                        <Link
-                            href={productsIndex().url}
-                            className="rounded-full border border-(--welcome-strong) px-5 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
-                        >
-                            View all products
-                        </Link>
-                    </div>
-                    {latest_products.length === 0 ? (
+
+                    <div className="mb-10 h-px bg-linear-to-r from-transparent via-(--welcome-border-soft) to-transparent" />
+
+                    {category_sections.length === 0 ? (
                         <div className="rounded-4xl border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-8 text-sm text-(--welcome-muted-text)">
                             No products available yet.
                         </div>
                     ) : (
-                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            {latest_products.map((product) => (
-                                <ProductCard key={product.id} product={product} />
+                        <div>
+                            {category_sections.map((category, index) => (
+                                <section key={category.id}>
+                                    {index > 0 && (
+                                        <div className="my-10 h-px bg-linear-to-r from-transparent via-(--welcome-border-soft) to-transparent" />
+                                    )}
+                                    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+                                        <div>
+                                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                Category
+                                            </p>
+                                            <h3 className="mt-2 font-['Playfair_Display',serif] text-2xl md:text-3xl">
+                                                {category.name}
+                                            </h3>
+                                            {category.description && (
+                                                <p className="mt-2 max-w-2xl text-sm text-(--welcome-body-text)">
+                                                    {category.description}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <Link
+                                            href={productsIndex.url({
+                                                query: {
+                                                    category: category.slug,
+                                                    page: 1,
+                                                    per_page: 9,
+                                                },
+                                            })}
+                                            className="rounded-full border border-(--welcome-strong) px-5 py-2 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                                        >
+                                            More in {category.name}
+                                        </Link>
+                                    </div>
+                                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                        {category.products.map((product) => (
+                                            <ProductCard
+                                                key={product.id}
+                                                product={product}
+                                            />
+                                        ))}
+                                    </div>
+                                </section>
                             ))}
                         </div>
                     )}

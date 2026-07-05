@@ -15,5 +15,10 @@ Useful things to include when available:
 
 Latest note:
 
-- [ ] I found some fixes required in the application
-    - I can see some timezone issue in several places on the front end. Specially order times. The database should be saved all the dates in UTC. But when showing in the browser it should be showing the date and time to compatible with the actual current timezone of the browser or the client device. 
+- [ ] We need to add category secitons in the home page (/var/www/loom-craft/resources/js/pages/welcome.tsx)
+    - One category section can have 3 product items.
+    - Max categories count is 5.
+    - If the category count less than 5 in the system, then we can show exisiting categories.
+    - Every category should have a link to go more products (the link like /products?category=cushion-cover&page=1&per_page=9)
+    - So "New Arrivals Shop the latest atelier pieces first." section will be replaced with above.
+    - Please keep other contents are same. Please keep the theme consitancy.

@@ -1,6 +1,6 @@
 # Task Board
 
-Last updated: 2026-07-03
+Last updated: 2026-07-04
 
 ## Planned
 
@@ -63,6 +63,7 @@ Last updated: 2026-07-03
 
 - [browser-local-timezone-order-times](/var/www/loom-craft/.ai/tasks/completed/ui/browser-local-timezone-order-times.md)
 - [dashboard-navigation-and-mobile-overflow](/var/www/loom-craft/.ai/tasks/completed/ui/dashboard-navigation-and-mobile-overflow.md)
+- [home-page-category-sections](/var/www/loom-craft/.ai/tasks/completed/ui/home-page-category-sections.md)
 - [home-page-content-simplification](/var/www/loom-craft/.ai/tasks/completed/ui/home-page-content-simplification.md)
 - [human-readable-order-status-badges](/var/www/loom-craft/.ai/tasks/completed/ui/human-readable-order-status-badges.md)
 - [logged-in-sidebar-documentation-and-repository-link-removal](/var/www/loom-craft/.ai/tasks/completed/ui/logged-in-sidebar-documentation-and-repository-link-removal.md)

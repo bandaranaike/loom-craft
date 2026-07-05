@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\ProductColor;
 use App\Models\User;
 use App\Models\Vendor;
@@ -12,11 +13,18 @@ test('home page renders', function () {
     $vendor = Vendor::factory()->create([
         'status' => 'approved',
     ]);
+    $category = ProductCategory::factory()->create([
+        'name' => 'Cushion Covers',
+        'slug' => 'cushion-covers',
+        'description' => 'Soft architectural pieces for refined rooms.',
+        'sort_order' => 1,
+    ]);
 
     $product = Product::factory()->for($vendor)->create([
         'status' => 'active',
         'name' => 'Signed Heritage Textile',
     ]);
+    $product->categories()->sync([$category->id]);
     $color = ProductColor::factory()->create([
         'name' => 'Beige',
         'slug' => 'beige',
@@ -28,15 +36,20 @@ test('home page renders', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('welcome')
             ->has('canRegister')
-            ->has('latest_products', 1)
-            ->where('latest_products.0.id', $product->id)
-            ->where('latest_products.0.name', $product->name)
-            ->where('latest_products.0.categories', [])
-            ->where('latest_products.0.colors.0.slug', 'beige')
+            ->has('category_sections', 1)
+            ->where('category_sections.0.id', $category->id)
+            ->where('category_sections.0.name', 'Cushion Covers')
+            ->where('category_sections.0.slug', 'cushion-covers')
+            ->where('category_sections.0.description', 'Soft architectural pieces for refined rooms.')
+            ->has('category_sections.0.products', 1)
+            ->where('category_sections.0.products.0.id', $product->id)
+            ->where('category_sections.0.products.0.name', $product->name)
+            ->where('category_sections.0.products.0.categories.0.slug', 'cushion-covers')
+            ->where('category_sections.0.products.0.colors.0.slug', 'beige')
         );
 });
 
-test('home page shows up to six random active products from approved vendors', function () {
+test('home page shows up to five categories with three active products from approved vendors', function () {
     $vendorUser = User::factory()->create(['role' => 'vendor']);
     $vendor = Vendor::factory()->for($vendorUser)->create([
         'status' => 'approved',
@@ -47,45 +60,64 @@ test('home page shows up to six random active products from approved vendors', f
         'status' => 'pending',
     ]);
 
-    $visibleProducts = [];
+    $visibleCategoryIds = [];
 
-    foreach (range(1, 9) as $index) {
-        $product = Product::factory()->for($vendor)->create([
-            'status' => 'active',
-            'name' => "Visible Product {$index}",
-            'created_at' => now()->subMinutes(10 - $index),
-            'updated_at' => now()->subMinutes(10 - $index),
+    foreach (range(1, 6) as $categoryIndex) {
+        $category = ProductCategory::factory()->create([
+            'name' => "Visible Category {$categoryIndex}",
+            'slug' => "visible-category-{$categoryIndex}",
+            'sort_order' => $categoryIndex,
         ]);
 
-        $visibleProducts[] = $product;
+        $visibleCategoryIds[] = $category->id;
+
+        foreach (range(1, 4) as $productIndex) {
+            $product = Product::factory()->for($vendor)->create([
+                'status' => 'active',
+                'name' => "Visible Product {$categoryIndex}-{$productIndex}",
+                'created_at' => now()->subMinutes($productIndex),
+                'updated_at' => now()->subMinutes($productIndex),
+            ]);
+
+            $product->categories()->sync([$category->id]);
+        }
     }
 
-    Product::factory()->for($excludedVendor)->create([
+    $pendingVendorCategory = ProductCategory::factory()->create([
+        'name' => 'Pending Vendor Category',
+        'slug' => 'pending-vendor-category',
+        'sort_order' => 0,
+    ]);
+    $pendingVendorProduct = Product::factory()->for($excludedVendor)->create([
         'status' => 'active',
         'name' => 'Excluded Vendor Product',
     ]);
+    $pendingVendorProduct->categories()->sync([$pendingVendorCategory->id]);
 
     $response = get('/')
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('welcome')
-            ->has('latest_products', 6)
+            ->has('category_sections', 5)
+            ->has('category_sections.0.products', 3)
+            ->has('category_sections.1.products', 3)
+            ->has('category_sections.2.products', 3)
+            ->has('category_sections.3.products', 3)
+            ->has('category_sections.4.products', 3)
         );
 
-    $visibleProductIds = collect($visibleProducts)
+    $homeCategoryIds = collect($response->viewData('page')['props']['category_sections'])
         ->pluck('id')
         ->values()
         ->all();
 
-    $homeProductIds = collect($response->viewData('page')['props']['latest_products'])
-        ->pluck('id')
-        ->values()
-        ->all();
+    expect($homeCategoryIds)
+        ->toBe(array_slice($visibleCategoryIds, 0, 5))
+        ->not->toContain($pendingVendorCategory->id);
 
-    expect($homeProductIds)
-        ->toHaveCount(6);
-
-    foreach ($homeProductIds as $productId) {
-        expect($visibleProductIds)->toContain($productId);
-    }
+    collect($response->viewData('page')['props']['category_sections'])
+        ->each(function (array $categorySection): void {
+            expect($categorySection['products'])
+                ->toHaveCount(3);
+        });
 });
