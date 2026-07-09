@@ -1,6 +1,6 @@
 # Task Board
 
-Last updated: 2026-07-04
+Last updated: 2026-07-09
 
 ## Planned
 
@@ -9,6 +9,7 @@ Last updated: 2026-07-04
 - [fulfillment/shipping-label-pdf-generation-and-print-pipeline](/var/www/loom-craft/.ai/tasks/planned/fulfillment/shipping-label-pdf-generation-and-print-pipeline.md)
 - [mobile/fulfillment-mobile-api-support](/var/www/loom-craft/.ai/tasks/planned/mobile/fulfillment-mobile-api-support.md)
 - [mobile/fulfillment-mobile-app-implementation-brief](/var/www/loom-craft/.ai/tasks/planned/mobile/fulfillment-mobile-app-implementation-brief.md)
+- [ui/naturesnature-multi-site-theme-and-deployment](/var/www/loom-craft/.ai/tasks/planned/ui/naturesnature-multi-site-theme-and-deployment.md)
 
 ## In Progress
 
