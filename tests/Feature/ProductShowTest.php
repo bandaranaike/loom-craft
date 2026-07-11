@@ -7,6 +7,10 @@ use App\Models\ProductColor;
 use App\Models\Vendor;
 use Inertia\Testing\AssertableInertia as Assert;
 
+beforeEach(function (): void {
+    config(['sites.default' => 'loomcraft']);
+});
+
 test('guests can view active products', function () {
     $vendor = Vendor::factory()->create([
         'status' => 'approved',
@@ -145,6 +149,33 @@ test('product show uses the canonical lkr currency for add to cart', function ()
         ->assertInertia(fn (Assert $page) => $page
             ->component('products/show')
             ->where('cartCurrency', 'LKR')
+        );
+});
+
+test('naturesnature product show hides color data entirely', function () {
+    config(['sites.default' => 'naturesnature']);
+
+    $vendor = Vendor::factory()->create([
+        'status' => 'approved',
+    ]);
+    $product = Product::factory()->create([
+        'vendor_id' => $vendor->id,
+        'status' => 'active',
+        'name' => 'Oat Cookie Box',
+    ]);
+    $color = ProductColor::factory()->create([
+        'name' => 'Orange',
+        'slug' => 'orange',
+    ]);
+    $product->colors()->sync([$color->id]);
+
+    $response = $this->get(route('products.show', ['product' => $product->slug]));
+
+    $response
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('products/show')
+            ->where('product.colors', [])
         );
 });
 

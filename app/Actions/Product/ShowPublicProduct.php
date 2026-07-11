@@ -13,6 +13,7 @@ use App\Models\ProductCategory;
 use App\Models\ProductColor;
 use App\Models\ProductReview;
 use App\Services\ProductPricingService;
+use App\Support\Site;
 use App\ValueObjects\Money;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -24,6 +25,7 @@ class ShowPublicProduct
     public function handle(ProductShowData $data): ProductShowResult
     {
         Gate::authorize('viewPublicAny', Product::class);
+        $hasColorFilters = ! Site::is('naturesnature');
 
         $product = Product::query()
             ->with([
@@ -34,10 +36,14 @@ class ShowPublicProduct
                     ->where('is_active', true)
                     ->orderBy('sort_order')
                     ->orderBy('name'),
-                'colors' => fn ($query) => $query
-                    ->where('is_active', true)
-                    ->orderBy('sort_order')
-                    ->orderBy('name'),
+                ...($hasColorFilters
+                    ? [
+                        'colors' => fn ($query) => $query
+                            ->where('is_active', true)
+                            ->orderBy('sort_order')
+                            ->orderBy('name'),
+                    ]
+                    : []),
                 'reviews' => fn ($query) => $query
                     ->with('user:id,name')
                     ->latest(),
@@ -150,14 +156,16 @@ class ShowPublicProduct
                     ])
                     ->values()
                     ->all(),
-                $product->colors
-                    ->map(static fn (ProductColor $color): array => [
-                        'id' => $color->id,
-                        'name' => $color->name,
-                        'slug' => $color->slug,
-                    ])
-                    ->values()
-                    ->all(),
+                $hasColorFilters
+                    ? $product->colors
+                        ->map(static fn (ProductColor $color): array => [
+                            'id' => $color->id,
+                            'name' => $color->name,
+                            'slug' => $color->slug,
+                        ])
+                        ->values()
+                        ->all()
+                    : [],
                 $product->variations
                     ->map(fn ($variation): array => [
                         'id' => $variation->id,

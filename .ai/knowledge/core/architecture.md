@@ -221,6 +221,27 @@ If something is not defined, state the limitation instead of inventing details.
 
 ---
 
+## 10. Multi-Site Reuse
+
+The same Laravel/Inertia codebase can be deployed for multiple branded sites.
+
+Current site keys:
+
+* `loomcraft` for `loomcraft.work`
+* `naturesnature` for `naturesnature.com`
+
+Site selection is controlled by `APP_SITE` and `config/sites.php`. Do not read `env('APP_SITE')` directly in application code; use the shared site config/context exposed through `App\Support\Site` and Inertia `page.props.site`.
+
+The backend commerce, checkout, order, vendor, auth, admin, and fulfillment functionality remains shared. Site differences should be handled through:
+
+* site config metadata
+* Inertia shared props
+* CSS/theme variables
+* targeted frontend presentation branches for pages that truly need different layout
+* route/content hiding for site-specific surfaces such as the Loom Craft weave demo
+
+---
+
 ## 10. Expected Output Format
 
 When responding, you should provide:

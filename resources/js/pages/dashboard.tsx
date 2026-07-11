@@ -67,7 +67,7 @@ type OrderHistory = {
 };
 
 export default function Dashboard() {
-    const { status, auth, order_histories } = usePage<SharedData & Props>().props;
+    const { status, auth, order_histories, site } = usePage<SharedData & Props>().props;
     const isAdmin = auth?.user?.role === 'admin';
     const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
     const selectedOrder = useMemo(() => order_histories.find((order) => order.id === selectedOrderId) ?? null, [order_histories, selectedOrderId]);
@@ -88,7 +88,7 @@ export default function Dashboard() {
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-col gap-2">
                             <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Order Library</p>
-                            <h2 className="text-2xl font-semibold text-foreground">View your orders and history</h2>
+                                <h2 className="text-2xl font-semibold text-foreground">View your orders and history</h2>
                             <p className="text-sm text-muted-foreground">Click any order card to see full details in a popup.</p>
                         </div>
                         <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
@@ -102,7 +102,7 @@ export default function Dashboard() {
                                 href={auth?.vendor ? vendorProfileEdit() : vendorRegister()}
                                 className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold tracking-[0.3em] text-foreground uppercase transition hover:bg-foreground hover:text-background"
                             >
-                                {auth?.vendor ? 'Vendor Profile' : 'Become Vendor'}
+                                {auth?.vendor ? `${site.vendorLabel} Profile` : `Become ${site.vendorLabel}`}
                             </Link>
                         </div>
                     </div>
@@ -111,7 +111,7 @@ export default function Dashboard() {
                 <div className="grid gap-4 lg:grid-cols-2">
                     {order_histories.length === 0 ? (
                         <div className="rounded-xl border border-dashed border-sidebar-border/80 p-10 text-center text-sm text-muted-foreground lg:col-span-2 dark:border-sidebar-border">
-                            No orders yet. Place your first LoomCraft order to build history.
+                            No orders yet. Place your first {site.displayName} order to build history.
                         </div>
                     ) : (
                         order_histories.map((order) => (
@@ -140,14 +140,16 @@ export default function Dashboard() {
                         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                             <div>
                                 <p className="text-xs tracking-[0.3em] text-muted-foreground uppercase">Admin Review</p>
-                                <h2 className="text-2xl font-semibold text-foreground">Pending vendor approvals</h2>
-                                <p className="text-sm text-muted-foreground">Review and approve artisan applications.</p>
+                                <h2 className="text-2xl font-semibold text-foreground">Pending {site.vendorLabel.toLowerCase()} approvals</h2>
+                                <p className="text-sm text-muted-foreground">
+                                    Review and approve {site.key === 'naturesnature' ? 'maker applications' : 'artisan applications'}.
+                                </p>
                             </div>
                             <Link
                                 href={adminVendorPending()}
                                 className="inline-flex items-center justify-center rounded-full border border-foreground/70 px-4 py-2 text-xs font-semibold tracking-[0.3em] text-foreground uppercase transition hover:bg-foreground hover:text-background"
                             >
-                                Review Vendors
+                                Review {site.vendorPluralLabel}
                             </Link>
                         </div>
                     </div>

@@ -8,11 +8,7 @@ import { useAppearance } from '@/hooks/use-appearance';
 import { dashboard, home } from '@/routes';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
-export function AppSidebarHeader({
-    breadcrumbs = [],
-}: {
-    breadcrumbs?: BreadcrumbItemType[];
-}) {
+export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     const { resolvedAppearance, updateAppearance } = useAppearance();
     const isDark = resolvedAppearance === 'dark';
 
@@ -26,7 +22,7 @@ export function AppSidebarHeader({
                     aria-label="Main site"
                     title="Main site"
                 >
-                    <AppLogoIcon className="h-8 w-auto object-contain" />
+                    <AppLogoIcon natureVariant="seal" className="h-8 w-auto object-contain" />
                 </Link>
                 <Link
                     href={dashboard()}

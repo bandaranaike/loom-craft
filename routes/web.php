@@ -38,6 +38,7 @@ use App\Http\Controllers\Vendor\VendorRegistrationController;
 use App\Http\Controllers\VendorPublicController;
 use App\Models\Product;
 use App\Models\Vendor;
+use App\Support\Site;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -101,12 +102,15 @@ Route::get('sitemap.xml', function () {
             'lastmod' => $today,
             'images' => [],
         ],
-        [
+    ];
+
+    if (! Site::hidesLoomFeatures()) {
+        $pages[] = [
             'loc' => route('loom-weave-demo'),
             'lastmod' => $today,
             'images' => [],
-        ],
-    ];
+        ];
+    }
 
     $productEntries = Product::query()
         ->where('status', 'active')

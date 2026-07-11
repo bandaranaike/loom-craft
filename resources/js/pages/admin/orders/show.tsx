@@ -253,7 +253,7 @@ export default function AdminOrderShow() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Admin Order ${order.order_number ?? `#${order.id}`}`} />
-            <div className="flex h-full min-w-0 flex-1 flex-col gap-6 overflow-x-hidden rounded-[24px] bg-(--welcome-on-strong) p-5 text-(--welcome-strong)">
+            <div className="flex h-full min-w-0 flex-1 flex-col gap-6 overflow-x-hidden rounded-3xl bg-(--welcome-on-strong) p-5 text-(--welcome-strong)">
                 <div className="rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-1) p-7 shadow-[0_20px_50px_-36px_var(--welcome-shadow-strong)]">
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="min-w-0 space-y-2">
@@ -300,7 +300,7 @@ export default function AdminOrderShow() {
 
                         <div className="grid gap-4 md:grid-cols-2">
                             {shipping && (
-                                <div className="rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                <div className="rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
                                     <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Shipping address</p>
                                     <p className="mt-3 text-sm font-semibold">{shipping.full_name}</p>
                                     <p className="text-sm text-(--welcome-body-text)">
@@ -315,7 +315,7 @@ export default function AdminOrderShow() {
                                 </div>
                             )}
                             {billing && (
-                                <div className="rounded-[24px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                <div className="rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
                                     <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Billing address</p>
                                     <p className="mt-3 text-sm font-semibold">{billing.full_name}</p>
                                     <p className="text-sm text-(--welcome-body-text)">

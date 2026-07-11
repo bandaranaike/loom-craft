@@ -9,11 +9,11 @@ Last updated: 2026-07-09
 - [fulfillment/shipping-label-pdf-generation-and-print-pipeline](/var/www/loom-craft/.ai/tasks/planned/fulfillment/shipping-label-pdf-generation-and-print-pipeline.md)
 - [mobile/fulfillment-mobile-api-support](/var/www/loom-craft/.ai/tasks/planned/mobile/fulfillment-mobile-api-support.md)
 - [mobile/fulfillment-mobile-app-implementation-brief](/var/www/loom-craft/.ai/tasks/planned/mobile/fulfillment-mobile-app-implementation-brief.md)
-- [ui/naturesnature-multi-site-theme-and-deployment](/var/www/loom-craft/.ai/tasks/planned/ui/naturesnature-multi-site-theme-and-deployment.md)
 
 ## In Progress
 
 - [fulfillment/end-to-end-order-fulfillment-platform](/var/www/loom-craft/.ai/tasks/in-progress/fulfillment/end-to-end-order-fulfillment-platform.md)
+- [ui/naturesnature-multi-site-theme-and-deployment](/var/www/loom-craft/.ai/tasks/in-progress/ui/naturesnature-multi-site-theme-and-deployment.md)
 
 ## Completed
 

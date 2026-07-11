@@ -14,6 +14,7 @@ import { show as cartShow } from '@/routes/cart';
 import { store as cartItemStore } from '@/routes/cart/items';
 import { store as productReviewStore } from '@/routes/products/reviews';
 import { show as vendorShow } from '@/routes/vendors';
+import type { SharedData } from '@/types';
 
 type ProductImage = {
     id: number;
@@ -147,7 +148,7 @@ export default function ProductShow({
     review_form,
     reviewStatus = null,
 }: ProductShowProps) {
-    const { errors } = usePage<{ errors: Record<string, string> }>().props;
+    const { errors, site } = usePage<SharedData & { errors: Record<string, string> }>().props;
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [isInquiryOpen, setIsInquiryOpen] = useState(false);
     const [isThumbnailDocked, setIsThumbnailDocked] = useState(false);
@@ -320,6 +321,23 @@ export default function ProductShow({
         }
     };
 
+    if (site.key === 'naturesnature') {
+        return (
+            <NaturesNatureProductShow
+                product={product}
+                canRegister={canRegister}
+                cartCurrency={cartCurrency}
+                review_summary={review_summary}
+                reviews={reviews}
+                review_form={review_form}
+                reviewStatus={reviewStatus}
+                status={status}
+                productionEstimateConfig={productionEstimateConfig}
+                selectedImage={selectedImage}
+            />
+        );
+    }
+
     const renderThumbnails = (className = ''): JSX.Element => {
         return (
             <div className={`flex flex-wrap items-center gap-3 ${className}`.trim()}>
@@ -346,7 +364,7 @@ export default function ProductShow({
     return (
         <>
             <SeoHead
-                title={`${product.name} — LoomCraft`}
+                title={`${product.name} — ${site.displayName}`}
                 description={product.description}
                 canonical={`/product/${product.slug}`}
                 image={selectedImage?.url ?? product.images[0]?.url ?? null}
@@ -423,7 +441,7 @@ export default function ProductShow({
                             )}
                         </div>
                         <div className="flex flex-wrap items-center gap-4 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
-                            <span>Approved LoomCraft Release</span>
+                            <span>{site.key === 'naturesnature' ? 'Approved Homemade Release' : 'Approved LoomCraft Release'}</span>
                             <span>
                                 Curated by {product.vendor.slug ? <Link href={vendorShow(product.vendor.slug)}>{product.vendor.display_name}</Link> : product.vendor.display_name}
                             </span>
@@ -431,7 +449,7 @@ export default function ProductShow({
                     </div>
                     <div className="space-y-6">
                         <div className="inline-flex items-center gap-3 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-2 text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                            Heritage Product
+                            {site.key === 'naturesnature' ? 'Homemade Product' : 'Heritage Product'}
                         </div>
                         <div>
                             <p className="mb-3 text-xs tracking-[0.35em] text-(--welcome-muted-text) uppercase">Product code: {product.product_code}</p>
@@ -446,7 +464,7 @@ export default function ProductShow({
                                     {review_summary.total_reviews > 0 && review_summary.average_rating ? `${review_summary.average_rating} / 5` : 'Not yet rated'}
                                 </span>
                                 <span className="text-(--welcome-muted-text)">
-                                    {review_summary.total_reviews === 1 ? '1 collector review' : `${review_summary.total_reviews} collector reviews`}
+                                    {review_summary.total_reviews === 1 ? `1 ${site.reviewerLabel.toLowerCase()} review` : `${review_summary.total_reviews} ${site.reviewerLabel.toLowerCase()} reviews`}
                                 </span>
                             </div>
                             {product.categories.length > 0 && (
@@ -480,13 +498,21 @@ export default function ProductShow({
                                     {formatMoney(selectedVariation?.original_price ?? product.original_price, DEFAULT_CURRENCY)}
                                 </p>
                             )}
-                            <p className="mt-2 text-sm text-(--welcome-body-text)">Crafted by verified artisans and prepared for collector-grade delivery.</p>
+                            <p className="mt-2 text-sm text-(--welcome-body-text)">
+                                {site.key === 'naturesnature'
+                                    ? 'Prepared by approved makers and packed for fresh, gift-ready delivery.'
+                                    : 'Crafted by verified artisans and prepared for collector-grade delivery.'}
+                            </p>
                         </div>
                         <form onSubmit={submit} className="grid gap-4 rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-6">
                             <div className="flex flex-wrap items-center justify-between gap-4">
                                 <div>
-                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Reserve this piece</p>
-                                    <p className="mt-1 text-sm text-(--welcome-body-text)">Choose a size and quantity to add to your cart.</p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                        {site.key === 'naturesnature' ? 'Add this treat' : 'Reserve this piece'}
+                                    </p>
+                                    <p className="mt-1 text-sm text-(--welcome-body-text)">
+                                        {site.key === 'naturesnature' ? 'Choose an option and quantity to add to your cart.' : 'Choose a size and quantity to add to your cart.'}
+                                    </p>
                                 </div>
                                 <Link href={cartShow()} className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase underline">
                                     View cart
@@ -494,7 +520,9 @@ export default function ProductShow({
                             </div>
                             {product.variations.length > 0 && (
                                 <div className="grid gap-2">
-                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Size</p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                        {site.key === 'naturesnature' ? 'Option' : 'Size'}
+                                    </p>
                                     <div className="flex flex-wrap gap-2">
                                         {product.variations.map((variation) => {
                                             const isSelected = variation.id === selectedVariation?.id;
@@ -543,15 +571,15 @@ export default function ProductShow({
                         <p className="text-base text-(--welcome-body-text)">{product.description}</p>
                         <div className="grid gap-4 rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-6">
                             <div className="flex items-center justify-between gap-4 text-sm">
-                                <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">Materials</span>
-                                <span className="text-(--welcome-strong)">{product.materials ?? 'Documented on request'}</span>
+                                <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">{site.key === 'naturesnature' ? 'Ingredients' : 'Materials'}</span>
+                                <span className="text-(--welcome-strong)">{product.materials ?? (site.key === 'naturesnature' ? 'Listed on request' : 'Documented on request')}</span>
                             </div>
                             <div className="flex items-center justify-between gap-4 text-sm">
                                 <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">Available now</span>
                                 <span className="text-(--welcome-strong)">{product.pieces_count ?? 'Made to order'}</span>
                             </div>
                             <div className="flex items-center justify-between gap-4 text-sm">
-                                <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">Production</span>
+                                <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">{site.key === 'naturesnature' ? 'Preparation' : 'Production'}</span>
                                 <span className="text-(--welcome-strong)">{product.production_time_days ? `${product.production_time_days} days` : 'Timeline on request'}</span>
                             </div>
                             <div className="flex items-center justify-between gap-4 text-sm">
@@ -574,7 +602,7 @@ export default function ProductShow({
                                     rel="noreferrer"
                                     className="rounded-full border border-(--welcome-strong) px-6 py-3 text-sm font-semibold tracking-[0.2em] text-(--welcome-strong) uppercase transition hover:-translate-y-0.5 hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
                                 >
-                                    Watch Studio Video
+                                    {site.key === 'naturesnature' ? 'Watch Kitchen Video' : 'Watch Studio Video'}
                                 </a>
                             )}
                         </div>
@@ -584,7 +612,7 @@ export default function ProductShow({
                 <section className="mx-auto grid w-full max-w-6xl gap-8 px-6 pb-16 lg:grid-cols-[0.78fr_1.22fr]">
                     <div className="space-y-6">
                         <div className="rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-8">
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Collector sentiment</p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{site.reviewerLabel} sentiment</p>
                             <div className="mt-4 flex items-end gap-4">
                                 <span className="font-['Playfair_Display',serif] text-5xl text-(--welcome-strong)">{review_summary.average_rating ?? '—'}</span>
                                 <div className="pb-2">
@@ -745,24 +773,568 @@ export default function ProductShow({
                 <section className="mx-auto w-full max-w-6xl px-6 pb-20">
                     <div className="grid gap-8 rounded-[48px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-10 md:grid-cols-3">
                         <div className="space-y-3 border-b border-(--welcome-border-soft) pb-6 last:border-b-0 last:pb-0 md:border-r md:border-b-0 md:pr-8 md:pb-0 md:last:border-r-0 md:last:pr-0">
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Provenance</p>
-                            <h2 className="font-['Playfair_Display',serif] text-2xl">Artisan Verified</h2>
-                            <p className="text-sm text-(--welcome-body-text)">Every LoomCraft piece is reviewed for authenticity and cultural lineage before it reaches patrons.</p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{site.key === 'naturesnature' ? 'Kitchen Standard' : 'Provenance'}</p>
+                            <h2 className="font-['Playfair_Display',serif] text-2xl">{site.key === 'naturesnature' ? 'Maker Approved' : 'Artisan Verified'}</h2>
+                            <p className="text-sm text-(--welcome-body-text)">
+                                {site.key === 'naturesnature'
+                                    ? 'Every product is presented through approved makers before it reaches customers.'
+                                    : 'Every LoomCraft piece is reviewed for authenticity and cultural lineage before it reaches patrons.'}
+                            </p>
                         </div>
                         <div className="space-y-3 border-b border-(--welcome-border-soft) pb-6 last:border-b-0 last:pb-0 md:border-r md:border-b-0 md:pr-8 md:pb-0 md:last:border-r-0 md:last:pr-0">
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Care Notes</p>
-                            <h2 className="font-['Playfair_Display',serif] text-2xl">Keeper&apos;s Guide</h2>
-                            <p className="text-sm text-(--welcome-body-text)">Request the artisan&apos;s care ritual to preserve texture, luminosity, and weave tension.</p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                {site.key === 'naturesnature' ? 'Storage Notes' : 'Care Notes'}
+                            </p>
+                            <h2 className="font-['Playfair_Display',serif] text-2xl">{site.key === 'naturesnature' ? 'Freshness Guide' : "Keeper's Guide"}</h2>
+                            <p className="text-sm text-(--welcome-body-text)">
+                                {site.key === 'naturesnature'
+                                    ? 'Check maker notes for storage, serving, and freshness guidance.'
+                                    : 'Request the artisan&apos;s care ritual to preserve texture, luminosity, and weave tension.'}
+                            </p>
                         </div>
                         <div className="space-y-3">
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Atelier Standard</p>
-                            <h2 className="font-['Playfair_Display',serif] text-2xl">Curated Excellence</h2>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                {site.key === 'naturesnature' ? 'Market Standard' : 'Atelier Standard'}
+                            </p>
+                            <h2 className="font-['Playfair_Display',serif] text-2xl">{site.key === 'naturesnature' ? 'Curated Flavor' : 'Curated Excellence'}</h2>
                             <p className="text-sm text-(--welcome-body-text)">
                                 Each listing is reviewed for motif quality, finishing precision, and presentation readiness before release.
                             </p>
                         </div>
                     </div>
                 </section>
+            </PublicSiteLayout>
+        </>
+    );
+}
+
+function NaturesNatureProductShow({
+    product,
+    cartCurrency,
+    productionEstimateConfig,
+    canRegister = true,
+    status = null,
+    review_summary,
+    reviews,
+    review_form,
+    reviewStatus = null,
+    selectedImage,
+}: ProductShowProps & {
+    selectedImage: ProductImage | null;
+}) {
+    const { errors, site } = usePage<SharedData & { errors: Record<string, string> }>().props;
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [isInquiryOpen, setIsInquiryOpen] = useState(false);
+    const galleryFrameRef = useRef<HTMLDivElement | null>(null);
+    const touchStartXRef = useRef<number | null>(null);
+    const form = useForm({
+        product_id: product.id,
+        product_variation_id: product.variations[0]?.id ?? null,
+        quantity: 1,
+        currency: cartCurrency,
+    });
+    const selectedVariation = useMemo(
+        () => product.variations.find((variation) => variation.id === form.data.product_variation_id) ?? product.variations[0] ?? null,
+        [form.data.product_variation_id, product.variations],
+    );
+    const dimensionLabel = formatDimensions(selectedVariation?.dimensions ?? product.dimensions);
+    const reviewFormState = useForm({
+        rating: 5,
+        review: '',
+    });
+    const hasInquiryErrors = ['name', 'email', 'phone', 'subject', 'message'].some((field) => Boolean(errors[field]));
+    const stockAvailability = useMemo(
+        () => resolveProductStockAvailability(form.data.quantity, product.pieces_count, product.production_time_days, productionEstimateConfig),
+        [form.data.quantity, product.pieces_count, product.production_time_days, productionEstimateConfig],
+    );
+    const hasMultipleImages = product.images.length > 1;
+    const currentImage = product.images[activeImageIndex] ?? selectedImage ?? product.images[0] ?? null;
+    const isInquiryDialogOpen = status ? false : hasInquiryErrors ? true : isInquiryOpen;
+
+    const submit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        form.post(cartItemStore().url, {
+            preserveScroll: true,
+        });
+    };
+
+    const submitReview = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        reviewFormState.post(productReviewStore(product.slug).url, {
+            preserveScroll: true,
+            onSuccess: () => {
+                reviewFormState.reset('review');
+                reviewFormState.setData('rating', 5);
+            },
+        });
+    };
+
+    const selectImageAt = (index: number): void => {
+        if (product.images.length === 0) {
+            return;
+        }
+
+        setActiveImageIndex((index + product.images.length) % product.images.length);
+    };
+
+    const goToPreviousImage = (): void => {
+        selectImageAt(activeImageIndex - 1);
+    };
+
+    const goToNextImage = (): void => {
+        selectImageAt(activeImageIndex + 1);
+    };
+
+    const handleImageTouchStart = (event: TouchEvent<HTMLDivElement>): void => {
+        touchStartXRef.current = event.touches[0]?.clientX ?? null;
+    };
+
+    const handleImageTouchEnd = (event: TouchEvent<HTMLDivElement>): void => {
+        const touchStartX = touchStartXRef.current;
+        const touchEndX = event.changedTouches[0]?.clientX ?? null;
+
+        touchStartXRef.current = null;
+
+        if (touchStartX === null || touchEndX === null) {
+            return;
+        }
+
+        const deltaX = touchEndX - touchStartX;
+
+        if (Math.abs(deltaX) < 40) {
+            return;
+        }
+
+        if (deltaX > 0) {
+            goToPreviousImage();
+        } else {
+            goToNextImage();
+        }
+    };
+
+    const renderStars = (rating: number): JSX.Element[] => {
+        return renderRatingStars(rating, 'text-amber-600', 'text-(--welcome-border)');
+    };
+
+    return (
+        <>
+            <SeoHead
+                title={`${product.name} — ${site.displayName}`}
+                description={product.description}
+                canonical={`/product/${product.slug}`}
+                image={currentImage?.url ?? product.images[0]?.url ?? null}
+                schema={{
+                    '@context': 'https://schema.org',
+                    '@type': 'Product',
+                    name: product.name,
+                    description: product.description,
+                    image: product.images.map((image) => image.url),
+                    brand: {
+                        '@type': 'Organization',
+                        name: product.vendor.display_name,
+                    },
+                    offers: {
+                        '@type': 'Offer',
+                        price: product.selling_price,
+                        priceCurrency: 'LKR',
+                        availability: 'https://schema.org/InStock',
+                        url: `/product/${product.slug}`,
+                    },
+                }}
+            >
+                <link rel="preconnect" href="https://fonts.bunny.net" />
+                <link
+                    href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
+                    rel="stylesheet"
+                />
+            </SeoHead>
+            <PublicSiteLayout canRegister={canRegister}>
+                <section className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-6 pb-12">
+                    <div className="overflow-hidden rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) shadow-[0_32px_90px_-48px_var(--welcome-shadow-heavy)]">
+                        <div className="grid gap-0 lg:grid-cols-[1.08fr_0.92fr]">
+                            <div className="border-b border-(--welcome-border-soft) bg-(--welcome-surface-2) p-5 lg:border-b-0 lg:border-r">
+                                <div
+                                    ref={galleryFrameRef}
+                                    className="group relative overflow-hidden rounded-[32px]"
+                                    onTouchStart={handleImageTouchStart}
+                                    onTouchEnd={handleImageTouchEnd}
+                                >
+                                    {currentImage ? (
+                                        <img
+                                            src={currentImage.url}
+                                            alt={currentImage.alt_text ?? product.name}
+                                            className="h-[28rem] w-full object-cover md:h-[36rem]"
+                                        />
+                                    ) : (
+                                        <div className="flex h-[28rem] items-center justify-center bg-(--welcome-surface-3) text-sm tracking-[0.3em] text-(--welcome-muted-text) uppercase md:h-[36rem]">
+                                            Image forthcoming
+                                        </div>
+                                    )}
+
+                                    {hasMultipleImages && (
+                                        <>
+                                            <button
+                                                type="button"
+                                                onClick={goToPreviousImage}
+                                                className="absolute top-1/2 left-4 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-lg font-semibold text-white backdrop-blur-sm transition hover:bg-black/50 md:inline-flex"
+                                                aria-label="Show previous image"
+                                            >
+                                                ‹
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={goToNextImage}
+                                                className="absolute top-1/2 right-4 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-lg font-semibold text-white backdrop-blur-sm transition hover:bg-black/50 md:inline-flex"
+                                                aria-label="Show next image"
+                                            >
+                                                ›
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                                {hasMultipleImages && (
+                                    <div className="mt-4 flex flex-wrap gap-3">
+                                        {product.images.map((image, index) => {
+                                            const isSelected = index === activeImageIndex;
+
+                                            return (
+                                                <button
+                                                    key={image.id}
+                                                    type="button"
+                                                    onClick={() => setActiveImageIndex(index)}
+                                                    className={`h-16 w-16 overflow-hidden rounded-2xl border transition ${
+                                                        isSelected
+                                                            ? 'border-(--welcome-strong) ring-2 ring-(--welcome-strong-20)'
+                                                            : 'border-(--welcome-border-soft) opacity-75 hover:opacity-100'
+                                                    }`}
+                                                    aria-label={`Show image of ${product.name}`}
+                                                    aria-pressed={isSelected}
+                                                >
+                                                    <img
+                                                        src={image.url}
+                                                        alt={image.alt_text ?? product.name}
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="space-y-6 p-6 md:p-8">
+                                <div className="space-y-3">
+                                    <div className="inline-flex items-center gap-2 rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">
+                                        Homemade foods
+                                    </div>
+                                    <p className="text-xs tracking-[0.28em] text-(--welcome-muted-text) uppercase">
+                                        Product code: {product.product_code}
+                                    </p>
+                                    <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight text-(--welcome-strong) md:text-5xl">
+                                        {product.name}
+                                    </h1>
+                                    <p className="text-sm leading-7 text-(--welcome-body-text) md:text-base">
+                                        {product.description}
+                                    </p>
+                                </div>
+
+                                <div className="grid gap-3 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5 sm:grid-cols-3">
+                                    <div>
+                                        <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Maker</p>
+                                        <p className="mt-2 text-sm font-semibold text-(--welcome-strong)">
+                                            {product.vendor.slug ? <Link href={vendorShow(product.vendor.slug)}>{product.vendor.display_name}</Link> : product.vendor.display_name}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Price</p>
+                                        <p className="mt-2 text-sm font-semibold text-(--welcome-strong)">
+                                            {formatMoney(selectedVariation?.selling_price ?? product.selling_price, DEFAULT_CURRENCY)}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Reviews</p>
+                                        <p className="mt-2 text-sm font-semibold text-(--welcome-strong)">
+                                            {review_summary.total_reviews > 0 && review_summary.average_rating
+                                                ? `${review_summary.average_rating} / 5`
+                                                : 'Not yet rated'}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {product.categories.length > 0 && (
+                                    <div className="flex flex-wrap gap-2">
+                                        {product.categories.map((category) => (
+                                            <span
+                                                key={category.id}
+                                                className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-3 py-1 text-[10px] tracking-[0.2em] text-(--welcome-muted-text) uppercase"
+                                            >
+                                                {category.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+
+                                <form onSubmit={submit} className="grid gap-4 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-5">
+                                    {product.variations.length > 0 && (
+                                        <div className="grid gap-2">
+                                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                {product.variations.length === 1 ? 'Option' : 'Choose option'}
+                                            </p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {product.variations.map((variation) => {
+                                                    const isSelected = variation.id === selectedVariation?.id;
+
+                                                    return (
+                                                        <button
+                                                            key={variation.id}
+                                                            type="button"
+                                                            onClick={() => form.setData('product_variation_id', variation.id)}
+                                                            className={`rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.2em] uppercase transition ${
+                                                                isSelected
+                                                                    ? 'border-(--welcome-strong) bg-(--welcome-strong) text-(--welcome-on-strong)'
+                                                                    : 'border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-strong) hover:border-(--welcome-strong)'
+                                                            }`}
+                                                        >
+                                                            {variation.label}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                            <InputError message={form.errors.product_variation_id} />
+                                        </div>
+                                    )}
+
+                                    <div className="flex flex-wrap items-center gap-4">
+                                        <label className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Quantity</label>
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            name="quantity"
+                                            value={form.data.quantity}
+                                            onChange={(event) => form.setData('quantity', Number(event.target.value))}
+                                            className="w-24 rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={form.processing}
+                                            className="inline-flex items-center justify-center rounded-full bg-(--welcome-strong) px-5 py-2 text-xs font-semibold tracking-[0.28em] text-(--welcome-on-strong) uppercase transition hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
+                                        >
+                                            {form.processing ? 'Adding...' : 'Add to cart'}
+                                        </button>
+                                        <Link href={cartShow()} className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase underline">
+                                            View cart
+                                        </Link>
+                                    </div>
+
+                                    <DismissibleStockDelayAlert pageKey={`product-${product.id}`} message={stockAvailability.stockDelayMessage} />
+                                    <InputError message={form.errors.quantity} />
+                                    <InputError message={form.errors.product_id} />
+                                </form>
+
+                                <div className="grid gap-3 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5 sm:grid-cols-3">
+                                    <div>
+                                        <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Ingredients</p>
+                                        <p className="mt-2 text-sm text-(--welcome-strong)">{product.materials ?? 'Listed on request'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Pieces</p>
+                                        <p className="mt-2 text-sm text-(--welcome-strong)">{product.pieces_count ?? 'Made to order'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Preparation</p>
+                                        <p className="mt-2 text-sm text-(--welcome-strong)">{product.production_time_days ? `${product.production_time_days} days` : 'Timeline on request'}</p>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                        <div>
+                                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{site.reviewerLabel} sentiment</p>
+                                            <h2 className="mt-2 font-['Playfair_Display',serif] text-2xl">Fresh feedback from fulfilled orders</h2>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-base">
+                                            {renderStars(Math.round(Number(review_summary.average_rating ?? 0)))}
+                                        </div>
+                                    </div>
+                                    <p className="mt-3 text-sm text-(--welcome-body-text)">
+                                        {review_summary.total_reviews === 0
+                                            ? 'Be the first verified buyer to review this listing.'
+                                            : review_summary.total_reviews === 1
+                                              ? 'Based on 1 verified review'
+                                              : `Based on ${review_summary.total_reviews} verified reviews`}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="mx-auto w-full max-w-6xl px-6 pb-12">
+                    <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr]">
+                        <div className="space-y-6">
+                            <div className="rounded-[32px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-6">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Product details</p>
+                                <div className="mt-4 grid gap-3 text-sm text-(--welcome-body-text)">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <span className="tracking-[0.24em] text-(--welcome-muted-text) uppercase">Maker</span>
+                                        <span className="text-right text-(--welcome-strong)">{product.vendor.display_name}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between gap-4">
+                                        <span className="tracking-[0.24em] text-(--welcome-muted-text) uppercase">Dimensions</span>
+                                        <span className="text-right text-(--welcome-strong)">{dimensionLabel ?? 'Dimensions on request'}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between gap-4">
+                                        <span className="tracking-[0.24em] text-(--welcome-muted-text) uppercase">Availability</span>
+                                        <span className="text-right text-(--welcome-strong)">{stockAvailability.quantityLabel}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="rounded-[32px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Made for gifting</p>
+                                <p className="mt-3 text-sm leading-7 text-(--welcome-body-text)">
+                                    Packed for pantry shelves, gift boxes, and quick ordering. This view is deliberately simpler than LoomCraft and keeps the focus on the food itself.
+                                </p>
+                                {product.video_url && (
+                                    <a
+                                        href={product.video_url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="mt-5 inline-flex rounded-full border border-(--welcome-strong) px-5 py-2 text-xs font-semibold tracking-[0.24em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong)"
+                                    >
+                                        Watch Kitchen Video
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="rounded-[32px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-6">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Customer reviews</p>
+                                        <h2 className="mt-2 font-['Playfair_Display',serif] text-3xl">What buyers are saying</h2>
+                                    </div>
+                                    <div className="rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">
+                                        Verified purchasers only
+                                    </div>
+                                </div>
+
+                                {reviewStatus && (
+                                    <div className="mt-5 rounded-3xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) px-4 py-3 text-sm text-(--welcome-body-text)">
+                                        {reviewStatus}
+                                    </div>
+                                )}
+
+                                {review_form.can_submit ? (
+                                    <form onSubmit={submitReview} className="mt-6 grid gap-5">
+                                        <div>
+                                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Your rating</p>
+                                            <div className="mt-3 flex flex-wrap gap-2">
+                                                {Array.from({ length: 5 }, (_, index) => {
+                                                    const rating = index + 1;
+                                                    const isSelected = reviewFormState.data.rating >= rating;
+
+                                                    return (
+                                                        <button
+                                                            key={rating}
+                                                            type="button"
+                                                            onClick={() => reviewFormState.setData('rating', rating)}
+                                                            className={`inline-flex h-11 w-11 items-center justify-center rounded-full border text-lg transition ${
+                                                                isSelected
+                                                                    ? 'border-amber-600 bg-amber-600/12 text-amber-600'
+                                                                    : 'border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-muted-text) hover:border-amber-600 hover:text-amber-600'
+                                                            }`}
+                                                            aria-label={`Rate ${rating} star${rating === 1 ? '' : 's'}`}
+                                                            aria-pressed={reviewFormState.data.rating === rating}
+                                                        >
+                                                            ★
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                            <InputError message={reviewFormState.errors.rating} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="review" className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                Your review
+                                            </label>
+                                            <textarea
+                                                id="review"
+                                                name="review"
+                                                rows={5}
+                                                value={reviewFormState.data.review}
+                                                onChange={(event) => reviewFormState.setData('review', event.target.value)}
+                                                className="mt-3 w-full rounded-[28px] border border-(--welcome-border) bg-(--welcome-surface-3) px-5 py-4 text-sm text-(--welcome-strong) shadow-xs focus:border-(--welcome-strong) focus:ring-2 focus:ring-(--welcome-strong-20) focus:outline-none"
+                                                placeholder="Share what the taste, texture, freshness, or packing was like."
+                                            />
+                                            <InputError message={reviewFormState.errors.review} className="mt-2" />
+                                        </div>
+                                        <div className="flex flex-wrap items-center justify-between gap-4">
+                                            <p className="text-sm text-(--welcome-body-text)">Your review appears publicly on this product page once submitted.</p>
+                                            <button
+                                                type="submit"
+                                                disabled={reviewFormState.processing}
+                                                className="inline-flex items-center justify-center rounded-full bg-(--welcome-strong) px-6 py-3 text-xs font-semibold tracking-[0.28em] text-(--welcome-on-strong) uppercase transition hover:bg-(--welcome-strong-hover) disabled:cursor-not-allowed disabled:opacity-70"
+                                            >
+                                                {reviewFormState.processing ? 'Publishing...' : 'Publish review'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <div className="mt-6 rounded-[32px] border border-dashed border-(--welcome-border) bg-(--welcome-surface-3) p-6 text-sm leading-6 text-(--welcome-body-text)">
+                                        {review_form.message ?? 'Reviews become available after fulfillment is complete.'}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="rounded-[32px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-6">
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Recent feedback</p>
+                                {reviews.length === 0 ? (
+                                    <div className="mt-4 rounded-[24px] bg-(--welcome-surface-3) p-5 text-sm leading-7 text-(--welcome-body-text)">
+                                        No reviews have been published yet. The first fulfilled buyer will set the tone for this listing.
+                                    </div>
+                                ) : (
+                                    <div className="mt-4 grid gap-4">
+                                        {reviews.map((review) => (
+                                            <article key={review.id} className="rounded-[24px] bg-(--welcome-surface-3) p-5">
+                                                <div className="flex flex-wrap items-center justify-between gap-4">
+                                                    <div>
+                                                        <p className="text-sm font-semibold text-(--welcome-strong)">{review.reviewer_name}</p>
+                                                        <p className="mt-1 text-xs tracking-[0.24em] text-(--welcome-muted-text) uppercase">
+                                                            {review.created_at_human ?? 'Verified purchase'}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex items-center gap-1 text-base">
+                                                        {renderStars(review.rating)}
+                                                    </div>
+                                                </div>
+                                                <p className="mt-4 text-sm leading-7 text-(--welcome-body-text)">{review.review}</p>
+                                            </article>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <Dialog open={isInquiryDialogOpen} onOpenChange={setIsInquiryOpen}>
+                    <DialogContent className="max-h-[92vh] overflow-y-auto border-(--welcome-border-soft) bg-(--welcome-surface-1) p-0 sm:max-w-2xl">
+                        <DialogHeader className="sr-only">
+                            <DialogTitle>Contact Maker</DialogTitle>
+                            <DialogDescription>Send an inquiry directly to this maker about the selected product.</DialogDescription>
+                        </DialogHeader>
+                        <div className="p-8">
+                            <VendorInquiryForm
+                                vendorSlug={product.vendor.slug ?? ''}
+                                contactEmail={product.vendor.contact_email}
+                                contactPhone={product.vendor.contact_phone}
+                                whatsappNumber={product.vendor.whatsapp_number}
+                                status={status}
+                            />
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </PublicSiteLayout>
         </>
     );

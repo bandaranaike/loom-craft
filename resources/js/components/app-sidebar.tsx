@@ -43,7 +43,7 @@ import type { NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, site } = usePage<SharedData>().props;
     const isAdmin = auth?.user?.role === 'admin';
     const isVendor = auth?.user?.role === 'vendor';
 
@@ -75,7 +75,7 @@ export function AppSidebar() {
                       icon: Mailbox,
                   },
                   {
-                      title: 'Vendor Approvals',
+                      title: `${site.vendorLabel} Approvals`,
                       href: adminVendorsPending(),
                       icon: ShieldCheck,
                   },
@@ -99,11 +99,15 @@ export function AppSidebar() {
                       href: adminShippingCarriersIndex(),
                       icon: Truck,
                   },
-                  {
-                      title: 'YouTube Connect',
-                      href: adminYouTubeConnect(),
-                      icon: Video,
-                  },
+                  ...(site.hideLoomFeatures
+                      ? []
+                      : [
+                            {
+                                title: 'YouTube Connect',
+                                href: adminYouTubeConnect(),
+                                icon: Video,
+                            },
+                        ]),
                   {
                       title: 'Feedback Approvals',
                       href: adminFeedbackPending(),
@@ -124,7 +128,7 @@ export function AppSidebar() {
                       icon: Package,
                   },
                   {
-                      title: 'Vendor Feedback',
+                      title: `${site.vendorLabel} Feedback`,
                       href: vendorFeedbackCreate(),
                       icon: MessageSquareQuote,
                   },

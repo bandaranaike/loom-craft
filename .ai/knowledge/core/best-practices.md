@@ -128,6 +128,9 @@ For larger domains such as fulfillment, shipping, returns, and complaints:
   - Vendor dashboard
   - Admin panel
 - Use named routes and `route()` helpers for links
+- Use `page.props.site` for brand/site metadata in React pages and layouts.
+- Keep multi-site differences in config, theme variables, and targeted presentation branches. Do not fork shared backend workflows for each domain.
+- Hide site-specific public surfaces through site config when needed, such as Loom Craft-only routes on `naturesnature`.
 
 ## Frontend Styling Convention
 - Use Tailwind v4 CSS variable shorthand classes for design tokens:

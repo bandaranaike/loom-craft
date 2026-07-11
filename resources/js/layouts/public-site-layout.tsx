@@ -7,6 +7,7 @@ import AppLogoIcon from '@/components/app-logo-icon';
 import LegalLinks from '@/components/legal-links';
 import { useAppearance } from '@/hooks/use-appearance';
 import dumbaraPatterns from '@/images/dumbara-patterns.png';
+import natureSeal from '@/images/brand/natures-nature-seal.png';
 import { dashboard, home, login, loomWeaveDemo, register } from '@/routes';
 import { index as productsIndex } from '@/routes/products';
 import type { SharedData } from '@/types';
@@ -28,7 +29,7 @@ const iconButtonClass =
     'inline-flex h-9 w-9 items-center justify-center rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) text-(--welcome-muted-text) transition hover:bg-(--welcome-surface-1) hover:text-(--welcome-strong)';
 
 export default function PublicSiteLayout({ children, canRegister = true, showBrowseProducts = true, headerActions }: PublicSiteLayoutProps) {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, site } = usePage<SharedData>().props;
     const { resolvedAppearance, updateAppearance } = useAppearance();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const isDark = resolvedAppearance === 'dark';
@@ -48,6 +49,7 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
     const handleMenuItemClick: MouseEventHandler = () => {
         setIsMobileMenuOpen(false);
     };
+    const isNaturesNature = site.key === 'naturesnature';
 
     const renderMenuActions = (isMobile: boolean = false): ReactNode => {
         if (headerActions) {
@@ -58,7 +60,7 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
             <>
                 {showBrowseProducts && (
                     <Link href={productsIndex()} className={isMobile ? mobileMenuItemClass : menuItemClass} onClick={isMobile ? handleMenuItemClick : undefined}>
-                        Browse Products
+                        {site.productsLabel}
                     </Link>
                 )}
                 <Link href={ContactController.show()} className={isMobile ? mobileMenuItemClass : menuItemClass} onClick={isMobile ? handleMenuItemClick : undefined}>
@@ -66,7 +68,7 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
                 </Link>
                 {auth.user ? (
                     <Link href={dashboard()} className={isMobile ? mobileActionButtonClass : actionButtonClass} onClick={isMobile ? handleMenuItemClick : undefined}>
-                        Enter Atelier
+                        {site.dashboardLabel}
                     </Link>
                 ) : (
                     <>
@@ -75,7 +77,7 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
                         </Link>
                         {canRegister && (
                             <Link href={register()} className={isMobile ? mobileActionButtonClass : actionButtonClass} onClick={isMobile ? handleMenuItemClick : undefined}>
-                                Become a Patron
+                                {site.registerLabel}
                             </Link>
                         )}
                     </>
@@ -85,22 +87,31 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
     };
 
     return (
-        <div className="min-h-screen bg-(--welcome-on-strong) text-(--welcome-strong)">
+        <div className={`min-h-screen text-(--welcome-strong) ${isNaturesNature ? 'bg-(--welcome-surface-2)' : 'bg-(--welcome-on-strong)'}`}>
             <div className="relative overflow-hidden">
-                <div className="pointer-events-none absolute bottom-0 left-1/2 h-80 w-180 -translate-x-1/2 rounded-[100%] bg-[radial-gradient(ellipse_at_center,var(--welcome-border-soft),transparent_70%)] opacity-60" />
-                <div
-                    className="pointer-events-none absolute inset-y-0 left-0 w-34 mask-[linear-gradient(to_right,black,transparent)] opacity-10 mix-blend-multiply"
-                    style={leftSidePatternStyle}
-                />
-                <div
-                    className="pointer-events-none absolute inset-y-0 right-0 w-34 mask-[linear-gradient(to_left,black,transparent)] opacity-10 mix-blend-multiply"
-                    style={rightSidePatternStyle}
-                />
+                {!isNaturesNature && (
+                    <>
+                        <div className="pointer-events-none absolute bottom-0 left-1/2 h-80 w-180 -translate-x-1/2 rounded-[100%] bg-[radial-gradient(ellipse_at_center,var(--welcome-border-soft),transparent_70%)] opacity-60" />
+                        <div
+                            className="pointer-events-none absolute inset-y-0 left-0 w-34 mask-[linear-gradient(to_right,black,transparent)] opacity-10 mix-blend-multiply"
+                            style={leftSidePatternStyle}
+                        />
+                        <div
+                            className="pointer-events-none absolute inset-y-0 right-0 w-34 mask-[linear-gradient(to_left,black,transparent)] opacity-10 mix-blend-multiply"
+                            style={rightSidePatternStyle}
+                        />
+                    </>
+                )}
 
                 <div className="relative z-20">
-                    <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 pt-8 pb-6">
+                    {isNaturesNature && (
+                        <div className="border-b border-(--welcome-border-soft) bg-(--welcome-strong) px-6 py-2 text-center text-[11px] font-semibold tracking-[0.22em] text-(--welcome-on-strong) uppercase">
+                            Organic homemade foods, packed with care from independent makers.
+                        </div>
+                    )}
+                    <header className={`relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 ${isNaturesNature ? 'pt-5 pb-5' : 'pt-8 pb-6'}`}>
                         <Link href={home()} className="flex items-center gap-3">
-                            <AppLogoIcon className="h-24 w-auto object-contain" />
+                            <AppLogoIcon alt={site.displayName} className={isNaturesNature ? 'h-auto w-[min(24rem,58vw)] object-contain' : 'h-24 w-auto object-contain'} />
                         </Link>
                         <div className="flex items-center gap-3">
                             <nav className="hidden flex-wrap items-center gap-3 text-sm md:flex">
@@ -155,11 +166,14 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
 
                 <main className="relative z-10">{children}</main>
 
-                <footer className="relative z-10 border-t border-(--welcome-border-soft) bg-(--welcome-surface-1)">
+                <footer className={`relative z-10 border-t border-(--welcome-border-soft) ${isNaturesNature ? 'bg-(--welcome-surface-2)' : 'bg-(--welcome-surface-1)'}`}>
                     <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 pt-10 pb-2 md:grid-cols-3">
-                        <div>
-                            <p className="font-['Playfair_Display',serif] text-2xl">LoomCraft</p>
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Heritage Marketplace</p>
+                        <div className="flex items-center gap-4">
+                            {isNaturesNature && <img src={natureSeal} alt="Nature's Nature seal" className="h-16 w-16 object-contain" />}
+                            <div>
+                                <p className="font-['Playfair_Display',serif] text-2xl">{site.displayName}</p>
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{site.marketplaceLabel}</p>
+                            </div>
                         </div>
                         <div>
                             <div className="mt-3 flex flex-wrap gap-3 text-xs tracking-[0.25em] text-(--welcome-muted-text) uppercase">
@@ -167,11 +181,13 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
                                     Home
                                 </Link>
                                 <Link href={productsIndex()} className="hover:text-(--welcome-strong)">
-                                    Products
+                                    {site.productsLabel}
                                 </Link>
-                                <Link href={loomWeaveDemo()} className="hover:text-(--welcome-strong)">
-                                    Design
-                                </Link>
+                                {!site.hideLoomFeatures && (
+                                    <Link href={loomWeaveDemo()} className="hover:text-(--welcome-strong)">
+                                        Design
+                                    </Link>
+                                )}
                                 <Link href={ContactController.show()} className="hover:text-(--welcome-strong)">
                                     Contact
                                 </Link>
@@ -184,8 +200,8 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
                             />
                         </div>
                     </div>
-                    <div className="text-center pb-8">
-                        <a href="https://erbitron.com/" target="_blank" className='text-gray-700 dark:text-gray-400 text-xs tracking-[0.25em]'>
+                    <div className="pb-8 text-center">
+                        <a href="https://erbitron.com/" target="_blank" className="text-xs tracking-[0.25em] text-gray-700 dark:text-gray-400">
                             Built by Erbitron
                         </a>
                     </div>

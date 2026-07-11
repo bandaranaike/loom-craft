@@ -1,18 +1,21 @@
+import { usePage } from '@inertiajs/react';
 import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import SeoHead from '@/components/seo-head';
 import LegalLinks from '@/components/legal-links';
-import type { AppLayoutProps } from '@/types';
+import type { AppLayoutProps, SharedData } from '@/types';
 
 export default function AppSidebarLayout({
     children,
     breadcrumbs = [],
 }: AppLayoutProps) {
+    const { site } = usePage<SharedData>().props;
+
     return (
         <>
-            <SeoHead title="LoomCraft" noIndex />
+            <SeoHead title={site.displayName} noIndex />
             <AppShell variant="sidebar">
                 <AppSidebar />
                 <AppContent variant="sidebar" className="overflow-x-hidden">

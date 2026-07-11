@@ -1,8 +1,10 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
+import { Leaf } from 'lucide-react';
 import ProductColorSwatches from '@/components/product-color-swatches';
 import { formatMoney } from '@/lib/currency';
 import { show as productShow } from '@/routes/products';
 import { show as vendorShow } from '@/routes/vendors';
+import type { SharedData } from '@/types';
 
 export type ProductCardItem = {
     id: number;
@@ -36,8 +38,11 @@ type ProductCardProps = {
 export default function ProductCard({
     product,
 }: ProductCardProps) {
+    const { site } = usePage<SharedData>().props;
+    const isNaturesNature = site.key === 'naturesnature';
+
     return (
-        <article className="group flex h-full flex-col overflow-hidden rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)">
+        <article className="group flex h-full flex-col overflow-hidden rounded-[12px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) transition hover:-translate-y-1 hover:border-(--welcome-accent)">
             <Link
                 href={productShow(product.slug)}
                 className="relative aspect-4/3 overflow-hidden bg-(--welcome-surface-1)"
@@ -90,11 +95,18 @@ export default function ProductCard({
                             ))}
                         </div>
                     )}
-                    <ProductColorSwatches
-                        colors={product.colors}
-                        className="mt-2 flex flex-wrap gap-1.5"
-                        sizeClassName="h-5 w-5"
-                    />
+                    {isNaturesNature ? (
+                        <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-3 py-1 text-[10px] tracking-[0.22em] text-(--welcome-muted-text) uppercase">
+                            <Leaf className="h-3.5 w-3.5 text-(--nature-leaf)" />
+                            Made fresh
+                        </div>
+                    ) : (
+                        <ProductColorSwatches
+                            colors={product.colors}
+                            className="mt-2 flex flex-wrap gap-1.5"
+                            sizeClassName="h-5 w-5"
+                        />
+                    )}
                 </div>
                 <div className="mt-auto flex items-end justify-between gap-3 text-sm">
                     <span className="text-(--welcome-body-text)">

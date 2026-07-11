@@ -6,6 +6,10 @@ use App\Models\ProductColor;
 use App\Models\Vendor;
 use Inertia\Testing\AssertableInertia as Assert;
 
+beforeEach(function (): void {
+    config(['sites.default' => 'loomcraft']);
+});
+
 test('guests can view approved active products', function () {
     $approvedVendor = Vendor::factory()->create([
         'status' => 'approved',
@@ -300,6 +304,32 @@ test('users can combine filters and receive intersection results', function () {
             ->where('selected_colors', ['blue'])
             ->where('min_price', '300')
             ->where('max_price', '600')
+        );
+});
+
+test('naturesnature product index hides color filters entirely', function () {
+    config(['sites.default' => 'naturesnature']);
+
+    $approvedVendor = Vendor::factory()->create([
+        'status' => 'approved',
+        'slug' => 'nature-maker',
+        'display_name' => 'Nature Maker',
+    ]);
+    $product = Product::factory()->create([
+        'vendor_id' => $approvedVendor->id,
+        'status' => 'active',
+        'name' => 'Oat Cookie Box',
+    ]);
+
+    $response = $this->get(route('products.index'));
+
+    $response
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('products/index')
+            ->where('colors', [])
+            ->where('selected_colors', [])
+            ->where('products.0.id', $product->id)
         );
 });
 

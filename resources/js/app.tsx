@@ -16,6 +16,15 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
+        const site = props.initialPage.props.site as { theme?: string; key?: string } | undefined;
+
+        if (site?.theme) {
+            document.documentElement.dataset.siteTheme = site.theme;
+        }
+
+        if (site?.key) {
+            document.documentElement.dataset.site = site.key;
+        }
 
         root.render(
             <StrictMode>

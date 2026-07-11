@@ -10,6 +10,7 @@ use App\Models\ProductCategory;
 use App\Models\ProductColor;
 use App\Models\Vendor;
 use App\Services\ProductPricingService;
+use App\Support\Site;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -21,6 +22,7 @@ class ListPublicProducts
     public function handle(ProductPublicIndexData $data): ProductPublicIndexResult
     {
         Gate::authorize('viewPublicAny', Product::class);
+        $hasColorFilters = ! Site::is('naturesnature');
 
         $query = Product::query()
             ->with([
@@ -30,10 +32,14 @@ class ListPublicProducts
                     ->where('is_active', true)
                     ->orderBy('sort_order')
                     ->orderBy('name'),
-                'colors' => fn ($query) => $query
-                    ->where('is_active', true)
-                    ->orderBy('sort_order')
-                    ->orderBy('name'),
+                ...($hasColorFilters
+                    ? [
+                        'colors' => fn ($query) => $query
+                            ->where('is_active', true)
+                            ->orderBy('sort_order')
+                            ->orderBy('name'),
+                    ]
+                    : []),
             ])
             ->where('status', 'active')
             ->whereHas('vendor', fn ($query) => $query->where('status', 'approved'))
@@ -54,7 +60,7 @@ class ListPublicProducts
                         ->where('status', 'approved');
                 });
             })
-            ->when($data->colors !== [], function ($query) use ($data): void {
+            ->when($hasColorFilters && $data->colors !== [], function ($query) use ($data): void {
                 $query->whereHas('colors', function ($colorQuery) use ($data): void {
                     $colorQuery
                         ->whereIn('slug', $data->colors)
@@ -75,14 +81,14 @@ class ListPublicProducts
                 'search' => $data->search,
                 'category' => $data->category,
                 'vendor' => $data->vendor,
-                'colors' => $data->colors !== [] ? $data->colors : null,
+                'colors' => $hasColorFilters && $data->colors !== [] ? $data->colors : null,
                 'min_price' => $data->minPrice,
                 'max_price' => $data->maxPrice,
                 'per_page' => $data->perPage,
             ], static fn (mixed $value): bool => $value !== null));
 
         $paginator->setCollection(
-            $paginator->getCollection()->map(function (Product $product): ProductPublicListItem {
+            $paginator->getCollection()->map(function (Product $product) use ($hasColorFilters): ProductPublicListItem {
                 $image = $product->media->firstWhere('type', 'image');
                 $vendor = $product->vendor;
 
@@ -112,14 +118,16 @@ class ListPublicProducts
                         ])
                         ->values()
                         ->all(),
-                    $product->colors
-                        ->map(static fn (ProductColor $color): array => [
-                            'id' => $color->id,
-                            'name' => $color->name,
-                            'slug' => $color->slug,
-                        ])
-                        ->values()
-                        ->all(),
+                    $hasColorFilters
+                        ? $product->colors
+                            ->map(static fn (ProductColor $color): array => [
+                                'id' => $color->id,
+                                'name' => $color->name,
+                                'slug' => $color->slug,
+                            ])
+                            ->values()
+                            ->all()
+                        : [],
                 );
             })
         );
@@ -152,22 +160,24 @@ class ListPublicProducts
             ->filter(static fn (array $vendor): bool => $vendor['slug'] !== '')
             ->values()
             ->all();
-        $colors = ProductColor::query()
-            ->where('is_active', true)
-            ->whereHas('products', function ($productQuery): void {
-                $productQuery
-                    ->where('status', 'active')
-                    ->whereHas('vendor', fn ($vendorQuery) => $vendorQuery->where('status', 'approved'));
-            })
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->get()
-            ->map(static fn (ProductColor $color): array => [
-                'id' => $color->id,
-                'name' => $color->name,
-                'slug' => $color->slug,
-            ])
-            ->all();
+        $colors = $hasColorFilters
+            ? ProductColor::query()
+                ->where('is_active', true)
+                ->whereHas('products', function ($productQuery): void {
+                    $productQuery
+                        ->where('status', 'active')
+                        ->whereHas('vendor', fn ($vendorQuery) => $vendorQuery->where('status', 'approved'));
+                })
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get()
+                ->map(static fn (ProductColor $color): array => [
+                    'id' => $color->id,
+                    'name' => $color->name,
+                    'slug' => $color->slug,
+                ])
+                ->all()
+            : [];
 
         return new ProductPublicIndexResult(
             $paginator->getCollection()->all(),
