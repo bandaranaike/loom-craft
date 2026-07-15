@@ -72,7 +72,7 @@ jobs:
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
       DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
-      APP_ROOT: ${{ secrets.LOOMCRAFT_APP_ROOT || '/var/www/loomcraft.work' }}
+      APP_ROOT: ${{ secrets.LOOMCRAFT_APP_ROOT || '/var/www/loom-craft' }}
       RELEASE_SHA: ${{ github.sha }}
 
     steps:
