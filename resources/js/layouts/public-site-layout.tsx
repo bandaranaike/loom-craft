@@ -6,8 +6,9 @@ import ContactController from '@/actions/App/Http/Controllers/ContactController'
 import AppLogoIcon from '@/components/app-logo-icon';
 import LegalLinks from '@/components/legal-links';
 import { useAppearance } from '@/hooks/use-appearance';
-import dumbaraPatterns from '@/images/dumbara-patterns.png';
 import natureSeal from '@/images/brand/natures-nature-seal.png';
+import loomCraftLogo from '@/images/brand/loomcraft-logo.png';
+import dumbaraPatterns from '@/images/dumbara-patterns.png';
 import { dashboard, home, login, loomWeaveDemo, register } from '@/routes';
 import { index as productsIndex } from '@/routes/products';
 import type { SharedData } from '@/types';
@@ -49,6 +50,7 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
     const handleMenuItemClick: MouseEventHandler = () => {
         setIsMobileMenuOpen(false);
     };
+    const isLoomCraft = site.key === 'loomcraft';
     const isNaturesNature = site.key === 'naturesnature';
 
     const renderMenuActions = (isMobile: boolean = false): ReactNode => {
@@ -109,9 +111,19 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
                             Organic homemade foods, packed with care from independent makers.
                         </div>
                     )}
-                    <header className={`relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 ${isNaturesNature ? 'pt-5 pb-5' : 'pt-8 pb-6'}`}>
-                        <Link href={home()} className="flex items-center gap-3">
-                            <AppLogoIcon alt={site.displayName} className={isNaturesNature ? 'h-auto w-[min(24rem,58vw)] object-contain' : 'h-24 w-auto object-contain'} />
+                    <header className={`relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 ${isNaturesNature ? 'min-h-24 py-4' : 'pt-8 pb-6'}`}>
+                        <Link href={home()} className="flex min-w-0 items-center gap-3 md:gap-4">
+                            <AppLogoIcon
+                                alt={site.displayName}
+                                natureVariant={isNaturesNature ? 'seal' : 'wordmark'}
+                                className={isNaturesNature ? 'size-16 shrink-0 object-contain md:size-24' : 'h-24 w-auto shrink-0 object-contain'}
+                            />
+                            <span className="min-w-0">
+                                <span className="block truncate font-['Playfair_Display',serif] text-xl leading-tight md:text-2xl">{site.displayName}</span>
+                                <span className="mt-1 block truncate text-[9px] tracking-[0.24em] text-(--welcome-muted-text) uppercase md:text-[10px]">
+                                    {site.marketplaceLabel}
+                                </span>
+                            </span>
                         </Link>
                         <div className="flex items-center gap-3">
                             <nav className="hidden flex-wrap items-center gap-3 text-sm md:flex">
@@ -168,8 +180,9 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
 
                 <footer className={`relative z-10 border-t border-(--welcome-border-soft) ${isNaturesNature ? 'bg-(--welcome-surface-2)' : 'bg-(--welcome-surface-1)'}`}>
                     <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 pt-10 pb-2 md:grid-cols-3">
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-start gap-3">
                             {isNaturesNature && <img src={natureSeal} alt="Nature's Nature seal" className="h-16 w-16 object-contain" />}
+                            {isLoomCraft && <img src={loomCraftLogo} alt="LoomCraft Handloom Textiles" className="h-16 w-16 object-contain" />}
                             <div>
                                 <p className="font-['Playfair_Display',serif] text-2xl">{site.displayName}</p>
                                 <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{site.marketplaceLabel}</p>

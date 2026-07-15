@@ -27,7 +27,7 @@ class ShowAdminOrder
         Gate::authorize('viewAny', Order::class);
 
         $order = Order::query()
-            ->with(['items.product.vendor', 'addresses', 'payment', 'user', 'shipments.shippingCarrier', 'shipments.shippingService'])
+            ->with(['items.product.vendor', 'addresses', 'payment', 'user', 'shipments.shippingCarrier', 'shipments.shippingService', 'shipments.items.orderItem.product', 'shipments.items.orderItem.vendor'])
             ->findOrFail($orderId);
 
         $payment = $order->payment;
@@ -95,6 +95,16 @@ class ShowAdminOrder
                 'shipping_service_id' => $shipment->shipping_service_id,
                 'carrier' => $shipment->shippingCarrier?->name ?? $shipment->carrier,
                 'service_level' => $shipment->shippingService?->name ?? $shipment->service_level,
+                'package_count' => $shipment->package_count,
+                'parcel_item_count' => $shipment->parcel_item_count,
+                'parcel_weight' => $shipment->parcel_weight,
+                'weight_unit' => $shipment->weight_unit,
+                'parcel_length' => $shipment->parcel_length,
+                'parcel_width' => $shipment->parcel_width,
+                'parcel_height' => $shipment->parcel_height,
+                'parcel_dimension_unit' => $shipment->parcel_dimension_unit,
+                'parcel_styles' => $shipment->parcel_styles,
+                'parcel_materials' => $shipment->parcel_materials,
                 'vendor_preparing_at' => $shipment->vendor_preparing_at?->toIso8601String(),
                 'vendor_handed_to_admin_at' => $shipment->vendor_handed_to_admin_at?->toIso8601String(),
                 'admin_received_at' => $shipment->admin_received_at?->toIso8601String(),

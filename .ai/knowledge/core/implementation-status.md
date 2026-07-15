@@ -72,6 +72,8 @@ Aligned with `.ai/knowledge/core/architecture.md`, `.ai/knowledge/core/implement
   - `service_level`
   - `package_count`
   - parcel weight and packed dimensions
+- Shipment labels now use active-site branding and return addresses, derive parcel item count/styles/materials from assigned shipment items, and accept admin-edited parcel overrides from the admin order page.
+- Admin order detail layout now places order summary and payment proof in the left desktop column while keeping shipment operations on the right.
 - Admin mobile sticker payloads now include order/invoice/shipment identifiers plus parcel metrics and selected variation dimensions.
 
 ### Vendor Features

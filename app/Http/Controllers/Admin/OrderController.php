@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateOfflineOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Http\Requests\Admin\UpdateShipmentDeliveryEvidenceRequest;
+use App\Http\Requests\Admin\UpdateShipmentParcelRequest;
 use App\Http\Requests\Admin\UpdateShipmentStatusRequest;
 use App\Http\Requests\Admin\UpdateShipmentTrackingRequest;
 use App\Models\Order;
@@ -115,6 +116,21 @@ class OrderController extends Controller
         );
 
         return back()->with('status', 'Shipment tracking updated.');
+    }
+
+    public function updateShipmentParcel(
+        UpdateShipmentParcelRequest $request,
+        Order $order,
+        Shipment $shipment,
+    ): RedirectResponse {
+        $this->fulfillmentStatusService->updateShipmentParcel(
+            $order,
+            $shipment,
+            $request->user(),
+            $request->validated(),
+        );
+
+        return back()->with('status', 'Shipment parcel details updated.');
     }
 
     public function updateShipmentDeliveryEvidence(

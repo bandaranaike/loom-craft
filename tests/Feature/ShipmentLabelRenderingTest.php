@@ -4,6 +4,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Services\Fulfillment\ShipmentLabelDataBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
@@ -13,7 +14,6 @@ it('renders an admin printable shipment label with live order data', function ()
     $admin = User::factory()->create(['role' => 'admin']);
     $order = createShipmentLabelOrder();
     $shipment = $order->shipments()->firstOrFail();
-
     $response = $this->actingAs($admin)
         ->get(route('admin.orders.shipments.label.show', ['order' => $order->id, 'shipment' => $shipment->id]));
 
@@ -27,7 +27,11 @@ it('renders an admin printable shipment label with live order data', function ()
         ->assertSee('DHL eCommerce', false)
         ->assertSee('GUEST BUYER', false)
         ->assertSee('Handwoven Cotton Area Rug', false)
-        ->assertSee('PRD-LABEL-001', false)
+        ->assertSee($order->items->first()->product_variation_label, false)
+        ->assertSee('01 Piece', false)
+        ->assertDontSee('<dt>Items</dt>', false)
+        ->assertDontSee('<dt>Style</dt>', false)
+        ->assertSee(asset('brand/loomcraft-logo.png'), false)
         ->assertSee('data:image/svg+xml;base64', false)
         ->assertSee('Tracking QR code', false);
 });
@@ -36,7 +40,6 @@ it('downloads an admin pdf shipment label', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $order = createShipmentLabelOrder();
     $shipment = $order->shipments()->firstOrFail();
-
     $response = $this->actingAs($admin)
         ->get(route('admin.orders.shipments.label.download', ['order' => $order->id, 'shipment' => $shipment->id]));
 
@@ -46,6 +49,59 @@ it('downloads an admin pdf shipment label', function () {
 
     expect($response->getContent())->toStartWith('%PDF');
     expect(roundedPdfMediaBox($response->getContent()))->toBe([0, 0, 465, 567]);
+});
+
+it('allows admins to update parcel details used by the label', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $order = createShipmentLabelOrder();
+    $shipment = $order->shipments()->firstOrFail();
+    $this->actingAs($admin)
+        ->patch(route('admin.orders.shipments.parcel.update', ['order' => $order->id, 'shipment' => $shipment->id]), [
+            'package_count' => 2,
+            'parcel_item_count' => 3,
+            'parcel_weight' => '4.50',
+            'weight_unit' => 'kg',
+            'parcel_length' => '45.00',
+            'parcel_width' => '30.00',
+            'parcel_height' => '20.00',
+            'parcel_dimension_unit' => 'cm',
+            'parcel_styles' => 'Area rug; Table runner',
+            'parcel_materials' => 'Cotton; Linen',
+        ])
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('shipments', [
+        'id' => $shipment->id,
+        'package_count' => 2,
+        'parcel_item_count' => 3,
+        'parcel_styles' => 'Area rug; Table runner',
+        'parcel_materials' => 'Cotton; Linen',
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.orders.shipments.label.show', ['order' => $order->id, 'shipment' => $shipment->id]))
+        ->assertSee('Area rug; Table runner', false)
+        ->assertSee('Cotton; Linen', false)
+        ->assertSee('03 Piece', false);
+});
+
+it('uses the active site branding and return address on shipment labels', function () {
+    config(['sites.default' => 'naturesnature']);
+    $admin = User::factory()->create(['role' => 'admin']);
+    $order = createShipmentLabelOrder();
+    $shipment = $order->shipments()->firstOrFail();
+    $label = app(ShipmentLabelDataBuilder::class)->build($order, $shipment);
+
+    expect($label['brand_name'])->toBe("Nature's Nature")
+        ->and($label['return_to']['name'])->toBe("Nature's Nature Fulfillment Center");
+
+    $response = $this->actingAs($admin)
+        ->get(route('admin.orders.shipments.label.show', ['order' => $order->id, 'shipment' => $shipment->id]));
+
+    $response
+        ->assertSee("Nature's Nature")
+        ->assertSee(asset('brand/natures-nature-seal.png'), false)
+        ->assertSee("Nature's Nature Fulfillment Center");
 });
 
 it('renders the mobile api label for authorized sticker tokens', function () {
@@ -99,6 +155,7 @@ function createShipmentLabelOrder(): Order
     $product = Product::factory()->for($vendor)->create([
         'name' => 'Handwoven Cotton Area Rug',
         'product_code' => 'PRD-LABEL-001',
+        'materials' => 'Cotton',
         'status' => 'active',
         'selling_price' => '180.00',
         'dimension_unit' => 'cm',

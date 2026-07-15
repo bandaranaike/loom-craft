@@ -177,14 +177,14 @@
 
         .brand-logo {
             width: 62px;
-            height: auto;
-            filter: grayscale(1) brightness(0);
+            height: 62px;
+            object-fit: contain;
         }
 
         .brand-name {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 800;
-            margin-top: -8px;
+            margin-top: -4px;
         }
 
         .meta-card,
@@ -542,7 +542,7 @@
                 @if ($label['assets']['logo'])
                     <img src="{{ $label['assets']['logo'] }}" alt="LoomCraft logo" class="brand-logo">
                 @endif
-                <div class="brand-name">LOOMCRAFT</div>
+                <div class="brand-name">{{ $label['brand_name'] }}</div>
             </div>
 
             <div class="card meta-card">
@@ -612,22 +612,22 @@
                 <p class="section-label">Parcel</p>
                 <h3 class="product-title">{{ $label['product']['name'] }}</h3>
                 <dl class="spec-grid">
-                    <dt>Parcel</dt>
-                    <dd>1 of {{ $label['parcel']['package_count'] }}</dd>
+                    <dt>Packages</dt>
+                    <dd>{{ $label['parcel']['package_count'] }}</dd>
                     <dt>AWB</dt>
                     <dd>{{ $label['tracking_number'] }}</dd>
-                    <dt>Style</dt>
-                    <dd>{{ $label['product']['code'] ?? 'Pending' }}</dd>
                     <dt>Weight</dt>
                     <dd>{{ $label['parcel']['weight'] }}</dd>
-                    <dt>Material</dt>
-                    <dd>{{ $label['product']['vendor'] ?? 'LoomCraft' }}</dd>
+                    <dt>Styles</dt>
+                    <dd>{{ $label['parcel']['styles'] }}</dd>
+                    <dt>Materials</dt>
+                    <dd>{{ $label['parcel']['materials'] }}</dd>
                     <dt>Dims</dt>
                     <dd>{{ $label['parcel']['dimensions'] }}</dd>
-                    <dt>Size</dt>
-                    <dd>{{ $label['product']['dimensions'] ?? 'Pending' }}</dd>
+                    <dt>Sizes</dt>
+                    <dd>{{ $label['parcel']['sizes'] }}</dd>
                     <dt>Qty</dt>
-                    <dd>{{ str_pad((string) $label['product']['quantity'], 2, '0', STR_PAD_LEFT) }} Piece</dd>
+                    <dd>{{ str_pad((string) $label['parcel']['item_count'], 2, '0', STR_PAD_LEFT) }} Piece</dd>
                 </dl>
             </div>
 

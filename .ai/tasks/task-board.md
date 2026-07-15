@@ -34,6 +34,7 @@ Last updated: 2026-07-09
 
 ### Fulfillment
 
+- [site-aware-shipment-label-and-admin-order-layout](/var/www/loom-craft/.ai/tasks/completed/fulfillment/site-aware-shipment-label-and-admin-order-layout.md)
 - [admin-orders-and-status-management](/var/www/loom-craft/.ai/tasks/completed/fulfillment/admin-orders-and-status-management.md)
 - [carrier-and-service-management-for-shipments](/var/www/loom-craft/.ai/tasks/completed/fulfillment/carrier-and-service-management-for-shipments.md)
 - [order-details-and-tracking](/var/www/loom-craft/.ai/tasks/completed/fulfillment/order-details-and-tracking.md)

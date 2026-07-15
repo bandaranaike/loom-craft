@@ -6,6 +6,9 @@ use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Models\Shipment;
+use App\Models\ShipmentItem;
+use App\Support\Site;
+use Illuminate\Support\Collection;
 
 class ShipmentLabelDataBuilder
 {
@@ -23,10 +26,12 @@ class ShipmentLabelDataBuilder
         }
 
         $order->loadMissing(['addresses', 'invoice', 'items.product', 'items.productVariation', 'items.vendor', 'user']);
-        $shipment->loadMissing(['vendor']);
+        $shipment->loadMissing(['vendor', 'items.orderItem.product', 'items.orderItem.productVariation', 'items.orderItem.vendor']);
 
         $shippingAddress = $order->addresses->firstWhere('type', 'shipping');
-        $primaryItem = $order->items->first();
+        $parcelItems = $this->parcelItems($shipment, $order->items);
+        $primaryItem = $parcelItems->first()['item'] ?? $order->items->first();
+        $site = Site::current();
 
         $orderNumber = $order->order_number ?? $order->public_id ?? sprintf('Order #%d', $order->id);
         $invoiceNumber = $order->invoice?->invoice_number ?? 'Pending';
@@ -38,6 +43,7 @@ class ShipmentLabelDataBuilder
 
         return [
             'document_title' => sprintf('Shipment Label %s', $shipment->shipment_number ?? $shipment->id),
+            'brand_name' => (string) ($site['display_name'] ?? $site['name'] ?? 'LoomCraft'),
             'order_number' => $orderNumber,
             'public_id' => $order->public_id,
             'invoice_number' => $invoiceNumber,
@@ -47,18 +53,14 @@ class ShipmentLabelDataBuilder
             'service_level' => $shipment->service_level ?? 'Standard',
             'order_date' => $order->placed_at?->format('d M Y') ?? $order->created_at?->format('d M Y'),
             'ship_to' => $this->shippingAddress($order, $shippingAddress),
-            'return_to' => [
-                'name' => 'LoomCraft Fulfillment Center',
-                'lines' => ['Colombo 05', 'Sri Lanka'],
-                'phone' => null,
-            ],
-            'parcel' => $this->parcel($shipment),
-            'product' => $this->primaryProduct($primaryItem, $order->items->count()),
-            'products' => $order->items->map(fn (OrderItem $item): array => [
-                'name' => $item->product?->name ?? 'Product',
-                'code' => $item->product?->product_code,
-                'quantity' => $item->quantity,
-                'vendor' => $item->vendor?->display_name,
+            'return_to' => $this->returnAddress($site),
+            'parcel' => $this->parcel($shipment, $parcelItems),
+            'product' => $this->primaryProduct($primaryItem, $parcelItems->count()),
+            'products' => $parcelItems->map(fn (array $parcelItem): array => [
+                'name' => $parcelItem['item']->product?->name ?? 'Product',
+                'code' => $parcelItem['item']->product?->product_code,
+                'quantity' => $parcelItem['quantity'],
+                'vendor' => $parcelItem['item']->vendor?->display_name ?? $parcelItem['item']->product?->vendor?->display_name,
             ])->values()->all(),
             'codes' => [
                 'tracking_payload' => $trackingPayload,
@@ -92,7 +94,7 @@ class ShipmentLabelDataBuilder
     /**
      * @return array<string, string>
      */
-    private function parcel(Shipment $shipment): array
+    private function parcel(Shipment $shipment, Collection $parcelItems): array
     {
         $weight = $shipment->parcel_weight === null
             ? 'Pending'
@@ -105,9 +107,84 @@ class ShipmentLabelDataBuilder
 
         return [
             'package_count' => (string) ($shipment->package_count ?? 1),
+            'item_count' => $shipment->parcel_item_count ?? $parcelItems->sum('quantity'),
+            'styles' => $this->parcelOverrideOrDerived($shipment->parcel_styles, $parcelItems
+                ->map(fn (array $parcelItem): ?string => $parcelItem['item']->product?->name)
+                ->filter()
+                ->unique()
+                ->implode('; ')),
+            'materials' => $this->parcelOverrideOrDerived($shipment->parcel_materials, $parcelItems
+                ->map(fn (array $parcelItem): ?string => $parcelItem['item']->product?->materials)
+                ->filter()
+                ->unique()
+                ->implode('; ')),
+            'sizes' => $this->parcelSizes($parcelItems),
             'weight' => $weight,
             'dimensions' => $dimensions === '' ? 'Pending' : sprintf('%s %s', $dimensions, $shipment->parcel_dimension_unit ?? 'cm'),
         ];
+    }
+
+    /**
+     * @param  Collection<int, OrderItem>  $orderItems
+     * @return Collection<int, array{item: OrderItem, quantity: int}>
+     */
+    private function parcelItems(Shipment $shipment, Collection $orderItems): Collection
+    {
+        if ($shipment->items->isEmpty()) {
+            return $orderItems->map(fn (OrderItem $item): array => [
+                'item' => $item,
+                'quantity' => (int) $item->quantity,
+            ]);
+        }
+
+        return $shipment->items
+            ->filter(fn (ShipmentItem $shipmentItem): bool => $shipmentItem->orderItem instanceof OrderItem)
+            ->map(fn (ShipmentItem $shipmentItem): array => [
+                'item' => $shipmentItem->orderItem,
+                'quantity' => (int) $shipmentItem->quantity,
+            ])
+            ->values();
+    }
+
+    /**
+     * @param  array<string, mixed>  $site
+     * @return array{name: string, lines: list<string>, phone: ?string}
+     */
+    private function returnAddress(array $site): array
+    {
+        $address = $site['fulfillment_return_address'] ?? [];
+
+        return [
+            'name' => (string) ($address['name'] ?? 'LoomCraft Fulfillment Center'),
+            'lines' => array_values(array_map('strval', $address['lines'] ?? ['Colombo 05', 'Sri Lanka'])),
+            'phone' => isset($address['phone']) ? (string) $address['phone'] : null,
+        ];
+    }
+
+    private function parcelOverrideOrDerived(?string $override, string $derived): string
+    {
+        return filled($override) ? $override : ($derived !== '' ? $derived : 'Pending');
+    }
+
+    /**
+     * @param  Collection<int, array{item: OrderItem, quantity: int}>  $parcelItems
+     */
+    private function parcelSizes(Collection $parcelItems): string
+    {
+        return $this->parcelOverrideOrDerived(null, $parcelItems
+            ->map(function (array $parcelItem): ?string {
+                $item = $parcelItem['item'];
+                $size = $item->product_variation_label ?? $item->productVariation?->label;
+
+                if (! is_string($size) || trim($size) === '') {
+                    return null;
+                }
+
+                return sprintf('%s: %s', $item->product?->name ?? 'Product', trim($size));
+            })
+            ->filter()
+            ->unique()
+            ->implode('; '));
     }
 
     /**
@@ -138,17 +215,16 @@ class ShipmentLabelDataBuilder
      */
     private function assets(): array
     {
-        $basePath = base_path('.ai/knowledge/assets/guidelines');
+        $guidelinesPath = base_path('.ai/knowledge/assets/guidelines');
 
         return [
-            'logo' => $this->codeGenerator->imageDataUri($basePath.'/LoomCraftLogo.png')
-                ?? $this->codeGenerator->imageDataUri(public_path('brand/logo-dark.png')),
-            'fragile' => $this->codeGenerator->imageDataUri($basePath.'/fragile.png'),
-            'hand_made' => $this->codeGenerator->imageDataUri($basePath.'/hand-made.png'),
-            'handle_with_care' => $this->codeGenerator->imageDataUri($basePath.'/handle-with-care.png'),
-            'keep_dry' => $this->codeGenerator->imageDataUri($basePath.'/keep-dry.png'),
-            'recycle' => $this->codeGenerator->imageDataUri($basePath.'/recycle.png'),
-            'made_in_sri_lanka' => $this->codeGenerator->imageDataUri($basePath.'/made-in-sri-lanka.png'),
+            'logo' => asset((string) (Site::current()['label_logo'] ?? 'brand/loomcraft-logo.png')),
+            'fragile' => $this->codeGenerator->imageDataUri($guidelinesPath.'/fragile.png'),
+            'hand_made' => $this->codeGenerator->imageDataUri($guidelinesPath.'/hand-made.png'),
+            'handle_with_care' => $this->codeGenerator->imageDataUri($guidelinesPath.'/handle-with-care.png'),
+            'keep_dry' => $this->codeGenerator->imageDataUri($guidelinesPath.'/keep-dry.png'),
+            'recycle' => $this->codeGenerator->imageDataUri($guidelinesPath.'/recycle.png'),
+            'made_in_sri_lanka' => $this->codeGenerator->imageDataUri($guidelinesPath.'/made-in-sri-lanka.png'),
         ];
     }
 }

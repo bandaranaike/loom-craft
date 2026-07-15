@@ -72,7 +72,7 @@ jobs:
       DEPLOY_HOST: ${{ secrets.NATURESNATURE_DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.NATURESNATURE_DEPLOY_USER }}
       DEPLOY_PORT: ${{ secrets.NATURESNATURE_DEPLOY_PORT || '22' }}
-      APP_ROOT: ${{ secrets.NATURESNATURE_APP_ROOT || '/var/www/naturesnature.com' }}
+      APP_ROOT: ${{ secrets.NATURESNATURE_APP_ROOT || '/var/www/naturesnature.store' }}
       RELEASE_SHA: ${{ github.sha }}
 
     steps:

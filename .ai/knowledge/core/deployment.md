@@ -7,7 +7,7 @@ Web server: Nginx
 App stack: Laravel 12 + PHP 8.4 + MariaDB (local only)  
 Deploy mode: GitHub Actions auto-deploy from `main`  
 
-> Multi-site note: this repository now supports both `loomcraft.work` and `naturesnature.com` from the same codebase. Each production site must use its own deployment root, `.env`, database, storage, cache/session settings, queue worker, scheduler, mail credentials, and payment credentials.
+> Multi-site note: this repository now supports both `loomcraft.work` and `naturesnature.store` from the same codebase. Each production site must use its own deployment root, `.env`, database, storage, cache/session settings, queue worker, scheduler, mail credentials, and payment credentials.
 
 ---
 
@@ -16,7 +16,7 @@ Deploy mode: GitHub Actions auto-deploy from `main`
 - GitHub Actions is the CI/CD pipeline source.
 - Deploy user is `deploy` (SSH key only).
 - LoomCraft app path defaults to `/var/www/loomcraft.work`.
-- Naturesnature app path defaults to `/var/www/naturesnature.com`.
+- Naturesnature app path defaults to `/var/www/naturesnature.store`.
 - Older single-site installs may still use `/var/www/loom-craft`; new deploys should prefer domain-specific app roots.
 - `www.loomcraft.work` must redirect to `loomcraft.work`.
 - HTTPS via Let's Encrypt (Certbot) is required.
@@ -25,7 +25,7 @@ Deploy mode: GitHub Actions auto-deploy from `main`
 - Frontend build must happen in CI (not on the VPS).
 - MariaDB runs on same VPS and must remain local/private only.
 - `APP_SITE=loomcraft` must be set for `loomcraft.work`.
-- `APP_SITE=naturesnature` must be set for `naturesnature.com`.
+- `APP_SITE=naturesnature` must be set for `naturesnature.store`.
 - The GitHub Actions deployment workflows are:
   - `.github/workflows/deploy-loomcraft.yml`
   - `.github/workflows/deploy-naturesnature.yml`

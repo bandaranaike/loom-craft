@@ -34,6 +34,9 @@ class Shipment extends Model
         'quality_checked_at',
         'packed_at',
         'package_count',
+        'parcel_item_count',
+        'parcel_styles',
+        'parcel_materials',
         'parcel_weight',
         'weight_unit',
         'parcel_length',
@@ -74,6 +77,7 @@ class Shipment extends Model
     {
         return [
             'parcel_weight' => 'decimal:2',
+            'parcel_item_count' => 'integer',
             'parcel_length' => 'decimal:2',
             'parcel_width' => 'decimal:2',
             'parcel_height' => 'decimal:2',

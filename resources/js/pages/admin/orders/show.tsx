@@ -5,6 +5,7 @@ import {
     destroy as adminOrderDestroy,
     updateOffline as adminOrderUpdateOffline,
     updateShipmentDeliveryEvidence as adminOrderUpdateShipmentDeliveryEvidence,
+    updateShipmentParcel as adminOrderUpdateShipmentParcel,
     updateShipmentStatus as adminOrderUpdateShipmentStatus,
     updateShipmentTracking as adminOrderUpdateShipmentTracking,
     updateStatus as adminOrderUpdateStatus,
@@ -70,6 +71,16 @@ type ShipmentSummary = {
     delivery_exception_reason: string | null;
     delivery_exception_note: string | null;
     failed_delivery_attempts: number;
+    package_count: number;
+    parcel_item_count: number | null;
+    parcel_weight: string | null;
+    weight_unit: string | null;
+    parcel_length: string | null;
+    parcel_width: string | null;
+    parcel_height: string | null;
+    parcel_dimension_unit: string | null;
+    parcel_styles: string | null;
+    parcel_materials: string | null;
 };
 
 type ShippingServiceOption = {
@@ -184,6 +195,22 @@ export default function AdminOrderShow() {
         shipping_service_id: order.shipment?.shipping_service_id?.toString() ?? '',
         tracking_number: order.shipment?.tracking_number ?? '',
     });
+    // Extract the parcel form data initialization into a helper function
+    const getParcelFormData = (shipment: ShipmentSummary | null) => ({
+        package_count: shipment?.package_count?.toString() ?? '1',
+        parcel_item_count: shipment?.parcel_item_count?.toString() ?? '0',
+        parcel_weight: shipment?.parcel_weight ?? '',
+        weight_unit: shipment?.weight_unit ?? 'kg',
+        parcel_length: shipment?.parcel_length ?? '',
+        parcel_width: shipment?.parcel_width ?? '',
+        parcel_height: shipment?.parcel_height ?? '',
+        parcel_dimension_unit: shipment?.parcel_dimension_unit ?? 'cm',
+        parcel_styles: shipment?.parcel_styles ?? '',
+        parcel_materials: shipment?.parcel_materials ?? '',
+    });
+
+    // Then use it in the component:
+    const parcelForm = useForm(getParcelFormData(order.shipment));
     const deleteForm = useForm({});
     const deliveryEvidenceForm = useForm<{
         recipient_name: string;
@@ -220,10 +247,23 @@ export default function AdminOrderShow() {
             shipping_service_id: order.shipment?.shipping_service_id?.toString() ?? '',
             tracking_number: order.shipment?.tracking_number ?? '',
         });
+        parcelForm.setData({
+            package_count: order.shipment?.package_count?.toString() ?? '1',
+            parcel_item_count: order.shipment?.parcel_item_count?.toString() ?? '0',
+            parcel_weight: order.shipment?.parcel_weight ?? '',
+            weight_unit: order.shipment?.weight_unit ?? 'kg',
+            parcel_length: order.shipment?.parcel_length ?? '',
+            parcel_width: order.shipment?.parcel_width ?? '',
+            parcel_height: order.shipment?.parcel_height ?? '',
+            parcel_dimension_unit: order.shipment?.parcel_dimension_unit ?? 'cm',
+            parcel_styles: order.shipment?.parcel_styles ?? '',
+            parcel_materials: order.shipment?.parcel_materials ?? '',
+        });
         statusForm.clearErrors();
         shipmentForm.clearErrors();
         form.clearErrors();
         trackingForm.clearErrors();
+        parcelForm.clearErrors();
         deliveryEvidenceForm.setData({
             recipient_name: order.shipment?.delivery_recipient_name ?? '',
             proof_reference: order.shipment?.delivery_proof_reference ?? '',
@@ -243,6 +283,11 @@ export default function AdminOrderShow() {
         order.shipment?.shipping_service_id,
         order.shipment?.status,
         order.shipment?.tracking_number,
+        order.shipment?.package_count,
+        order.shipment?.parcel_item_count,
+        order.shipment?.parcel_weight,
+        order.shipment?.parcel_styles,
+        order.shipment?.parcel_materials,
         order.shipment?.delivery_note,
         order.shipment?.delivery_proof_reference,
         order.shipment?.delivery_recipient_name,
@@ -330,9 +375,6 @@ export default function AdminOrderShow() {
                                 </div>
                             )}
                         </div>
-                    </div>
-
-                    <div className="min-w-0 space-y-6">
                         <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                             <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Order summary</p>
                             <div className="mt-4 space-y-3 text-sm">
@@ -415,7 +457,9 @@ export default function AdminOrderShow() {
                                 </div>
                             </div>
                         </div>
+                    </div>
 
+                    <div className="min-w-0 space-y-6">
                         {order.order_status_options.length > 0 && (
                             <form
                                 onSubmit={(event) => {
@@ -675,6 +719,99 @@ export default function AdminOrderShow() {
                                         {trackingForm.processing ? 'Saving...' : 'Save tracking'}
                                     </button>
                                 </div>
+                            </form>
+                        )}
+
+                        {order.shipment && (
+                            <form
+                                onSubmit={(event) => {
+                                    event.preventDefault();
+                                    parcelForm.patch(
+                                        adminOrderUpdateShipmentParcel({
+                                            order: order.id,
+                                            shipment: order.shipment!.id,
+                                        }).url,
+                                        { preserveScroll: true },
+                                    );
+                                }}
+                                className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6"
+                            >
+                                <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Parcel details</p>
+                                <p className="mt-3 text-sm text-(--welcome-body-text)">Update the physical parcel information used on the shipping label.</p>
+                                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                                    {(
+                                        [
+                                            ['package_count', 'Packages'],
+                                            ['parcel_item_count', 'Items'],
+                                            ['parcel_weight', 'Weight'],
+                                            ['weight_unit', 'Weight unit'],
+                                            ['parcel_length', 'Length'],
+                                            ['parcel_width', 'Width'],
+                                            ['parcel_height', 'Height'],
+                                            ['parcel_dimension_unit', 'Dimension unit'],
+                                        ] as const
+                                    ).map(([field, label]) => (
+                                        <div key={field} className="space-y-2">
+                                            <label className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">{label}</label>
+                                            <input
+                                                type={
+                                                    field.includes('count') ||
+                                                    field.includes('length') ||
+                                                    field.includes('width') ||
+                                                    field.includes('height') ||
+                                                    field === 'parcel_weight'
+                                                        ? 'number'
+                                                        : 'text'
+                                                }
+                                                step={
+                                                    field === 'parcel_weight' || field.includes('length') || field.includes('width') || field.includes('height')
+                                                        ? '0.01'
+                                                        : undefined
+                                                }
+                                                min={
+                                                    field.includes('count') ||
+                                                    field.includes('length') ||
+                                                    field.includes('width') ||
+                                                    field.includes('height') ||
+                                                    field === 'parcel_weight'
+                                                        ? '0'
+                                                        : undefined
+                                                }
+                                                value={parcelForm.data[field]}
+                                                onChange={(event) => parcelForm.setData(field, event.target.value)}
+                                                className="w-full rounded-full border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                            />
+                                            <InputError message={parcelForm.errors[field]} />
+                                        </div>
+                                    ))}
+                                    <div className="space-y-2 sm:col-span-2">
+                                        <label className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">Styles</label>
+                                        <textarea
+                                            value={parcelForm.data.parcel_styles}
+                                            onChange={(event) => parcelForm.setData('parcel_styles', event.target.value)}
+                                            placeholder="Leave blank to derive from parcel items"
+                                            className="min-h-20 w-full rounded-[18px] border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                        />
+                                        <InputError message={parcelForm.errors.parcel_styles} />
+                                    </div>
+                                    <div className="space-y-2 sm:col-span-2">
+                                        <label className="text-xs tracking-[0.2em] text-(--welcome-muted-text) uppercase">Materials</label>
+                                        <textarea
+                                            value={parcelForm.data.parcel_materials}
+                                            onChange={(event) => parcelForm.setData('parcel_materials', event.target.value)}
+                                            placeholder="Leave blank to derive from parcel items"
+                                            className="min-h-20 w-full rounded-[18px] border border-(--welcome-border) bg-(--welcome-surface-1) px-4 py-3 text-sm"
+                                        />
+                                        <InputError message={parcelForm.errors.parcel_materials} />
+                                    </div>
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={parcelForm.processing}
+                                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-(--welcome-strong) px-4 py-3 text-xs font-semibold tracking-[0.3em] text-(--welcome-strong) uppercase transition hover:bg-(--welcome-strong) hover:text-(--welcome-on-strong) disabled:opacity-70"
+                                >
+                                    {parcelForm.processing ? 'Saving...' : 'Save parcel details'}
+                                </button>
                             </form>
                         )}
 

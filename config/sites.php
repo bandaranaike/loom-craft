@@ -6,8 +6,8 @@ return [
     'sites' => [
         'loomcraft' => [
             'key' => 'loomcraft',
-            'name' => 'LoomCraft',
-            'display_name' => 'LoomCraft',
+            'name' => env('LOOMCRAFT_NAME', 'LoomCraft'),
+            'display_name' => env('LOOMCRAFT_NAME', 'LoomCraft'),
             'domain' => env('LOOMCRAFT_DOMAIN', 'loomcraft.work'),
             'theme' => 'loomcraft',
             'tagline' => 'Heritage woven luxury',
@@ -20,17 +20,23 @@ return [
             'vendor_plural_label' => 'Vendors',
             'reviewer_label' => 'Collector',
             'hide_loom_features' => false,
+            'label_logo' => 'brand/loomcraft-logo.png',
+            'fulfillment_return_address' => [
+                'name' => 'Loomcraft Pvt Ltd',
+                'lines' => ['84\1, Weediyawaththa', 'Kundasale', 'Sri Lanka'],
+                'phone' => "+94 712 512 512",
+            ],
         ],
 
         'naturesnature' => [
             'key' => 'naturesnature',
-            'name' => "Nature's Nature",
-            'display_name' => "Nature's Nature",
-            'domain' => env('NATURESNATURE_DOMAIN', 'naturesnature.com'),
+            'name' => env('NATURESNATURE_NAME', "Nature's Nature"),
+            'display_name' => env('NATURESNATURE_NAME', "Nature's Nature"),
+            'domain' => env('NATURESNATURE_DOMAIN', 'naturesnature.store'),
             'theme' => 'naturesnature',
             'tagline' => 'Organic homemade foods',
             'description' => 'Organic homemade cookies, pantry treats, and curated food gifts prepared with warm, natural ingredients.',
-            'marketplace_label' => 'Homemade Food Market',
+            'marketplace_label' => 'Pure Flavors From Nature',
             'products_label' => 'Pantry',
             'dashboard_label' => 'Open Kitchen',
             'register_label' => 'Join the Kitchen',
@@ -38,6 +44,12 @@ return [
             'vendor_plural_label' => 'Makers',
             'reviewer_label' => 'Customer',
             'hide_loom_features' => true,
+            'label_logo' => 'brand/natures-nature-seal.png',
+            'fulfillment_return_address' => [
+                'name' => "Nature's Nature Fulfillment Center",
+                'lines' => ['Nagolla', 'Ukuwela', 'Sri Lanka'],
+                'phone' => "+94 75 135 5635",
+            ],
         ],
     ],
 ];

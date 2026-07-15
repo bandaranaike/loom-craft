@@ -464,7 +464,9 @@ export default function ProductShow({
                                     {review_summary.total_reviews > 0 && review_summary.average_rating ? `${review_summary.average_rating} / 5` : 'Not yet rated'}
                                 </span>
                                 <span className="text-(--welcome-muted-text)">
-                                    {review_summary.total_reviews === 1 ? `1 ${site.reviewerLabel.toLowerCase()} review` : `${review_summary.total_reviews} ${site.reviewerLabel.toLowerCase()} reviews`}
+                                    {review_summary.total_reviews === 1
+                                        ? `1 ${site.reviewerLabel.toLowerCase()} review`
+                                        : `${review_summary.total_reviews} ${site.reviewerLabel.toLowerCase()} reviews`}
                                 </span>
                             </div>
                             {product.categories.length > 0 && (
@@ -520,9 +522,7 @@ export default function ProductShow({
                             </div>
                             {product.variations.length > 0 && (
                                 <div className="grid gap-2">
-                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                        {site.key === 'naturesnature' ? 'Option' : 'Size'}
-                                    </p>
+                                    <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{site.key === 'naturesnature' ? 'Option' : 'Size'}</p>
                                     <div className="flex flex-wrap gap-2">
                                         {product.variations.map((variation) => {
                                             const isSelected = variation.id === selectedVariation?.id;
@@ -572,7 +572,9 @@ export default function ProductShow({
                         <div className="grid gap-4 rounded-4xl border border-(--welcome-border-soft) bg-(--welcome-surface-1) p-6">
                             <div className="flex items-center justify-between gap-4 text-sm">
                                 <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">{site.key === 'naturesnature' ? 'Ingredients' : 'Materials'}</span>
-                                <span className="text-(--welcome-strong)">{product.materials ?? (site.key === 'naturesnature' ? 'Listed on request' : 'Documented on request')}</span>
+                                <span className="text-(--welcome-strong)">
+                                    {product.materials ?? (site.key === 'naturesnature' ? 'Listed on request' : 'Documented on request')}
+                                </span>
                             </div>
                             <div className="flex items-center justify-between gap-4 text-sm">
                                 <span className="tracking-[0.25em] text-(--welcome-muted-text) uppercase">Available now</span>
@@ -782,9 +784,7 @@ export default function ProductShow({
                             </p>
                         </div>
                         <div className="space-y-3 border-b border-(--welcome-border-soft) pb-6 last:border-b-0 last:pb-0 md:border-r md:border-b-0 md:pr-8 md:pb-0 md:last:border-r-0 md:last:pr-0">
-                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
-                                {site.key === 'naturesnature' ? 'Storage Notes' : 'Care Notes'}
-                            </p>
+                            <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{site.key === 'naturesnature' ? 'Storage Notes' : 'Care Notes'}</p>
                             <h2 className="font-['Playfair_Display',serif] text-2xl">{site.key === 'naturesnature' ? 'Freshness Guide' : "Keeper's Guide"}</h2>
                             <p className="text-sm text-(--welcome-body-text)">
                                 {site.key === 'naturesnature'
@@ -943,16 +943,13 @@ function NaturesNatureProductShow({
                 }}
             >
                 <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link
-                    href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600"
-                    rel="stylesheet"
-                />
+                <link href="https://fonts.bunny.net/css?family=playfair-display:400,500,600,700|work-sans:300,400,500,600" rel="stylesheet" />
             </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-6 pb-12">
-                    <div className="overflow-hidden rounded-[40px] border border-(--welcome-border-soft) bg-(--welcome-surface-1) shadow-[0_32px_90px_-48px_var(--welcome-shadow-heavy)]">
-                        <div className="grid gap-0 lg:grid-cols-[1.08fr_0.92fr]">
-                            <div className="border-b border-(--welcome-border-soft) bg-(--welcome-surface-2) p-5 lg:border-b-0 lg:border-r">
+                    <div className="overflow-hidden rounded-[40px] bg-(--welcome-surface-1) p-4 md:p-6">
+                        <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+                            <div className="rounded-[28px] bg-(--welcome-surface-2) p-4 md:p-5">
                                 <div
                                     ref={galleryFrameRef}
                                     className="group relative overflow-hidden rounded-[32px]"
@@ -960,11 +957,7 @@ function NaturesNatureProductShow({
                                     onTouchEnd={handleImageTouchEnd}
                                 >
                                     {currentImage ? (
-                                        <img
-                                            src={currentImage.url}
-                                            alt={currentImage.alt_text ?? product.name}
-                                            className="h-[28rem] w-full object-cover md:h-[36rem]"
-                                        />
+                                        <img src={currentImage.url} alt={currentImage.alt_text ?? product.name} className="h-[28rem] w-full object-cover md:h-[36rem]" />
                                     ) : (
                                         <div className="flex h-[28rem] items-center justify-center bg-(--welcome-surface-3) text-sm tracking-[0.3em] text-(--welcome-muted-text) uppercase md:h-[36rem]">
                                             Image forthcoming
@@ -1010,11 +1003,7 @@ function NaturesNatureProductShow({
                                                     aria-label={`Show image of ${product.name}`}
                                                     aria-pressed={isSelected}
                                                 >
-                                                    <img
-                                                        src={image.url}
-                                                        alt={image.alt_text ?? product.name}
-                                                        className="h-full w-full object-cover"
-                                                    />
+                                                    <img src={image.url} alt={image.alt_text ?? product.name} className="h-full w-full object-cover" />
                                                 </button>
                                             );
                                         })}
@@ -1026,15 +1015,9 @@ function NaturesNatureProductShow({
                                     <div className="inline-flex items-center gap-2 rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">
                                         Homemade foods
                                     </div>
-                                    <p className="text-xs tracking-[0.28em] text-(--welcome-muted-text) uppercase">
-                                        Product code: {product.product_code}
-                                    </p>
-                                    <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight text-(--welcome-strong) md:text-5xl">
-                                        {product.name}
-                                    </h1>
-                                    <p className="text-sm leading-7 text-(--welcome-body-text) md:text-base">
-                                        {product.description}
-                                    </p>
+                                    <p className="text-xs tracking-[0.28em] text-(--welcome-muted-text) uppercase">Product code: {product.product_code}</p>
+                                    <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight text-(--welcome-strong) md:text-5xl">{product.name}</h1>
+                                    <p className="text-sm leading-7 text-(--welcome-body-text) md:text-base">{product.description}</p>
                                 </div>
 
                                 <div className="grid gap-3 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5 sm:grid-cols-3">
@@ -1053,9 +1036,7 @@ function NaturesNatureProductShow({
                                     <div>
                                         <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Reviews</p>
                                         <p className="mt-2 text-sm font-semibold text-(--welcome-strong)">
-                                            {review_summary.total_reviews > 0 && review_summary.average_rating
-                                                ? `${review_summary.average_rating} / 5`
-                                                : 'Not yet rated'}
+                                            {review_summary.total_reviews > 0 && review_summary.average_rating ? `${review_summary.average_rating} / 5` : 'Not yet rated'}
                                         </p>
                                     </div>
                                 </div>
@@ -1141,7 +1122,9 @@ function NaturesNatureProductShow({
                                     </div>
                                     <div>
                                         <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Preparation</p>
-                                        <p className="mt-2 text-sm text-(--welcome-strong)">{product.production_time_days ? `${product.production_time_days} days` : 'Timeline on request'}</p>
+                                        <p className="mt-2 text-sm text-(--welcome-strong)">
+                                            {product.production_time_days ? `${product.production_time_days} days` : 'Timeline on request'}
+                                        </p>
                                     </div>
                                 </div>
 
@@ -1151,9 +1134,7 @@ function NaturesNatureProductShow({
                                             <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">{site.reviewerLabel} sentiment</p>
                                             <h2 className="mt-2 font-['Playfair_Display',serif] text-2xl">Fresh feedback from fulfilled orders</h2>
                                         </div>
-                                        <div className="flex items-center gap-1 text-base">
-                                            {renderStars(Math.round(Number(review_summary.average_rating ?? 0)))}
-                                        </div>
+                                        <div className="flex items-center gap-1 text-base">{renderStars(Math.round(Number(review_summary.average_rating ?? 0)))}</div>
                                     </div>
                                     <p className="mt-3 text-sm text-(--welcome-body-text)">
                                         {review_summary.total_reviews === 0
@@ -1184,7 +1165,9 @@ function NaturesNatureProductShow({
                                     </div>
                                     <div className="flex items-center justify-between gap-4">
                                         <span className="tracking-[0.24em] text-(--welcome-muted-text) uppercase">Availability</span>
-                                        <span className="text-right text-(--welcome-strong)">{stockAvailability.quantityLabel}</span>
+                                        <span className="text-right text-(--welcome-strong)">
+                                            {stockAvailability.availableQuantity === null ? 'Available on request' : `${stockAvailability.availableQuantity} in stock`}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -1192,7 +1175,8 @@ function NaturesNatureProductShow({
                             <div className="rounded-[32px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-6">
                                 <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">Made for gifting</p>
                                 <p className="mt-3 text-sm leading-7 text-(--welcome-body-text)">
-                                    Packed for pantry shelves, gift boxes, and quick ordering. This view is deliberately simpler than LoomCraft and keeps the focus on the food itself.
+                                    Packed for pantry shelves, gift boxes, and quick ordering. This view is deliberately simpler than LoomCraft and keeps the focus on the food
+                                    itself.
                                 </p>
                                 {product.video_url && (
                                     <a
@@ -1304,9 +1288,7 @@ function NaturesNatureProductShow({
                                                             {review.created_at_human ?? 'Verified purchase'}
                                                         </p>
                                                     </div>
-                                                    <div className="flex items-center gap-1 text-base">
-                                                        {renderStars(review.rating)}
-                                                    </div>
+                                                    <div className="flex items-center gap-1 text-base">{renderStars(review.rating)}</div>
                                                 </div>
                                                 <p className="mt-4 text-sm leading-7 text-(--welcome-body-text)">{review.review}</p>
                                             </article>

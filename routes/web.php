@@ -361,6 +361,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.orders.shipments.status.update');
         Route::patch('orders/{order}/shipments/{shipment}/tracking', [AdminOrderController::class, 'updateShipmentTracking'])
             ->name('admin.orders.shipments.tracking.update');
+        Route::patch('orders/{order}/shipments/{shipment}/parcel', [AdminOrderController::class, 'updateShipmentParcel'])
+            ->name('admin.orders.shipments.parcel.update');
         Route::patch('orders/{order}/shipments/{shipment}/delivery-evidence', [AdminOrderController::class, 'updateShipmentDeliveryEvidence'])
             ->name('admin.orders.shipments.delivery-evidence.update');
         Route::post('orders/{order}/returns', [AdminOrderReturnController::class, 'store'])

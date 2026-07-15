@@ -228,7 +228,7 @@ The same Laravel/Inertia codebase can be deployed for multiple branded sites.
 Current site keys:
 
 * `loomcraft` for `loomcraft.work`
-* `naturesnature` for `naturesnature.com`
+* `naturesnature` for `naturesnature.store`
 
 Site selection is controlled by `APP_SITE` and `config/sites.php`. Do not read `env('APP_SITE')` directly in application code; use the shared site config/context exposed through `App\Support\Site` and Inertia `page.props.site`.
 

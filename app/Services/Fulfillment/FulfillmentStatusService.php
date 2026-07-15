@@ -768,6 +768,29 @@ class FulfillmentStatusService
     }
 
     /**
+     * @param  array<string, mixed>  $data
+     */
+    public function updateShipmentParcel(Order $order, Shipment $shipment, User $actor, array $data): void
+    {
+        if ($actor->role !== 'admin' || $shipment->order_id !== $order->id) {
+            throw new InvalidArgumentException('The requested shipment parcel update is not allowed.');
+        }
+
+        $shipment->update([
+            'package_count' => $data['package_count'],
+            'parcel_item_count' => $data['parcel_item_count'],
+            'parcel_weight' => $data['parcel_weight'] ?? null,
+            'weight_unit' => $data['weight_unit'] ?? null,
+            'parcel_length' => $data['parcel_length'] ?? null,
+            'parcel_width' => $data['parcel_width'] ?? null,
+            'parcel_height' => $data['parcel_height'] ?? null,
+            'parcel_dimension_unit' => $data['parcel_dimension_unit'] ?? null,
+            'parcel_styles' => $data['parcel_styles'] ?? null,
+            'parcel_materials' => $data['parcel_materials'] ?? null,
+        ]);
+    }
+
+    /**
      * @param  array{recipient_name?: string|null, proof_reference?: string|null, evidence_path?: string|null, evidence_original_name?: string|null, evidence_mime_type?: string|null, note?: string|null}  $data
      */
     public function recordDeliveryEvidence(Order $order, Shipment $shipment, User $actor, array $data): void
