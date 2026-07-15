@@ -156,11 +156,19 @@ jobs:
             done
 
             if command -v pnpm >/dev/null 2>&1; then
-              PUPPETEER_CACHE_DIR="${BROWSERSHOT_CACHE_DIR}" pnpm dlx --yes puppeteer@24.43.1 browsers install chrome
-              return
+              echo "Downloading Chrome into ${BROWSERSHOT_CACHE_DIR}/chrome..."
+              PUPPETEER_CACHE_DIR="${BROWSERSHOT_CACHE_DIR}" pnpm dlx --reporter append-only --package puppeteer@24.43.1 puppeteer browsers install chrome
+            else
+              echo "Downloading Chrome with npx into ${BROWSERSHOT_CACHE_DIR}/chrome..."
+              PUPPETEER_CACHE_DIR="${BROWSERSHOT_CACHE_DIR}" npx --yes puppeteer@24.43.1 browsers install chrome
             fi
 
-            PUPPETEER_CACHE_DIR="${BROWSERSHOT_CACHE_DIR}" npx --yes puppeteer@24.43.1 browsers install chrome
+            CHROME_EXECUTABLE="$(find "${BROWSERSHOT_CACHE_DIR}/chrome" -type f -path "*/chrome-linux64/chrome" -perm -111 2>/dev/null | head -n 1 || true)"
+            if [ -z "${CHROME_EXECUTABLE}" ]; then
+              echo "Chrome installation completed without a usable executable."
+              find "${BROWSERSHOT_CACHE_DIR}" -maxdepth 4 -type f -print 2>/dev/null || true
+              return 1
+            fi
           }
 
           ensure_node_runtime

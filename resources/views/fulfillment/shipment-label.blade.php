@@ -52,17 +52,16 @@
 
         body.pdf .label {
             width: 465pt;
-            height: 567pt;
-            min-height: 0;
+            min-height: 567pt;
         }
 
         body.pdf {
-            overflow: hidden;
-            min-height: auto;
+            overflow: visible;
+            min-height: 567pt;
             padding: 0;
             background: #ffffff;
             width: 465pt;
-            height: 567pt;
+            height: auto;
             margin: 0;
         }
 
@@ -104,14 +103,13 @@
 
         body.pdf .label {
             width: 465pt;
-            height: 567pt;
-            min-height: 0;
+            min-height: 567pt;
             border-radius: 13.5pt;
             overflow: hidden;
         }
 
         body.pdf .shell {
-            height: 100%;
+            min-height: 567pt;
         }
 
         .shell,
