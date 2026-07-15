@@ -129,6 +129,7 @@ jobs:
           }
 
           install_production_js_dependencies() {
+            echo "Installing production JavaScript dependencies..."
             if command -v pnpm >/dev/null 2>&1; then
               PUPPETEER_SKIP_DOWNLOAD=1 pnpm install --frozen-lockfile --prod
               return
@@ -138,6 +139,7 @@ jobs:
           }
 
           ensure_browsershot_chrome() {
+            echo "Ensuring Browsershot Chrome is installed..."
             BROWSERSHOT_CACHE_DIR="${SHARED_DIR}/storage/app/browsershot"
             mkdir -p "${BROWSERSHOT_CACHE_DIR}"
 
@@ -154,11 +156,11 @@ jobs:
             done
 
             if command -v pnpm >/dev/null 2>&1; then
-              PUPPETEER_CACHE_DIR="${BROWSERSHOT_CACHE_DIR}" pnpm exec puppeteer browsers install chrome
+              PUPPETEER_CACHE_DIR="${BROWSERSHOT_CACHE_DIR}" pnpm dlx --yes puppeteer@24.43.1 browsers install chrome
               return
             fi
 
-            PUPPETEER_CACHE_DIR="${BROWSERSHOT_CACHE_DIR}" npx --yes pnpm@10.31.0 exec puppeteer browsers install chrome
+            PUPPETEER_CACHE_DIR="${BROWSERSHOT_CACHE_DIR}" npx --yes puppeteer@24.43.1 browsers install chrome
           }
 
           ensure_node_runtime
