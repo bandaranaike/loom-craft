@@ -948,9 +948,9 @@ function NaturesNatureProductShow({
             </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-6 pb-12">
-                    <div className="overflow-hidden rounded-4xl bg-(--welcome-surface-1) shadow-[0_24px_70px_-45px_var(--welcome-shadow-strong)]">
-                        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.06fr)_minmax(360px,0.94fr)]">
-                            <div className="overflow-hidden rounded-tl-4xl bg-(--welcome-surface-2)">
+                    <div className="rounded-4xl bg-(--welcome-surface-1) shadow-[0_24px_70px_-45px_var(--welcome-shadow-strong)]">
+                        <div className="grid items-start gap-2 lg:grid-cols-[minmax(0,1.06fr)_minmax(360px,0.94fr)]">
+                            <div className="overflow-hidden ">
                                 <div
                                     ref={galleryFrameRef}
                                     className="group relative overflow-hidden rounded-4xl"
@@ -960,7 +960,7 @@ function NaturesNatureProductShow({
                                     {currentImage ? (
                                         <img src={currentImage.url} alt={currentImage.alt_text ?? product.name} className="block h-auto w-full rounded-none rounded-tl-4xl object-contain" />
                                     ) : (
-                                        <div className="flex h-[28rem] items-center justify-center bg-(--welcome-surface-3) text-sm tracking-[0.3em] text-(--welcome-muted-text) uppercase md:h-[36rem]">
+                                        <div className="flex h-112 items-center justify-center bg-(--welcome-surface-3) text-sm tracking-[0.3em] text-(--welcome-muted-text) uppercase md:h-[36rem]">
                                             Image forthcoming
                                         </div>
                                     )}
@@ -1011,13 +1011,13 @@ function NaturesNatureProductShow({
                                     </div>
                                 )}
                             </div>
-                            <div className="space-y-4 p-2 md:p-3">
+                            <div className="space-y-4 p-2 md:p-6">
                                 <div className="space-y-3">
                                     <div className="inline-flex items-center gap-2 rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">
                                         Homemade foods
                                     </div>
                                     <p className="text-xs tracking-[0.28em] text-(--welcome-muted-text) uppercase">Product code: {product.product_code}</p>
-                                    <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight text-(--welcome-strong) md:text-5xl">{product.name}</h1>
+                                    <h1 className="font-['Playfair_Display',serif] text-4xl text-(--welcome-strong) md:text-5xl">{product.name}</h1>
                                     <p className="max-w-2xl text-sm leading-6 text-(--welcome-body-text)">{product.description}</p>
                                 </div>
 
