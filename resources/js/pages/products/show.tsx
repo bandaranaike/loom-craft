@@ -948,9 +948,9 @@ function NaturesNatureProductShow({
             </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-6 pb-12">
-                    <div className="overflow-hidden rounded-4xl bg-(--welcome-surface-1) p-3 shadow-[0_24px_70px_-45px_var(--welcome-shadow-strong)] md:p-4">
+                    <div className="overflow-hidden rounded-4xl bg-(--welcome-surface-1) shadow-[0_24px_70px_-45px_var(--welcome-shadow-strong)]">
                         <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.06fr)_minmax(360px,0.94fr)]">
-                            <div className="rounded-3xl bg-(--welcome-surface-2) p-3 md:p-4">
+                            <div className="overflow-hidden rounded-tl-4xl bg-(--welcome-surface-2)">
                                 <div
                                     ref={galleryFrameRef}
                                     className="group relative overflow-hidden rounded-4xl"
@@ -958,7 +958,7 @@ function NaturesNatureProductShow({
                                     onTouchEnd={handleImageTouchEnd}
                                 >
                                     {currentImage ? (
-                                        <img src={currentImage.url} alt={currentImage.alt_text ?? product.name} className="aspect-square h-auto w-full object-contain" />
+                                        <img src={currentImage.url} alt={currentImage.alt_text ?? product.name} className="block h-auto w-full rounded-none rounded-tl-4xl object-contain" />
                                     ) : (
                                         <div className="flex h-[28rem] items-center justify-center bg-(--welcome-surface-3) text-sm tracking-[0.3em] text-(--welcome-muted-text) uppercase md:h-[36rem]">
                                             Image forthcoming
