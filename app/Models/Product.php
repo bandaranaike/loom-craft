@@ -32,6 +32,7 @@ class Product extends Model
         'materials',
         'pieces_count',
         'production_time_days',
+        'expiry_information',
         'dimension_unit',
         'dead_weight',
         'dead_weight_unit',

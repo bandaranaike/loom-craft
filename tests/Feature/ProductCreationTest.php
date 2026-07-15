@@ -65,6 +65,7 @@ it('creates products for approved vendors', function () {
         'materials' => 'Cotton, natural dyes',
         'pieces_count' => 4,
         'production_time_days' => 21,
+        'expiry_information' => '3 months after manufacture',
         'dimension_length' => 120.5,
         'dimension_width' => 60.0,
         'dimension_height' => 2.5,
@@ -93,6 +94,7 @@ it('creates products for approved vendors', function () {
         'selling_price' => $expectedSellingPrice,
         'discount_percentage' => '12.50',
         'status' => 'pending_review',
+        'expiry_information' => '3 months after manufacture',
     ]);
 
     $product = Product::query()->where('name', 'Heritage Runner')->firstOrFail();

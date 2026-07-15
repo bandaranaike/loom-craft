@@ -68,6 +68,7 @@ class PrepareProductEditing
                 'materials' => $product->materials,
                 'pieces_count' => $product->pieces_count,
                 'production_time_days' => $product->production_time_days,
+                'expiry_information' => $product->expiry_information,
                 'dimension_unit' => $product->dimension_unit,
                 'category_ids' => $product->categories
                     ->pluck('id')

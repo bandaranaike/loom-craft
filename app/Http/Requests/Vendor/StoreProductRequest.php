@@ -55,6 +55,7 @@ class StoreProductRequest extends FormRequest
             'materials' => ['nullable', 'string', 'max:2000'],
             'pieces_count' => ['nullable', 'integer', 'min:1'],
             'production_time_days' => ['nullable', 'integer', 'min:1'],
+            'expiry_information' => ['nullable', 'string', 'max:255'],
             'dimension_unit' => ['nullable', 'string', 'max:20'],
             'category_ids' => ['required', 'array', 'min:1'],
             'category_ids.*' => [

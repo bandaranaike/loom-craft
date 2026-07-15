@@ -15,6 +15,7 @@ class ProductEditFormResult
      *     materials: string|null,
      *     pieces_count: int|null,
      *     production_time_days: int|null,
+     *     expiry_information: string|null,
      *     dimension_unit: string|null,
      *     category_ids: list<int>,
      *     color_ids: list<int>,

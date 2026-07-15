@@ -47,6 +47,7 @@ class UpdateProduct
             'materials' => $data->materials,
             'pieces_count' => $data->piecesCount,
             'production_time_days' => $data->productionTimeDays,
+            'expiry_information' => $data->expiryInformation,
             'dimension_unit' => $data->dimensionUnit,
         ])->save();
 

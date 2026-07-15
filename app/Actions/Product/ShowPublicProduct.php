@@ -132,6 +132,7 @@ class ShowPublicProduct
                 $product->materials,
                 $product->pieces_count,
                 $product->production_time_days,
+                $product->expiry_information,
                 new ProductDimensions(
                     $defaultVariation?->dimension_length !== null ? (float) $defaultVariation->dimension_length : null,
                     $defaultVariation?->dimension_width !== null ? (float) $defaultVariation->dimension_width : null,

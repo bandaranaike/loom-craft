@@ -25,6 +25,7 @@ class ProductShowItem
         public ?string $materials,
         public ?int $piecesCount,
         public ?int $productionTimeDays,
+        public ?string $expiryInformation,
         public ProductDimensions $dimensions,
         public ProductVendorSummary $vendor,
         public array $images,
@@ -54,6 +55,7 @@ class ProductShowItem
             'materials' => $this->materials,
             'pieces_count' => $this->piecesCount,
             'production_time_days' => $this->productionTimeDays,
+            'expiry_information' => $this->expiryInformation,
             'dimensions' => $this->dimensions->toArray(),
             'vendor' => $this->vendor->toArray(),
             'images' => array_map(

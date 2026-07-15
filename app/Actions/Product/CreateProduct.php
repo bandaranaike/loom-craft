@@ -57,6 +57,7 @@ class CreateProduct
             'materials' => $data->materials,
             'pieces_count' => $data->piecesCount,
             'production_time_days' => $data->productionTimeDays,
+            'expiry_information' => $data->expiryInformation,
             'dimension_unit' => $data->dimensionUnit,
             'status' => 'pending_review',
         ]);

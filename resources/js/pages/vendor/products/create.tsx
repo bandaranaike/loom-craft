@@ -9,6 +9,7 @@ import { formatMoney } from '@/lib/currency';
 import { dashboard } from '@/routes';
 import { store } from '@/routes/vendor/products';
 import { show as vendorShow } from '@/routes/vendors';
+import type { SharedData } from '@/types';
 
 type Props = {
     base_currency: string;
@@ -49,7 +50,7 @@ type VariationDraft = {
 const variationKey = () => Math.random().toString(36).slice(2);
 
 export default function ProductCreate() {
-    const { base_currency, commission_rate, vendor_name, vendor_slug, categories, colors, status } = usePage<Props>().props;
+    const { base_currency, commission_rate, vendor_name, vendor_slug, categories, colors, status, site } = usePage<SharedData & Props>().props;
     const [variations, setVariations] = useState<VariationDraft[]>([
         { key: variationKey(), label: '16*16', vendor_price: '', dimension_length: '', dimension_width: '', dimension_height: '' },
     ]);
@@ -405,6 +406,15 @@ export default function ProductCreate() {
                                                 <input id="production_time_days" type="number" name="production_time_days" min="1" placeholder="28" className={inputClassName} />
                                                 <InputError message={errors.production_time_days} className="text-xs" />
                                             </div>
+                                            {site.key === 'naturesnature' && (
+                                                <div className="grid gap-2">
+                                                    <label htmlFor="expiry_information" className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                        Best before / expiry
+                                                    </label>
+                                                    <input id="expiry_information" type="text" name="expiry_information" placeholder="3 months after manufacture or 2026-12-01" className={inputClassName} />
+                                                    <InputError message={errors.expiry_information} className="text-xs" />
+                                                </div>
+                                            )}
                                             <div className="grid gap-2">
                                                 <label htmlFor="dimension_unit" className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                     Dimension unit

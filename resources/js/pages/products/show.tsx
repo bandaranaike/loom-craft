@@ -37,6 +37,7 @@ type ProductDetails = {
     materials: string | null;
     pieces_count: number | null;
     production_time_days: number | null;
+    expiry_information: string | null;
     dimensions: {
         length: number | null;
         width: number | null;
@@ -947,17 +948,17 @@ function NaturesNatureProductShow({
             </SeoHead>
             <PublicSiteLayout canRegister={canRegister}>
                 <section className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-6 pb-12">
-                    <div className="overflow-hidden rounded-[40px] bg-(--welcome-surface-1) p-4 md:p-6">
-                        <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-                            <div className="rounded-[28px] bg-(--welcome-surface-2) p-4 md:p-5">
+                    <div className="overflow-hidden rounded-4xl bg-(--welcome-surface-1) p-3 shadow-[0_24px_70px_-45px_var(--welcome-shadow-strong)] md:p-4">
+                        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.06fr)_minmax(360px,0.94fr)]">
+                            <div className="rounded-3xl bg-(--welcome-surface-2) p-3 md:p-4">
                                 <div
                                     ref={galleryFrameRef}
-                                    className="group relative overflow-hidden rounded-[32px]"
+                                    className="group relative overflow-hidden rounded-4xl"
                                     onTouchStart={handleImageTouchStart}
                                     onTouchEnd={handleImageTouchEnd}
                                 >
                                     {currentImage ? (
-                                        <img src={currentImage.url} alt={currentImage.alt_text ?? product.name} className="h-[28rem] w-full object-cover md:h-[36rem]" />
+                                        <img src={currentImage.url} alt={currentImage.alt_text ?? product.name} className="aspect-square h-auto w-full object-contain" />
                                     ) : (
                                         <div className="flex h-[28rem] items-center justify-center bg-(--welcome-surface-3) text-sm tracking-[0.3em] text-(--welcome-muted-text) uppercase md:h-[36rem]">
                                             Image forthcoming
@@ -1010,17 +1011,17 @@ function NaturesNatureProductShow({
                                     </div>
                                 )}
                             </div>
-                            <div className="space-y-6 p-6 md:p-8">
+                            <div className="space-y-4 p-2 md:p-3">
                                 <div className="space-y-3">
                                     <div className="inline-flex items-center gap-2 rounded-full border border-(--welcome-border) bg-(--welcome-surface-3) px-4 py-2 text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">
                                         Homemade foods
                                     </div>
                                     <p className="text-xs tracking-[0.28em] text-(--welcome-muted-text) uppercase">Product code: {product.product_code}</p>
                                     <h1 className="font-['Playfair_Display',serif] text-4xl leading-tight text-(--welcome-strong) md:text-5xl">{product.name}</h1>
-                                    <p className="text-sm leading-7 text-(--welcome-body-text) md:text-base">{product.description}</p>
+                                    <p className="max-w-2xl text-sm leading-6 text-(--welcome-body-text)">{product.description}</p>
                                 </div>
 
-                                <div className="grid gap-3 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5 sm:grid-cols-3">
+                                <div className="grid gap-3 rounded-[22px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4 sm:grid-cols-3">
                                     <div>
                                         <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Maker</p>
                                         <p className="mt-2 text-sm font-semibold text-(--welcome-strong)">
@@ -1054,7 +1055,7 @@ function NaturesNatureProductShow({
                                     </div>
                                 )}
 
-                                <form onSubmit={submit} className="grid gap-4 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-5">
+                                <form onSubmit={submit} className="grid gap-3 rounded-[22px] border border-(--welcome-border-soft) bg-(--welcome-surface-2) p-4">
                                     {product.variations.length > 0 && (
                                         <div className="grid gap-2">
                                             <p className="text-xs tracking-[0.3em] text-(--welcome-muted-text) uppercase">
@@ -1111,21 +1112,27 @@ function NaturesNatureProductShow({
                                     <InputError message={form.errors.product_id} />
                                 </form>
 
-                                <div className="grid gap-3 rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5 sm:grid-cols-3">
-                                    <div>
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                    <div className="rounded-[22px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4 sm:col-span-2">
                                         <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Ingredients</p>
-                                        <p className="mt-2 text-sm text-(--welcome-strong)">{product.materials ?? 'Listed on request'}</p>
+                                        <p className="mt-2 max-w-2xl text-sm leading-6 text-(--welcome-strong)">{product.materials ?? 'Listed on request'}</p>
                                     </div>
-                                    <div>
+                                    <div className="rounded-[22px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
                                         <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Pieces</p>
                                         <p className="mt-2 text-sm text-(--welcome-strong)">{product.pieces_count ?? 'Made to order'}</p>
                                     </div>
-                                    <div>
+                                    <div className="rounded-[22px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4">
                                         <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Preparation</p>
                                         <p className="mt-2 text-sm text-(--welcome-strong)">
                                             {product.production_time_days ? `${product.production_time_days} days` : 'Timeline on request'}
                                         </p>
                                     </div>
+                                    {product.expiry_information && (
+                                        <div className="rounded-[22px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-4 sm:col-span-2">
+                                            <p className="text-[11px] tracking-[0.24em] text-(--welcome-muted-text) uppercase">Best before / expiry</p>
+                                            <p className="mt-2 text-sm text-(--welcome-strong)">{product.expiry_information}</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="rounded-[28px] border border-(--welcome-border-soft) bg-(--welcome-surface-3) p-5">

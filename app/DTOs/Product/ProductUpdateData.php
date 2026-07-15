@@ -20,6 +20,7 @@ class ProductUpdateData
         public ?string $materials,
         public ?int $piecesCount,
         public ?int $productionTimeDays,
+        public ?string $expiryInformation,
         public ?string $dimensionUnit,
         /** @var list<int> */
         public array $categoryIds,
@@ -53,6 +54,7 @@ class ProductUpdateData
             $request->string('materials')->toString() ?: null,
             $request->integer('pieces_count') ?: null,
             $request->integer('production_time_days') ?: null,
+            $request->string('expiry_information')->toString() ?: null,
             $request->string('dimension_unit')->toString() ?: null,
             array_map(static fn (int|string $categoryId): int => (int) $categoryId, $categoryIds),
             array_map(static fn (int|string $colorId): int => (int) $colorId, $colorIds),

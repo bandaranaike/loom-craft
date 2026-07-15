@@ -79,6 +79,7 @@ it('updates vendor owned products and recalculates selling price', function () {
             'materials' => 'Cotton',
             'pieces_count' => 3,
             'production_time_days' => 14,
+            'expiry_information' => '2026-12-01',
             'dimension_length' => 120,
             'dimension_width' => 40,
             'dimension_height' => 2,
@@ -102,6 +103,7 @@ it('updates vendor owned products and recalculates selling price', function () {
         'selling_price' => $expectedSellingPrice,
         'discount_percentage' => '25.00',
         'status' => 'active',
+        'expiry_information' => '2026-12-01',
     ]);
     expect($product->fresh()->categories()->pluck('product_categories.id')->all())
         ->toEqualCanonicalizing($updatedCategories->pluck('id')->all());

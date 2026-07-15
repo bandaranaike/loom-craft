@@ -162,6 +162,7 @@ test('naturesnature product show hides color data entirely', function () {
         'vendor_id' => $vendor->id,
         'status' => 'active',
         'name' => 'Oat Cookie Box',
+        'expiry_information' => '2026-12-01',
     ]);
     $color = ProductColor::factory()->create([
         'name' => 'Orange',
@@ -175,6 +176,7 @@ test('naturesnature product show hides color data entirely', function () {
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('products/show')
+            ->where('product.expiry_information', '2026-12-01')
             ->where('product.colors', [])
         );
 });

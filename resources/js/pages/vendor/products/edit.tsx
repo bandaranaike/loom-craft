@@ -10,6 +10,7 @@ import { dashboard } from '@/routes';
 import { index as vendorProductsIndex, update } from '@/routes/vendor/products';
 import { destroy, store } from '@/routes/vendor/products/images';
 import { show as vendorShow } from '@/routes/vendors';
+import type { SharedData } from '@/types';
 
 type ProductForm = {
     id: number;
@@ -21,6 +22,7 @@ type ProductForm = {
     materials: string | null;
     pieces_count: number | null;
     production_time_days: number | null;
+    expiry_information: string | null;
     dimension_unit: string | null;
     category_ids: number[];
     color_ids: number[];
@@ -79,7 +81,7 @@ type VariationDraft = {
 const variationKey = () => Math.random().toString(36).slice(2);
 
 export default function ProductEdit() {
-    const { base_currency, commission_rate, vendor_name, vendor_slug, product, categories, colors, status } = usePage<Props>().props;
+    const { base_currency, commission_rate, vendor_name, vendor_slug, product, categories, colors, status, site } = usePage<SharedData & Props>().props;
     const [variations, setVariations] = useState<VariationDraft[]>(
         product.variations.length > 0
             ? product.variations.map((variation) => ({
@@ -523,6 +525,22 @@ export default function ProductEdit() {
                                                 />
                                                 <InputError message={errors.production_time_days} className="text-xs" />
                                             </div>
+                                            {site.key === 'naturesnature' && (
+                                                <div className="grid gap-2">
+                                                    <label htmlFor="expiry_information" className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
+                                                        Best before / expiry
+                                                    </label>
+                                                    <input
+                                                        id="expiry_information"
+                                                        type="text"
+                                                        name="expiry_information"
+                                                        defaultValue={product.expiry_information ?? ''}
+                                                        placeholder="3 months after manufacture or 2026-12-01"
+                                                        className={inputClassName}
+                                                    />
+                                                    <InputError message={errors.expiry_information} className="text-xs" />
+                                                </div>
+                                            )}
                                             <div className="grid gap-2">
                                                 <label htmlFor="dimension_unit" className="text-xs font-semibold tracking-[0.3em] text-(--welcome-muted-text) uppercase">
                                                     Dimension unit
