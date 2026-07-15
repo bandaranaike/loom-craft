@@ -3,7 +3,7 @@ name: deploy-naturesnature
 on:
   push:
     branches:
-      - main
+      - main-1
   workflow_dispatch:
 
 concurrency:

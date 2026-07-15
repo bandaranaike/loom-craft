@@ -118,12 +118,14 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
                                 natureVariant={isNaturesNature ? 'seal' : 'wordmark'}
                                 className={isNaturesNature ? 'size-16 shrink-0 object-contain md:size-24' : 'h-24 w-auto shrink-0 object-contain'}
                             />
-                            <span className="min-w-0">
-                                <span className="block truncate font-['Playfair_Display',serif] text-xl leading-tight md:text-2xl">{site.displayName}</span>
-                                <span className="mt-1 block truncate text-[9px] tracking-[0.24em] text-(--welcome-muted-text) uppercase md:text-[10px]">
-                                    {site.marketplaceLabel}
+                            {isNaturesNature && (
+                                <span className="min-w-0">
+                                    <span className="block truncate font-['Playfair_Display',serif] text-xl leading-tight md:text-2xl">{site.displayName}</span>
+                                    <span className="mt-1 block truncate text-[9px] tracking-[0.24em] text-(--welcome-muted-text) uppercase md:text-[10px]">
+                                        {site.marketplaceLabel}
+                                    </span>
                                 </span>
-                            </span>
+                            )}
                         </Link>
                         <div className="flex items-center gap-3">
                             <nav className="hidden flex-wrap items-center gap-3 text-sm md:flex">
@@ -180,7 +182,7 @@ export default function PublicSiteLayout({ children, canRegister = true, showBro
 
                 <footer className={`relative z-10 border-t border-(--welcome-border-soft) ${isNaturesNature ? 'bg-(--welcome-surface-2)' : 'bg-(--welcome-surface-1)'}`}>
                     <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 pt-10 pb-2 md:grid-cols-3">
-                        <div className="flex flex-col items-start gap-3">
+                        <div className="flex items-center gap-3">
                             {isNaturesNature && <img src={natureSeal} alt="Nature's Nature seal" className="h-16 w-16 object-contain" />}
                             {isLoomCraft && <img src={loomCraftLogo} alt="LoomCraft Handloom Textiles" className="h-16 w-16 object-contain" />}
                             <div>
