@@ -142,6 +142,7 @@ jobs:
             echo "Ensuring Browsershot Chrome is installed..."
             BROWSERSHOT_CACHE_DIR="${SHARED_DIR}/storage/app/browsershot"
             mkdir -p "${BROWSERSHOT_CACHE_DIR}"
+            mkdir -p "${BROWSERSHOT_CACHE_DIR}/chrome"
 
             CHROME_EXECUTABLE="$(find "${BROWSERSHOT_CACHE_DIR}/chrome" -type f -path "*/chrome-linux64/chrome" -perm -111 2>/dev/null | head -n 1 || true)"
 
