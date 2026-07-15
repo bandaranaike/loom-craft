@@ -87,9 +87,17 @@ jobs:
           chmod 700 ~/.ssh
           printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null
+          echo "Validating deployment SSH key..."
+          if ! ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null; then
+            echo "The shared DEPLOY_SSH_KEY is not a valid private SSH key."
+            exit 1
+          fi
           touch ~/.ssh/known_hosts
-          ssh-keyscan -T 30 -p "${DEPLOY_PORT}" -H "${DEPLOY_HOST}" >> ~/.ssh/known_hosts
+          echo "Scanning SSH host ${DEPLOY_HOST}:${DEPLOY_PORT}..."
+          if ! ssh-keyscan -T 30 -p "${DEPLOY_PORT}" -H "${DEPLOY_HOST}" >> ~/.ssh/known_hosts; then
+            echo "Unable to read an SSH host key from ${DEPLOY_HOST}:${DEPLOY_PORT}. Check DNS, firewall rules, port, and SSH service."
+            exit 1
+          fi
 
       - name: Upload artifact to server
         run: |
